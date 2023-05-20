@@ -1,0 +1,48 @@
+---
+spring:
+  config.activate.on-profile: sandbox, stable
+  datasource:
+    driver-class-name: oracle.jdbc.OracleDriver
+    url: ${DATASOURCE_URL}
+    username: ${DB_USER_NAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    database: oracle
+    database-platform: org.hibernate.dialect.OracleDialect
+logging:
+  level:
+    org:
+      hibernate: info
+---
+# 요 아래 설정들은 테스트 작성하실때 사용할 메모리 DB 연결 설정입니다!
+spring:
+  config.activate.on-profile: test
+
+  h2:
+    console:
+      enabled: true
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+    database: h2
+    generate-ddl: off
+  datasource:
+    url: jdbc:h2:mem:test;MODE=Oracle;
+    username: SA
+    password: password
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:sql/schema-h2.sql
+      data-locations: classpath:sql/data-h2.sql
+
+logging:
+  level:
+    org:
+      hibernate: trace

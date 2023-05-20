@@ -1,0 +1,7 @@
+FROM eclipse-temurin:17.0.7_7-jdk AS cache
+
+COPY . /app
+WORKDIR /app
+
+RUN ./gradlew assemble && \
+    rm -rf /app
