@@ -5,16 +5,5 @@ spring:
     active: sandbox
     include:
       - database
----
-spring.config.activate.on-profile: sandbox
-sentry:
-  dsn: ${SENTRY_DSN}
-  traces-sample-rate: 1.0
-  environment: sandbox
-
----
-spring.config.activate.on-profile: stable
-sentry:
-  dsn: ${SENTRY_DSN}
-  traces-sample-rate: 0.5
-  environment: stable
+      - object-storage
+      - sentry

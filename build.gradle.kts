@@ -18,6 +18,7 @@ repositories {
 }
 
 dependencies {
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -35,6 +36,8 @@ dependencies {
     testImplementation("io.kotest:kotest-runner-junit5:5.6.2")
     testImplementation("io.kotest:kotest-assertions-core:5.6.2")
 
+    implementation("com.oracle.oci.sdk:oci-java-sdk-objectstorage:3.14.0")
+    implementation("com.oracle.oci.sdk:oci-java-sdk-common-httpclient-jersey3:3.14.0")
 }
 
 tasks.withType<KotlinCompile> {

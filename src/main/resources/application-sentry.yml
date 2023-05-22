@@ -1,0 +1,12 @@
+sentry:
+  environment: ${spring.profiles.active}
+
+---
+spring.config.activate.on-profile: sandbox
+sentry:
+  traces-sample-rate: 1.0
+
+---
+spring.config.activate.on-profile: stable
+sentry:
+  traces-sample-rate: 0.5
