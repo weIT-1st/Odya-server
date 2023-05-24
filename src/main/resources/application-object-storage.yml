@@ -1,0 +1,15 @@
+object:
+  configuration-file-path: ${OBJECT_STORAGE_CONFIG_FILE_PATH}
+  namespace-name: "axivk99fjind"
+
+---
+spring.config.activate.on-profile: sandbox
+
+object:
+  bucket-name: "Odya-sandbox"
+
+---
+spring.config.activate.on-profile: stable
+
+object:
+  bucket-name: "Odya-stable"
