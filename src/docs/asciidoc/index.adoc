@@ -1,4 +1,4 @@
-= Pureureum API DOCS
+= Odya API DOCS
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs
