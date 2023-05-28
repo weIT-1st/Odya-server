@@ -4,6 +4,7 @@ plugins {
     id("org.springframework.boot") version "3.1.0"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jlleitschuh.gradle.ktlint") version "11.3.2"
+    id("org.asciidoctor.jvm.convert") version "3.3.2"
     kotlin("jvm") version "1.8.21"
     kotlin("plugin.spring") version "1.8.21"
     kotlin("plugin.jpa") version "1.8.21"
@@ -16,6 +17,9 @@ java.sourceCompatibility = JavaVersion.VERSION_17
 repositories {
     mavenCentral()
 }
+
+val asciidoctorExt: Configuration by configurations.creating
+val snippetsDir by extra { "build/generated-snippets" }
 
 dependencies {
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
@@ -35,18 +39,52 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.5")
     testImplementation("io.kotest:kotest-runner-junit5:5.6.2")
     testImplementation("io.kotest:kotest-assertions-core:5.6.2")
+    testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.2")
 
     implementation("com.oracle.oci.sdk:oci-java-sdk-objectstorage:3.14.0")
     implementation("com.oracle.oci.sdk:oci-java-sdk-common-httpclient-jersey3:3.14.0")
+
+    asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor")
+    testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "17"
+tasks {
+    withType<Test> {
+        useJUnitPlatform()
     }
-}
 
-tasks.withType<Test> {
-    useJUnitPlatform()
+    withType<KotlinCompile> {
+        kotlinOptions {
+            freeCompilerArgs = listOf("-Xjsr305=strict")
+            jvmTarget = "17"
+        }
+    }
+
+    test {
+        useJUnitPlatform()
+        outputs.dir(snippetsDir)
+    }
+
+    asciidoctor {
+        inputs.dir(snippetsDir)
+        configurations("asciidoctorExt")
+        sources {
+            include("**/index.adoc")
+        }
+        dependsOn(test)
+        baseDirFollowsSourceFile()
+    }
+
+    register<Copy>("copyDocs") {
+        dependsOn(asciidoctor)
+        from("${asciidoctor.get().outputDir}/index.html")
+        into("src/main/resources/static/docs")
+    }
+
+    bootJar {
+        dependsOn("copyDocs")
+        from("${asciidoctor.get().outputDir}/index.html") {
+            into("static/docs")
+        }
+    }
 }

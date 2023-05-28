@@ -1,0 +1,31 @@
+[[Overview]]
+= *Overview*
+
+[[overview-http-status-codes]]
+== HTTP status codes
+
+|===
+| HttpStatusCode | Description
+
+| `200 OK`
+| Success
+
+| `201 CREATED`
+| Success Created
+
+| `400 BAD_REQUEST`
+| Bad request / Request is invalid
+
+| `401 UNAUTHORIZED`
+| Token is invalid / Unauthenticated Access
+
+| `403 FORBIDDEN`
+| Permission is invalid
+
+| `405 METHOD_NOT_ALLOWED`
+| Http Method is invalid
+
+| `500 INTERNAL_SERVER_ERROR`
+| Internal server error
+|===
+
