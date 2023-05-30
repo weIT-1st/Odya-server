@@ -44,7 +44,7 @@ class User(
 ) {
     constructor(
         username: String,
-        email: String,
+        email: String?,
         nickname: String,
         phoneNumber: String? = null,
         gender: Gender,
@@ -58,7 +58,7 @@ class User(
         withdrawDate = null
     )
 
-    val email: String
+    val email: String?
         get() = information.email
 
     val nickname: String
