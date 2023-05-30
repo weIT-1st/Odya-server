@@ -24,7 +24,7 @@ class User(
     @Id
     @Column(columnDefinition = "NUMERIC(19, 0)")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "USERS_SEQ_GENERATOR")
-    val id: Long,
+    val id: Long = 0L,
 
     @Column(nullable = false, updatable = false)
     val username: String,
@@ -52,7 +52,6 @@ class User(
         profileName: String = "default_profile.png",
         socialType: SocialType
     ) : this(
-        id = 0L,
         username = username,
         information = UserInformation(email, nickname, phoneNumber, gender, birthday, profileName),
         socialType = socialType,
