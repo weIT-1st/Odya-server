@@ -10,20 +10,21 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
-import java.time.LocalDate
-import java.time.LocalDateTime
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Entity
 @Table(name = "users")
-@Where(clause = "withdraw = false")
-@SQLDelete(sql = "update users set withdraw = true where id = ?")
+@Where(clause = "withdraw_date is null")
+@SQLDelete(sql = "update users set withdraw_date = sysdate where id = ?")
 @SequenceGenerator(name = "USERS_SEQ_GENERATOR", sequenceName = "USERS_SEQ", initialValue = 1, allocationSize = 1)
 class User(
     @Id
+    @Column(columnDefinition = "NUMERIC(19, 0)")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "USERS_SEQ_GENERATOR")
-    val id: Long = 0L,
+    val id: Long,
 
     @Column(nullable = false, updatable = false)
     val username: String,
@@ -35,30 +36,27 @@ class User(
     @Column(nullable = false, updatable = false)
     val socialType: SocialType,
 
-    @Column(nullable = false)
-    val withdraw: Boolean = false,
-
     @Column
     val withdrawDate: LocalDateTime? = null,
 
     @Column(nullable = false, updatable = false)
-    val createdDate: LocalDateTime = LocalDateTime.now(),
+    val createdDate: LocalDateTime = LocalDateTime.now()
 ) {
     constructor(
         username: String,
         email: String,
         nickname: String,
-        phoneNumber: String?,
+        phoneNumber: String? = null,
         gender: Gender,
         birthday: LocalDate,
         profileName: String = "default_profile.png",
         socialType: SocialType
     ) : this(
+        id = 0L,
         username = username,
         information = UserInformation(email, nickname, phoneNumber, gender, birthday, profileName),
         socialType = socialType,
-        withdraw = false,
-        withdrawDate = null,
+        withdrawDate = null
     )
 
     val email: String
