@@ -8,8 +8,8 @@ import java.time.LocalDate
 
 @Embeddable
 data class UserInformation(
-    @Column(nullable = false)
-    val email: String,
+    @Column
+    val email: String?,
 
     @Column(nullable = false, length = 24)
     val nickname: String,
