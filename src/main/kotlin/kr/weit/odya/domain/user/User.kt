@@ -12,6 +12,7 @@ import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
+import org.springframework.data.annotation.CreatedDate
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -39,8 +40,9 @@ class User(
     @Column
     val withdrawDate: LocalDateTime? = null,
 
+    @CreatedDate
     @Column(nullable = false, updatable = false)
-    val createdDate: LocalDateTime = LocalDateTime.now()
+    val createdDate: LocalDateTime = LocalDateTime.now(),
 ) {
     constructor(
         username: String,
@@ -50,12 +52,12 @@ class User(
         gender: Gender,
         birthday: LocalDate,
         profileName: String = "default_profile.png",
-        socialType: SocialType
+        socialType: SocialType,
     ) : this(
         username = username,
         information = UserInformation(email, nickname, phoneNumber, gender, birthday, profileName),
         socialType = socialType,
-        withdrawDate = null
+        withdrawDate = null,
     )
 
     val email: String?
