@@ -1,0 +1,14 @@
+---
+spring.config.activate.on-profile: sandbox
+
+spring:
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+---
+spring.config.activate.on-profile: stable, test
+
+spring:
+  flyway:
+    enabled: false

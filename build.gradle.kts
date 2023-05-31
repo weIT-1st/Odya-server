@@ -34,6 +34,8 @@ dependencies {
     implementation("com.oracle.database.security:oraclepki:19.8.0.0")
     implementation("com.oracle.database.security:osdt_core:19.8.0.0")
 
+    implementation("org.flywaydb:flyway-core")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("com.h2database:h2:2.1.214")
     testImplementation("io.mockk:mockk:1.13.5")
