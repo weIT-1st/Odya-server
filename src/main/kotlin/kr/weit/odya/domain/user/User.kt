@@ -42,10 +42,6 @@ class User(
 
     @Column
     val withdrawDate: LocalDateTime? = null,
-
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    val createdDate: LocalDateTime = LocalDateTime.now(),
 ) {
     constructor(
         username: String,
@@ -62,6 +58,11 @@ class User(
         socialType = socialType,
         withdrawDate = null,
     )
+
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    lateinit var createdDate: LocalDateTime
+        private set
 
     val email: String?
         get() = information.email

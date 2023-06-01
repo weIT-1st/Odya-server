@@ -19,6 +19,7 @@ abstract class BaseTimeEntity {
         protected set
 
     @LastModifiedDate
+    @Column(nullable = false)
     lateinit var updatedDate: LocalDateTime
         protected set
 }
