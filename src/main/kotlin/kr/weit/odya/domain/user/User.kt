@@ -41,7 +41,7 @@ class User(
     val socialType: SocialType,
 
     @Column
-    val withdrawDate: LocalDateTime? = null,
+    val withdrawDate: LocalDateTime? = null
 ) {
     constructor(
         username: String,
@@ -51,12 +51,12 @@ class User(
         gender: Gender,
         birthday: LocalDate,
         profileName: String = "default_profile.png",
-        socialType: SocialType,
+        socialType: SocialType
     ) : this(
         username = username,
         information = UserInformation(email, nickname, phoneNumber, gender, birthday, profileName),
         socialType = socialType,
-        withdrawDate = null,
+        withdrawDate = null
     )
 
     @CreatedDate

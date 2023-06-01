@@ -25,5 +25,5 @@ class PlaceReview(
     val starRating: Int,
 
     @Column(length = 300, nullable = false, updatable = false)
-    val comment: String,
+    val comment: String
 ) : BaseTimeEntity()
