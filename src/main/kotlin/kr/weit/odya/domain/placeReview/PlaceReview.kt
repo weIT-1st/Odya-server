@@ -6,9 +6,8 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import kr.weit.odya.domain.BaseTimeEntity
 import kr.weit.odya.domain.user.User
-import org.springframework.data.annotation.CreatedDate
-import java.time.LocalDateTime
 
 @Entity
 @Table(name = "place_review")
@@ -27,8 +26,4 @@ class PlaceReview(
 
     @Column(length = 300, nullable = false, updatable = false)
     val comment: String,
-
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    val createdDate: LocalDateTime = LocalDateTime.now(),
-)
+) : BaseTimeEntity()

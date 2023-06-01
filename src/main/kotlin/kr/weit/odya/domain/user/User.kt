@@ -3,6 +3,7 @@ package kr.weit.odya.domain.user
 import jakarta.persistence.Column
 import jakarta.persistence.Embedded
 import jakarta.persistence.Entity
+import jakarta.persistence.EntityListeners
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
@@ -13,6 +14,7 @@ import jakarta.persistence.Table
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
 import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -21,6 +23,7 @@ import java.time.LocalDateTime
 @Where(clause = "withdraw_date is null")
 @SQLDelete(sql = "update users set withdraw_date = sysdate where id = ?")
 @SequenceGenerator(name = "USERS_SEQ_GENERATOR", sequenceName = "USERS_SEQ", initialValue = 1, allocationSize = 1)
+@EntityListeners(AuditingEntityListener::class)
 class User(
     @Id
     @Column(columnDefinition = "NUMERIC(19, 0)")
