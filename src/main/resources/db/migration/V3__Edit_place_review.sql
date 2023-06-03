@@ -1,0 +1,2 @@
+alter table PLACE_REVIEW
+    MODIFY "COMMENT" VARCHAR2(90);
