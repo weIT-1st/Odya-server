@@ -3,6 +3,7 @@ package kr.weit.odya.domain.placeReview
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
+import jakarta.persistence.IdClass
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
@@ -11,7 +12,8 @@ import kr.weit.odya.domain.user.User
 
 @Entity
 @Table(name = "place_review")
-class PlaceReview(
+@IdClass(PlaceReviewId::class)
+data class PlaceReview(
     @Id
     @Column(length = 400, nullable = false, updatable = false)
     val placeId: String,

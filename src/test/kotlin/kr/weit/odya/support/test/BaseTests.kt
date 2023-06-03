@@ -6,11 +6,14 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs
 import org.springframework.context.annotation.Import
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.restdocs.RestDocumentationExtension
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestConstructor
+import org.springframework.transaction.annotation.Transactional
 
 class BaseTests {
+    @Transactional
     @ActiveProfiles("test")
     @Target(AnnotationTarget.CLASS)
     @Retention(AnnotationRetention.RUNTIME)
@@ -29,4 +32,8 @@ class BaseTests {
     @Import(TestSecurityConfig::class)
     @ExtendWith(RestDocumentationExtension::class)
     annotation class UnitControllerTestEnvironment
+
+    @TestEnvironment
+    @SpringBootTest
+    annotation class SpringTestEnvironment
 }
