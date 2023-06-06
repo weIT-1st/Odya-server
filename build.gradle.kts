@@ -46,6 +46,13 @@ dependencies {
     implementation("com.oracle.oci.sdk:oci-java-sdk-objectstorage:3.14.0")
     implementation("com.oracle.oci.sdk:oci-java-sdk-common-httpclient-jersey3:3.14.0")
 
+    implementation("org.opensearch.client:spring-data-opensearch-starter:1.1.0") {
+        exclude("org.opensearch.client", "opensearch-rest-client-sniffer")
+    }
+    implementation("org.opensearch.client:spring-data-opensearch-test-autoconfigure:1.1.0") {
+        exclude("org.opensearch.client", "opensearch-rest-client-sniffer")
+    }
+
     asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor")
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
 }
