@@ -16,6 +16,13 @@ CREATE TABLE users
 
 create sequence users_seq start with 1 increment by 1;
 
+ALTER TABLE users
+    ADD CONSTRAINT UK_USERNAME_ON_USERS UNIQUE (username);
+ALTER TABLE users
+    ADD CONSTRAINT UK_NICKNAME_ON_USERS UNIQUE (nickname);
+ALTER TABLE users
+    ADD user_role VARCHAR2(255) NOT NULL;
+
 CREATE TABLE place_review
 (
     place_id     VARCHAR2(400) NOT NULL,
