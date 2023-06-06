@@ -2,3 +2,17 @@ open-search:
   server-url: ${OPEN_SEARCH_URL}
   user-name: ${OPEN_SEARCH_USER_NAME}
   password: ${OPEN_SEARCH_PASSWORD}
+
+---
+spring.config.activate.on-profile: sandbox
+
+open-search:
+  indices:
+    test: sandbox-logstash-logs
+
+---
+spring.config.activate.on-profile: stable
+
+open-search:
+  indices:
+    test: stable-logstash-logs
