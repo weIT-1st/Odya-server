@@ -1,9 +1,10 @@
 |===
-|Parameter|Type|Required|Description
+|Parameter|Description|Type|Nullable|Example
 {{#parameters}}
 |{{#tableCellContent}}`+{{name}}+`{{/tableCellContent}}
-|{{#tableCellContent}}`+{{type}}+`{{/tableCellContent}}
-|{{#tableCellContent}}{{^optional}}true{{/optional}}{{#optional}}false{{/optional}}{{/tableCellContent}}
 |{{#tableCellContent}}{{description}}{{/tableCellContent}}
+|{{#tableCellContent}}`+{{type}}+`{{/tableCellContent}}
+|{{#tableCellContent}}{{^optional}}false{{/optional}}{{#optional}}true{{/optional}}{{/tableCellContent}}
+|{{#tableCellContent}}{{#example}}{{.}}{{/example}}{{/tableCellContent}}
 {{/parameters}}
 |===

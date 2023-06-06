@@ -14,6 +14,8 @@ class ControllerTestHelper {
             contentType = MediaType.APPLICATION_JSON
         }
 
+        fun jsonContent(value: Any): String = objectToString(value)
+
         private fun objectToString(value: Any): String = objectMapper.writeValueAsString(value)
     }
 }
