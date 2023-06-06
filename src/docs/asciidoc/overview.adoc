@@ -2,7 +2,7 @@
 = *Overview*
 
 [[overview-http-status-codes]]
-== HTTP status codes
+== *HTTP status codes*
 
 |===
 | HttpStatusCode | Description
@@ -29,3 +29,11 @@
 | Internal server error
 |===
 
+[[참고사항]]
+== *참고사항*
+
+=== *1번*
+
+example 필드의 ","로 구분된 값은 그 중 하나를 선택해서 보내주시면 됩니다.
+
+---
