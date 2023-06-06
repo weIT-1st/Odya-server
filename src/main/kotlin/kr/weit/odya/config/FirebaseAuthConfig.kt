@@ -6,18 +6,19 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.io.ClassPathResource
-import java.io.FileInputStream
+import org.springframework.core.io.ResourceLoader
 
 @Configuration
-class FirebaseAuthConfig {
+class FirebaseAuthConfig(
+    private val resourceLoader: ResourceLoader
+) {
     @Bean
     fun firebaseApp(): FirebaseApp {
         val serviceAccount =
-            FileInputStream(ClassPathResource("firebase/odya-2f0f1-firebase-adminsdk-pwfxi-18bc9d3347.json").file)
+            resourceLoader.getResource("classpath:/firebase/odya-2f0f1-firebase-adminsdk-pwfxi-18bc9d3347.json")
 
         val options: FirebaseOptions = FirebaseOptions.builder()
-            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+            .setCredentials(GoogleCredentials.fromStream(serviceAccount.inputStream))
             .build()
 
         return FirebaseApp.initializeApp(options)
