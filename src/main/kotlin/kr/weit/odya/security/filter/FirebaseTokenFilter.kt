@@ -14,7 +14,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.filter.OncePerRequestFilter
 
-val FIREBASE_TOKEN_FILTER_PERMITTED_PATTERNS: List<String> = listOf("/api/v1/auth/**", "/test", "/ready", "/health")
+val FIREBASE_TOKEN_FILTER_PERMITTED_PATTERNS: List<String> =
+    listOf("/api/v1/auth/**", "/test", "/ready", "/health", "/docs/index.html")
 
 data class TokenInvalidErrorResponse(val errorMessage: String)
 
