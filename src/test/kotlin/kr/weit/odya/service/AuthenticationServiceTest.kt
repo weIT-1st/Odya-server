@@ -8,7 +8,7 @@ import io.mockk.mockk
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.existsByNickname
 import kr.weit.odya.security.FirebaseTokenParser
-import kr.weit.odya.security.LoginFailedException
+import kr.weit.odya.security.InvalidTokenException
 import kr.weit.odya.support.TEST_NICKNAME
 import kr.weit.odya.support.TEST_PROVIDER
 import kr.weit.odya.support.TEST_USERNAME
@@ -33,17 +33,17 @@ class AuthenticationServiceTest : DescribeSpec({
         }
 
         context("유효하지 않은 ID TOKEN이 주어지는 경우") {
-            every { firebaseTokenParser.getUsername(loginRequest.idToken) } throws LoginFailedException()
+            every { firebaseTokenParser.getUsername(loginRequest.idToken) } throws InvalidTokenException()
             it("[LoginFailedException] 예외가 발생한다") {
-                shouldThrow<LoginFailedException> { authenticationService.loginProcess(loginRequest) }
+                shouldThrow<InvalidTokenException> { authenticationService.loginProcess(loginRequest) }
             }
         }
 
         context("가입하지 않은 ID TOKEN이 주어지는 경우") {
             every { firebaseTokenParser.getUsername(loginRequest.idToken) } returns TEST_USERNAME
             every { userRepository.existsByUsername(TEST_USERNAME) } returns false
-            it("[NotExistResourceException] 예외가 발생한다") {
-                shouldThrow<NotExistResourceException> { authenticationService.loginProcess(loginRequest) }
+            it("[LoginFailedException] 예외가 발생한다") {
+                shouldThrow<LoginFailedException> { authenticationService.loginProcess(loginRequest) }
             }
         }
     }
@@ -61,9 +61,9 @@ class AuthenticationServiceTest : DescribeSpec({
         }
 
         context("유효하지 않은 ID TOKEN이 주어지는 경우") {
-            every { firebaseTokenParser.getUsername(registerRequest.idToken) } throws LoginFailedException()
+            every { firebaseTokenParser.getUsername(registerRequest.idToken) } throws InvalidTokenException()
             it("[LoginFailedException] 예외가 발생한다") {
-                shouldThrow<LoginFailedException> { authenticationService.register(registerRequest, TEST_PROVIDER) }
+                shouldThrow<InvalidTokenException> { authenticationService.register(registerRequest, TEST_PROVIDER) }
             }
         }
 

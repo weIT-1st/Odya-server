@@ -19,7 +19,7 @@ class AuthenticationService(
     fun loginProcess(loginRequest: LoginRequest) {
         val username = firebaseTokenParser.getUsername(loginRequest.idToken)
         if (!userRepository.existsByUsername(username)) {
-            throw NotExistResourceException("$username: 존재하지 않는 회원입니다")
+            throw LoginFailedException("$username: 존재하지 않는 회원입니다")
         }
     }
 
