@@ -1,6 +1,10 @@
 package kr.weit.odya.controller
 
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
+import kr.weit.odya.security.LoginFailedException
+import kr.weit.odya.service.ExistResourceException
+import kr.weit.odya.service.NotExistResourceException
+import kr.weit.odya.service.OdyaException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
@@ -51,10 +55,28 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiErrorResponse(ex.message))
     }
 
-    @ExceptionHandler(IllegalArgumentException::class)
-    fun illegalArgumentException(ex: IllegalArgumentException): ResponseEntity<ApiErrorResponse> {
-        logger.error("[IllegalArgumentException]", ex)
+    @ExceptionHandler(IllegalArgumentException::class, IllegalStateException::class)
+    fun illegalException(ex: RuntimeException): ResponseEntity<ApiErrorResponse> {
+        logger.error("[IllegalException]", ex)
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiErrorResponse(ex.message))
+    }
+
+    @ExceptionHandler(NoSuchElementException::class)
+    fun noSuchElementException(ex: NoSuchElementException): ResponseEntity<ApiErrorResponse> {
+        logger.error("[NoSuchElementException]", ex)
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiErrorResponse(ex.message))
+    }
+
+    @ExceptionHandler(LoginFailedException::class)
+    fun loginFailedException(ex: LoginFailedException): ResponseEntity<ApiErrorResponse> {
+        logger.error("[LoginFailedException]", ex)
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiErrorResponse(ex.message))
+    }
+
+    @ExceptionHandler(ExistResourceException::class, NotExistResourceException::class)
+    fun resourcesExceptionException(ex: OdyaException): ResponseEntity<ApiErrorResponse> {
+        logger.error("[ResourceException]", ex)
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiErrorResponse(ex.message))
     }
 
     @ExceptionHandler(Exception::class)

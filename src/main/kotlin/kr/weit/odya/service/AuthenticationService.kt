@@ -19,7 +19,7 @@ class AuthenticationService(
     fun loginProcess(loginRequest: LoginRequest) {
         val username = firebaseTokenParser.getUsername(loginRequest.idToken)
         if (!userRepository.existsByUsername(username)) {
-            throw IllegalArgumentException("$username: 존재하지 않는 회원입니다")
+            throw NotExistResourceException("$username: 존재하지 않는 회원입니다")
         }
     }
 
@@ -32,12 +32,14 @@ class AuthenticationService(
     }
 
     fun validateNickname(nickname: String) {
-        require(!userRepository.existsByNickname(nickname)) { "$nickname: 이미 존재하는 닉네임입니다" }
+        if (userRepository.existsByNickname(nickname)) {
+            throw ExistResourceException("$nickname: 이미 존재하는 닉네임입니다")
+        }
     }
 
     private fun validateRegisterInformation(username: String, nickname: String) {
         if (userRepository.existsByUsername(username)) {
-            throw IllegalArgumentException("$username: 이미 존재하는 회원입니다")
+            throw ExistResourceException("$username: 이미 존재하는 회원입니다")
         }
         validateNickname(nickname)
     }

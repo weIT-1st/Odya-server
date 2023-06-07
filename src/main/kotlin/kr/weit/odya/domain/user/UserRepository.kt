@@ -7,10 +7,10 @@ import org.springframework.data.repository.query.Param
 fun UserRepository.existsByNickname(nickname: String): Boolean = existsByInformationNickname(nickname)
 
 fun UserRepository.getByUsername(username: String): User =
-    findByUsername(username) ?: throw IllegalArgumentException("$username: 사용자가 존재하지 않습니다")
+    findByUsername(username) ?: throw NoSuchElementException("$username: 사용자가 존재하지 않습니다")
 
 fun UserRepository.getUserRoleByUsername(username: String): String =
-    findUserRoleByUsername(username) ?: throw IllegalArgumentException("$username: 사용자가 존재하지 않습니다")
+    findUserRoleByUsername(username) ?: throw NoSuchElementException("$username: 사용자가 존재하지 않습니다")
 
 interface UserRepository : JpaRepository<User, Long> {
     fun existsByUsername(username: String): Boolean

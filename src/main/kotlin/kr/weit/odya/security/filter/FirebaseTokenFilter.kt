@@ -40,7 +40,7 @@ class FirebaseTokenFilter(
                 val authenticationToken =
                     UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities)
                 SecurityContextHolder.getContext().authentication = authenticationToken
-            } catch (ex: IllegalArgumentException) {
+            } catch (ex: RuntimeException) {
                 setErrorResponse(response, ex)
                 return
             }
@@ -49,7 +49,7 @@ class FirebaseTokenFilter(
         filterChain.doFilter(request, response)
     }
 
-    private fun setErrorResponse(response: HttpServletResponse, ex: IllegalArgumentException) {
+    private fun setErrorResponse(response: HttpServletResponse, ex: RuntimeException) {
         Logger.error(ex) { "[FirebaseTokenFilter] ${ex.message}" }
         response.status = HttpStatus.UNAUTHORIZED.value()
         response.contentType = MediaType.APPLICATION_JSON_VALUE
@@ -67,7 +67,7 @@ class FirebaseTokenFilter(
 
     private fun getIdTokenByFirebaseToken(firebaseToken: String): String {
         if (!firebaseToken.startsWith(BEARER)) {
-            throw IllegalArgumentException()
+            throw IllegalArgumentException("$firebaseToken: Bearer 형식의 토큰이 아닙니다")
         }
         return firebaseToken.split(" ")[1]
     }

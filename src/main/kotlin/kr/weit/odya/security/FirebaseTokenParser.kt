@@ -9,6 +9,6 @@ class FirebaseTokenParser(
 ) {
     fun getUsername(idToken: String): String =
         runCatching { firebaseAuth.verifyIdToken(idToken).uid }
-            .onFailure { ex -> throw IllegalArgumentException(ex.message) }
+            .onFailure { ex -> throw LoginFailedException(ex.message) }
             .getOrThrow()
 }
