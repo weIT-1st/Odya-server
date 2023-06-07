@@ -8,6 +8,7 @@ import io.mockk.mockk
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.existsByNickname
 import kr.weit.odya.security.FirebaseTokenParser
+import kr.weit.odya.security.LoginFailedException
 import kr.weit.odya.support.TEST_NICKNAME
 import kr.weit.odya.support.TEST_PROVIDER
 import kr.weit.odya.support.TEST_USERNAME
@@ -32,17 +33,17 @@ class AuthenticationServiceTest : DescribeSpec({
         }
 
         context("유효하지 않은 ID TOKEN이 주어지는 경우") {
-            every { firebaseTokenParser.getUsername(loginRequest.idToken) } throws IllegalArgumentException()
-            it("[IllegalArgumentException] 예외가 발생한다") {
-                shouldThrow<IllegalArgumentException> { authenticationService.loginProcess(loginRequest) }
+            every { firebaseTokenParser.getUsername(loginRequest.idToken) } throws LoginFailedException()
+            it("[LoginFailedException] 예외가 발생한다") {
+                shouldThrow<LoginFailedException> { authenticationService.loginProcess(loginRequest) }
             }
         }
 
         context("가입하지 않은 ID TOKEN이 주어지는 경우") {
             every { firebaseTokenParser.getUsername(loginRequest.idToken) } returns TEST_USERNAME
             every { userRepository.existsByUsername(TEST_USERNAME) } returns false
-            it("[IllegalArgumentException] 예외가 발생한다") {
-                shouldThrow<IllegalArgumentException> { authenticationService.loginProcess(loginRequest) }
+            it("[NotExistResourceException] 예외가 발생한다") {
+                shouldThrow<NotExistResourceException> { authenticationService.loginProcess(loginRequest) }
             }
         }
     }
@@ -60,17 +61,17 @@ class AuthenticationServiceTest : DescribeSpec({
         }
 
         context("유효하지 않은 ID TOKEN이 주어지는 경우") {
-            every { firebaseTokenParser.getUsername(registerRequest.idToken) } throws IllegalArgumentException()
-            it("[IllegalArgumentException] 예외가 발생한다") {
-                shouldThrow<IllegalArgumentException> { authenticationService.register(registerRequest, TEST_PROVIDER) }
+            every { firebaseTokenParser.getUsername(registerRequest.idToken) } throws LoginFailedException()
+            it("[LoginFailedException] 예외가 발생한다") {
+                shouldThrow<LoginFailedException> { authenticationService.register(registerRequest, TEST_PROVIDER) }
             }
         }
 
         context("이미 가입한 ID TOKEN이 주어지는 경우") {
             every { firebaseTokenParser.getUsername(registerRequest.idToken) } returns TEST_USERNAME
             every { userRepository.existsByUsername(TEST_USERNAME) } returns true
-            it("[IllegalArgumentException] 예외가 발생한다") {
-                shouldThrow<IllegalArgumentException> { authenticationService.register(registerRequest, TEST_PROVIDER) }
+            it("[ExistResourceException] 예외가 발생한다") {
+                shouldThrow<ExistResourceException> { authenticationService.register(registerRequest, TEST_PROVIDER) }
             }
         }
 
@@ -78,8 +79,8 @@ class AuthenticationServiceTest : DescribeSpec({
             every { firebaseTokenParser.getUsername(registerRequest.idToken) } returns TEST_USERNAME
             every { userRepository.existsByUsername(TEST_USERNAME) } returns true
             every { userRepository.existsByNickname(TEST_NICKNAME) } returns true
-            it("[IllegalArgumentException] 예외가 발생한다") {
-                shouldThrow<IllegalArgumentException> { authenticationService.register(registerRequest, TEST_PROVIDER) }
+            it("[ExistResourceException] 예외가 발생한다") {
+                shouldThrow<ExistResourceException> { authenticationService.register(registerRequest, TEST_PROVIDER) }
             }
         }
     }
@@ -94,8 +95,8 @@ class AuthenticationServiceTest : DescribeSpec({
 
         context("중복이 있는 닉네임이 주어지는 경우") {
             every { userRepository.existsByNickname(TEST_NICKNAME) } returns true
-            it("[IllegalArgumentException] 예외가 발생한다") {
-                shouldThrow<IllegalArgumentException> { authenticationService.validateNickname(TEST_NICKNAME) }
+            it("[ExistResourceException] 예외가 발생한다") {
+                shouldThrow<ExistResourceException> { authenticationService.validateNickname(TEST_NICKNAME) }
             }
         }
     }
