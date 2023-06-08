@@ -8,3 +8,4 @@ spring:
       - object-storage
       - sentry
       - flyway
+      - open-search

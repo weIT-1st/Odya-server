@@ -1,0 +1,4 @@
+open-search:
+  server-url: ${OPEN_SEARCH_URL}
+  user-name: ${OPEN_SEARCH_USER_NAME}
+  password: ${OPEN_SEARCH_PASSWORD}
