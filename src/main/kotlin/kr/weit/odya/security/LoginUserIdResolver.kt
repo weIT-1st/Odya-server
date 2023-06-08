@@ -9,16 +9,16 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.method.support.ModelAndViewContainer
 
 @Component
-class LoginUsernameResolver : HandlerMethodArgumentResolver {
+class LoginUserIdResolver : HandlerMethodArgumentResolver {
     override fun supportsParameter(parameter: MethodParameter): Boolean =
-        parameter.hasParameterAnnotation(LoginUsername::class.java) && parameter.parameterType.isAssignableFrom(String::class.java)
+        parameter.hasParameterAnnotation(LoginUserId::class.java) && parameter.parameterType.isAssignableFrom(Long::class.java)
 
     override fun resolveArgument(
         parameter: MethodParameter,
         mavContainer: ModelAndViewContainer?,
         webRequest: NativeWebRequest,
         binderFactory: WebDataBinderFactory?
-    ): String {
-        return SecurityContextHolder.getContext().authentication.name
+    ): Long {
+        return SecurityContextHolder.getContext().authentication.name.toLong()
     }
 }

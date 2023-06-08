@@ -1,7 +1,7 @@
 package kr.weit.odya.security
 
 import kr.weit.odya.domain.user.UserRepository
-import kr.weit.odya.domain.user.getUserRoleByUsername
+import kr.weit.odya.domain.user.getByUsername
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
@@ -13,8 +13,8 @@ class UserDetailsService(
     private val userRepository: UserRepository
 ) : UserDetailsService {
     override fun loadUserByUsername(username: String): UserDetails {
-        val userRole = userRepository.getUserRoleByUsername(username)
+        val user = userRepository.getByUsername(username)
 
-        return User(username, "", listOf(SimpleGrantedAuthority(userRole)))
+        return User(user.id.toString(), "", listOf(SimpleGrantedAuthority(user.userRole.name)))
     }
 }

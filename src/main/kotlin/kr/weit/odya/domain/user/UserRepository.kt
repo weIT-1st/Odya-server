@@ -9,8 +9,8 @@ fun UserRepository.existsByNickname(nickname: String): Boolean = existsByInforma
 fun UserRepository.getByUsername(username: String): User =
     findByUsername(username) ?: throw NoSuchElementException("$username: 사용자가 존재하지 않습니다")
 
-fun UserRepository.getUserRoleByUsername(username: String): String =
-    findUserRoleByUsername(username) ?: throw NoSuchElementException("$username: 사용자가 존재하지 않습니다")
+fun UserRepository.getByUserId(userId: Long): User =
+    findByUserId(userId) ?: throw NoSuchElementException("$userId: 사용자가 존재하지 않습니다")
 
 interface UserRepository : JpaRepository<User, Long> {
     fun existsByUsername(username: String): Boolean
@@ -19,6 +19,6 @@ interface UserRepository : JpaRepository<User, Long> {
 
     fun findByUsername(username: String): User?
 
-    @Query("select u.userRole from User u where u.username = :username")
-    fun findUserRoleByUsername(@Param("username") username: String): String?
+    @Query("select u from User u where u.id = :userId")
+    fun findByUserId(@Param("userId") userId: Long): User?
 }
