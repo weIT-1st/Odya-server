@@ -37,13 +37,4 @@ class UserRepositoryTest(
             result shouldBe true
         }
     }
-
-    context("사용자 역할 조회") {
-        userRepository.save(createUser())
-
-        expect("USERNAME이 일치하는 사용자 역할을 조회한다") {
-            val result = userRepository.getUserRoleByUsername(TEST_USERNAME)
-            result shouldBe UserRole.ROLE_USER.name
-        }
-    }
 })

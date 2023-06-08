@@ -7,6 +7,7 @@ import kr.weit.odya.service.UserService
 import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
 import kr.weit.odya.support.TEST_USERNAME
+import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.TOKEN_ERROR_MESSAGE
 import kr.weit.odya.support.createUserResponse
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
@@ -40,7 +41,7 @@ class UserControllerTest(
         val targetUri = "/api/v1/users/me"
         context("유효한 토큰이면서, 가입된 사용자인 경우") {
             val response = createUserResponse()
-            every { userService.getInformation(TEST_USERNAME) } returns response
+            every { userService.getInformation(TEST_USER_ID) } returns response
             it("200 응답한다.") {
                 restDocMockMvc.get(targetUri) {
                     header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -66,7 +67,7 @@ class UserControllerTest(
         }
 
         context("유효한 토큰이면서, 가입되지 않은 사용자인 경우") {
-            every { userService.getInformation(TEST_USERNAME) } throws IllegalArgumentException("$TEST_USERNAME: 사용자가 존재하지 않습니다")
+            every { userService.getInformation(TEST_USER_ID) } throws IllegalArgumentException("$TEST_USERNAME: 사용자가 존재하지 않습니다")
             it("400 응답한다.") {
                 restDocMockMvc.get(targetUri) {
                     header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)

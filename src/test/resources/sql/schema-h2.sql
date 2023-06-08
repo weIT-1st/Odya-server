@@ -7,6 +7,7 @@ CREATE TABLE users
     phone_number  VARCHAR2(13)   NULL,
     gender        VARCHAR2(1)    NOT NULL,
     birthday      DATE           NOT NULL,
+    user_role     VARCHAR2(255)  NOT NULL,
     profile_name  VARCHAR2(255)  NOT NULL,
     social_type   VARCHAR2(10)   NOT NULL,
     withdraw_date DATE           NULL,
@@ -20,8 +21,6 @@ ALTER TABLE users
     ADD CONSTRAINT UK_USERNAME_ON_USERS UNIQUE (username);
 ALTER TABLE users
     ADD CONSTRAINT UK_NICKNAME_ON_USERS UNIQUE (nickname);
-ALTER TABLE users
-    ADD user_role VARCHAR2(255) NOT NULL;
 
 CREATE TABLE place_review
 (

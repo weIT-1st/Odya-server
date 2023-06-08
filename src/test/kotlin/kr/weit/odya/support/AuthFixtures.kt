@@ -23,4 +23,4 @@ fun createRegisterRequest() =
     RegisterRequest(TEST_ID_TOKEN, TEST_EMAIL, TEST_PHONE_NUMBER, TEST_NICKNAME, TEST_GENDER, TEST_BIRTHDAY)
 
 fun userAuthentication() =
-    UsernamePasswordAuthenticationToken(TEST_USERNAME, null, listOf(SimpleGrantedAuthority("ROLE_USER")))
+    UsernamePasswordAuthenticationToken(TEST_USER_ID, null, listOf(SimpleGrantedAuthority("ROLE_USER")))

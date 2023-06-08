@@ -1,6 +1,6 @@
 package kr.weit.odya.controller
 
-import kr.weit.odya.security.LoginUsername
+import kr.weit.odya.security.LoginUserId
 import kr.weit.odya.service.UserService
 import kr.weit.odya.service.dto.UserResponse
 import org.springframework.http.ResponseEntity
@@ -14,8 +14,8 @@ class UserController(
     private val userService: UserService
 ) {
     @GetMapping("/me")
-    fun getMyInfo(@LoginUsername username: String): ResponseEntity<UserResponse> {
-        val response = userService.getInformation(username)
+    fun getMyInfo(@LoginUserId userId: Long): ResponseEntity<UserResponse> {
+        val response = userService.getInformation(userId)
         return ResponseEntity.ok(response)
     }
 }

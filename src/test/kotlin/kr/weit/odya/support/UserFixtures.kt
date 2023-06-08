@@ -6,6 +6,7 @@ import kr.weit.odya.domain.user.User
 import kr.weit.odya.service.dto.UserResponse
 import java.time.LocalDate
 
+const val TEST_USER_ID = 0L
 const val TEST_USERNAME = "testUsername"
 const val TEST_EMAIL = "test@test.com"
 const val TEST_INVALID_EMAIL = "test"
