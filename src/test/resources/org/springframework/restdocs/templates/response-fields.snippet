@@ -1,8 +1,9 @@
 |===
-|Field|Type|Description
+|Field|Description|Type|Nullable
 {{#fields}}
 |{{#tableCellContent}}`+{{path}}+`{{/tableCellContent}}
-|{{#tableCellContent}}`+{{type}}+`{{/tableCellContent}}
 |{{#tableCellContent}}{{description}}{{/tableCellContent}}
+|{{#tableCellContent}}`+{{type}}+`{{/tableCellContent}}
+|{{#tableCellContent}}{{^optional}}false{{/optional}}{{#optional}}true{{/optional}}{{/tableCellContent}}
 {{/fields}}
 |===

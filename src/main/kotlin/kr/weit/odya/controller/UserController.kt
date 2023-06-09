@@ -1,0 +1,21 @@
+package kr.weit.odya.controller
+
+import kr.weit.odya.security.LoginUserId
+import kr.weit.odya.service.UserService
+import kr.weit.odya.service.dto.UserResponse
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+
+@RestController
+@RequestMapping("/api/v1/users")
+class UserController(
+    private val userService: UserService
+) {
+    @GetMapping("/me")
+    fun getMyInfo(@LoginUserId userId: Long): ResponseEntity<UserResponse> {
+        val response = userService.getInformation(userId)
+        return ResponseEntity.ok(response)
+    }
+}

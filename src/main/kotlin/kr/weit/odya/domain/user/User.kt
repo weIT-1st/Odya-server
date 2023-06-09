@@ -3,7 +3,6 @@ package kr.weit.odya.domain.user
 import jakarta.persistence.Column
 import jakarta.persistence.Embedded
 import jakarta.persistence.Entity
-import jakarta.persistence.EntityListeners
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
@@ -11,10 +10,9 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
+import kr.weit.odya.domain.BaseTimeEntity
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
-import org.springframework.data.annotation.CreatedDate
-import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -23,14 +21,13 @@ import java.time.LocalDateTime
 @Where(clause = "withdraw_date is null")
 @SQLDelete(sql = "update users set withdraw_date = sysdate where id = ?")
 @SequenceGenerator(name = "USERS_SEQ_GENERATOR", sequenceName = "USERS_SEQ", initialValue = 1, allocationSize = 1)
-@EntityListeners(AuditingEntityListener::class)
 class User(
     @Id
     @Column(columnDefinition = "NUMERIC(19, 0)")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "USERS_SEQ_GENERATOR")
     val id: Long = 0L,
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false, unique = true)
     val username: String,
 
     @Embedded
@@ -40,10 +37,15 @@ class User(
     @Column(nullable = false, updatable = false)
     val socialType: SocialType,
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    val userRole: UserRole,
+
     @Column
     val withdrawDate: LocalDateTime? = null
-) {
+) : BaseTimeEntity() {
     constructor(
+        id: Long = 0L,
         username: String,
         email: String?,
         nickname: String,
@@ -51,18 +53,16 @@ class User(
         gender: Gender,
         birthday: LocalDate,
         profileName: String = "default_profile.png",
-        socialType: SocialType
+        socialType: SocialType,
+        userRole: UserRole = UserRole.ROLE_USER
     ) : this(
+        id = id,
         username = username,
         information = UserInformation(email, nickname, phoneNumber, gender, birthday, profileName),
         socialType = socialType,
-        withdrawDate = null
+        withdrawDate = null,
+        userRole = userRole
     )
-
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    lateinit var createdDate: LocalDateTime
-        private set
 
     val email: String?
         get() = information.email

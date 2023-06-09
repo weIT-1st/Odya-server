@@ -11,7 +11,7 @@ data class UserInformation(
     @Column
     val email: String?,
 
-    @Column(nullable = false, length = 24)
+    @Column(nullable = false, length = 24, unique = true)
     val nickname: String,
 
     @Column(length = 13)

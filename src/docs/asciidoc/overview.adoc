@@ -2,7 +2,7 @@
 = *Overview*
 
 [[overview-http-status-codes]]
-== HTTP status codes
+== *HTTP status codes*
 
 |===
 | HttpStatusCode | Description
@@ -25,7 +25,18 @@
 | `405 METHOD_NOT_ALLOWED`
 | Http Method is invalid
 
+| `409 CONFLICT`
+| Request resource already exists
+
 | `500 INTERNAL_SERVER_ERROR`
 | Internal server error
 |===
 
+[[참고사항]]
+== *참고사항*
+
+=== *1번*
+
+example 필드의 ","로 구분된 값은 그 중 하나를 선택해서 보내주시면 됩니다.
+
+---
