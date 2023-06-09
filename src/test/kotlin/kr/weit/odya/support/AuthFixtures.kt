@@ -26,11 +26,5 @@ fun createLoginRequest() = LoginRequest(TEST_ID_TOKEN)
 fun createRegisterRequest() =
     RegisterRequest(TEST_ID_TOKEN, TEST_EMAIL, TEST_PHONE_NUMBER, TEST_NICKNAME, TEST_GENDER, TEST_BIRTHDAY)
 
-fun createInvalidEmailRegisterRequest() =
-    RegisterRequest(TEST_ID_TOKEN, TEST_INVALID_EMAIL, TEST_PHONE_NUMBER, TEST_NICKNAME, TEST_GENDER, TEST_BIRTHDAY)
-
-fun createInvalidPhoneNumberRegisterRequest() =
-    RegisterRequest(TEST_ID_TOKEN, TEST_EMAIL, TEST_INVALID_PHONE_NUMBER, TEST_NICKNAME, TEST_GENDER, TEST_BIRTHDAY)
-
 fun userAuthentication() =
     UsernamePasswordAuthenticationToken(TEST_USER_ID, null, listOf(SimpleGrantedAuthority("ROLE_USER")))

@@ -34,7 +34,7 @@ class AuthenticationServiceTest : DescribeSpec({
 
         context("유효하지 않은 ID TOKEN이 주어지는 경우") {
             every { firebaseTokenParser.getUsername(loginRequest.idToken) } throws InvalidTokenException()
-            it("[LoginFailedException] 예외가 발생한다") {
+            it("[InvalidTokenException] 예외가 발생한다") {
                 shouldThrow<InvalidTokenException> { authenticationService.loginProcess(loginRequest) }
             }
         }
@@ -62,7 +62,7 @@ class AuthenticationServiceTest : DescribeSpec({
 
         context("유효하지 않은 ID TOKEN이 주어지는 경우") {
             every { firebaseTokenParser.getUsername(registerRequest.idToken) } throws InvalidTokenException()
-            it("[LoginFailedException] 예외가 발생한다") {
+            it("[InvalidTokenException] 예외가 발생한다") {
                 shouldThrow<InvalidTokenException> { authenticationService.register(registerRequest, TEST_PROVIDER) }
             }
         }
@@ -77,7 +77,7 @@ class AuthenticationServiceTest : DescribeSpec({
 
         context("이미 가입한 닉네임이 주어지는 경우") {
             every { firebaseTokenParser.getUsername(registerRequest.idToken) } returns TEST_USERNAME
-            every { userRepository.existsByUsername(TEST_USERNAME) } returns true
+            every { userRepository.existsByUsername(TEST_USERNAME) } returns false
             every { userRepository.existsByNickname(TEST_NICKNAME) } returns true
             it("[ExistResourceException] 예외가 발생한다") {
                 shouldThrow<ExistResourceException> { authenticationService.register(registerRequest, TEST_PROVIDER) }
