@@ -14,11 +14,11 @@ import kr.weit.odya.service.LoginFailedException
 import kr.weit.odya.support.EXIST_NICKNAME_ERROR_MESSAGE
 import kr.weit.odya.support.EXIST_USER_ERROR_MESSAGE
 import kr.weit.odya.support.NOT_EXIST_USER_ERROR_MESSAGE
+import kr.weit.odya.support.TEST_INVALID_EMAIL
+import kr.weit.odya.support.TEST_INVALID_PHONE_NUMBER
 import kr.weit.odya.support.TEST_NICKNAME
 import kr.weit.odya.support.TEST_PROVIDER
 import kr.weit.odya.support.TOKEN_ERROR_MESSAGE
-import kr.weit.odya.support.createInvalidEmailRegisterRequest
-import kr.weit.odya.support.createInvalidPhoneNumberRegisterRequest
 import kr.weit.odya.support.createLoginRequest
 import kr.weit.odya.support.createRegisterRequest
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
@@ -224,7 +224,7 @@ class AuthControllerTest(
         }
 
         context("유효한 토큰이지만, 유효하지 않은 형식의 이메일이면") {
-            val request = createInvalidEmailRegisterRequest()
+            val request = createRegisterRequest().copy(email = TEST_INVALID_EMAIL)
             it("400 응답한다.") {
                 restDocMockMvc.perform(
                     RestDocumentationRequestBuilders
@@ -258,7 +258,7 @@ class AuthControllerTest(
         }
 
         context("유효한 토큰이지만, 유효하지 않은 형식의 전화번호이면") {
-            val request = createInvalidPhoneNumberRegisterRequest()
+            val request = createRegisterRequest().copy(phoneNumber = TEST_INVALID_PHONE_NUMBER)
             it("400 응답한다.") {
                 restDocMockMvc.perform(
                     RestDocumentationRequestBuilders

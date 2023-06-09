@@ -80,7 +80,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
     }
 
     @ExceptionHandler(Exception::class)
-    fun illegalArgumentException(ex: Exception): ResponseEntity<ApiErrorResponse> {
+    fun exception(ex: Exception): ResponseEntity<ApiErrorResponse> {
         logger.error("[Exception]", ex)
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiErrorResponse(ex.message))
     }
