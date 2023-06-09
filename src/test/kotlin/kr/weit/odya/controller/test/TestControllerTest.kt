@@ -3,6 +3,7 @@ package kr.weit.odya.controller.test
 import io.kotest.core.spec.style.DescribeSpec
 import kr.weit.odya.controller.TestController
 import kr.weit.odya.support.createTestEmptyRequest
+import kr.weit.odya.support.createTestErrorRequest
 import kr.weit.odya.support.createTestRequest
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
 import kr.weit.odya.support.test.ControllerTestHelper.Companion.jsonContent
@@ -70,7 +71,7 @@ class TestControllerTest(
         }
 
         context("김한빈이라는 요청 데이터가 전달되면") {
-            val request = createTestEmptyRequest()
+            val request = createTestErrorRequest()
             it("김한빈은 안됨 에러 메시지를 응답한다.") {
                 restDocMockMvc.post(targetUri) {
                     jsonContent(request)

@@ -7,9 +7,13 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 
 const val TEST_ID_TOKEN = "testIdToken"
 
+const val TEST_NOT_EXIST_USER_ID_TOKEN = "testNotExistUserToken"
+
 const val TEST_INVALID_ID_TOKEN = "testInvalidIdToken"
 
 const val TEST_BEARER_ID_TOKEN = "Bearer $TEST_ID_TOKEN"
+
+const val TEST_BEARER_NOT_EXIST_USER_ID_TOKEN = "Bearer $TEST_NOT_EXIST_USER_ID_TOKEN"
 
 const val TEST_BEARER_INVALID_ID_TOKEN = "Bearer $TEST_INVALID_ID_TOKEN"
 

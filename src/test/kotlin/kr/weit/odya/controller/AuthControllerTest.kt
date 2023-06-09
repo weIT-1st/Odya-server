@@ -7,11 +7,12 @@ import io.mockk.just
 import io.mockk.runs
 import kr.weit.odya.domain.user.Gender
 import kr.weit.odya.domain.user.SocialType
+import kr.weit.odya.security.InvalidTokenException
 import kr.weit.odya.service.AuthenticationService
+import kr.weit.odya.service.ExistResourceException
+import kr.weit.odya.service.LoginFailedException
 import kr.weit.odya.support.EXIST_NICKNAME_ERROR_MESSAGE
 import kr.weit.odya.support.EXIST_USER_ERROR_MESSAGE
-import kr.weit.odya.support.INVALID_EMAIL_ERROR_MESSAGE
-import kr.weit.odya.support.INVALID_PHONE_NUMBER_ERROR_MESSAGE
 import kr.weit.odya.support.NOT_EXIST_USER_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_INVALID_EMAIL
 import kr.weit.odya.support.TEST_INVALID_PHONE_NUMBER
@@ -77,14 +78,14 @@ class AuthControllerTest(
 
         context("유효하지만 가입되지 않은 토큰이 전달되면") {
             val request = createLoginRequest()
-            every { authenticationService.loginProcess(request) } throws IllegalArgumentException(
+            every { authenticationService.loginProcess(request) } throws LoginFailedException(
                 NOT_EXIST_USER_ERROR_MESSAGE
             )
-            it("400 응답한다.") {
+            it("401 응답한다.") {
                 restDocMockMvc.post(targetUri) {
                     jsonContent(request)
                 }.andExpect {
-                    status { isBadRequest() }
+                    status { isUnauthorized() }
                 }.andDo {
                     createDocument(
                         "login-fail-not-registered-token",
@@ -97,12 +98,12 @@ class AuthControllerTest(
 
         context("유효하지 않은 토큰이 전달되면") {
             val request = createLoginRequest()
-            every { authenticationService.loginProcess(request) } throws IllegalArgumentException(TOKEN_ERROR_MESSAGE)
+            every { authenticationService.loginProcess(request) } throws InvalidTokenException(TOKEN_ERROR_MESSAGE)
             it("401 응답한다.") {
                 restDocMockMvc.post(targetUri) {
                     jsonContent(request)
                 }.andExpect {
-                    status { isBadRequest() }
+                    status { isUnauthorized() }
                 }.andDo {
                     createDocument(
                         "login-fail-invalid-token",
@@ -119,7 +120,7 @@ class AuthControllerTest(
         context("유효한 회원가입 정보가 전달되면") {
             val request = createRegisterRequest()
             every { authenticationService.register(request, TEST_PROVIDER) } just runs
-            it("204 응답한다.") {
+            it("201 응답한다.") {
                 restDocMockMvc.perform(
                     RestDocumentationRequestBuilders
                         .post(targetUri, TEST_PROVIDER)
@@ -150,17 +151,17 @@ class AuthControllerTest(
 
         context("유효한 토큰이지만, 이미 존재하는 사용자면") {
             val request = createRegisterRequest()
-            every { authenticationService.register(request, TEST_PROVIDER) } throws IllegalArgumentException(
+            every { authenticationService.register(request, TEST_PROVIDER) } throws ExistResourceException(
                 EXIST_USER_ERROR_MESSAGE
             )
-            it("400 응답한다.") {
+            it("409 응답한다.") {
                 restDocMockMvc.perform(
                     RestDocumentationRequestBuilders
                         .post(targetUri, TEST_PROVIDER)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent(request))
                 )
-                    .andExpect(status().isBadRequest)
+                    .andExpect(status().isConflict)
                     .andDo(
                         createPathDocument(
                             "register-fail-exist-user",
@@ -187,17 +188,17 @@ class AuthControllerTest(
 
         context("유효한 토큰이지만, 이미 존재하는 닉네임이면") {
             val request = createRegisterRequest()
-            every { authenticationService.register(request, TEST_PROVIDER) } throws IllegalArgumentException(
+            every { authenticationService.register(request, TEST_PROVIDER) } throws ExistResourceException(
                 EXIST_NICKNAME_ERROR_MESSAGE
             )
-            it("400 응답한다.") {
+            it("409 응답한다.") {
                 restDocMockMvc.perform(
                     RestDocumentationRequestBuilders
                         .post(targetUri, TEST_PROVIDER)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent(request))
                 )
-                    .andExpect(status().isBadRequest)
+                    .andExpect(status().isConflict)
                     .andDo(
                         createPathDocument(
                             "register-fail-exist-nickname",
@@ -223,10 +224,7 @@ class AuthControllerTest(
         }
 
         context("유효한 토큰이지만, 유효하지 않은 형식의 이메일이면") {
-            val request = createRegisterRequest()
-            every { authenticationService.register(request, TEST_PROVIDER) } throws IllegalArgumentException(
-                INVALID_EMAIL_ERROR_MESSAGE
-            )
+            val request = createRegisterRequest().copy(email = TEST_INVALID_EMAIL)
             it("400 응답한다.") {
                 restDocMockMvc.perform(
                     RestDocumentationRequestBuilders
@@ -244,7 +242,7 @@ class AuthControllerTest(
                             ),
                             requestBody(
                                 "idToken" type JsonFieldType.STRING description "유효한 ID TOKEN" example request.idToken,
-                                "email" type JsonFieldType.STRING description "올바르지 않은 형식의 이메일" example TEST_INVALID_EMAIL isOptional true,
+                                "email" type JsonFieldType.STRING description "올바르지 않은 형식의 이메일" example request.email isOptional true,
                                 "nickname" type JsonFieldType.STRING description "사용자 닉네임" example request.nickname,
                                 "phoneNumber" type JsonFieldType.STRING description "사용자 전화번호" example request.phoneNumber isOptional true,
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
@@ -260,10 +258,7 @@ class AuthControllerTest(
         }
 
         context("유효한 토큰이지만, 유효하지 않은 형식의 전화번호이면") {
-            val request = createRegisterRequest()
-            every { authenticationService.register(request, TEST_PROVIDER) } throws IllegalArgumentException(
-                INVALID_PHONE_NUMBER_ERROR_MESSAGE
-            )
+            val request = createRegisterRequest().copy(phoneNumber = TEST_INVALID_PHONE_NUMBER)
             it("400 응답한다.") {
                 restDocMockMvc.perform(
                     RestDocumentationRequestBuilders
@@ -283,7 +278,7 @@ class AuthControllerTest(
                                 "idToken" type JsonFieldType.STRING description "유효한 ID TOKEN" example request.idToken,
                                 "email" type JsonFieldType.STRING description "사용자 이메일" example request.email isOptional true,
                                 "nickname" type JsonFieldType.STRING description "사용자 닉네임" example request.nickname,
-                                "phoneNumber" type JsonFieldType.STRING description "올바르지 않은 형식의 휴대전화" example TEST_INVALID_PHONE_NUMBER isOptional true,
+                                "phoneNumber" type JsonFieldType.STRING description "올바르지 않은 형식의 휴대전화" example request.phoneNumber isOptional true,
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
                                     .joinToString(),
                                 "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday.toString()
@@ -298,17 +293,17 @@ class AuthControllerTest(
 
         context("유효하지 않은 토큰이 전달되면") {
             val request = createRegisterRequest()
-            every { authenticationService.register(request, TEST_PROVIDER) } throws IllegalArgumentException(
+            every { authenticationService.register(request, TEST_PROVIDER) } throws InvalidTokenException(
                 TOKEN_ERROR_MESSAGE
             )
-            it("400 응답한다.") {
+            it("401 응답한다.") {
                 restDocMockMvc.perform(
                     RestDocumentationRequestBuilders
                         .post(targetUri, TEST_PROVIDER)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent(request))
                 )
-                    .andExpect(status().isBadRequest)
+                    .andExpect(status().isUnauthorized)
                     .andDo(
                         createPathDocument(
                             "register-fail-invalid-token",
@@ -353,12 +348,14 @@ class AuthControllerTest(
         }
 
         context("중복인 닉네임이면") {
-            every { authenticationService.validateNickname(TEST_NICKNAME) } throws IllegalArgumentException("$TEST_NICKNAME: 이미 존재하는 회원입니다")
-            it("400 응답한다.") {
+            every { authenticationService.validateNickname(TEST_NICKNAME) } throws ExistResourceException(
+                EXIST_NICKNAME_ERROR_MESSAGE
+            )
+            it("409 응답한다.") {
                 restDocMockMvc.get(targetUri) {
                     param("value", TEST_NICKNAME)
                 }.andExpect {
-                    status { isBadRequest() }
+                    status { isConflict() }
                 }.andDo {
                     createDocument(
                         "validate-nickname-fail-exist-nickname",
