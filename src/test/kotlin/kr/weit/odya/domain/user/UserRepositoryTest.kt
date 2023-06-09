@@ -6,6 +6,7 @@ import io.kotest.extensions.spring.SpringTestLifecycleMode
 import io.kotest.matchers.shouldBe
 import kr.weit.odya.support.TEST_NICKNAME
 import kr.weit.odya.support.TEST_USERNAME
+import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createUser
 import kr.weit.odya.support.test.BaseTests.RepositoryTest
 
@@ -22,6 +23,11 @@ class UserRepositoryTest(
             val result = userRepository.getByUsername(TEST_USERNAME)
             result.username shouldBe TEST_USERNAME
         }
+
+        expect("USER_ID가 일치하는 사용자를 조회한다") {
+            val result = userRepository.getByUserId(TEST_USER_ID)
+            result.username shouldBe TEST_USERNAME
+        }
     }
 
     context("사용자 여부 확인") {
@@ -35,15 +41,6 @@ class UserRepositoryTest(
         expect("닉네임이 일치하는 사용자 여부를 확인한다") {
             val result = userRepository.existsByNickname(TEST_NICKNAME)
             result shouldBe true
-        }
-    }
-
-    context("사용자 역할 조회") {
-        userRepository.save(createUser())
-
-        expect("USERNAME이 일치하는 사용자 역할을 조회한다") {
-            val result = userRepository.getUserRoleByUsername(TEST_USERNAME)
-            result shouldBe UserRole.ROLE_USER.name
         }
     }
 })

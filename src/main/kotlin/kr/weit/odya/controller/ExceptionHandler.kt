@@ -74,8 +74,8 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
     }
 
     @ExceptionHandler(ExistResourceException::class)
-    fun resourcesExceptionException(ex: OdyaException): ResponseEntity<ApiErrorResponse> {
-        logger.error("[ResourceException]", ex)
+    fun existResourceException(ex: OdyaException): ResponseEntity<ApiErrorResponse> {
+        logger.error("[ExistResourceException]", ex)
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiErrorResponse(ex.message))
     }
 

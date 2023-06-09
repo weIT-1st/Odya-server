@@ -45,6 +45,7 @@ class User(
     val withdrawDate: LocalDateTime? = null
 ) : BaseTimeEntity() {
     constructor(
+        id: Long = 0L,
         username: String,
         email: String?,
         nickname: String,
@@ -55,6 +56,7 @@ class User(
         socialType: SocialType,
         userRole: UserRole = UserRole.ROLE_USER
     ) : this(
+        id = id,
         username = username,
         information = UserInformation(email, nickname, phoneNumber, gender, birthday, profileName),
         socialType = socialType,

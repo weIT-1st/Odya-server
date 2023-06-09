@@ -19,7 +19,6 @@ class TestTokenFilter : OncePerRequestFilter() {
         if (loginToken == TEST_BEARER_ID_TOKEN) {
             SecurityContextHolder.getContext().authentication = userAuthentication()
         }
-
         filterChain.doFilter(request, response)
     }
 }

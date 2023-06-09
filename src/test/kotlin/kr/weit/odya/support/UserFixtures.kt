@@ -6,6 +6,7 @@ import kr.weit.odya.domain.user.User
 import kr.weit.odya.service.dto.UserResponse
 import java.time.LocalDate
 
+const val TEST_USER_ID = 1L
 const val TEST_USERNAME = "testUsername"
 const val TEST_EMAIL = "test@test.com"
 const val TEST_INVALID_EMAIL = "test"
@@ -17,6 +18,7 @@ val TEST_BIRTHDAY: LocalDate = LocalDate.of(1999, 10, 10)
 val TEST_SOCIAL_TYPE: SocialType = SocialType.KAKAO
 
 fun createUser(): User = User(
+    id = TEST_USER_ID,
     username = TEST_USERNAME,
     email = TEST_EMAIL,
     nickname = TEST_NICKNAME,
