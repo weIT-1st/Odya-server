@@ -1,6 +1,7 @@
 package kr.weit.odya.controller
 
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
+import jakarta.ws.rs.ForbiddenException
 import kr.weit.odya.security.InvalidTokenException
 import kr.weit.odya.service.ExistResourceException
 import kr.weit.odya.service.LoginFailedException
@@ -39,7 +40,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
     ): ResponseEntity<Any>? {
         logger.error("[HttpMessageNotReadableException] ${ex.message}")
         val errorMessage = when (val cause = ex.cause) {
-            is MismatchedInputException -> "${cause.path.joinToString() { it.fieldName }}: ${ex.message}"
+            is MismatchedInputException -> "${cause.path.joinToString { it.fieldName }}: ${ex.message}"
             else -> "유효하지 않은 요청입니다"
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiErrorResponse(errorMessage))
@@ -83,6 +84,12 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
     fun exception(ex: Exception): ResponseEntity<ApiErrorResponse> {
         logger.error("[Exception]", ex)
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiErrorResponse(ex.message))
+    }
+
+    @ExceptionHandler(ForbiddenException::class)
+    fun forbiddenException(ex: Exception): ResponseEntity<ApiErrorResponse> {
+        logger.error("[ForbiddenException]", ex)
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiErrorResponse(ex.message))
     }
 
     private fun MethodArgumentNotValidException.messages(): List<String> {

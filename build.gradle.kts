@@ -41,6 +41,8 @@ dependencies {
 
     implementation("com.google.firebase:firebase-admin:9.1.1")
 
+    implementation("com.google.firebase:firebase-admin:9.1.1")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("com.h2database:h2:2.1.214")
     testImplementation("io.mockk:mockk:1.13.5")
@@ -62,6 +64,8 @@ dependencies {
     asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
+
+    implementation("org.springframework.boot:spring-boot-starter-validation:2.5.6")
 }
 
 tasks {
