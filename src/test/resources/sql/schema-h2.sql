@@ -22,16 +22,22 @@ ALTER TABLE users
 ALTER TABLE users
     ADD CONSTRAINT UK_NICKNAME_ON_USERS UNIQUE (nickname);
 
+CREATE SEQUENCE place_review_seq START WITH 1 INCREMENT BY 1;
+
 CREATE TABLE place_review
 (
+    id           NUMBER(19, 0) NOT NULL,
     place_id     VARCHAR2(400) NOT NULL,
     user_id      NUMBER(19, 0) NOT NULL,
     star_rating  INTEGER       NOT NULL,
-    "COMMENT"    VARCHAR2(90)  NOT NULL,
+    review       VARCHAR2(90)  NOT NULL,
     created_date DATE          NOT NULL,
     updated_date DATE          NOT NULL,
-    CONSTRAINT pk_place_review PRIMARY KEY (place_id, user_id)
+    CONSTRAINT pk_placereview PRIMARY KEY (id)
 );
+
+ALTER TABLE place_review
+    ADD CONSTRAINT place_id_user_id_unique UNIQUE (place_id, user_id);
 
 ALTER TABLE place_review
     ADD CONSTRAINT FK_PLACE_REVIEW_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
