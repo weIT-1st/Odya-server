@@ -37,13 +37,4 @@ class PlaceReviewService(
         }
         placeReviewRepository.save(placeReview)
     }
-
-    @Transactional
-    fun deleteReview(request: Long, userId: Long) {
-        val placeReview = placeReviewRepository.getByPlaceReviewId(request)
-        if (placeReview.writerId != userId) {
-            throw ForbiddenException("삭제 권한이 없습니다.")
-        }
-        placeReviewRepository.delete(placeReview)
-    }
 }
