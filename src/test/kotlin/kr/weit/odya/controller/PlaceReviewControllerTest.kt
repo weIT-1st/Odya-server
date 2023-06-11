@@ -6,7 +6,6 @@ import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import jakarta.ws.rs.ForbiddenException
-import kr.weit.odya.security.InvalidTokenException
 import kr.weit.odya.service.ExistResourceException
 import kr.weit.odya.service.PlaceReviewService
 import kr.weit.odya.support.EXIST_PLACE_REVIEW_ERROR_MESSAGE
@@ -155,7 +154,7 @@ class PlaceReviewControllerTest(
                         ),
                         requestBody(
                             "placeId" type JsonFieldType.STRING description "장소 ID" example TEST_PLACE_ID,
-                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_TOO_HIGH_RATING.toString(),
+                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString(),
                             "review" type JsonFieldType.STRING description "공백인 리뷰" example " "
                         ),
                         responseBody(
@@ -182,8 +181,8 @@ class PlaceReviewControllerTest(
                         ),
                         requestBody(
                             "placeId" type JsonFieldType.STRING description "장소 ID" example TEST_PLACE_ID,
-                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_TOO_HIGH_RATING.toString(),
-                            "review" type JsonFieldType.STRING description "최대 길이를 초과한 리뷰" example TEST_REVIEW
+                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString(),
+                            "review" type JsonFieldType.STRING description "최대 길이를 초과한 리뷰" example TEST_TOO_LONG_REVIEW
                         ),
                         responseBody(
                             "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
@@ -195,7 +194,7 @@ class PlaceReviewControllerTest(
 
         context("가입되어 있지 않은 USERID이 주어지는 경우") {
             val request = createPlaceReviewRequest()
-            it("404 응답한다.") {
+            it("401 응답한다.") {
                 restDocMockMvc.post(targetUri) {
                     header(HttpHeaders.AUTHORIZATION, TEST_BEARER_NOT_EXIST_USER_ID_TOKEN)
                     jsonContent(request)
@@ -252,9 +251,6 @@ class PlaceReviewControllerTest(
 
         context("유효하지 않은 토큰이 전달되면") {
             val request = createPlaceReviewRequest()
-            every { placeReviewService.createReview(request, TEST_USER_ID) } throws InvalidTokenException(
-                TOKEN_ERROR_MESSAGE
-            )
             it("401 응답한다.") {
                 restDocMockMvc.post(targetUri) {
                     header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
@@ -390,7 +386,7 @@ class PlaceReviewControllerTest(
         }
 
         context("유효한 토큰이지만 리뷰가 최소 길이를 미만인 경우") {
-            val request = updatePlaceReviewRequest().copy(review = "")
+            val request = updatePlaceReviewRequest().copy(review = " ")
             it("400을 반환한다.") {
                 restDocMockMvc.patch(targetUri) {
                     header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -405,8 +401,8 @@ class PlaceReviewControllerTest(
                         ),
                         requestBody(
                             "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
-                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_TOO_HIGH_RATING.toString(),
-                            "review" type JsonFieldType.STRING description "최소 길이 미만인 리뷰" example TEST_REVIEW
+                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString(),
+                            "review" type JsonFieldType.STRING description "공백인 리뷰" example " "
                         ),
                         responseBody(
                             "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
@@ -432,8 +428,8 @@ class PlaceReviewControllerTest(
                         ),
                         requestBody(
                             "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
-                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_TOO_HIGH_RATING.toString(),
-                            "review" type JsonFieldType.STRING description "최대 길이를 초과한 리뷰" example TEST_REVIEW
+                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString(),
+                            "review" type JsonFieldType.STRING description "최대 길이를 초과한 리뷰" example TEST_TOO_LONG_REVIEW
                         ),
                         responseBody(
                             "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
@@ -445,7 +441,7 @@ class PlaceReviewControllerTest(
 
         context("가입되어 있지 않은 USERID이 주어지는 경우") {
             val request = updatePlaceReviewRequest()
-            it("404 응답한다.") {
+            it("401 응답한다.") {
                 restDocMockMvc.patch(targetUri) {
                     header(HttpHeaders.AUTHORIZATION, TEST_BEARER_NOT_EXIST_USER_ID_TOKEN)
                     jsonContent(request)
@@ -486,9 +482,9 @@ class PlaceReviewControllerTest(
                             HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                         ),
                         requestBody(
-                            "id" type JsonFieldType.NUMBER description "잘못된 장소 리뷰 ID",
-                            "rating" type JsonFieldType.NUMBER description "별점",
-                            "review" type JsonFieldType.STRING description "장소 ID"
+                            "id" type JsonFieldType.NUMBER description "잘못된 장소 리뷰 ID" example TEST_EXIST_PLACE_REVIEW_ID.toString(),
+                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString(),
+                            "review" type JsonFieldType.STRING description "장소 ID" example TEST_REVIEW
                         ),
                         responseBody(
                             "errorMessage" type JsonFieldType.STRING description "에러 메시지" example NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE
@@ -514,9 +510,9 @@ class PlaceReviewControllerTest(
                             HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                         ),
                         requestBody(
-                            "id" type JsonFieldType.NUMBER description "장소 리뷰 ID",
-                            "rating" type JsonFieldType.NUMBER description "별점",
-                            "review" type JsonFieldType.STRING description "장소 ID"
+                            "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
+                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString(),
+                            "review" type JsonFieldType.STRING description "장소 ID" example TEST_REVIEW
                         ),
                         responseBody(
                             "errorMessage" type JsonFieldType.STRING description "에러 메시지" example FORBIDDEN_PLACE_REVIEW_ERROR_MESSAGE
@@ -528,9 +524,6 @@ class PlaceReviewControllerTest(
 
         context("유효하지 않은 토큰이 전달되면") {
             val request = updatePlaceReviewRequest()
-            every { placeReviewService.updateReview(request, TEST_USER_ID) } throws InvalidTokenException(
-                TOKEN_ERROR_MESSAGE
-            )
             it("401 응답한다.") {
                 restDocMockMvc.post(targetUri) {
                     header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)

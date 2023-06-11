@@ -15,8 +15,7 @@ const val TEST_UPDATE_REVIEW = "test update review"
 const val TEST_UPDATE_RATING = 4
 const val TEST_TOO_LOW_RATING = -1
 const val TEST_TOO_HIGH_RATING = 11
-const val TEST_TOO_LONG_REVIEW = "김수한무 거북이와 두루미 삼천갑자 동방삭 치치카포 사리사리센타 워리워리 세브리깡 무두셀라 구름이 허리케인에 담벼락 담벼락에 서생원 서생원에 고양이 고양이엔 바둑이 바둑이는 돌돌이"
-
+const val TEST_TOO_LONG_REVIEW = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit"
 
 fun createPlaceReviewRequest(): PlaceReviewCreateRequest {
     return PlaceReviewCreateRequest(TEST_PLACE_ID, TEST_RATING, TEST_REVIEW)

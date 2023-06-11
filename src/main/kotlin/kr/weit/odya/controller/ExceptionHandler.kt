@@ -87,7 +87,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
     }
 
     @ExceptionHandler(ForbiddenException::class)
-    fun forbiddenException(ex: Exception): ResponseEntity<ApiErrorResponse> {
+    fun forbiddenException(ex: ForbiddenException): ResponseEntity<ApiErrorResponse> {
         logger.error("[ForbiddenException]", ex)
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiErrorResponse(ex.message))
     }

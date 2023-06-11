@@ -13,7 +13,6 @@ import jakarta.persistence.UniqueConstraint
 import kr.weit.odya.domain.BaseModifiableEntity
 import kr.weit.odya.domain.user.User
 
-
 @Table(
     uniqueConstraints = [
         UniqueConstraint(
@@ -24,7 +23,7 @@ import kr.weit.odya.domain.user.User
 )
 @SequenceGenerator(name = "PLACE_REVIEW_SEQ_GENERATOR", sequenceName = "PLACE_REVIEW_SEQ", initialValue = 1, allocationSize = 1)
 @Entity
-data class PlaceReview(
+class PlaceReview(
     @Id
     @Column(columnDefinition = "NUMERIC(19, 0)")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PLACE_REVIEW_SEQ_GENERATOR")

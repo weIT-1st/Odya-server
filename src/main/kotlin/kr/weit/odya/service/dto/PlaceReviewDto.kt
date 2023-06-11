@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Positive
 import kr.weit.odya.domain.placeReview.PlaceReview
 import kr.weit.odya.domain.user.User
+import kr.weit.odya.support.validator.NullOrNotBlank
 import org.hibernate.validator.constraints.Length
 
 data class PlaceReviewCreateRequest(
@@ -40,6 +41,7 @@ data class PlaceReviewUpdateRequest(
     @field:Max(message = "별점은 10점 이하이어야 합니다.", value = 10)
     val rating: Int?,
 
-    @field:Length(min = 1, max = 90, message = "리뷰의 길이가 올바르지 않습니다.")
+    @field:NullOrNotBlank(message = "리뷰는 빈 문자열이 될 수 없습니다.")
+    @field:Length(max = 90, message = "리뷰의 최대 길이를 초과했습니다.")
     val review: String?
 )

@@ -10,18 +10,15 @@ import kr.weit.odya.domain.placeReview.PlaceReviewRepository
 import kr.weit.odya.domain.placeReview.getByPlaceReviewId
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
-import kr.weit.odya.support.TEST_OTHER_USER_ID
 import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_USER_ID
+import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createPlaceReview
 import kr.weit.odya.support.createPlaceReviewRequest
 import kr.weit.odya.support.createUser
-import kr.weit.odya.support.test.BaseTests.SpringTestEnvironment
 import kr.weit.odya.support.updatePlaceReviewRequest
 
-
-@SpringTestEnvironment
 class PlaceReviewServiceTest : DescribeSpec(
     {
         val userRepository = mockk<UserRepository>()
@@ -56,7 +53,7 @@ class PlaceReviewServiceTest : DescribeSpec(
         describe("UpdatePlaceReview 메소드") {
             context("유효한 데이터가 전달되면") {
                 every { placeReviewRepository.getByPlaceReviewId(TEST_USER_ID) } returns createPlaceReview()
-                every { placeReviewRepository.save(any()) } returns createPlaceReview().copy(review = "updated", starRating = 5)
+                every { placeReviewRepository.save(any()) } returns createPlaceReview()
                 it("리뷰를 생성한다.") {
                     shouldNotThrow<Exception> { sut.updateReview(updatePlaceReviewRequest(), TEST_USER_ID) }
                 }
@@ -70,7 +67,7 @@ class PlaceReviewServiceTest : DescribeSpec(
             }
 
             context("수정할 권한이 없는 경우") {
-                every { placeReviewRepository.getByPlaceReviewId(TEST_PLACE_REVIEW_ID) } returns createPlaceReview().copy(user = createUser().copy(id = TEST_OTHER_USER_ID))
+                every { placeReviewRepository.getByPlaceReviewId(TEST_PLACE_REVIEW_ID) } returns createPlaceReview(createOtherUser())
                 it("[ForbiddenException] 예외가 발생한다") {
                     shouldThrow<ForbiddenException> { sut.updateReview(updatePlaceReviewRequest(), TEST_USER_ID) }
                 }

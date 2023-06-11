@@ -19,9 +19,6 @@ spring:
       ddl-auto: validate
     database: oracle
     database-platform: org.hibernate.dialect.OracleDialect
-    properties:
-      hibernate:
-        auto_quote_keyword: true
 logging:
   level:
     org:

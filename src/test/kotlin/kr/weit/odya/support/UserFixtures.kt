@@ -30,4 +30,15 @@ fun createUser(): User = User(
     socialType = TEST_SOCIAL_TYPE
 )
 
+fun createOtherUser(): User = User(
+    id = TEST_OTHER_USER_ID,
+    username = TEST_USERNAME,
+    email = TEST_EMAIL,
+    nickname = TEST_NICKNAME,
+    phoneNumber = TEST_PHONE_NUMBER,
+    gender = TEST_GENDER,
+    birthday = TEST_BIRTHDAY,
+    socialType = TEST_SOCIAL_TYPE
+)
+
 fun createUserResponse(): UserResponse = UserResponse(createUser())
