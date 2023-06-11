@@ -9,3 +9,12 @@ spring:
       - sentry
       - flyway
       - open-search
+  servlet:
+    multipart:
+      max-file-size: 50MB # 사진 1개당 약 100kb * 최대 15일까지 한번에 올릴수 있음 * 1일당 30장까지 올릴수 있음 + 10% 버퍼 = 50MB
+
+server:
+  error:
+    whitelabel:
+      enabled: false
+  shutdown: graceful
