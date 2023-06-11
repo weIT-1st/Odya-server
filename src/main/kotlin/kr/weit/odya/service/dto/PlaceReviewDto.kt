@@ -15,7 +15,7 @@ data class PlaceReviewCreateRequest(
     val placeId: String,
 
     @field:NotNull(message = "별점은 필수 입력값입니다.")
-    @field:Min(message = "별점은 0점 이상이어야 합니다.", value = 0)
+    @field:Min(message = "별점은 1점 이상이어야 합니다.", value = 1)
     @field:Max(message = "별점은 10점 이하이어야 합니다.", value = 10)
     val rating: Int,
 
@@ -37,7 +37,7 @@ data class PlaceReviewUpdateRequest(
     @field:Positive(message = "장소 리뷰 ID는 양수여야 합니다.")
     val id: Long,
 
-    @field:Min(message = "별점은 0점 이상이어야 합니다.", value = 0)
+    @field:Min(message = "별점은 1점 이상이어야 합니다.", value = 1)
     @field:Max(message = "별점은 10점 이하이어야 합니다.", value = 10)
     val rating: Int?,
 
