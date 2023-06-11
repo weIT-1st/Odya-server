@@ -14,7 +14,6 @@ spring:
     database-platform: org.hibernate.dialect.OracleDialect
     properties:
       hibernate:
-        auto_quote_keyword: true
         format_sql: true
 logging:
   level:
