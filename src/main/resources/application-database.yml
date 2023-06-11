@@ -1,3 +1,9 @@
+spring:
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        default_batch_fetch_size: 100 # 나중에 부족하시면 늘려주세요!
 ---
 spring:
   config.activate.on-profile: sandbox, stable
@@ -6,6 +12,8 @@ spring:
     url: ${DATASOURCE_URL}
     username: ${DB_USER_NAME}
     password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 8 # DB 최대 세션수가 30개인데 서버배포시 rolling update를 할때 디폴트 값인 10개씩 먹으면 아슬아슬해서 줄였습니다!
   jpa:
     hibernate:
       ddl-auto: validate
@@ -15,6 +23,19 @@ logging:
   level:
     org:
       hibernate: info
+
+---
+spring:
+  config.activate.on-profile: sandbox
+  datasource:
+    hikari:
+      maximum-pool-size: 4 # 샌박은 동시에 DB에 붙을 서버가 많아서 더 작게 설정했습니다
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
 ---
 # 요 아래 설정들은 테스트 작성하실때 사용할 메모리 DB 연결 설정입니다!
 spring:
