@@ -7,14 +7,10 @@ spring:
     username: ${DB_USER_NAME}
     password: ${DB_PASSWORD}
   jpa:
-    show-sql: true
     hibernate:
       ddl-auto: validate
     database: oracle
     database-platform: org.hibernate.dialect.OracleDialect
-    properties:
-      hibernate:
-        format_sql: true
 logging:
   level:
     org:
