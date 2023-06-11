@@ -296,8 +296,8 @@ class PlaceReviewControllerTest(
                         ),
                         requestBody(
                             "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
-                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString(),
-                            "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW
+                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString() isOptional true,
+                            "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true
                         )
                     )
                 }
@@ -320,8 +320,8 @@ class PlaceReviewControllerTest(
                         ),
                         requestBody(
                             "id" type JsonFieldType.NUMBER description "음수인 장소 리뷰 ID" example TEST_INVALID_PLACE_REVIEW_ID.toString(),
-                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString(),
-                            "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW
+                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString() isOptional true,
+                            "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true
                         ),
                         responseBody(
                             "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
@@ -347,8 +347,8 @@ class PlaceReviewControllerTest(
                         ),
                         requestBody(
                             "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
-                            "rating" type JsonFieldType.NUMBER description "최소보다 미만인 별점" example TEST_TOO_LOW_RATING.toString(),
-                            "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW
+                            "rating" type JsonFieldType.NUMBER description "최소보다 미만인 별점" example TEST_TOO_LOW_RATING.toString() isOptional true,
+                            "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true
                         ),
                         responseBody(
                             "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
@@ -374,8 +374,8 @@ class PlaceReviewControllerTest(
                         ),
                         requestBody(
                             "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
-                            "rating" type JsonFieldType.NUMBER description "최대보다 초과인 별점" example TEST_TOO_HIGH_RATING.toString(),
-                            "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW
+                            "rating" type JsonFieldType.NUMBER description "최대보다 초과인 별점" example TEST_TOO_HIGH_RATING.toString() isOptional true,
+                            "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true
                         ),
                         responseBody(
                             "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
@@ -385,7 +385,7 @@ class PlaceReviewControllerTest(
             }
         }
 
-        context("유효한 토큰이지만 리뷰가 최소 길이를 미만인 경우") {
+        context("유효한 토큰이지만 리뷰가 공백인 경우") {
             val request = updatePlaceReviewRequest().copy(review = " ")
             it("400을 반환한다.") {
                 restDocMockMvc.patch(targetUri) {
@@ -401,8 +401,8 @@ class PlaceReviewControllerTest(
                         ),
                         requestBody(
                             "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
-                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString(),
-                            "review" type JsonFieldType.STRING description "공백인 리뷰" example " "
+                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString() isOptional true,
+                            "review" type JsonFieldType.STRING description "공백인 리뷰" example " " isOptional true
                         ),
                         responseBody(
                             "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
@@ -428,8 +428,8 @@ class PlaceReviewControllerTest(
                         ),
                         requestBody(
                             "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
-                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString(),
-                            "review" type JsonFieldType.STRING description "최대 길이를 초과한 리뷰" example TEST_TOO_LONG_REVIEW
+                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString() isOptional true,
+                            "review" type JsonFieldType.STRING description "최대 길이를 초과한 리뷰" example TEST_TOO_LONG_REVIEW isOptional true
                         ),
                         responseBody(
                             "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
@@ -455,8 +455,8 @@ class PlaceReviewControllerTest(
                         ),
                         requestBody(
                             "id" type JsonFieldType.NUMBER description "장소 리뷰 ID",
-                            "rating" type JsonFieldType.NUMBER description "별점",
-                            "review" type JsonFieldType.STRING description "장소 ID"
+                            "rating" type JsonFieldType.NUMBER description "별점" isOptional true,
+                            "review" type JsonFieldType.STRING description "장소 ID" isOptional true
                         ),
                         responseBody(
                             "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
@@ -483,8 +483,8 @@ class PlaceReviewControllerTest(
                         ),
                         requestBody(
                             "id" type JsonFieldType.NUMBER description "잘못된 장소 리뷰 ID" example TEST_EXIST_PLACE_REVIEW_ID.toString(),
-                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString(),
-                            "review" type JsonFieldType.STRING description "장소 ID" example TEST_REVIEW
+                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString() isOptional true,
+                            "review" type JsonFieldType.STRING description "장소 ID" example TEST_REVIEW isOptional true
                         ),
                         responseBody(
                             "errorMessage" type JsonFieldType.STRING description "에러 메시지" example NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE
@@ -511,8 +511,8 @@ class PlaceReviewControllerTest(
                         ),
                         requestBody(
                             "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
-                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString(),
-                            "review" type JsonFieldType.STRING description "장소 ID" example TEST_REVIEW
+                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString() isOptional true,
+                            "review" type JsonFieldType.STRING description "장소 ID" example TEST_REVIEW isOptional true
                         ),
                         responseBody(
                             "errorMessage" type JsonFieldType.STRING description "에러 메시지" example FORBIDDEN_PLACE_REVIEW_ERROR_MESSAGE
@@ -538,8 +538,8 @@ class PlaceReviewControllerTest(
                         ),
                         requestBody(
                             "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
-                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString(),
-                            "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW
+                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString() isOptional true,
+                            "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true
                         ),
                         responseBody(
                             "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
