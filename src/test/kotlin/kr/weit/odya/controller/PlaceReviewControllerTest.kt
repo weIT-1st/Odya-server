@@ -456,7 +456,7 @@ class PlaceReviewControllerTest(
                         requestBody(
                             "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
                             "rating" type JsonFieldType.NUMBER description "별점" example TEST_PLACE_REVIEW_ID.toString() isOptional true,
-                            "review" type JsonFieldType.STRING description "장소 ID" example TEST_PLACE_REVIEW_ID.toString() isOptional true
+                            "review" type JsonFieldType.STRING description "리뷰" example TEST_PLACE_REVIEW_ID.toString() isOptional true
                         ),
                         responseBody(
                             "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
@@ -484,7 +484,7 @@ class PlaceReviewControllerTest(
                         requestBody(
                             "id" type JsonFieldType.NUMBER description "잘못된 장소 리뷰 ID" example TEST_EXIST_PLACE_REVIEW_ID.toString(),
                             "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString() isOptional true,
-                            "review" type JsonFieldType.STRING description "장소 ID" example TEST_REVIEW isOptional true
+                            "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true
                         ),
                         responseBody(
                             "errorMessage" type JsonFieldType.STRING description "에러 메시지" example NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE
@@ -512,7 +512,7 @@ class PlaceReviewControllerTest(
                         requestBody(
                             "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
                             "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString() isOptional true,
-                            "review" type JsonFieldType.STRING description "장소 ID" example TEST_REVIEW isOptional true
+                            "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true
                         ),
                         responseBody(
                             "errorMessage" type JsonFieldType.STRING description "에러 메시지" example FORBIDDEN_PLACE_REVIEW_ERROR_MESSAGE
