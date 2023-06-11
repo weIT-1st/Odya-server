@@ -62,8 +62,6 @@ dependencies {
     asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
-
-    implementation("org.springframework.boot:spring-boot-starter-validation:2.5.6")
 }
 
 tasks {
