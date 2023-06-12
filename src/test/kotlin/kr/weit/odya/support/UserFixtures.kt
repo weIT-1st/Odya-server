@@ -17,8 +17,21 @@ val TEST_GENDER: Gender = Gender.M
 val TEST_BIRTHDAY: LocalDate = LocalDate.of(1999, 10, 10)
 val TEST_SOCIAL_TYPE: SocialType = SocialType.KAKAO
 
+const val TEST_OTHER_USER_ID = 2L
+
 fun createUser(): User = User(
     id = TEST_USER_ID,
+    username = TEST_USERNAME,
+    email = TEST_EMAIL,
+    nickname = TEST_NICKNAME,
+    phoneNumber = TEST_PHONE_NUMBER,
+    gender = TEST_GENDER,
+    birthday = TEST_BIRTHDAY,
+    socialType = TEST_SOCIAL_TYPE
+)
+
+fun createOtherUser(): User = User(
+    id = TEST_OTHER_USER_ID,
     username = TEST_USERNAME,
     email = TEST_EMAIL,
     nickname = TEST_NICKNAME,
