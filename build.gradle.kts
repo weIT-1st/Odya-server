@@ -59,6 +59,10 @@ dependencies {
         exclude("org.opensearch.client", "opensearch-rest-client-sniffer")
     }
 
+    implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.0.1"))
+    implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store")
+    implementation("org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.3")
+
     asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
