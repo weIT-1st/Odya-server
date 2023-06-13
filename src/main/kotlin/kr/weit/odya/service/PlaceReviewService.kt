@@ -1,6 +1,7 @@
 package kr.weit.odya.service
 
 import jakarta.ws.rs.ForbiddenException
+import kr.weit.odya.domain.placeReview.PlaceReview
 import kr.weit.odya.domain.placeReview.PlaceReviewRepository
 import kr.weit.odya.domain.placeReview.getByPlaceReviewId
 import kr.weit.odya.domain.user.User
@@ -36,5 +37,25 @@ class PlaceReviewService(
             this.review = request.review ?: this.review
         }
         placeReviewRepository.save(placeReview)
+    }
+
+    @Transactional
+    fun deleteReview(placeReviewId: Long, userId: Long) {
+        val placeReview = placeReviewRepository.getByPlaceReviewId(placeReviewId)
+        if (placeReview.writerId != userId) {
+            throw ForbiddenException("작성자만 삭제할 수 있습니다.")
+        }
+        placeReviewRepository.delete(placeReview)
+    }
+
+    @Transactional
+    fun getPlaceReviewList(placeId: String, userId: Long): List<PlaceReview>? {
+        return placeReviewRepository.findAllByPlaceId(placeId)
+    }
+
+    @Transactional
+    fun getUserReviewList(userId: Long): List<PlaceReview>? {
+        val user: User = userRepository.getByUserId(userId)
+        return placeReviewRepository.findAllByUser(user)
     }
 }
