@@ -8,7 +8,9 @@ import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.service.dto.PlaceReviewCreateRequest
+import kr.weit.odya.service.dto.PlaceReviewListResponse
 import kr.weit.odya.service.dto.PlaceReviewUpdateRequest
+import kr.weit.odya.service.dto.UserPlaceReviewListResponse
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -49,13 +51,23 @@ class PlaceReviewService(
     }
 
     @Transactional
-    fun getPlaceReviewList(placeId: String, userId: Long): List<PlaceReview>? {
-        return placeReviewRepository.findAllByPlaceId(placeId)
+    fun getPlaceReviewList(placeId: String, userId: Long): MutableList<PlaceReviewListResponse>? {
+        val placeReviewList: List<PlaceReview> = placeReviewRepository.findAllByPlaceId(placeId) ?: return null
+        var responseList: MutableList<PlaceReviewListResponse> = mutableListOf()
+        for (placeReview in placeReviewList) {
+            responseList.add(PlaceReviewListResponse(placeReview))
+        }
+        return responseList
     }
 
     @Transactional
-    fun getUserReviewList(userId: Long): List<PlaceReview>? {
+    fun getUserReviewList(userId: Long): MutableList<UserPlaceReviewListResponse> {
         val user: User = userRepository.getByUserId(userId)
-        return placeReviewRepository.findAllByUser(user)
+        val placeReviewList: List<PlaceReview>? = placeReviewRepository.findAllByUser(user)
+        var responseList: MutableList<UserPlaceReviewListResponse> = mutableListOf()
+        for (placeReview in placeReviewList!!) {
+            responseList.add(UserPlaceReviewListResponse(placeReview))
+        }
+        return responseList
     }
 }

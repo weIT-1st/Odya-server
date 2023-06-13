@@ -6,7 +6,9 @@ import jakarta.validation.constraints.Positive
 import kr.weit.odya.security.LoginUserId
 import kr.weit.odya.service.PlaceReviewService
 import kr.weit.odya.service.dto.PlaceReviewCreateRequest
+import kr.weit.odya.service.dto.PlaceReviewListResponse
 import kr.weit.odya.service.dto.PlaceReviewUpdateRequest
+import kr.weit.odya.service.dto.UserPlaceReviewListResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -63,16 +65,14 @@ class PlaceReviewController(private val placeReviewService: PlaceReviewService) 
         @PathVariable("id")
         placeId: String,
         @LoginUserId userId: Long
-    ): ResponseEntity<Void> {
-        val placeReviewList = placeReviewService.getPlaceReviewList(placeId, userId)
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
+    ): ResponseEntity<MutableList<PlaceReviewListResponse>> {
+        return ResponseEntity.ok(placeReviewService.getPlaceReviewList(placeId, userId))
     }
 
-    @GetMapping("/list/user/")
+    @GetMapping("/list/user")
     fun getUserReviewList(
         @LoginUserId userId: Long
-    ): ResponseEntity<Void> {
-        val placeReviewList = placeReviewService.getUserReviewList(userId)
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
+    ): ResponseEntity<MutableList<UserPlaceReviewListResponse>> {
+        return ResponseEntity.ok(placeReviewService.getUserReviewList(userId))
     }
 }

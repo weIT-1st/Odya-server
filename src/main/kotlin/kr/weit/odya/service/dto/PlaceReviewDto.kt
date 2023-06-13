@@ -45,3 +45,29 @@ data class PlaceReviewUpdateRequest(
     @field:Length(max = 90, message = "리뷰의 최대 길이를 초과했습니다.")
     val review: String?
 )
+
+data class PlaceReviewListResponse(
+    val placeId: String,
+    val writerNickname: String,
+    val starRating: Int,
+    val review: String
+) {
+    constructor(placeReview: PlaceReview) : this(
+        placeReview.placeId,
+        placeReview.writerNickname,
+        placeReview.starRating,
+        placeReview.review
+    )
+}
+
+data class UserPlaceReviewListResponse(
+    val placeId: String,
+    val starRating: Int,
+    val review: String
+) {
+    constructor(placeReview: PlaceReview) : this(
+        placeReview.placeId,
+        placeReview.starRating,
+        placeReview.review
+    )
+}
