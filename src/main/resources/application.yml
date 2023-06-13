@@ -2,7 +2,6 @@ spring:
   application:
     name: Odya
   profiles:
-    active: sandbox
     include:
       - database
       - object-storage

@@ -8,12 +8,9 @@ spring:
 spring:
   config.activate.on-profile: sandbox, stable
   datasource:
+    driver-class-name: oracle.jdbc.OracleDriver
     hikari:
       maximum-pool-size: 8 # DB 최대 세션수가 30개인데 서버배포시 rolling update를 할때 디폴트 값인 10개씩 먹으면 아슬아슬해서 줄였습니다!
-    driver-class-name: oracle.jdbc.OracleDriver
-    url: ${DATASOURCE_URL}
-    username: ${DB_USER_NAME}
-    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate
