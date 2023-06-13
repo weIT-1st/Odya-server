@@ -1,0 +1,9 @@
+spring:
+  profiles:
+    active: sandbox
+  config:
+    import: 'aws-parameterstore:/config/Odya_${spring.profiles.active}'
+  cloud:
+    aws:
+      region:
+        static: ap-northeast-2
