@@ -17,7 +17,7 @@ const val TEST_BEARER_NOT_EXIST_USER_ID_TOKEN = "Bearer $TEST_NOT_EXIST_USER_ID_
 
 const val TEST_BEARER_INVALID_ID_TOKEN = "Bearer $TEST_INVALID_ID_TOKEN"
 
-const val TOKEN_ERROR_MESSAGE = "something error message"
+const val SOMETHING_ERROR_MESSAGE = "something error message"
 
 const val TEST_PROVIDER = "kakao"
 

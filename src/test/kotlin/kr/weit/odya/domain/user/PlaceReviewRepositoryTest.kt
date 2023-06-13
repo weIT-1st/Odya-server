@@ -34,12 +34,12 @@ class PlaceReviewRepositoryTest(
 
         expect("PLACE_ID와 일치하는 장소 리뷰를 조회한다") {
             val result = placeReviewRepository.findAllByPlaceId(TEST_PLACE_ID)
-            result?.get(0)?.placeId shouldBe TEST_PLACE_ID
+            result[0].placeId shouldBe TEST_PLACE_ID
         }
 
         expect("USER_ID와 일치하는 장소 리뷰를 조회한다") {
             val result = placeReviewRepository.findAllByUser(createUser())
-            result?.get(0)?.user?.id shouldBe TEST_USER_ID
+            result[0].writerId shouldBe TEST_USER_ID
         }
     }
 

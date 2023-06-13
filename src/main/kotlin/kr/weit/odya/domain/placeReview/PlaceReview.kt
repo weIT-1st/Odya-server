@@ -5,6 +5,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.SequenceGenerator
@@ -19,6 +20,9 @@ import kr.weit.odya.domain.user.User
             name = "place_id_user_id_unique",
             columnNames = ["place_id", "user_id"]
         )
+    ],
+    indexes = [
+        Index(name = "place_id_index", columnList = "place_id")
     ]
 )
 @SequenceGenerator(name = "PLACE_REVIEW_SEQ_GENERATOR", sequenceName = "PLACE_REVIEW_SEQ", initialValue = 1, allocationSize = 1)

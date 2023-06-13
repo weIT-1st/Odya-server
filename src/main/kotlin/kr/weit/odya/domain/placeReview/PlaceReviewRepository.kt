@@ -12,7 +12,7 @@ fun PlaceReviewRepository.getByPlaceReviewId(id: Long): PlaceReview =
 interface PlaceReviewRepository : JpaRepository<PlaceReview, Long> {
     fun existsByUserIdAndPlaceId(userId: Long, placeId: String): Boolean
 
-    fun findAllByPlaceId(placeId: String): List<PlaceReview>?
+    fun findAllByPlaceId(placeId: String): List<PlaceReview>
 
-    fun findAllByUser(user: User): List<PlaceReview>?
+    fun findAllByUser(user: User): List<PlaceReview>
 }

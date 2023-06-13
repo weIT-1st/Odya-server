@@ -3,6 +3,7 @@ package kr.weit.odya.service
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.shouldBe
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
@@ -16,6 +17,7 @@ import kr.weit.odya.support.TEST_EXIST_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_USER_ID
+import kr.weit.odya.support.creatPlaceReviewListResponse
 import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createPlaceReview
 import kr.weit.odya.support.createPlaceReviewRequest
@@ -97,6 +99,32 @@ class PlaceReviewServiceTest : DescribeSpec(
                 every { placeReviewRepository.getByPlaceReviewId(TEST_PLACE_REVIEW_ID) } returns createPlaceReview(createOtherUser())
                 it("[ForbiddenException] 예외가 발생한다") {
                     shouldThrow<ForbiddenException> { sut.deleteReview(TEST_PLACE_REVIEW_ID, TEST_USER_ID) }
+                }
+            }
+        }
+
+        describe("getByPlaceReviewList 메소드") {
+            context("유효한 placeId가 전달되면") {
+                every { placeReviewRepository.findAllByPlaceId(TEST_PLACE_ID) } returns listOf(createPlaceReview())
+                it("리뷰를 조회한다.") {
+                    sut.getByPlaceReviewId(TEST_PLACE_ID)[0] shouldBe creatPlaceReviewListResponse()
+                }
+            }
+        }
+
+        describe("getByUserReviewList 메소드") {
+            context("유효한 userId가 전달되면") {
+                every { userRepository.getByUserId(TEST_USER_ID) } returns createUser()
+                every { placeReviewRepository.findAllByUser(any()) } returns listOf(createPlaceReview())
+                it("리뷰를 조회한다.") {
+                    sut.getByUserReviewList(TEST_USER_ID)[0] shouldBe creatPlaceReviewListResponse()
+                }
+            }
+
+            context("존재하지 않는 userId가 전달되면") {
+                every { userRepository.getByUserId(TEST_USER_ID) } throws NoSuchElementException()
+                it("[NoSuchElementException] 예외가 발생한다") {
+                    shouldThrow<NoSuchElementException> { sut.getByUserReviewList(TEST_USER_ID) }
                 }
             }
         }

@@ -4,11 +4,11 @@ import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.DescribeSpec
 import io.mockk.every
 import kr.weit.odya.service.UserService
+import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_NOT_EXIST_USER_ID_TOKEN
 import kr.weit.odya.support.TEST_USER_ID
-import kr.weit.odya.support.TOKEN_ERROR_MESSAGE
 import kr.weit.odya.support.createUserResponse
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
 import kr.weit.odya.support.test.RestDocsHelper
@@ -79,7 +79,7 @@ class UserControllerTest(
                             HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                         ),
                         responseBody(
-                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
+                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
                         )
                     )
                 }
@@ -99,7 +99,7 @@ class UserControllerTest(
                             HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN"
                         ),
                         responseBody(
-                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
+                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
                         )
                     )
                 }

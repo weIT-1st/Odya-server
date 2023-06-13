@@ -14,11 +14,11 @@ import kr.weit.odya.service.LoginFailedException
 import kr.weit.odya.support.EXIST_NICKNAME_ERROR_MESSAGE
 import kr.weit.odya.support.EXIST_USER_ERROR_MESSAGE
 import kr.weit.odya.support.NOT_EXIST_USER_ERROR_MESSAGE
+import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_INVALID_EMAIL
 import kr.weit.odya.support.TEST_INVALID_PHONE_NUMBER
 import kr.weit.odya.support.TEST_NICKNAME
 import kr.weit.odya.support.TEST_PROVIDER
-import kr.weit.odya.support.TOKEN_ERROR_MESSAGE
 import kr.weit.odya.support.createLoginRequest
 import kr.weit.odya.support.createRegisterRequest
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
@@ -98,7 +98,7 @@ class AuthControllerTest(
 
         context("유효하지 않은 토큰이 전달되면") {
             val request = createLoginRequest()
-            every { authenticationService.loginProcess(request) } throws InvalidTokenException(TOKEN_ERROR_MESSAGE)
+            every { authenticationService.loginProcess(request) } throws InvalidTokenException(SOMETHING_ERROR_MESSAGE)
             it("401 응답한다.") {
                 restDocMockMvc.post(targetUri) {
                     jsonContent(request)
@@ -179,7 +179,7 @@ class AuthControllerTest(
                                 "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday.toString()
                             ),
                             responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
                             )
                         )
                     )
@@ -216,7 +216,7 @@ class AuthControllerTest(
                                 "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday.toString()
                             ),
                             responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
                             )
                         )
                     )
@@ -250,7 +250,7 @@ class AuthControllerTest(
                                 "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday.toString()
                             ),
                             responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
                             )
                         )
                     )
@@ -284,7 +284,7 @@ class AuthControllerTest(
                                 "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday.toString()
                             ),
                             responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
                             )
                         )
                     )
@@ -294,7 +294,7 @@ class AuthControllerTest(
         context("유효하지 않은 토큰이 전달되면") {
             val request = createRegisterRequest()
             every { authenticationService.register(request, TEST_PROVIDER) } throws InvalidTokenException(
-                TOKEN_ERROR_MESSAGE
+                SOMETHING_ERROR_MESSAGE
             )
             it("401 응답한다.") {
                 restDocMockMvc.perform(

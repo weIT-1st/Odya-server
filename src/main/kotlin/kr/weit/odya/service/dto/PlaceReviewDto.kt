@@ -59,15 +59,3 @@ data class PlaceReviewListResponse(
         placeReview.review
     )
 }
-
-data class UserPlaceReviewListResponse(
-    val placeId: String,
-    val starRating: Int,
-    val review: String
-) {
-    constructor(placeReview: PlaceReview) : this(
-        placeReview.placeId,
-        placeReview.starRating,
-        placeReview.review
-    )
-}

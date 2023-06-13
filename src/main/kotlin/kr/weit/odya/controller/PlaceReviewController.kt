@@ -8,7 +8,6 @@ import kr.weit.odya.service.PlaceReviewService
 import kr.weit.odya.service.dto.PlaceReviewCreateRequest
 import kr.weit.odya.service.dto.PlaceReviewListResponse
 import kr.weit.odya.service.dto.PlaceReviewUpdateRequest
-import kr.weit.odya.service.dto.UserPlaceReviewListResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -59,20 +58,22 @@ class PlaceReviewController(private val placeReviewService: PlaceReviewService) 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
     }
 
-    @GetMapping("/list/place/{id}")
-    fun getPlaceReviewList(
+    @GetMapping("/place/{id}")
+    fun getByPlaceReviewList(
         @NotNull(message = "장소 ID는 필수 입력값입니다.")
         @PathVariable("id")
-        placeId: String,
-        @LoginUserId userId: Long
-    ): ResponseEntity<MutableList<PlaceReviewListResponse>> {
-        return ResponseEntity.ok(placeReviewService.getPlaceReviewList(placeId, userId))
+        placeId: String
+    ): ResponseEntity<List<PlaceReviewListResponse>> {
+        return ResponseEntity.ok(placeReviewService.getByPlaceReviewId(placeId))
     }
 
-    @GetMapping("/list/user")
-    fun getUserReviewList(
-        @LoginUserId userId: Long
-    ): ResponseEntity<MutableList<UserPlaceReviewListResponse>> {
-        return ResponseEntity.ok(placeReviewService.getUserReviewList(userId))
+    @GetMapping("/user/{id}")
+    fun getByUserReviewList(
+        @NotNull(message = "유저 ID는 필수 입력값입니다.")
+        @Positive(message = "유저 ID는 양수여야 합니다.")
+        @PathVariable("id")
+        userId: Long
+    ): ResponseEntity<List<PlaceReviewListResponse>> {
+        return ResponseEntity.ok(placeReviewService.getByUserReviewList(userId))
     }
 }

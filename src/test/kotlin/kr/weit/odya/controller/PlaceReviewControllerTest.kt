@@ -11,11 +11,15 @@ import kr.weit.odya.service.PlaceReviewService
 import kr.weit.odya.support.EXIST_PLACE_REVIEW_ERROR_MESSAGE
 import kr.weit.odya.support.FORBIDDEN_PLACE_REVIEW_ERROR_MESSAGE
 import kr.weit.odya.support.NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE
+import kr.weit.odya.support.NOT_EXIST_USER_ERROR_MESSAGE
+import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_NOT_EXIST_USER_ID_TOKEN
 import kr.weit.odya.support.TEST_EXIST_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_INVALID_PLACE_REVIEW_ID
+import kr.weit.odya.support.TEST_INVALID_USER_ID
+import kr.weit.odya.support.TEST_NOT_EXIST_USER_ID
 import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_RATING
@@ -24,7 +28,7 @@ import kr.weit.odya.support.TEST_TOO_HIGH_RATING
 import kr.weit.odya.support.TEST_TOO_LONG_REVIEW
 import kr.weit.odya.support.TEST_TOO_LOW_RATING
 import kr.weit.odya.support.TEST_USER_ID
-import kr.weit.odya.support.TOKEN_ERROR_MESSAGE
+import kr.weit.odya.support.creatPlaceReviewListResponse
 import kr.weit.odya.support.createPlaceReviewRequest
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
 import kr.weit.odya.support.test.ControllerTestHelper.Companion.jsonContent
@@ -43,7 +47,8 @@ import org.springframework.http.HttpHeaders
 import org.springframework.restdocs.ManualRestDocumentation
 import org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
-import org.springframework.restdocs.payload.JsonFieldType
+import org.springframework.restdocs.payload.JsonFieldType.NUMBER
+import org.springframework.restdocs.payload.JsonFieldType.STRING
 import org.springframework.restdocs.request.RequestDocumentation.pathParameters
 import org.springframework.test.web.servlet.patch
 import org.springframework.test.web.servlet.post
@@ -81,9 +86,9 @@ class PlaceReviewControllerTest(
                             HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                         ),
                         requestBody(
-                            "placeId" type JsonFieldType.STRING description "장소 ID" example TEST_PLACE_ID,
-                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString(),
-                            "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW
+                            "placeId" type STRING description "장소 ID" example TEST_PLACE_ID,
+                            "rating" type NUMBER description "별점" example TEST_RATING.toString(),
+                            "review" type STRING description "리뷰" example TEST_REVIEW
                         )
                     )
                 }
@@ -105,12 +110,12 @@ class PlaceReviewControllerTest(
                             HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                         ),
                         requestBody(
-                            "placeId" type JsonFieldType.STRING description "장소 ID" example TEST_PLACE_ID,
-                            "rating" type JsonFieldType.NUMBER description "최소보다 미만인 별점" example TEST_TOO_LOW_RATING.toString(),
-                            "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW
+                            "placeId" type STRING description "장소 ID" example TEST_PLACE_ID,
+                            "rating" type NUMBER description "최소보다 미만인 별점" example TEST_TOO_LOW_RATING.toString(),
+                            "review" type STRING description "리뷰" example TEST_REVIEW
                         ),
                         responseBody(
-                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
+                            "errorMessage" type STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
                         )
                     )
                 }
@@ -132,12 +137,12 @@ class PlaceReviewControllerTest(
                             HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                         ),
                         requestBody(
-                            "placeId" type JsonFieldType.STRING description "장소 ID" example TEST_PLACE_ID,
-                            "rating" type JsonFieldType.NUMBER description "최대보다 초과인 별점" example TEST_TOO_HIGH_RATING.toString(),
-                            "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW
+                            "placeId" type STRING description "장소 ID" example TEST_PLACE_ID,
+                            "rating" type NUMBER description "최대보다 초과인 별점" example TEST_TOO_HIGH_RATING.toString(),
+                            "review" type STRING description "리뷰" example TEST_REVIEW
                         ),
                         responseBody(
-                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
+                            "errorMessage" type STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
                         )
                     )
                 }
@@ -159,12 +164,12 @@ class PlaceReviewControllerTest(
                             HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                         ),
                         requestBody(
-                            "placeId" type JsonFieldType.STRING description "장소 ID" example TEST_PLACE_ID,
-                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString(),
-                            "review" type JsonFieldType.STRING description "공백인 리뷰" example " "
+                            "placeId" type STRING description "장소 ID" example TEST_PLACE_ID,
+                            "rating" type NUMBER description "별점" example TEST_RATING.toString(),
+                            "review" type STRING description "공백인 리뷰" example " "
                         ),
                         responseBody(
-                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
+                            "errorMessage" type STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
                         )
                     )
                 }
@@ -186,12 +191,12 @@ class PlaceReviewControllerTest(
                             HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                         ),
                         requestBody(
-                            "placeId" type JsonFieldType.STRING description "장소 ID" example TEST_PLACE_ID,
-                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString(),
-                            "review" type JsonFieldType.STRING description "최대 길이를 초과한 리뷰" example TEST_TOO_LONG_REVIEW
+                            "placeId" type STRING description "장소 ID" example TEST_PLACE_ID,
+                            "rating" type NUMBER description "별점" example TEST_RATING.toString(),
+                            "review" type STRING description "최대 길이를 초과한 리뷰" example TEST_TOO_LONG_REVIEW
                         ),
                         responseBody(
-                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
+                            "errorMessage" type STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
                         )
                     )
                 }
@@ -213,12 +218,12 @@ class PlaceReviewControllerTest(
                             HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                         ),
                         requestBody(
-                            "placeId" type JsonFieldType.STRING description "장소 ID" example TEST_PLACE_ID,
-                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString(),
-                            "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW
+                            "placeId" type STRING description "장소 ID" example TEST_PLACE_ID,
+                            "rating" type NUMBER description "별점" example TEST_RATING.toString(),
+                            "review" type STRING description "리뷰" example TEST_REVIEW
                         ),
                         responseBody(
-                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
+                            "errorMessage" type STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
                         )
                     )
                 }
@@ -243,12 +248,12 @@ class PlaceReviewControllerTest(
                             HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                         ),
                         requestBody(
-                            "placeId" type JsonFieldType.STRING description "이미 리뷰한 장소 ID" example TEST_PLACE_ID,
-                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString(),
-                            "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW
+                            "placeId" type STRING description "이미 리뷰한 장소 ID" example TEST_PLACE_ID,
+                            "rating" type NUMBER description "별점" example TEST_RATING.toString(),
+                            "review" type STRING description "리뷰" example TEST_REVIEW
                         ),
                         responseBody(
-                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example EXIST_PLACE_REVIEW_ERROR_MESSAGE
+                            "errorMessage" type STRING description "에러 메시지" example EXIST_PLACE_REVIEW_ERROR_MESSAGE
                         )
                     )
                 }
@@ -270,12 +275,12 @@ class PlaceReviewControllerTest(
                             HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN"
                         ),
                         requestBody(
-                            "placeId" type JsonFieldType.STRING description "장소 ID" example TEST_PLACE_ID,
-                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString(),
-                            "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW
+                            "placeId" type STRING description "장소 ID" example TEST_PLACE_ID,
+                            "rating" type NUMBER description "별점" example TEST_RATING.toString(),
+                            "review" type STRING description "리뷰" example TEST_REVIEW
                         ),
                         responseBody(
-                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
+                            "errorMessage" type STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
                         )
                     )
                 }
@@ -301,9 +306,9 @@ class PlaceReviewControllerTest(
                             HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                         ),
                         requestBody(
-                            "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
-                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString() isOptional true,
-                            "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true
+                            "id" type NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
+                            "rating" type NUMBER description "별점" example TEST_RATING.toString() isOptional true,
+                            "review" type STRING description "리뷰" example TEST_REVIEW isOptional true
                         )
                     )
                 }
@@ -325,12 +330,12 @@ class PlaceReviewControllerTest(
                             HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                         ),
                         requestBody(
-                            "id" type JsonFieldType.NUMBER description "음수인 장소 리뷰 ID" example TEST_INVALID_PLACE_REVIEW_ID.toString(),
-                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString() isOptional true,
-                            "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true
+                            "id" type NUMBER description "음수인 장소 리뷰 ID" example TEST_INVALID_PLACE_REVIEW_ID.toString(),
+                            "rating" type NUMBER description "별점" example TEST_RATING.toString() isOptional true,
+                            "review" type STRING description "리뷰" example TEST_REVIEW isOptional true
                         ),
                         responseBody(
-                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
+                            "errorMessage" type STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
                         )
                     )
                 }
@@ -352,12 +357,12 @@ class PlaceReviewControllerTest(
                             HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                         ),
                         requestBody(
-                            "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
-                            "rating" type JsonFieldType.NUMBER description "최소보다 미만인 별점" example TEST_TOO_LOW_RATING.toString() isOptional true,
-                            "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true
+                            "id" type NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
+                            "rating" type NUMBER description "최소보다 미만인 별점" example TEST_TOO_LOW_RATING.toString() isOptional true,
+                            "review" type STRING description "리뷰" example TEST_REVIEW isOptional true
                         ),
                         responseBody(
-                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
+                            "errorMessage" type STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
                         )
                     )
                 }
@@ -379,12 +384,12 @@ class PlaceReviewControllerTest(
                             HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                         ),
                         requestBody(
-                            "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
-                            "rating" type JsonFieldType.NUMBER description "최대보다 초과인 별점" example TEST_TOO_HIGH_RATING.toString() isOptional true,
-                            "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true
+                            "id" type NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
+                            "rating" type NUMBER description "최대보다 초과인 별점" example TEST_TOO_HIGH_RATING.toString() isOptional true,
+                            "review" type STRING description "리뷰" example TEST_REVIEW isOptional true
                         ),
                         responseBody(
-                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
+                            "errorMessage" type STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
                         )
                     )
                 }
@@ -406,12 +411,12 @@ class PlaceReviewControllerTest(
                             HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                         ),
                         requestBody(
-                            "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
-                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString() isOptional true,
-                            "review" type JsonFieldType.STRING description "공백인 리뷰" example " " isOptional true
+                            "id" type NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
+                            "rating" type NUMBER description "별점" example TEST_RATING.toString() isOptional true,
+                            "review" type STRING description "공백인 리뷰" example " " isOptional true
                         ),
                         responseBody(
-                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
+                            "errorMessage" type STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
                         )
                     )
                 }
@@ -433,12 +438,12 @@ class PlaceReviewControllerTest(
                             HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                         ),
                         requestBody(
-                            "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
-                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString() isOptional true,
-                            "review" type JsonFieldType.STRING description "최대 길이를 초과한 리뷰" example TEST_TOO_LONG_REVIEW isOptional true
+                            "id" type NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
+                            "rating" type NUMBER description "별점" example TEST_RATING.toString() isOptional true,
+                            "review" type STRING description "최대 길이를 초과한 리뷰" example TEST_TOO_LONG_REVIEW isOptional true
                         ),
                         responseBody(
-                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
+                            "errorMessage" type STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
                         )
                     )
                 }
@@ -460,12 +465,12 @@ class PlaceReviewControllerTest(
                             HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                         ),
                         requestBody(
-                            "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
-                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_PLACE_REVIEW_ID.toString() isOptional true,
-                            "review" type JsonFieldType.STRING description "리뷰" example TEST_PLACE_REVIEW_ID.toString() isOptional true
+                            "id" type NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
+                            "rating" type NUMBER description "별점" example TEST_PLACE_REVIEW_ID.toString() isOptional true,
+                            "review" type STRING description "리뷰" example TEST_PLACE_REVIEW_ID.toString() isOptional true
                         ),
                         responseBody(
-                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
+                            "errorMessage" type STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
                         )
                     )
                 }
@@ -488,12 +493,12 @@ class PlaceReviewControllerTest(
                             HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                         ),
                         requestBody(
-                            "id" type JsonFieldType.NUMBER description "잘못된 장소 리뷰 ID" example TEST_EXIST_PLACE_REVIEW_ID.toString(),
-                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString() isOptional true,
-                            "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true
+                            "id" type NUMBER description "잘못된 장소 리뷰 ID" example TEST_EXIST_PLACE_REVIEW_ID.toString(),
+                            "rating" type NUMBER description "별점" example TEST_RATING.toString() isOptional true,
+                            "review" type STRING description "리뷰" example TEST_REVIEW isOptional true
                         ),
                         responseBody(
-                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE
+                            "errorMessage" type STRING description "에러 메시지" example NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE
                         )
                     )
                 }
@@ -516,12 +521,12 @@ class PlaceReviewControllerTest(
                             HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                         ),
                         requestBody(
-                            "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
-                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString() isOptional true,
-                            "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true
+                            "id" type NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
+                            "rating" type NUMBER description "별점" example TEST_RATING.toString() isOptional true,
+                            "review" type STRING description "리뷰" example TEST_REVIEW isOptional true
                         ),
                         responseBody(
-                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example FORBIDDEN_PLACE_REVIEW_ERROR_MESSAGE
+                            "errorMessage" type STRING description "에러 메시지" example FORBIDDEN_PLACE_REVIEW_ERROR_MESSAGE
                         )
                     )
                 }
@@ -543,12 +548,12 @@ class PlaceReviewControllerTest(
                             HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN"
                         ),
                         requestBody(
-                            "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
-                            "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING.toString() isOptional true,
-                            "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true
+                            "id" type NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString(),
+                            "rating" type NUMBER description "별점" example TEST_RATING.toString() isOptional true,
+                            "review" type STRING description "리뷰" example TEST_REVIEW isOptional true
                         ),
                         responseBody(
-                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
+                            "errorMessage" type STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
                         )
                     )
                 }
@@ -621,7 +626,7 @@ class PlaceReviewControllerTest(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                             ),
                             responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example TOKEN_ERROR_MESSAGE
+                                "errorMessage" type STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
                             )
                         )
                     )
@@ -647,7 +652,7 @@ class PlaceReviewControllerTest(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                             ),
                             responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE
+                                "errorMessage" type STRING description "에러 메시지" example NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE
                             )
                         )
                     )
@@ -673,7 +678,7 @@ class PlaceReviewControllerTest(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                             ),
                             responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example FORBIDDEN_PLACE_REVIEW_ERROR_MESSAGE
+                                "errorMessage" type STRING description "에러 메시지" example FORBIDDEN_PLACE_REVIEW_ERROR_MESSAGE
                             )
                         )
                     )
@@ -698,7 +703,7 @@ class PlaceReviewControllerTest(
                                 HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN"
                             ),
                             responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example FORBIDDEN_PLACE_REVIEW_ERROR_MESSAGE
+                                "errorMessage" type STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
                             )
                         )
                     )
@@ -706,6 +711,222 @@ class PlaceReviewControllerTest(
         }
     }
 
+    describe("GET /api/v1/place-reviews/place/{id}") {
+        val targetUri = "/api/v1/place-reviews/place/{id}"
+        context("유효한 요청 데이터가 전달되면") {
+            val response = listOf(creatPlaceReviewListResponse())
+            every { placeReviewService.getByPlaceReviewId(TEST_PLACE_ID) } returns response
+            it("200 응답한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .get(targetUri, TEST_PLACE_ID)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                )
+                    .andExpect(status().isOk)
+                    .andDo(
+                        createPathDocument(
+                            "placeReview-placeId-get-list-success",
+                            pathParameters(
+                                "id" pathDescription "장소 ID" example TEST_PLACE_ID
+                            ),
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                            ),
+                            responseBody(
+                                "[].placeId" type STRING description "장소 ID" example response[0].placeId,
+                                "[].writerNickname" type STRING description "장소 이름" example response[0].writerNickname,
+                                "[].starRating" type NUMBER description "별점" example response[0].starRating.toString(),
+                                "[].review" type STRING description "리뷰" example response[0].review
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("가입되어 있지 않은 USERID이 주어지는 경우") {
+            it("401 응답한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .get(targetUri, TEST_PLACE_ID)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_NOT_EXIST_USER_ID_TOKEN)
+                )
+                    .andExpect(status().isUnauthorized)
+                    .andDo(
+                        createPathDocument(
+                            "placeReview-placeId-get-fail-not-registered-user",
+                            pathParameters(
+                                "id" pathDescription "장소 ID" example TEST_PLACE_ID
+                            ),
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                            ),
+                            responseBody(
+                                "errorMessage" type STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("유효하지 않은 토큰이 전달되면") {
+            it("401 응답한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .get(targetUri, TEST_PLACE_ID)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                )
+                    .andExpect(status().isUnauthorized)
+                    .andDo(
+                        createPathDocument(
+                            "placeReview-placeId-get-fail-invalid-token",
+                            pathParameters(
+                                "id" pathDescription "장소 ID" example TEST_PLACE_ID
+                            ),
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN"
+                            ),
+                            responseBody(
+                                "errorMessage" type STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
+                            )
+                        )
+                    )
+            }
+        }
+    }
+
+    describe("GET /api/v1/place-reviews/user/{id}") {
+        val targetUri = "/api/v1/place-reviews/user/{id}"
+        context("유효한 요청 데이터가 전달되면") {
+            val response = listOf(creatPlaceReviewListResponse())
+            every { placeReviewService.getByUserReviewList(TEST_USER_ID) } returns response
+            it("200 응답한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .get(targetUri, TEST_USER_ID)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                )
+                    .andExpect(status().isOk)
+                    .andDo(
+                        createPathDocument(
+                            "placeReview-userId-get-list-success",
+                            pathParameters(
+                                "id" pathDescription "유저 ID" example TEST_USER_ID.toString()
+                            ),
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                            ),
+                            responseBody(
+                                "[].placeId" type STRING description "장소 ID" example response[0].placeId,
+                                "[].writerNickname" type STRING description "장소 이름" example response[0].writerNickname,
+                                "[].starRating" type NUMBER description "별점" example response[0].starRating.toString(),
+                                "[].review" type STRING description "리뷰" example response[0].review
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("유효한 토큰이지만 유저 ID가 음수인 경우") {
+            it("400 응답한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .get(targetUri, TEST_INVALID_USER_ID)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                )
+                    .andExpect(status().isBadRequest)
+                    .andDo(
+                        createPathDocument(
+                            "placeReview-userId-get-fail-negative-id",
+                            pathParameters(
+                                "id" pathDescription "음수인 유저 ID" example TEST_INVALID_USER_ID.toString()
+                            ),
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                            ),
+                            responseBody(
+                                "errorMessage" type STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("가입되어 있지 않은 USERID이 주어지는 경우") {
+            it("401 응답한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .get(targetUri, TEST_USER_ID)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_NOT_EXIST_USER_ID_TOKEN)
+                )
+                    .andExpect(status().isUnauthorized)
+                    .andDo(
+                        createPathDocument(
+                            "placeReview-userId-get-fail-not-registered-user",
+                            pathParameters(
+                                "id" pathDescription "유저 ID" example TEST_USER_ID.toString()
+                            ),
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                            ),
+                            responseBody(
+                                "errorMessage" type STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("유효한 토큰이지만 가입되어 있지 않은 USER ID이 주어지는 경우") {
+            every { placeReviewService.getByUserReviewList(TEST_NOT_EXIST_USER_ID) } throws NoSuchElementException(NOT_EXIST_USER_ERROR_MESSAGE)
+            it("404 응답한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .get(targetUri, TEST_NOT_EXIST_USER_ID)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                )
+                    .andExpect(status().isNotFound)
+                    .andDo(
+                        createPathDocument(
+                            "placeReview-userId-get-fail-not-registered-id",
+                            pathParameters(
+                                "id" pathDescription "가입되어 있지 않은 유저 ID" example TEST_NOT_EXIST_USER_ID.toString()
+                            ),
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                            ),
+                            responseBody(
+                                "errorMessage" type STRING description "에러 메시지" example NOT_EXIST_USER_ERROR_MESSAGE
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("유효하지 않은 토큰이 전달되면") {
+            it("401 응답한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .get(targetUri, TEST_USER_ID)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                )
+                    .andExpect(status().isUnauthorized)
+                    .andDo(
+                        createPathDocument(
+                            "placeReview-userId-get-fail-invalid-token",
+                            pathParameters(
+                                "id" pathDescription "유저 ID" example TEST_USER_ID.toString()
+                            ),
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN"
+                            ),
+                            responseBody(
+                                "errorMessage" type STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
+                            )
+                        )
+                    )
+            }
+        }
+    }
     afterEach {
         restDocumentation.afterTest()
     }
