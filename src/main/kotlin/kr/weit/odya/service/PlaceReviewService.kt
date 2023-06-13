@@ -53,7 +53,7 @@ class PlaceReviewService(
     @Transactional
     fun getPlaceReviewList(placeId: String, userId: Long): MutableList<PlaceReviewListResponse>? {
         val placeReviewList: List<PlaceReview> = placeReviewRepository.findAllByPlaceId(placeId) ?: return null
-        var responseList: MutableList<PlaceReviewListResponse> = mutableListOf()
+        val responseList: MutableList<PlaceReviewListResponse> = mutableListOf()
         for (placeReview in placeReviewList) {
             responseList.add(PlaceReviewListResponse(placeReview))
         }
@@ -64,7 +64,7 @@ class PlaceReviewService(
     fun getUserReviewList(userId: Long): MutableList<UserPlaceReviewListResponse> {
         val user: User = userRepository.getByUserId(userId)
         val placeReviewList: List<PlaceReview>? = placeReviewRepository.findAllByUser(user)
-        var responseList: MutableList<UserPlaceReviewListResponse> = mutableListOf()
+        val responseList: MutableList<UserPlaceReviewListResponse> = mutableListOf()
         for (placeReview in placeReviewList!!) {
             responseList.add(UserPlaceReviewListResponse(placeReview))
         }
