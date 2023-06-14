@@ -27,19 +27,27 @@ operation::auth-controller-test/register-success[snippets='http-request,path-par
 
 operation::auth-controller-test/register-fail-exist-user[snippets='http-request,path-parameters,request-body,request-fields,http-response,response-fields']
 
-=== *2-3 실패 - 유효한 토큰이지만, 이미 존재하는 닉네임*
+=== *2-3 실패 - 유효한 토큰이지만, 이미 존재하는 이메일*
+
+operation::auth-controller-test/register-fail-exist-email[snippets='http-request,path-parameters,request-body,request-fields,http-response,response-fields']
+
+=== *2-4 실패 - 유효한 토큰이지만, 이미 존재하는 전화번호*
+
+operation::auth-controller-test/register-fail-exist-phone-number[snippets='http-request,path-parameters,request-body,request-fields,http-response,response-fields']
+
+=== *2-5 실패 - 유효한 토큰이지만, 이미 존재하는 닉네임*
 
 operation::auth-controller-test/register-fail-exist-nickname[snippets='http-request,path-parameters,request-body,request-fields,http-response,response-fields']
 
-=== *2-4 실패 - 유효한 토큰이지만, 유효하지 않은 형식의 이메일*
+=== *2-6 실패 - 유효한 토큰이지만, 유효하지 않은 형식의 이메일*
 
 operation::auth-controller-test/register-fail-invalid-email[snippets='http-request,path-parameters,request-body,request-fields,http-response,response-fields']
 
-=== *2-5 실패 - 유효한 토큰이지만, 유효하지 않은 형식의 전화번호*
+=== *2-7 실패 - 유효한 토큰이지만, 유효하지 않은 형식의 전화번호*
 
 operation::auth-controller-test/register-fail-invalid-phone-number[snippets='http-request,path-parameters,request-body,request-fields,http-response,response-fields']
 
-=== *2-5 실패 - 유효하지 않은 토큰*
+=== *2-8 실패 - 유효하지 않은 토큰*
 
 operation::auth-controller-test/register-fail-invalid-token[snippets='http-request,path-parameters,request-body,request-fields,http-response,response-fields']
 
