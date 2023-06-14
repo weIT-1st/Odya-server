@@ -1,10 +1,16 @@
 package kr.weit.odya.controller
 
+import jakarta.validation.Valid
 import kr.weit.odya.security.LoginUserId
 import kr.weit.odya.service.UserService
+import kr.weit.odya.service.dto.InformationRequest
 import kr.weit.odya.service.dto.UserResponse
+import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -17,5 +23,34 @@ class UserController(
     fun getMyInfo(@LoginUserId userId: Long): ResponseEntity<UserResponse> {
         val response = userService.getInformation(userId)
         return ResponseEntity.ok(response)
+    }
+
+    @PatchMapping("/email")
+    fun updateEmail(
+        @RequestHeader(HttpHeaders.AUTHORIZATION) bearerToken: String,
+        @LoginUserId userId: Long
+    ): ResponseEntity<Void> {
+        val idToken = bearerToken.split(" ")[1]
+        userService.updateEmail(userId, idToken)
+        return ResponseEntity.noContent().build()
+    }
+
+    @PatchMapping("/phone-number")
+    fun updatePhoneNumber(
+        @RequestHeader(HttpHeaders.AUTHORIZATION) bearerToken: String,
+        @LoginUserId userId: Long
+    ): ResponseEntity<Void> {
+        val idToken = bearerToken.split(" ")[1]
+        userService.updatePhoneNumber(userId, idToken)
+        return ResponseEntity.noContent().build()
+    }
+
+    @PatchMapping("/information")
+    fun updateInformation(
+        @RequestBody @Valid informationRequest: InformationRequest,
+        @LoginUserId userId: Long
+    ): ResponseEntity<Void> {
+        userService.updateInformation(userId, informationRequest)
+        return ResponseEntity.noContent().build()
     }
 }
