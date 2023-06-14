@@ -3,5 +3,8 @@ FROM eclipse-temurin:17.0.7_7-jdk AS cache
 COPY . /app
 WORKDIR /app
 
+ARG AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY
+
 RUN ./gradlew assemble && \
     rm -rf /app
