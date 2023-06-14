@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.springframework.boot") version "3.0.7"
+    id("org.springframework.boot") version "3.1.0"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jlleitschuh.gradle.ktlint") version "11.2.0"
     id("org.asciidoctor.jvm.convert") version "3.3.2"
@@ -62,9 +62,8 @@ dependencies {
     }
 
     implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.0.1"))
-
     implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store")
-    implementation("org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.1")
+    implementation("org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.3")
 
     asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor")
     testImplementation("org.springframework.security:spring-security-test")
