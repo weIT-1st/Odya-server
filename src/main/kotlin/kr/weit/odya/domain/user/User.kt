@@ -31,7 +31,7 @@ class User(
     val username: String,
 
     @Embedded
-    val information: UserInformation,
+    var information: UserInformation,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, updatable = false)
@@ -81,4 +81,16 @@ class User(
 
     val profileName: String
         get() = information.profileName
+
+    fun changePhoneNumber(phoneNumber: String) {
+        information = information.copy(phoneNumber = phoneNumber)
+    }
+
+    fun changeEmail(email: String) {
+        information = information.copy(email = email)
+    }
+
+    fun changeInformation(nickname: String) {
+        information = information.copy(nickname = nickname)
+    }
 }
