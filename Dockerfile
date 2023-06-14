@@ -2,6 +2,9 @@ FROM ghcr.io/weit-1st/odya-gradle-cache AS build
 COPY . /app
 WORKDIR /app
 
+ARG AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY
+
 RUN ./gradlew assemble
 
 FROM eclipse-temurin:17.0.7_7-jdk AS run
