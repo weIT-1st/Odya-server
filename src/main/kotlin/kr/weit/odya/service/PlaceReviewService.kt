@@ -7,6 +7,7 @@ import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.service.dto.PlaceReviewCreateRequest
+import kr.weit.odya.service.dto.PlaceReviewListResponse
 import kr.weit.odya.service.dto.PlaceReviewUpdateRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -36,5 +37,26 @@ class PlaceReviewService(
             this.review = request.review ?: this.review
         }
         placeReviewRepository.save(placeReview)
+    }
+
+    @Transactional
+    fun deleteReview(placeReviewId: Long, userId: Long) {
+        val placeReview = placeReviewRepository.getByPlaceReviewId(placeReviewId)
+        if (placeReview.writerId != userId) {
+            throw ForbiddenException("작성자만 삭제할 수 있습니다.")
+        }
+        placeReviewRepository.delete(placeReview)
+    }
+
+    fun getByPlaceReviewId(placeId: String): List<PlaceReviewListResponse> {
+        return placeReviewRepository.findAllByPlaceId(placeId)
+            .map { PlaceReviewListResponse(it) }
+    }
+
+    @Transactional
+    fun getByUserReviewList(userId: Long): List<PlaceReviewListResponse> {
+        val user: User = userRepository.getByUserId(userId)
+        return placeReviewRepository.findAllByUser(user)
+            .map { PlaceReviewListResponse(it) }
     }
 }

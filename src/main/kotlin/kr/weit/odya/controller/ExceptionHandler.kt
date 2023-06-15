@@ -1,6 +1,7 @@
 package kr.weit.odya.controller
 
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
+import jakarta.validation.ConstraintViolationException
 import jakarta.ws.rs.ForbiddenException
 import kr.weit.odya.security.InvalidTokenException
 import kr.weit.odya.service.ExistResourceException
@@ -59,6 +60,12 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(IllegalArgumentException::class, IllegalStateException::class)
     fun illegalException(ex: RuntimeException): ResponseEntity<ApiErrorResponse> {
         logger.error("[IllegalException]", ex)
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiErrorResponse(ex.message))
+    }
+
+    @ExceptionHandler(ConstraintViolationException::class)
+    fun constraintViolationException(ex: ConstraintViolationException): ResponseEntity<ApiErrorResponse> {
+        logger.error("[ConstraintViolationException]", ex)
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiErrorResponse(ex.message))
     }
 

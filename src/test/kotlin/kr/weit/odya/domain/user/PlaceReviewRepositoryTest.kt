@@ -8,6 +8,7 @@ import kr.weit.odya.domain.placeReview.PlaceReviewRepository
 import kr.weit.odya.domain.placeReview.getByPlaceReviewId
 import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_PLACE_REVIEW_ID
+import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createPlaceReview
 import kr.weit.odya.support.createUser
 import kr.weit.odya.support.test.BaseTests.RepositoryTest
@@ -29,6 +30,16 @@ class PlaceReviewRepositoryTest(
         expect("PLACE_REVIEW_ID와 일치하는 장소 리뷰를 조회한다") {
             val result = placeReviewRepository.getByPlaceReviewId(TEST_PLACE_REVIEW_ID)
             result.id shouldBe TEST_PLACE_REVIEW_ID
+        }
+
+        expect("PLACE_ID와 일치하는 장소 리뷰를 조회한다") {
+            val result = placeReviewRepository.findAllByPlaceId(TEST_PLACE_ID)
+            result[0].placeId shouldBe TEST_PLACE_ID
+        }
+
+        expect("USER_ID와 일치하는 장소 리뷰를 조회한다") {
+            val result = placeReviewRepository.findAllByUser(createUser())
+            result[0].writerId shouldBe TEST_USER_ID
         }
     }
 
