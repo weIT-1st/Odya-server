@@ -1,9 +1,9 @@
 package kr.weit.odya.service.dto
 
-import jakarta.validation.constraints.Pattern
 import kr.weit.odya.domain.user.Gender
 import kr.weit.odya.domain.user.SocialType
 import kr.weit.odya.domain.user.User
+import kr.weit.odya.support.validator.NicknameValidation
 import java.time.LocalDate
 
 data class UserResponse(
@@ -25,6 +25,6 @@ data class UserResponse(
 }
 
 data class InformationRequest(
-    @field:Pattern(regexp = "[ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9\\s]+")
+    @field:NicknameValidation
     val nickname: String
 )

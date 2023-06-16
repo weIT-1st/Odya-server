@@ -12,19 +12,21 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-@Transactional(readOnly = true)
 class UserService(
     private val userRepository: UserRepository,
     private val firebaseTokenParser: FirebaseTokenParser
 ) {
+    fun getEmailByIdToken(idToken: String) = firebaseTokenParser.getEmail(idToken)
+
+    fun getPhoneNumberByIdToken(idToken: String) = firebaseTokenParser.getPhoneNumber(idToken)
+
     fun getInformation(userId: Long): UserResponse {
         val findUser = userRepository.getByUserId(userId)
         return UserResponse(findUser)
     }
 
     @Transactional
-    fun updateEmail(userId: Long, idToken: String) {
-        val email = firebaseTokenParser.getEmail(idToken)
+    fun updateEmail(userId: Long, email: String) {
         if (userRepository.existsByEmail(email)) {
             throw ExistResourceException("$email: 이미 존재하는 이메일입니다")
         }
@@ -34,8 +36,7 @@ class UserService(
     }
 
     @Transactional
-    fun updatePhoneNumber(userId: Long, idToken: String) {
-        val phoneNumber = firebaseTokenParser.getPhoneNumber(idToken)
+    fun updatePhoneNumber(userId: Long, phoneNumber: String) {
         if (userRepository.existsByPhoneNumber(phoneNumber)) {
             throw ExistResourceException("$phoneNumber: 이미 존재하는 전화번호입니다")
         }

@@ -29,7 +29,7 @@ class UserServiceTest : DescribeSpec({
     val userService = UserService(userRepository, firebaseTokenParser)
 
     describe("getInformation") {
-        context("가입되어 있는 USERID이 주어지는 경우") {
+        context("가입되어 있는 USER ID이 주어지는 경우") {
             every { userRepository.getByUserId(TEST_USER_ID) } returns createUser()
             it("UserResponse를 반환한다") {
                 val userResponse = userService.getInformation(TEST_USER_ID)
@@ -37,7 +37,7 @@ class UserServiceTest : DescribeSpec({
             }
         }
 
-        context("가입되어 있지 않은 USERID이 주어지는 경우") {
+        context("가입되어 있지 않은 USER ID이 주어지는 경우") {
             every { userRepository.getByUserId(TEST_USER_ID) } throws NoSuchElementException()
             it("[NoSuchElementException] 예외가 발생한다") {
                 shouldThrow<NoSuchElementException> { userService.getInformation(TEST_USER_ID) }
@@ -45,93 +45,107 @@ class UserServiceTest : DescribeSpec({
         }
     }
 
-    describe("updateEmail") {
-        context("가입되어 있는 USERID와 인증된 이메일을 포함한 ID TOKEN이 주어지는 경우") {
+    describe("getEmailByIdToken") {
+        context("유효하고 인증된 이메일이 있는 토큰이 주어지는 경우") {
             every { firebaseTokenParser.getEmail(TEST_ID_TOKEN) } returns TEST_EMAIL
-            every { userRepository.existsByEmail(TEST_EMAIL) } returns false
-            every { userRepository.getByUserId(TEST_USER_ID) } returns createUser()
-            it("정상적으로 종료한다") {
-                shouldNotThrow<Exception> { userService.updateEmail(TEST_USER_ID, TEST_ID_TOKEN) }
-            }
-        }
-
-        context("유효하지 않은 토큰이 주어지는 경우") {
-            every { firebaseTokenParser.getEmail(TEST_ID_TOKEN) } throws InvalidTokenException()
-            it("[InvalidTokenException] 반환한다") {
-                shouldThrow<InvalidTokenException> { userService.updateEmail(TEST_USER_ID, TEST_ID_TOKEN) }
+            it("이메일을 반환한다") {
+                val response = userService.getEmailByIdToken(TEST_ID_TOKEN)
+                response shouldBe TEST_EMAIL
             }
         }
 
         context("유효하지만 인증된 이메일이 없는 토큰이 주어지는 경우") {
             every { firebaseTokenParser.getEmail(TEST_ID_TOKEN) } throws NoSuchElementException()
             it("[NoSuchElementException] 반환한다") {
-                shouldThrow<NoSuchElementException> { userService.updateEmail(TEST_USER_ID, TEST_ID_TOKEN) }
-            }
-        }
-
-        context("유효한 토큰이 주어지지만, 이미 존재하는 이메일인 경우") {
-            every { firebaseTokenParser.getEmail(TEST_ID_TOKEN) } returns TEST_EMAIL
-            every { userRepository.existsByEmail(TEST_EMAIL) } returns true
-            it("[ExistResourceException] 반환한다") {
-                shouldThrow<ExistResourceException> { userService.updateEmail(TEST_USER_ID, TEST_ID_TOKEN) }
-            }
-        }
-
-        context("유효한 토큰이 주어지지만, 가입되어 있지 않은 USERID인 경우") {
-            every { firebaseTokenParser.getEmail(TEST_ID_TOKEN) } returns TEST_EMAIL
-            every { userRepository.existsByEmail(TEST_EMAIL) } returns false
-            every { userRepository.getByUserId(TEST_USER_ID) } throws NoSuchElementException()
-            it("[NoSuchElementException] 반환한다") {
-                shouldThrow<NoSuchElementException> { userService.updateEmail(TEST_USER_ID, TEST_ID_TOKEN) }
-            }
-        }
-    }
-
-    describe("updatePhoneNumber") {
-        context("가입되어 있는 USERID와 전화번호를 포함한 ID TOKEN이 주어지는 경우") {
-            every { firebaseTokenParser.getPhoneNumber(TEST_ID_TOKEN) } returns TEST_PHONE_NUMBER
-            every { userRepository.existsByPhoneNumber(TEST_PHONE_NUMBER) } returns false
-            every { userRepository.getByUserId(TEST_USER_ID) } returns createUser()
-            it("정상적으로 종료한다") {
-                shouldNotThrow<Exception> { userService.updatePhoneNumber(TEST_USER_ID, TEST_ID_TOKEN) }
+                shouldThrow<NoSuchElementException> { userService.getEmailByIdToken(TEST_ID_TOKEN) }
             }
         }
 
         context("유효하지 않은 토큰이 주어지는 경우") {
-            every { firebaseTokenParser.getPhoneNumber(TEST_ID_TOKEN) } throws InvalidTokenException()
+            every { firebaseTokenParser.getEmail(TEST_ID_TOKEN) } throws InvalidTokenException()
             it("[InvalidTokenException] 반환한다") {
-                shouldThrow<InvalidTokenException> { userService.updatePhoneNumber(TEST_USER_ID, TEST_ID_TOKEN) }
+                shouldThrow<InvalidTokenException> { userService.getEmailByIdToken(TEST_ID_TOKEN) }
+            }
+        }
+    }
+
+    describe("getPhoneNumberByIdToken") {
+        context("유효하고 인증된 전화번호가 있는 토큰이 주어지는 경우") {
+            every { firebaseTokenParser.getPhoneNumber(TEST_ID_TOKEN) } returns TEST_PHONE_NUMBER
+            it("전화번호를 반환한다") {
+                val response = userService.getPhoneNumberByIdToken(TEST_ID_TOKEN)
+                response shouldBe TEST_PHONE_NUMBER
             }
         }
 
         context("유효하지만 인증된 전화번호가 없는 토큰이 주어지는 경우") {
             every { firebaseTokenParser.getPhoneNumber(TEST_ID_TOKEN) } throws NoSuchElementException()
             it("[NoSuchElementException] 반환한다") {
-                shouldThrow<NoSuchElementException> { userService.updatePhoneNumber(TEST_USER_ID, TEST_ID_TOKEN) }
+                shouldThrow<NoSuchElementException> { userService.getPhoneNumberByIdToken(TEST_ID_TOKEN) }
             }
         }
 
-        context("유효한 토큰이 주어지지만, 이미 존재하는 전화번호인 경우") {
-            every { firebaseTokenParser.getPhoneNumber(TEST_ID_TOKEN) } returns TEST_PHONE_NUMBER
+        context("유효하지 않은 토큰이 주어지는 경우") {
+            every { firebaseTokenParser.getPhoneNumber(TEST_ID_TOKEN) } throws InvalidTokenException()
+            it("[InvalidTokenException] 반환한다") {
+                shouldThrow<InvalidTokenException> { userService.getPhoneNumberByIdToken(TEST_ID_TOKEN) }
+            }
+        }
+    }
+
+    describe("updateEmail") {
+        context("가입되어 있는 USER ID와 유효한 이메일이 주어지는 경우") {
+            every { userRepository.existsByEmail(TEST_EMAIL) } returns false
+            every { userRepository.getByUserId(TEST_USER_ID) } returns createUser()
+            it("정상적으로 종료한다") {
+                shouldNotThrow<Exception> { userService.updateEmail(TEST_USER_ID, TEST_EMAIL) }
+            }
+        }
+
+        context("이미 존재하는 이메일인 경우") {
+            every { userRepository.existsByEmail(TEST_EMAIL) } returns true
+            it("[ExistResourceException] 반환한다") {
+                shouldThrow<ExistResourceException> { userService.updateEmail(TEST_USER_ID, TEST_EMAIL) }
+            }
+        }
+
+        context("유효한 이메일이지만, 가입되어 있지 않은 USER ID인 경우") {
+            every { userRepository.existsByEmail(TEST_EMAIL) } returns false
+            every { userRepository.getByUserId(TEST_USER_ID) } throws NoSuchElementException()
+            it("[NoSuchElementException] 반환한다") {
+                shouldThrow<NoSuchElementException> { userService.updateEmail(TEST_USER_ID, TEST_EMAIL) }
+            }
+        }
+    }
+
+    describe("updatePhoneNumber") {
+        context("가입되어 있는 USER ID와 유효한 전화번호가 주어지는 경우") {
+            every { userRepository.existsByPhoneNumber(TEST_PHONE_NUMBER) } returns false
+            every { userRepository.getByUserId(TEST_USER_ID) } returns createUser()
+            it("정상적으로 종료한다") {
+                shouldNotThrow<Exception> { userService.updatePhoneNumber(TEST_USER_ID, TEST_PHONE_NUMBER) }
+            }
+        }
+
+        context("이미 존재하는 전화번호인 경우") {
             every { userRepository.existsByPhoneNumber(TEST_PHONE_NUMBER) } returns true
             it("[ExistResourceException] 반환한다") {
-                shouldThrow<ExistResourceException> { userService.updatePhoneNumber(TEST_USER_ID, TEST_ID_TOKEN) }
+                shouldThrow<ExistResourceException> { userService.updatePhoneNumber(TEST_USER_ID, TEST_PHONE_NUMBER) }
             }
         }
 
-        context("유효한 토큰이 주어지지만, 가입되어 있지 않은 USERID인 경우") {
-            every { firebaseTokenParser.getPhoneNumber(TEST_ID_TOKEN) } returns TEST_PHONE_NUMBER
+        context("유효한 전화번호가 주어지지만, 가입되어 있지 않은 USER ID인 경우") {
             every { userRepository.existsByPhoneNumber(TEST_PHONE_NUMBER) } returns false
             every { userRepository.getByUserId(TEST_USER_ID) } throws NoSuchElementException()
             it("[NoSuchElementException] 반환한다") {
-                shouldThrow<NoSuchElementException> { userService.updatePhoneNumber(TEST_USER_ID, TEST_ID_TOKEN) }
+                shouldThrow<NoSuchElementException> { userService.updatePhoneNumber(TEST_USER_ID, TEST_PHONE_NUMBER) }
             }
         }
     }
 
     describe("updateInformation") {
         val informationRequest = createInformationRequest()
-        context("가입되어 있는 USERID와 유효한 정보 요청이 주어지는 경우") {
+        context("가입되어 있는 USER ID와 유효한 정보 요청이 주어지는 경우") {
             every { userRepository.existsByNickname(TEST_NICKNAME) } returns false
             every { userRepository.getByUserId(TEST_USER_ID) } returns createUser()
             it("정상적으로 종료한다") {
@@ -146,7 +160,7 @@ class UserServiceTest : DescribeSpec({
             }
         }
 
-        context("유효한 정보 요청이지만, 가입되어 있지 않은 USERID인 경우") {
+        context("유효한 정보 요청이지만, 가입되어 있지 않은 USER ID인 경우") {
             every { userRepository.existsByNickname(TEST_NICKNAME) } returns false
             every { userRepository.getByUserId(TEST_USER_ID) } throws NoSuchElementException()
             it("[NoSuchElementException] 반환한다") {
