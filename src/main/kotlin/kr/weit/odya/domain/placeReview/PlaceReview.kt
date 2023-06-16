@@ -11,6 +11,7 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
+import jakarta.ws.rs.ForbiddenException
 import kr.weit.odya.domain.BaseModifiableEntity
 import kr.weit.odya.domain.user.User
 
@@ -51,4 +52,10 @@ class PlaceReview(
 
     val writerNickname: String
         get() = user.nickname
+
+    fun checkPermissions(userId: Long) {
+        if (writerId != userId) {
+            throw ForbiddenException("권한 없음")
+        }
+    }
 }
