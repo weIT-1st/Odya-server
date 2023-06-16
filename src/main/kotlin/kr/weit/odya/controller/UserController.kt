@@ -31,7 +31,8 @@ class UserController(
         @LoginUserId userId: Long
     ): ResponseEntity<Void> {
         val idToken = bearerToken.split(" ")[1]
-        userService.updateEmail(userId, idToken)
+        val email = userService.getEmailByIdToken(idToken)
+        userService.updateEmail(userId, email)
         return ResponseEntity.noContent().build()
     }
 
@@ -41,7 +42,8 @@ class UserController(
         @LoginUserId userId: Long
     ): ResponseEntity<Void> {
         val idToken = bearerToken.split(" ")[1]
-        userService.updatePhoneNumber(userId, idToken)
+        val phoneNumber = userService.getPhoneNumberByIdToken(idToken)
+        userService.updatePhoneNumber(userId, phoneNumber)
         return ResponseEntity.noContent().build()
     }
 
