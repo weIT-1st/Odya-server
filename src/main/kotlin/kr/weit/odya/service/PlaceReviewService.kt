@@ -1,5 +1,7 @@
 package kr.weit.odya.service
 
+import jakarta.ws.rs.ForbiddenException
+import kr.weit.odya.domain.placeReview.PlaceReview
 import kr.weit.odya.domain.placeReview.PlaceReviewRepository
 import kr.weit.odya.domain.placeReview.getByPlaceReviewId
 import kr.weit.odya.domain.user.User
@@ -28,7 +30,7 @@ class PlaceReviewService(
     @Transactional
     fun updateReview(request: PlaceReviewUpdateRequest, userId: Long) {
         val placeReview = placeReviewRepository.getByPlaceReviewId(request.id)
-        placeReview.checkPermissions(userId)
+        checkPermissions(placeReview, userId)
         placeReview.apply {
             this.starRating = request.rating ?: this.starRating
             this.review = request.review ?: this.review
@@ -39,8 +41,14 @@ class PlaceReviewService(
     @Transactional
     fun deleteReview(placeReviewId: Long, userId: Long) {
         val placeReview = placeReviewRepository.getByPlaceReviewId(placeReviewId)
-        placeReview.checkPermissions(userId)
+        checkPermissions(placeReview, userId)
         placeReviewRepository.delete(placeReview)
+    }
+
+    private fun checkPermissions(placeReview: PlaceReview, userId: Long) {
+        if (placeReview.writerId != userId) {
+            throw ForbiddenException("권한 없음")
+        }
     }
 
     fun getByPlaceReviewId(placeId: String): List<PlaceReviewListResponse> {
