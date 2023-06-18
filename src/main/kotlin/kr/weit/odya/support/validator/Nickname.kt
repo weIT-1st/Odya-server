@@ -26,6 +26,6 @@ class NicknameValidator : ConstraintValidator<Nickname, String?> {
         contactField: String?,
         cxt: ConstraintValidatorContext?
     ): Boolean {
-        return NICKNAME_PATTERN.matcher(contactField).matches()
+        return !contactField.isNullOrBlank() && NICKNAME_PATTERN.matcher(contactField).matches()
     }
 }
