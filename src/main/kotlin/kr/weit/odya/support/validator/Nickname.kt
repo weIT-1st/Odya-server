@@ -14,14 +14,14 @@ private val NICKNAME_PATTERN = Pattern.compile(NICKNAME_REGEXP)
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
 @Constraint(validatedBy = [NicknameValidator::class])
-annotation class NicknameValidation(
+annotation class Nickname(
     val message: String = "유효하지 않은 닉네임 패턴입니다",
     val groups: Array<KClass<*>> = [],
     val payload: Array<KClass<out Payload>> = []
 )
 
-class NicknameValidator : ConstraintValidator<NicknameValidation, String?> {
-    override fun initialize(contactNumber: NicknameValidation) {}
+class NicknameValidator : ConstraintValidator<Nickname, String?> {
+    override fun initialize(contactNumber: Nickname) {}
     override fun isValid(
         contactField: String?,
         cxt: ConstraintValidatorContext?

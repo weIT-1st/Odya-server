@@ -1,15 +1,6 @@
 package kr.weit.odya.domain.user
 
-import jakarta.persistence.Column
-import jakarta.persistence.Embedded
-import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.SequenceGenerator
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import kr.weit.odya.domain.BaseTimeEntity
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
@@ -30,9 +21,6 @@ class User(
     @Column(nullable = false, updatable = false, unique = true)
     val username: String,
 
-    @Embedded
-    var information: UserInformation,
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, updatable = false)
     val socialType: SocialType,
@@ -42,8 +30,14 @@ class User(
     val userRole: UserRole,
 
     @Column
-    val withdrawDate: LocalDateTime? = null
+    val withdrawDate: LocalDateTime? = null,
+
+    userInformation: UserInformation,
 ) : BaseTimeEntity() {
+    @Embedded
+    var information: UserInformation = userInformation
+        private set
+
     constructor(
         id: Long = 0L,
         username: String,
@@ -58,10 +52,10 @@ class User(
     ) : this(
         id = id,
         username = username,
-        information = UserInformation(email, nickname, phoneNumber, gender, birthday, profileName),
         socialType = socialType,
         withdrawDate = null,
-        userRole = userRole
+        userRole = userRole,
+        userInformation = UserInformation(email, nickname, phoneNumber, gender, birthday, profileName)
     )
 
     val email: String?
