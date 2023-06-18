@@ -29,7 +29,7 @@ class UserServiceTest : DescribeSpec({
     val userService = UserService(userRepository, firebaseTokenParser)
 
     describe("getInformation") {
-        context("가입되어 있는 USER ID이 주어지는 경우") {
+        context("가입되어 있는 USER ID가 주어지는 경우") {
             every { userRepository.getByUserId(TEST_USER_ID) } returns createUser()
             it("UserResponse를 반환한다") {
                 val userResponse = userService.getInformation(TEST_USER_ID)
@@ -37,7 +37,7 @@ class UserServiceTest : DescribeSpec({
             }
         }
 
-        context("가입되어 있지 않은 USER ID이 주어지는 경우") {
+        context("가입되어 있지 않은 USER ID가 주어지는 경우") {
             every { userRepository.getByUserId(TEST_USER_ID) } throws NoSuchElementException()
             it("[NoSuchElementException] 예외가 발생한다") {
                 shouldThrow<NoSuchElementException> { userService.getInformation(TEST_USER_ID) }

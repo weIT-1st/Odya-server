@@ -14,14 +14,14 @@ private val PHONE_NUMBER_PATTERN = Pattern.compile(PHONE_NUMBER_REGEXP)
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
 @Constraint(validatedBy = [PhoneNumberValidator::class])
-annotation class PhoneNumberValidation(
+annotation class PhoneNumber(
     val message: String = "유효하지 않은 전화번호 패턴입니다",
     val groups: Array<KClass<*>> = [],
     val payload: Array<KClass<out Payload>> = []
 )
 
-class PhoneNumberValidator : ConstraintValidator<PhoneNumberValidation, String?> {
-    override fun initialize(contactNumber: PhoneNumberValidation) {}
+class PhoneNumberValidator : ConstraintValidator<PhoneNumber, String?> {
+    override fun initialize(contactNumber: PhoneNumber) {}
     override fun isValid(
         contactField: String?,
         cxt: ConstraintValidatorContext?

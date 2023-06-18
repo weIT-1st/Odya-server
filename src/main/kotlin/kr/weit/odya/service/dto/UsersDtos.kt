@@ -3,7 +3,7 @@ package kr.weit.odya.service.dto
 import kr.weit.odya.domain.user.Gender
 import kr.weit.odya.domain.user.SocialType
 import kr.weit.odya.domain.user.User
-import kr.weit.odya.support.validator.NicknameValidation
+import kr.weit.odya.support.validator.Nickname
 import java.time.LocalDate
 
 data class UserResponse(
@@ -25,6 +25,6 @@ data class UserResponse(
 }
 
 data class InformationRequest(
-    @field:NicknameValidation
+    @field:Nickname
     val nickname: String
 )
