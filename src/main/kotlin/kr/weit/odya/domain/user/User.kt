@@ -1,6 +1,15 @@
 package kr.weit.odya.domain.user
 
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Embedded
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.SequenceGenerator
+import jakarta.persistence.Table
 import kr.weit.odya.domain.BaseTimeEntity
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
@@ -32,7 +41,7 @@ class User(
     @Column
     val withdrawDate: LocalDateTime? = null,
 
-    userInformation: UserInformation,
+    userInformation: UserInformation
 ) : BaseTimeEntity() {
     @Embedded
     var information: UserInformation = userInformation
