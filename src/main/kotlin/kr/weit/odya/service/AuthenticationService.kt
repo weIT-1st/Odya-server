@@ -3,7 +3,9 @@ package kr.weit.odya.service
 import kr.weit.odya.domain.user.SocialType
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
+import kr.weit.odya.domain.user.existsByEmail
 import kr.weit.odya.domain.user.existsByNickname
+import kr.weit.odya.domain.user.existsByPhoneNumber
 import kr.weit.odya.security.FirebaseTokenParser
 import kr.weit.odya.service.dto.LoginRequest
 import kr.weit.odya.service.dto.RegisterRequest
@@ -27,7 +29,7 @@ class AuthenticationService(
     fun register(registerRequest: RegisterRequest, provider: String) {
         val socialType = SocialType.getValue(provider)
         val username = firebaseTokenParser.getUsername(registerRequest.idToken)
-        validateRegisterInformation(username, registerRequest.nickname)
+        validateRegisterInformation(username, registerRequest)
         userRepository.save(createUser(username, socialType, registerRequest))
     }
 
@@ -37,11 +39,22 @@ class AuthenticationService(
         }
     }
 
-    private fun validateRegisterInformation(username: String, nickname: String) {
+    private fun validateRegisterInformation(username: String, registerRequest: RegisterRequest) {
         if (userRepository.existsByUsername(username)) {
             throw ExistResourceException("$username: 이미 존재하는 회원입니다")
         }
-        validateNickname(nickname)
+
+        registerRequest.apply {
+            if (email != null && userRepository.existsByEmail(email)) {
+                throw ExistResourceException("$email: 이미 존재하는 이메일입니다")
+            }
+
+            if (phoneNumber != null && userRepository.existsByPhoneNumber(phoneNumber)) {
+                throw ExistResourceException("$phoneNumber: 이미 존재하는 전화번호입니다")
+            }
+
+            validateNickname(nickname)
+        }
     }
 
     private fun createUser(

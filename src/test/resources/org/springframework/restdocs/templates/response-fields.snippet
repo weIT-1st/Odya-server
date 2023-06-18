@@ -1,9 +1,10 @@
 |===
-|Field|Description|Type|Nullable
+    |Field|Description|Type|Nullable|Example
 {{#fields}}
-|{{#tableCellContent}}`+{{path}}+`{{/tableCellContent}}
-|{{#tableCellContent}}{{description}}{{/tableCellContent}}
-|{{#tableCellContent}}`+{{type}}+`{{/tableCellContent}}
-|{{#tableCellContent}}{{^optional}}false{{/optional}}{{#optional}}true{{/optional}}{{/tableCellContent}}
+    |{{#tableCellContent}}`+{{path}}+`{{/tableCellContent}}
+    |{{#tableCellContent}}{{description}}{{/tableCellContent}}
+    |{{#tableCellContent}}`+{{type}}+`{{/tableCellContent}}
+    |{{#tableCellContent}}{{^optional}}false{{/optional}}{{#optional}}true{{/optional}}{{/tableCellContent}}
+    |{{#tableCellContent}}{{#example}}{{.}}{{/example}}{{/tableCellContent}}
 {{/fields}}
-|===
+    |===

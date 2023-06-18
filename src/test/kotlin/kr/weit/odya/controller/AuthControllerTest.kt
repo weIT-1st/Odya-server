@@ -11,7 +11,9 @@ import kr.weit.odya.security.InvalidTokenException
 import kr.weit.odya.service.AuthenticationService
 import kr.weit.odya.service.ExistResourceException
 import kr.weit.odya.service.LoginFailedException
+import kr.weit.odya.support.EXIST_EMAIL_ERROR_MESSAGE
 import kr.weit.odya.support.EXIST_NICKNAME_ERROR_MESSAGE
+import kr.weit.odya.support.EXIST_PHONE_NUMBER_ERROR_MESSAGE
 import kr.weit.odya.support.EXIST_USER_ERROR_MESSAGE
 import kr.weit.odya.support.NOT_EXIST_USER_ERROR_MESSAGE
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
@@ -108,7 +110,7 @@ class AuthControllerTest(
                     createDocument(
                         "login-fail-invalid-token",
                         requestBody("idToken" type JsonFieldType.STRING description "유효하지 않은 ID TOKEN" example request.idToken),
-                        responseBody("errorMessage" type JsonFieldType.STRING description "에러 메시지")
+                        responseBody("errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE)
                     )
                 }
             }
@@ -179,7 +181,81 @@ class AuthControllerTest(
                                 "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday.toString()
                             ),
                             responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example EXIST_USER_ERROR_MESSAGE
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("유효한 토큰이지만, 이미 존재하는 이메일이면") {
+            val request = createRegisterRequest()
+            every { authenticationService.register(request, TEST_PROVIDER) } throws ExistResourceException(
+                EXIST_EMAIL_ERROR_MESSAGE
+            )
+            it("409 응답한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .post(targetUri, TEST_PROVIDER)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonContent(request))
+                )
+                    .andExpect(status().isConflict)
+                    .andDo(
+                        createPathDocument(
+                            "register-fail-exist-email",
+                            pathParameters(
+                                "provider" pathDescription "소셜 타입" example SocialType.values()
+                                    .joinToString { value -> value.name.lowercase() }
+                            ),
+                            requestBody(
+                                "idToken" type JsonFieldType.STRING description "유효한 ID TOKEN" example request.idToken,
+                                "email" type JsonFieldType.STRING description "이미 존재하는 사용자 이메일" example request.email isOptional true,
+                                "nickname" type JsonFieldType.STRING description "사용자 닉네임" example request.nickname,
+                                "phoneNumber" type JsonFieldType.STRING description "사용자 전화번호" example request.phoneNumber isOptional true,
+                                "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
+                                    .joinToString(),
+                                "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday.toString()
+                            ),
+                            responseBody(
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example EXIST_EMAIL_ERROR_MESSAGE
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("유효한 토큰이지만, 이미 존재하는 전화번호이면") {
+            val request = createRegisterRequest()
+            every { authenticationService.register(request, TEST_PROVIDER) } throws ExistResourceException(
+                EXIST_PHONE_NUMBER_ERROR_MESSAGE
+            )
+            it("409 응답한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .post(targetUri, TEST_PROVIDER)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonContent(request))
+                )
+                    .andExpect(status().isConflict)
+                    .andDo(
+                        createPathDocument(
+                            "register-fail-exist-phone-number",
+                            pathParameters(
+                                "provider" pathDescription "소셜 타입" example SocialType.values()
+                                    .joinToString { value -> value.name.lowercase() }
+                            ),
+                            requestBody(
+                                "idToken" type JsonFieldType.STRING description "유효한 ID TOKEN" example request.idToken,
+                                "email" type JsonFieldType.STRING description "사용자 이메일" example request.email isOptional true,
+                                "nickname" type JsonFieldType.STRING description "사용자 닉네임" example request.nickname,
+                                "phoneNumber" type JsonFieldType.STRING description "이미 존재하는 사용자 전화번호" example request.phoneNumber isOptional true,
+                                "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
+                                    .joinToString(),
+                                "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday.toString()
+                            ),
+                            responseBody(
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example EXIST_PHONE_NUMBER_ERROR_MESSAGE
                             )
                         )
                     )
@@ -216,7 +292,7 @@ class AuthControllerTest(
                                 "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday.toString()
                             ),
                             responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example EXIST_NICKNAME_ERROR_MESSAGE
                             )
                         )
                     )
@@ -320,7 +396,7 @@ class AuthControllerTest(
                                     .joinToString(),
                                 "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday.toString()
                             ),
-                            responseBody("errorMessage" type JsonFieldType.STRING description "에러 메시지")
+                            responseBody("errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE)
                         )
                     )
             }

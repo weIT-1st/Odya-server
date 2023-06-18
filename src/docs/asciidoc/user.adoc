@@ -15,3 +15,56 @@ operation::user-controller-test/get-my-information-fail-not-registered-user[snip
 === *1-3 실패 - 유효하지 않은 토큰*
 
 operation::user-controller-test/get-my-information-fail-invalid-token[snippets='http-request,request-headers,http-response,response-fields']
+
+[[이메일-변경-API]]
+== *2. 이메일 변경 API*
+
+=== *2-1 성공*
+
+operation::user-controller-test/update-email-success[snippets='http-request,request-headers,http-response']
+
+=== *2-2 실패 - 유효한 토큰이면서, 인증된 이메일이 토큰에 없는 경우*
+
+operation::user-controller-test/update-email-fail-not-exist-email-in-token[snippets='http-request,request-headers,http-response,response-fields']
+
+=== *2-3 실패 - 유효한 토큰이면서, 가입되어 있는 이메일인 경우*
+
+operation::user-controller-test/update-email-fail-exist-email[snippets='http-request,request-headers,http-response']
+
+=== *2-4 실패 - 유효하지 않은 토큰*
+
+operation::user-controller-test/update-email-fail-invalid-token[snippets='http-request,request-headers,http-response']
+
+[[전화번호-변경-API]]
+== *3. 전화번호 변경 API*
+
+=== *3-1 성공*
+
+operation::user-controller-test/update-phone-number-success[snippets='http-request,request-headers,http-response']
+
+=== *3-2 실패 - 유효한 토큰이면서, 인증된 전화번호가 토큰에 없는 경우*
+
+operation::user-controller-test/update-phone-number-fail-not-exist-phone-number-in-token[snippets='http-request,request-headers,http-response,response-fields']
+
+=== *3-3 실패 - 유효한 토큰이면서, 가입되어 있는 전화번호인 경우*
+
+operation::user-controller-test/update-phone-number-fail-exist-email[snippets='http-request,request-headers,http-response']
+
+=== *3-4 실패 - 유효하지 않은 토큰*
+
+operation::user-controller-test/update-phone-number-fail-invalid-token[snippets='http-request,request-headers,http-response']
+
+[[정보-변경-API]]
+== *4. 정보 변경 API*
+
+=== *4-1 성공*
+
+operation::user-controller-test/update-information-success[snippets='http-request,request-headers,request-fields,http-response']
+
+=== *4-2 실패 - 유효한 토큰이면서, 중복된 닉네임인 경우*
+
+operation::user-controller-test/update-information-fail-exist-nickname[snippets='http-request,request-headers,request-fields,http-response']
+
+=== *4-3 실패 - 유효하지 않은 토큰*
+
+operation::user-controller-test/update-information-fail-invalid-token[snippets='http-request,request-headers,http-response']
