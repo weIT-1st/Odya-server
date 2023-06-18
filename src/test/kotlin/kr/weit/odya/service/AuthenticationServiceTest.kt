@@ -6,10 +6,14 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.mockk.every
 import io.mockk.mockk
 import kr.weit.odya.domain.user.UserRepository
+import kr.weit.odya.domain.user.existsByEmail
 import kr.weit.odya.domain.user.existsByNickname
+import kr.weit.odya.domain.user.existsByPhoneNumber
 import kr.weit.odya.security.FirebaseTokenParser
 import kr.weit.odya.security.InvalidTokenException
+import kr.weit.odya.support.TEST_EMAIL
 import kr.weit.odya.support.TEST_NICKNAME
+import kr.weit.odya.support.TEST_PHONE_NUMBER
 import kr.weit.odya.support.TEST_PROVIDER
 import kr.weit.odya.support.TEST_USERNAME
 import kr.weit.odya.support.createLoginRequest
@@ -54,6 +58,8 @@ class AuthenticationServiceTest : DescribeSpec({
             every { firebaseTokenParser.getUsername(registerRequest.idToken) } returns TEST_USERNAME
             every { userRepository.existsByUsername(TEST_USERNAME) } returns false
             every { userRepository.existsByNickname(registerRequest.nickname) } returns false
+            every { userRepository.existsByEmail(TEST_EMAIL) } returns false
+            every { userRepository.existsByPhoneNumber(TEST_PHONE_NUMBER) } returns false
             every { userRepository.save(any()) } returns createUser()
             it("정상적으로 종료한다") {
                 shouldNotThrow<Exception> { authenticationService.register(registerRequest, TEST_PROVIDER) }
@@ -75,9 +81,30 @@ class AuthenticationServiceTest : DescribeSpec({
             }
         }
 
+        context("이미 가입한 이메일이 주어지는 경우") {
+            every { firebaseTokenParser.getUsername(registerRequest.idToken) } returns TEST_USERNAME
+            every { userRepository.existsByUsername(TEST_USERNAME) } returns false
+            every { userRepository.existsByEmail(TEST_EMAIL) } returns true
+            it("[ExistResourceException] 예외가 발생한다") {
+                shouldThrow<ExistResourceException> { authenticationService.register(registerRequest, TEST_PROVIDER) }
+            }
+        }
+
+        context("이미 가입한 전화번호가 주어지는 경우") {
+            every { firebaseTokenParser.getUsername(registerRequest.idToken) } returns TEST_USERNAME
+            every { userRepository.existsByUsername(TEST_USERNAME) } returns false
+            every { userRepository.existsByEmail(TEST_EMAIL) } returns false
+            every { userRepository.existsByPhoneNumber(TEST_PHONE_NUMBER) } returns true
+            it("[ExistResourceException] 예외가 발생한다") {
+                shouldThrow<ExistResourceException> { authenticationService.register(registerRequest, TEST_PROVIDER) }
+            }
+        }
+
         context("이미 가입한 닉네임이 주어지는 경우") {
             every { firebaseTokenParser.getUsername(registerRequest.idToken) } returns TEST_USERNAME
             every { userRepository.existsByUsername(TEST_USERNAME) } returns false
+            every { userRepository.existsByEmail(TEST_EMAIL) } returns false
+            every { userRepository.existsByPhoneNumber(TEST_PHONE_NUMBER) } returns false
             every { userRepository.existsByNickname(TEST_NICKNAME) } returns true
             it("[ExistResourceException] 예외가 발생한다") {
                 shouldThrow<ExistResourceException> { authenticationService.register(registerRequest, TEST_PROVIDER) }

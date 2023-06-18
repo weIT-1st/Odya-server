@@ -14,8 +14,7 @@ import kr.weit.odya.support.test.RestDocsHelper.Companion.responseBody
 import kr.weit.odya.support.test.type
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.restdocs.ManualRestDocumentation
-import org.springframework.restdocs.payload.JsonFieldType.NUMBER
-import org.springframework.restdocs.payload.JsonFieldType.STRING
+import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.test.web.servlet.post
 import org.springframework.web.context.WebApplicationContext
 
@@ -43,10 +42,10 @@ class TestControllerTest(
                 }.andDo {
                     createDocument(
                         "test-success",
-                        requestBody("name" type STRING description "이름" example request.name),
+                        requestBody("name" type JsonFieldType.STRING description "이름" example request.name),
                         responseBody(
-                            "hashValue" type NUMBER description "name의 hashCode 값",
-                            "originalName" type STRING description "trim을 적용한 name 값"
+                            "hashValue" type JsonFieldType.NUMBER description "name의 hashCode 값",
+                            "originalName" type JsonFieldType.STRING description "trim을 적용한 name 값"
                         )
                     )
                 }
@@ -63,8 +62,8 @@ class TestControllerTest(
                 }.andDo {
                     createDocument(
                         "test-fail-empty-name",
-                        requestBody("name" type STRING description "빈 값" example request.name),
-                        responseBody("errorMessage" type STRING description "에러 메시지")
+                        requestBody("name" type JsonFieldType.STRING description "빈 값" example request.name),
+                        responseBody("errorMessage" type JsonFieldType.STRING description "에러 메시지")
                     )
                 }
             }
@@ -80,8 +79,8 @@ class TestControllerTest(
                 }.andDo {
                     createDocument(
                         "test-fail-error-name",
-                        requestBody("name" type STRING description "에러 발생 이름" example request.name),
-                        responseBody("errorMessage" type STRING description "에러 메시지")
+                        requestBody("name" type JsonFieldType.STRING description "에러 발생 이름" example request.name),
+                        responseBody("errorMessage" type JsonFieldType.STRING description "에러 메시지")
                     )
                 }
             }

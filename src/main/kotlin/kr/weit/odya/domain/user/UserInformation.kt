@@ -8,13 +8,13 @@ import java.time.LocalDate
 
 @Embeddable
 data class UserInformation(
-    @Column
+    @Column(unique = true)
     val email: String?,
 
     @Column(nullable = false, length = 24, unique = true)
     val nickname: String,
 
-    @Column(length = 13)
+    @Column(length = 13, unique = true)
     val phoneNumber: String?,
 
     @Column(nullable = false)

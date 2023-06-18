@@ -30,9 +30,6 @@ class User(
     @Column(nullable = false, updatable = false, unique = true)
     val username: String,
 
-    @Embedded
-    val information: UserInformation,
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, updatable = false)
     val socialType: SocialType,
@@ -42,8 +39,14 @@ class User(
     val userRole: UserRole,
 
     @Column
-    val withdrawDate: LocalDateTime? = null
+    val withdrawDate: LocalDateTime? = null,
+
+    userInformation: UserInformation
 ) : BaseTimeEntity() {
+    @Embedded
+    var information: UserInformation = userInformation
+        private set
+
     constructor(
         id: Long = 0L,
         username: String,
@@ -58,10 +61,10 @@ class User(
     ) : this(
         id = id,
         username = username,
-        information = UserInformation(email, nickname, phoneNumber, gender, birthday, profileName),
         socialType = socialType,
         withdrawDate = null,
-        userRole = userRole
+        userRole = userRole,
+        userInformation = UserInformation(email, nickname, phoneNumber, gender, birthday, profileName)
     )
 
     val email: String?
@@ -81,4 +84,16 @@ class User(
 
     val profileName: String
         get() = information.profileName
+
+    fun changePhoneNumber(phoneNumber: String) {
+        information = information.copy(phoneNumber = phoneNumber)
+    }
+
+    fun changeEmail(email: String) {
+        information = information.copy(email = email)
+    }
+
+    fun changeInformation(nickname: String) {
+        information = information.copy(nickname = nickname)
+    }
 }

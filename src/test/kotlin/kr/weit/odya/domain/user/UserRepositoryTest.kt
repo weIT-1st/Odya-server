@@ -4,7 +4,9 @@ import io.kotest.core.spec.style.ExpectSpec
 import io.kotest.extensions.spring.SpringTestExtension
 import io.kotest.extensions.spring.SpringTestLifecycleMode
 import io.kotest.matchers.shouldBe
+import kr.weit.odya.support.TEST_EMAIL
 import kr.weit.odya.support.TEST_NICKNAME
+import kr.weit.odya.support.TEST_PHONE_NUMBER
 import kr.weit.odya.support.TEST_USERNAME
 import kr.weit.odya.support.createUser
 import kr.weit.odya.support.test.BaseTests.RepositoryTest
@@ -39,6 +41,16 @@ class UserRepositoryTest(
 
         expect("닉네임이 일치하는 사용자 여부를 확인한다") {
             val result = userRepository.existsByNickname(TEST_NICKNAME)
+            result shouldBe true
+        }
+
+        expect("이메일이 일치하는 사용자 여부를 확인한다") {
+            val result = userRepository.existsByEmail(TEST_EMAIL)
+            result shouldBe true
+        }
+
+        expect("전화번호가 일치하는 사용자 여부를 확인한다") {
+            val result = userRepository.existsByPhoneNumber(TEST_PHONE_NUMBER)
             result shouldBe true
         }
     }

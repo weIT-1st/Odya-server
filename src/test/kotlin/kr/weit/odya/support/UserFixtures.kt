@@ -3,6 +3,7 @@ package kr.weit.odya.support
 import kr.weit.odya.domain.user.Gender
 import kr.weit.odya.domain.user.SocialType
 import kr.weit.odya.domain.user.User
+import kr.weit.odya.service.dto.InformationRequest
 import kr.weit.odya.service.dto.UserResponse
 import java.time.LocalDate
 
@@ -42,3 +43,5 @@ fun createOtherUser(): User = User(
 )
 
 fun createUserResponse(): UserResponse = UserResponse(createUser())
+
+fun createInformationRequest(): InformationRequest = InformationRequest(TEST_NICKNAME)
