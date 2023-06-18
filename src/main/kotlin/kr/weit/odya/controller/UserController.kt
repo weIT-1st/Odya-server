@@ -49,7 +49,8 @@ class UserController(
 
     @PatchMapping("/information")
     fun updateInformation(
-        @RequestBody @Valid informationRequest: InformationRequest,
+        @RequestBody @Valid
+        informationRequest: InformationRequest,
         @LoginUserId userId: Long
     ): ResponseEntity<Void> {
         userService.updateInformation(userId, informationRequest)

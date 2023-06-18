@@ -1,12 +1,14 @@
 package kr.weit.odya.service
 
 import jakarta.ws.rs.ForbiddenException
+import kr.weit.odya.domain.placeReview.PlaceReview
 import kr.weit.odya.domain.placeReview.PlaceReviewRepository
 import kr.weit.odya.domain.placeReview.getByPlaceReviewId
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.service.dto.PlaceReviewCreateRequest
+import kr.weit.odya.service.dto.PlaceReviewListResponse
 import kr.weit.odya.service.dto.PlaceReviewUpdateRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -28,13 +30,36 @@ class PlaceReviewService(
     @Transactional
     fun updateReview(request: PlaceReviewUpdateRequest, userId: Long) {
         val placeReview = placeReviewRepository.getByPlaceReviewId(request.id)
-        if (placeReview.writerId != userId) {
-            throw ForbiddenException("작성자만 수정할 수 있습니다.")
-        }
+        checkPermissions(placeReview, userId)
         placeReview.apply {
             this.starRating = request.rating ?: this.starRating
             this.review = request.review ?: this.review
         }
         placeReviewRepository.save(placeReview)
+    }
+
+    @Transactional
+    fun deleteReview(placeReviewId: Long, userId: Long) {
+        val placeReview = placeReviewRepository.getByPlaceReviewId(placeReviewId)
+        checkPermissions(placeReview, userId)
+        placeReviewRepository.delete(placeReview)
+    }
+
+    private fun checkPermissions(placeReview: PlaceReview, userId: Long) {
+        if (placeReview.writerId != userId) {
+            throw ForbiddenException("권한 없음")
+        }
+    }
+
+    fun getByPlaceReviewId(placeId: String): List<PlaceReviewListResponse> {
+        return placeReviewRepository.findAllByPlaceId(placeId)
+            .map { PlaceReviewListResponse(it) }
+    }
+
+    @Transactional
+    fun getByUserReviewList(userId: Long): List<PlaceReviewListResponse> {
+        val user: User = userRepository.getByUserId(userId)
+        return placeReviewRepository.findAllByUser(user)
+            .map { PlaceReviewListResponse(it) }
     }
 }

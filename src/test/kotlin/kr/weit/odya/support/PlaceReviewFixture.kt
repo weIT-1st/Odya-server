@@ -3,6 +3,7 @@ package kr.weit.odya.support
 import kr.weit.odya.domain.placeReview.PlaceReview
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.service.dto.PlaceReviewCreateRequest
+import kr.weit.odya.service.dto.PlaceReviewListResponse
 import kr.weit.odya.service.dto.PlaceReviewUpdateRequest
 
 const val TEST_PLACE_REVIEW_ID = 1L
@@ -27,4 +28,8 @@ fun updatePlaceReviewRequest(): PlaceReviewUpdateRequest {
 
 fun createPlaceReview(user: User = createUser()): PlaceReview {
     return PlaceReview(TEST_PLACE_REVIEW_ID, TEST_PLACE_ID, user, TEST_RATING, TEST_REVIEW)
+}
+
+fun creatPlaceReviewListResponse(): PlaceReviewListResponse {
+    return PlaceReviewListResponse(createPlaceReview())
 }

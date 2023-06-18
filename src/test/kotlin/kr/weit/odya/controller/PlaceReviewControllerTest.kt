@@ -11,12 +11,15 @@ import kr.weit.odya.service.PlaceReviewService
 import kr.weit.odya.support.EXIST_PLACE_REVIEW_ERROR_MESSAGE
 import kr.weit.odya.support.FORBIDDEN_PLACE_REVIEW_ERROR_MESSAGE
 import kr.weit.odya.support.NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE
+import kr.weit.odya.support.NOT_EXIST_USER_ERROR_MESSAGE
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_NOT_EXIST_USER_ID_TOKEN
 import kr.weit.odya.support.TEST_EXIST_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_INVALID_PLACE_REVIEW_ID
+import kr.weit.odya.support.TEST_INVALID_USER_ID
+import kr.weit.odya.support.TEST_NOT_EXIST_USER_ID
 import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_RATING
@@ -25,23 +28,30 @@ import kr.weit.odya.support.TEST_TOO_HIGH_RATING
 import kr.weit.odya.support.TEST_TOO_LONG_REVIEW
 import kr.weit.odya.support.TEST_TOO_LOW_RATING
 import kr.weit.odya.support.TEST_USER_ID
+import kr.weit.odya.support.creatPlaceReviewListResponse
 import kr.weit.odya.support.createPlaceReviewRequest
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
 import kr.weit.odya.support.test.ControllerTestHelper.Companion.jsonContent
 import kr.weit.odya.support.test.RestDocsHelper
 import kr.weit.odya.support.test.RestDocsHelper.Companion.createDocument
+import kr.weit.odya.support.test.RestDocsHelper.Companion.createPathDocument
 import kr.weit.odya.support.test.RestDocsHelper.Companion.requestBody
 import kr.weit.odya.support.test.RestDocsHelper.Companion.responseBody
+import kr.weit.odya.support.test.example
 import kr.weit.odya.support.test.headerDescription
+import kr.weit.odya.support.test.pathDescription
 import kr.weit.odya.support.test.type
 import kr.weit.odya.support.updatePlaceReviewRequest
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.HttpHeaders
 import org.springframework.restdocs.ManualRestDocumentation
 import org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.payload.JsonFieldType
+import org.springframework.restdocs.request.RequestDocumentation.pathParameters
 import org.springframework.test.web.servlet.patch
 import org.springframework.test.web.servlet.post
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.web.context.WebApplicationContext
 
 @UnitControllerTestEnvironment
@@ -57,8 +67,8 @@ class PlaceReviewControllerTest(
         restDocumentation.beforeTest(javaClass, it.name.testName)
     }
 
-    describe("POST /api/v1/place-review") {
-        val targetUri = "/api/v1/place-review"
+    describe("POST /api/v1/place-reviews") {
+        val targetUri = "/api/v1/place-reviews"
         context("유효한 요청 데이터가 전달되면") {
             val request = createPlaceReviewRequest()
             every { placeReviewService.createReview(request, TEST_USER_ID) } just Runs
@@ -277,8 +287,8 @@ class PlaceReviewControllerTest(
         }
     }
 
-    describe("PATCH /api/v1/place-review") {
-        val targetUri = "/api/v1/place-review"
+    describe("PATCH /api/v1/place-reviews") {
+        val targetUri = "/api/v1/place-reviews"
         context("유효한 요청 데이터가 전달되면") {
             val request = updatePlaceReviewRequest()
             every { placeReviewService.updateReview(request, TEST_USER_ID) } just Runs
@@ -314,7 +324,7 @@ class PlaceReviewControllerTest(
                     status { isBadRequest() }
                 }.andDo {
                     createDocument(
-                        "placeReview-update-fail-negative-rating",
+                        "placeReview-update-fail-negative-id",
                         requestHeaders(
                             HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                         ),
@@ -477,7 +487,7 @@ class PlaceReviewControllerTest(
                     status { isNotFound() }
                 }.andDo {
                     createDocument(
-                        "placeReview-update-fail-not-found-review",
+                        "placeReview-update-fail-not-found-id",
                         requestHeaders(
                             HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                         ),
@@ -550,6 +560,372 @@ class PlaceReviewControllerTest(
         }
     }
 
+    describe("DELETE /api/v1/place-reviews/{id}") {
+        val targetUri = "/api/v1/place-reviews/{id}"
+        context("유효한 요청 데이터가 전달되면") {
+            every { placeReviewService.deleteReview(TEST_PLACE_REVIEW_ID, TEST_USER_ID) } just Runs
+            it("204를 반환한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .delete(targetUri, TEST_PLACE_REVIEW_ID)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                )
+                    .andExpect(status().isNoContent)
+                    .andDo(
+                        createPathDocument(
+                            "placeReview-delete-success",
+                            pathParameters(
+                                "id" pathDescription "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString()
+                            ),
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("유효한 토큰이지만 장소리뷰ID가 음수인 경우") {
+            it("400를 반환한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .delete(targetUri, TEST_INVALID_PLACE_REVIEW_ID)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                )
+                    .andExpect(status().isBadRequest)
+                    .andDo(
+                        createPathDocument(
+                            "placeReview-delete-fail-negative-id",
+                            pathParameters(
+                                "id" pathDescription "음수인 장소 리뷰 ID" example TEST_INVALID_PLACE_REVIEW_ID.toString()
+                            ),
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("가입되어 있지 않은 USERID이 주어지는 경우") {
+            it("401 응답한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .delete(targetUri, TEST_PLACE_REVIEW_ID)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_NOT_EXIST_USER_ID_TOKEN)
+                )
+                    .andExpect(status().isUnauthorized)
+                    .andDo(
+                        createPathDocument(
+                            "placeReview-delete-fail-not-registered-user",
+                            pathParameters(
+                                "id" pathDescription "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString()
+                            ),
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                            ),
+                            responseBody(
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("유효한 토큰이지만 존재하지 않는 장소리뷰ID인 경우") {
+            every { placeReviewService.deleteReview(TEST_EXIST_PLACE_REVIEW_ID, TEST_USER_ID) } throws NoSuchElementException(NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE)
+            it("404를 반환한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .delete(targetUri, TEST_EXIST_PLACE_REVIEW_ID)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                )
+                    .andExpect(status().isNotFound)
+                    .andDo(
+                        createPathDocument(
+                            "placeReview-delete-not-found-id",
+                            pathParameters(
+                                "id" pathDescription "존재하지 않는 장소 리뷰 ID" example TEST_EXIST_PLACE_REVIEW_ID.toString()
+                            ),
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                            ),
+                            responseBody(
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("유효한 토큰이지만, 삭제할 권한이 없는 경우") {
+            every { placeReviewService.deleteReview(TEST_PLACE_REVIEW_ID, TEST_USER_ID) } throws ForbiddenException(FORBIDDEN_PLACE_REVIEW_ERROR_MESSAGE)
+            it("403를 반환한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .delete(targetUri, TEST_PLACE_REVIEW_ID)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                )
+                    .andExpect(status().isForbidden)
+                    .andDo(
+                        createPathDocument(
+                            "placeReview-delete-no-permissions",
+                            pathParameters(
+                                "id" pathDescription "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString()
+                            ),
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                            ),
+                            responseBody(
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example FORBIDDEN_PLACE_REVIEW_ERROR_MESSAGE
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("유효하지 않은 토큰이 전달되면") {
+            it("401를 반환한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .delete(targetUri, TEST_PLACE_REVIEW_ID)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                )
+                    .andExpect(status().isUnauthorized)
+                    .andDo(
+                        createPathDocument(
+                            "placeReview-delete-invalid-token",
+                            pathParameters(
+                                "id" pathDescription "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID.toString()
+                            ),
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN"
+                            ),
+                            responseBody(
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
+                            )
+                        )
+                    )
+            }
+        }
+    }
+
+    describe("GET /api/v1/place-reviews/place/{id}") {
+        val targetUri = "/api/v1/place-reviews/place/{id}"
+        context("유효한 요청 데이터가 전달되면") {
+            val response = listOf(creatPlaceReviewListResponse())
+            every { placeReviewService.getByPlaceReviewId(TEST_PLACE_ID) } returns response
+            it("200 응답한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .get(targetUri, TEST_PLACE_ID)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                )
+                    .andExpect(status().isOk)
+                    .andDo(
+                        createPathDocument(
+                            "placeReview-placeId-get-list-success",
+                            pathParameters(
+                                "id" pathDescription "장소 ID" example TEST_PLACE_ID
+                            ),
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                            ),
+                            responseBody(
+                                "[].placeId" type JsonFieldType.STRING description "장소 ID" example response[0].placeId,
+                                "[].writerNickname" type JsonFieldType.STRING description "장소 이름" example response[0].writerNickname,
+                                "[].starRating" type JsonFieldType.NUMBER description "별점" example response[0].starRating.toString(),
+                                "[].review" type JsonFieldType.STRING description "리뷰" example response[0].review
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("가입되어 있지 않은 USERID이 주어지는 경우") {
+            it("401 응답한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .get(targetUri, TEST_PLACE_ID)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_NOT_EXIST_USER_ID_TOKEN)
+                )
+                    .andExpect(status().isUnauthorized)
+                    .andDo(
+                        createPathDocument(
+                            "placeReview-placeId-get-fail-not-registered-user",
+                            pathParameters(
+                                "id" pathDescription "장소 ID" example TEST_PLACE_ID
+                            ),
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                            ),
+                            responseBody(
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("유효하지 않은 토큰이 전달되면") {
+            it("401 응답한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .get(targetUri, TEST_PLACE_ID)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                )
+                    .andExpect(status().isUnauthorized)
+                    .andDo(
+                        createPathDocument(
+                            "placeReview-placeId-get-fail-invalid-token",
+                            pathParameters(
+                                "id" pathDescription "장소 ID" example TEST_PLACE_ID
+                            ),
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN"
+                            ),
+                            responseBody(
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
+                            )
+                        )
+                    )
+            }
+        }
+    }
+
+    describe("GET /api/v1/place-reviews/user/{id}") {
+        val targetUri = "/api/v1/place-reviews/user/{id}"
+        context("유효한 요청 데이터가 전달되면") {
+            val response = listOf(creatPlaceReviewListResponse())
+            every { placeReviewService.getByUserReviewList(TEST_USER_ID) } returns response
+            it("200 응답한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .get(targetUri, TEST_USER_ID)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                )
+                    .andExpect(status().isOk)
+                    .andDo(
+                        createPathDocument(
+                            "placeReview-userId-get-list-success",
+                            pathParameters(
+                                "id" pathDescription "유저 ID" example TEST_USER_ID.toString()
+                            ),
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                            ),
+                            responseBody(
+                                "[].placeId" type JsonFieldType.STRING description "장소 ID" example response[0].placeId,
+                                "[].writerNickname" type JsonFieldType.STRING description "장소 이름" example response[0].writerNickname,
+                                "[].starRating" type JsonFieldType.NUMBER description "별점" example response[0].starRating.toString(),
+                                "[].review" type JsonFieldType.STRING description "리뷰" example response[0].review
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("유효한 토큰이지만 유저 ID가 음수인 경우") {
+            it("400 응답한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .get(targetUri, TEST_INVALID_USER_ID)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                )
+                    .andExpect(status().isBadRequest)
+                    .andDo(
+                        createPathDocument(
+                            "placeReview-userId-get-fail-negative-id",
+                            pathParameters(
+                                "id" pathDescription "음수인 유저 ID" example TEST_INVALID_USER_ID.toString()
+                            ),
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                            ),
+                            responseBody(
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("가입되어 있지 않은 USERID이 주어지는 경우") {
+            it("401 응답한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .get(targetUri, TEST_USER_ID)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_NOT_EXIST_USER_ID_TOKEN)
+                )
+                    .andExpect(status().isUnauthorized)
+                    .andDo(
+                        createPathDocument(
+                            "placeReview-userId-get-fail-not-registered-user",
+                            pathParameters(
+                                "id" pathDescription "유저 ID" example TEST_USER_ID.toString()
+                            ),
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                            ),
+                            responseBody(
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("유효한 토큰이지만 가입되어 있지 않은 USER ID이 주어지는 경우") {
+            every { placeReviewService.getByUserReviewList(TEST_NOT_EXIST_USER_ID) } throws NoSuchElementException(NOT_EXIST_USER_ERROR_MESSAGE)
+            it("404 응답한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .get(targetUri, TEST_NOT_EXIST_USER_ID)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                )
+                    .andExpect(status().isNotFound)
+                    .andDo(
+                        createPathDocument(
+                            "placeReview-userId-get-fail-not-registered-id",
+                            pathParameters(
+                                "id" pathDescription "가입되어 있지 않은 유저 ID" example TEST_NOT_EXIST_USER_ID.toString()
+                            ),
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                            ),
+                            responseBody(
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example NOT_EXIST_USER_ERROR_MESSAGE
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("유효하지 않은 토큰이 전달되면") {
+            it("401 응답한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .get(targetUri, TEST_USER_ID)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                )
+                    .andExpect(status().isUnauthorized)
+                    .andDo(
+                        createPathDocument(
+                            "placeReview-userId-get-fail-invalid-token",
+                            pathParameters(
+                                "id" pathDescription "유저 ID" example TEST_USER_ID.toString()
+                            ),
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN"
+                            ),
+                            responseBody(
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
+                            )
+                        )
+                    )
+            }
+        }
+    }
     afterEach {
         restDocumentation.afterTest()
     }

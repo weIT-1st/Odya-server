@@ -8,6 +8,8 @@ import kr.weit.odya.service.dto.UserResponse
 import java.time.LocalDate
 
 const val TEST_USER_ID = 1L
+const val TEST_INVALID_USER_ID = -1L
+const val TEST_NOT_EXIST_USER_ID = 2L
 const val TEST_USERNAME = "testUsername"
 const val TEST_EMAIL = "test@test.com"
 const val TEST_INVALID_EMAIL = "test"
