@@ -26,6 +26,6 @@ class PhoneNumberValidator : ConstraintValidator<PhoneNumber, String?> {
         contactField: String?,
         cxt: ConstraintValidatorContext?
     ): Boolean {
-        return PHONE_NUMBER_PATTERN.matcher(contactField).matches()
+        return contactField == null || PHONE_NUMBER_PATTERN.matcher(contactField).matches()
     }
 }
