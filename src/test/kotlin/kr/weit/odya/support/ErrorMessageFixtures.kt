@@ -19,3 +19,5 @@ const val EXIST_PLACE_REVIEW_ERROR_MESSAGE = "이미 리뷰를 작성한 장소�
 const val NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE = "존재하지 않는 장소 리뷰입니다."
 
 const val FORBIDDEN_PLACE_REVIEW_ERROR_MESSAGE = "작성자만 수정할 수 있습니다."
+
+const val ALREADY_FOLLOW_ERROR_MESSAGE = "$TEST_OTHER_USER_ID: 해당 유저를 이미 팔로우 중 입니다"
