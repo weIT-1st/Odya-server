@@ -87,7 +87,7 @@ class RestDocsField(
     }
 
     infix fun example(value: Any?): RestDocsField {
-        descriptor.attributes(field(EXAMPLE, value.toString()))
+        descriptor.attributes(field(EXAMPLE, if (value is String) value else value?.toString()))
         return this
     }
 }
@@ -110,5 +110,5 @@ infix fun ParameterDescriptor.isOptional(value: Boolean): ParameterDescriptor {
 }
 
 infix fun ParameterDescriptor.example(value: Any): ParameterDescriptor {
-    return this.attributes(field(EXAMPLE, value.toString()))
+    return this.attributes(field(EXAMPLE, if (value is String) value else value.toString()))
 }

@@ -144,7 +144,7 @@ class AuthControllerTest(
                                 "phoneNumber" type JsonFieldType.STRING description "사용자 전화번호" example request.phoneNumber isOptional true,
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
                                     .joinToString(),
-                                "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday.toString()
+                                "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday
                             )
                         )
                     )
@@ -178,7 +178,7 @@ class AuthControllerTest(
                                 "phoneNumber" type JsonFieldType.STRING description "사용자 전화번호" example request.phoneNumber isOptional true,
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
                                     .joinToString(),
-                                "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday.toString()
+                                "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday
                             ),
                             responseBody(
                                 "errorMessage" type JsonFieldType.STRING description "에러 메시지" example EXIST_USER_ERROR_MESSAGE
@@ -215,7 +215,7 @@ class AuthControllerTest(
                                 "phoneNumber" type JsonFieldType.STRING description "사용자 전화번호" example request.phoneNumber isOptional true,
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
                                     .joinToString(),
-                                "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday.toString()
+                                "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday
                             ),
                             responseBody(
                                 "errorMessage" type JsonFieldType.STRING description "에러 메시지" example EXIST_EMAIL_ERROR_MESSAGE
@@ -252,7 +252,7 @@ class AuthControllerTest(
                                 "phoneNumber" type JsonFieldType.STRING description "이미 존재하는 사용자 전화번호" example request.phoneNumber isOptional true,
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
                                     .joinToString(),
-                                "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday.toString()
+                                "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday
                             ),
                             responseBody(
                                 "errorMessage" type JsonFieldType.STRING description "에러 메시지" example EXIST_PHONE_NUMBER_ERROR_MESSAGE
@@ -289,7 +289,7 @@ class AuthControllerTest(
                                 "phoneNumber" type JsonFieldType.STRING description "사용자 전화번호" example request.phoneNumber isOptional true,
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
                                     .joinToString(),
-                                "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday.toString()
+                                "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday
                             ),
                             responseBody(
                                 "errorMessage" type JsonFieldType.STRING description "에러 메시지" example EXIST_NICKNAME_ERROR_MESSAGE
@@ -323,7 +323,7 @@ class AuthControllerTest(
                                 "phoneNumber" type JsonFieldType.STRING description "사용자 전화번호" example request.phoneNumber isOptional true,
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
                                     .joinToString(),
-                                "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday.toString()
+                                "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday
                             ),
                             responseBody(
                                 "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
@@ -357,7 +357,7 @@ class AuthControllerTest(
                                 "phoneNumber" type JsonFieldType.STRING description "올바르지 않은 형식의 휴대전화" example request.phoneNumber isOptional true,
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
                                     .joinToString(),
-                                "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday.toString()
+                                "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday
                             ),
                             responseBody(
                                 "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
@@ -394,7 +394,7 @@ class AuthControllerTest(
                                 "phoneNumber" type JsonFieldType.STRING description "사용자 전화번호" example request.phoneNumber isOptional true,
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
                                     .joinToString(),
-                                "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday.toString()
+                                "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday
                             ),
                             responseBody("errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE)
                         )

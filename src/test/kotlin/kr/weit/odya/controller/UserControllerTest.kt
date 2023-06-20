@@ -74,7 +74,7 @@ class UserControllerTest(
                             "nickname" type JsonFieldType.STRING description "사용자 닉네임" example response.nickname,
                             "phoneNumber" type JsonFieldType.STRING description "사용자 전화번호" example response.phoneNumber isOptional true,
                             "gender" type JsonFieldType.STRING description "사용자 성별" example response.gender.name,
-                            "birthday" type JsonFieldType.STRING description "사용자 생일" example response.birthday.toString(),
+                            "birthday" type JsonFieldType.STRING description "사용자 생일" example response.birthday,
                             "socialType" type JsonFieldType.STRING description "사용자 소셜 타입" example response.socialType.name
                         )
                     )

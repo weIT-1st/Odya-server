@@ -55,12 +55,12 @@ class FollowRepositoryTest(
             val result = followRepository.countByFollowingId(following.id)
             result shouldBe 1
         }
+    }
 
-        context("팔로우 삭제") {
-            expect("FOLLOWER ID와 FOLLOWING ID가 일치하는 팔로우를 삭제한다") {
-                followRepository.deleteByFollowerIdAndFollowingId(follower.id, following.id)
-                followRepository.existsByFollowerIdAndFollowingId(follower.id, following.id) shouldBe false
-            }
+    context("팔로우 삭제") {
+        expect("FOLLOWER ID와 FOLLOWING ID가 일치하는 팔로우를 삭제한다") {
+            followRepository.deleteByFollowerIdAndFollowingId(follower.id, following.id)
+            followRepository.existsByFollowerIdAndFollowingId(follower.id, following.id) shouldBe false
         }
     }
 })
