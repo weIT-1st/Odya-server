@@ -10,7 +10,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
-import kr.weit.odya.domain.BaseTimeEntity
+import kr.weit.odya.support.domain.BaseTimeEntity
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
 import java.time.LocalDate
@@ -45,7 +45,7 @@ class User(
 ) : BaseTimeEntity() {
     @Embedded
     var information: UserInformation = userInformation
-        private set
+        protected set
 
     constructor(
         id: Long = 0L,

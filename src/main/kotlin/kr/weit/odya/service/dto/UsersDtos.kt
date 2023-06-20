@@ -7,6 +7,7 @@ import kr.weit.odya.support.validator.Nickname
 import java.time.LocalDate
 
 data class UserResponse(
+    val userId: Long,
     val email: String?,
     val nickname: String,
     val phoneNumber: String?,
@@ -15,6 +16,7 @@ data class UserResponse(
     val socialType: SocialType
 ) {
     constructor(user: User) : this(
+        user.id,
         user.email,
         user.nickname,
         user.phoneNumber,
