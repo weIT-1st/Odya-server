@@ -1,35 +1,143 @@
 package kr.weit.odya.service.dto
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Past
 import kr.weit.odya.domain.user.Gender
+import kr.weit.odya.domain.user.SocialType
 import kr.weit.odya.support.validator.Nickname
 import kr.weit.odya.support.validator.PhoneNumber
 import java.time.LocalDate
 
-data class LoginRequest(
+data class AppleLoginRequest(
     @field:NotBlank
     val idToken: String
 )
 
-data class RegisterRequest(
+data class KakaoLoginRequest(
+    @field:NotBlank
+    val accessToken: String
+)
+
+data class KakaoRegistrationResponse(
+    val uid: String,
+    val email: String?,
+    val phoneNumber: String?,
+    val nickname: String,
+    val gender: Gender?
+) {
+    constructor(kakaoUserInfo: KakaoUserInfo) : this(
+        uid = kakaoUserInfo.uid,
+        email = kakaoUserInfo.email,
+        phoneNumber = kakaoUserInfo.phoneNumber,
+        nickname = kakaoUserInfo.nickname,
+        gender = kakaoUserInfo.gender
+    )
+}
+
+data class AppleRegisterRequest(
     @field:NotBlank
     val idToken: String,
 
     @field:Email
-    val email: String?,
+    override val email: String?,
 
     @field:PhoneNumber
-    val phoneNumber: String?,
+    override val phoneNumber: String?,
 
     @field:Nickname
-    val nickname: String,
+    override var nickname: String,
 
     @field:NotNull
-    val gender: Gender,
+    override var gender: Gender,
 
     @field:Past
-    val birthday: LocalDate
+    override var birthday: LocalDate
+) : RegisterRequest() {
+    @JsonIgnore
+    override var uid: String = ""
+
+    @JsonIgnore
+    override var socialType: SocialType = SocialType.APPLE
+    fun updateUid(uid: String) {
+        this.uid = uid
+    }
+}
+
+data class KakaoRegisterRequest(
+    @field:NotBlank
+    override var uid: String,
+
+    @field:Email
+    override val email: String?,
+
+    @field:PhoneNumber
+    override val phoneNumber: String?,
+
+    @field:Nickname
+    override var nickname: String,
+
+    @field:NotNull
+    override var gender: Gender,
+
+    @field:Past
+    override var birthday: LocalDate
+) : RegisterRequest() {
+    @JsonIgnore
+    override var socialType: SocialType = SocialType.KAKAO
+}
+
+open class RegisterRequest {
+    open val email: String? = null
+    open val phoneNumber: String? = null
+    open lateinit var uid: String
+        protected set
+    open lateinit var nickname: String
+        protected set
+    open lateinit var gender: Gender
+        protected set
+    open lateinit var birthday: LocalDate
+        protected set
+    open lateinit var socialType: SocialType
+        protected set
+}
+
+data class KakaoUserInfo(
+    val id: String = "",
+    @JsonProperty("kakao_account")
+    val kakaoAccount: KakaoAccount = KakaoAccount()
+) {
+    data class KakaoAccount(
+        val name: String? = null,
+        val email: String? = null,
+        val gender: String? = null,
+        @JsonProperty("phone_number")
+        val phoneNumber: String? = null,
+        val profile: Profile = Profile()
+    )
+
+    data class Profile(
+        val nickname: String = ""
+    )
+
+    val uid: String = "KAKAO_$id"
+    val name: String? = kakaoAccount.name
+    val email: String? = kakaoAccount.email
+    val phoneNumber: String? = kakaoAccount.phoneNumber
+    val gender: Gender? = genderFormat()
+    val nickname: String = kakaoAccount.profile.nickname
+
+    private fun genderFormat(): Gender? =
+        if (!kakaoAccount.gender.isNullOrBlank()) {
+            Gender.valueOf(kakaoAccount.gender[0].toString().uppercase())
+        } else {
+            null
+        }
+}
+
+data class TokenResponse(
+    val firebaseCustomToken: String
 )

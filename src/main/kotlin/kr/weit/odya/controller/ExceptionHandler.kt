@@ -3,10 +3,11 @@ package kr.weit.odya.controller
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import jakarta.validation.ConstraintViolationException
 import jakarta.ws.rs.ForbiddenException
+import kr.weit.odya.security.CreateFirebaseUserException
+import kr.weit.odya.security.CreateTokenException
 import kr.weit.odya.security.InvalidTokenException
 import kr.weit.odya.service.ExistResourceException
 import kr.weit.odya.service.LoginFailedException
-import kr.weit.odya.service.OdyaException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
@@ -81,13 +82,13 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiErrorResponse(ex.message))
     }
 
-    @ExceptionHandler(ExistResourceException::class)
-    fun existResourceException(ex: OdyaException): ResponseEntity<ApiErrorResponse> {
-        logger.error("[ExistResourceException]", ex)
+    @ExceptionHandler(ExistResourceException::class, CreateFirebaseUserException::class)
+    fun conflictException(ex: RuntimeException): ResponseEntity<ApiErrorResponse> {
+        logger.error("[ConflictException]", ex)
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiErrorResponse(ex.message))
     }
 
-    @ExceptionHandler(Exception::class)
+    @ExceptionHandler(Exception::class, CreateTokenException::class)
     fun exception(ex: Exception): ResponseEntity<ApiErrorResponse> {
         logger.error("[Exception]", ex)
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiErrorResponse(ex.message))
