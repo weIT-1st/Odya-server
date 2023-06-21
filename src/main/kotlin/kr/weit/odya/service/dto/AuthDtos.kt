@@ -23,14 +23,14 @@ data class KakaoLoginRequest(
 )
 
 data class KakaoRegistrationResponse(
-    val uid: String,
+    val username: String,
     val email: String?,
     val phoneNumber: String?,
     val nickname: String,
     val gender: Gender?
 ) {
     constructor(kakaoUserInfo: KakaoUserInfo) : this(
-        uid = kakaoUserInfo.uid,
+        username = kakaoUserInfo.username,
         email = kakaoUserInfo.email,
         phoneNumber = kakaoUserInfo.phoneNumber,
         nickname = kakaoUserInfo.nickname,
@@ -58,18 +58,18 @@ data class AppleRegisterRequest(
     override var birthday: LocalDate
 ) : RegisterRequest() {
     @JsonIgnore
-    override var uid: String = ""
+    override var username: String = ""
 
     @JsonIgnore
     override var socialType: SocialType = SocialType.APPLE
-    fun updateUid(uid: String) {
-        this.uid = uid
+    fun updateUsername(username: String) {
+        this.username = username
     }
 }
 
 data class KakaoRegisterRequest(
     @field:NotBlank
-    override var uid: String,
+    override var username: String,
 
     @field:Email
     override val email: String?,
@@ -93,7 +93,7 @@ data class KakaoRegisterRequest(
 open class RegisterRequest {
     open val email: String? = null
     open val phoneNumber: String? = null
-    open lateinit var uid: String
+    open lateinit var username: String
         protected set
     open lateinit var nickname: String
         protected set
@@ -123,7 +123,7 @@ data class KakaoUserInfo(
         val nickname: String = ""
     )
 
-    val uid: String = "KAKAO_$id"
+    val username: String = "KAKAO_$id"
     val name: String? = kakaoAccount.name
     val email: String? = kakaoAccount.email
     val phoneNumber: String? = kakaoAccount.phoneNumber

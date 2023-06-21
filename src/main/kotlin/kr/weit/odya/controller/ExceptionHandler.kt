@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import jakarta.validation.ConstraintViolationException
 import jakarta.ws.rs.ForbiddenException
 import kr.weit.odya.security.CreateFirebaseUserException
-import kr.weit.odya.security.CreateTokenException
+import kr.weit.odya.security.FirebaseAuthException
 import kr.weit.odya.security.InvalidTokenException
 import kr.weit.odya.service.ExistResourceException
 import kr.weit.odya.service.LoginFailedException
@@ -88,7 +88,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiErrorResponse(ex.message))
     }
 
-    @ExceptionHandler(Exception::class, CreateTokenException::class)
+    @ExceptionHandler(Exception::class, FirebaseAuthException::class)
     fun exception(ex: Exception): ResponseEntity<ApiErrorResponse> {
         logger.error("[Exception]", ex)
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiErrorResponse(ex.message))

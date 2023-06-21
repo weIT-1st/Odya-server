@@ -44,7 +44,10 @@ class AuthController(
     fun appleRegister(
         @RequestBody @Valid appleRegisterRequest: AppleRegisterRequest
     ): ResponseEntity<Void> {
-        authenticationService.appleRegister(appleRegisterRequest)
+        authenticationService.getUsernameByIdToken(appleRegisterRequest.idToken).apply {
+            appleRegisterRequest.updateUsername(this)
+        }
+        authenticationService.register(appleRegisterRequest)
         return ResponseEntity.status(HttpStatus.CREATED).build()
     }
 
@@ -52,13 +55,26 @@ class AuthController(
     fun kakaoRegister(
         @RequestBody @Valid kakaoRegisterRequest: KakaoRegisterRequest
     ): ResponseEntity<Void> {
-        authenticationService.kakaoRegister(kakaoRegisterRequest)
+        authenticationService.createFirebaseUser(kakaoRegisterRequest.username)
+        authenticationService.register(kakaoRegisterRequest)
         return ResponseEntity.status(HttpStatus.CREATED).build()
     }
 
     @GetMapping("/validate/nickname")
     fun validateNickname(@RequestParam("value") value: String): ResponseEntity<Void> {
         authenticationService.validateNickname(value)
+        return ResponseEntity.noContent().build()
+    }
+
+    @GetMapping("/validate/email")
+    fun validateEmail(@RequestParam("value") value: String): ResponseEntity<Void> {
+        authenticationService.validateEmail(value)
+        return ResponseEntity.noContent().build()
+    }
+
+    @GetMapping("/validate/phone-number")
+    fun validatePhoneNumber(@RequestParam("value") value: String): ResponseEntity<Void> {
+        authenticationService.validatePhoneNumber(value)
         return ResponseEntity.noContent().build()
     }
 }

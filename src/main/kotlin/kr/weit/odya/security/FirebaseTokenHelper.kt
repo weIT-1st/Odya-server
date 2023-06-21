@@ -1,6 +1,7 @@
 package kr.weit.odya.security
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.UserRecord
 import org.springframework.stereotype.Component
 
@@ -8,15 +9,17 @@ import org.springframework.stereotype.Component
 class FirebaseTokenHelper(
     private val firebaseAuth: FirebaseAuth
 ) {
-    fun createFirebaseUser(uid: String) =
-        runCatching {
-            firebaseAuth.createUser(createUserRequest(uid))
+    fun createFirebaseUser(username: String) {
+        try {
+            firebaseAuth.createUser(createUserRequest(username))
+        } catch (ex: FirebaseAuthException) {
+            throw CreateFirebaseUserException("$username: 이미 등록된 사용자입니다")
         }
-            .onFailure { throw CreateFirebaseUserException("$uid: 이미 등록된 사용자입니다") }
+    }
 
-    fun createFirebaseCustomToken(uid: String): String =
+    fun createFirebaseCustomToken(username: String): String =
         runCatching {
-            firebaseAuth.createCustomToken(uid)
+            firebaseAuth.createCustomToken(username)
         }
             .onFailure { ex -> throw CreateTokenException(ex.message) }
             .getOrNull() ?: throw CreateTokenException("토큰 생성에 실패했습니다")
@@ -42,6 +45,6 @@ class FirebaseTokenHelper(
             .onFailure { ex -> throw InvalidTokenException(ex.message) }
             .getOrNull() ?: throw NoSuchElementException("인증된 전화번호가 존재하지 않습니다")
 
-    private fun createUserRequest(uid: String): UserRecord.CreateRequest? =
-        UserRecord.CreateRequest().setUid(uid)
+    private fun createUserRequest(username: String): UserRecord.CreateRequest? =
+        UserRecord.CreateRequest().setUid(username)
 }
