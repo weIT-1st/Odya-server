@@ -12,15 +12,18 @@ import kr.weit.odya.security.InvalidTokenException
 import kr.weit.odya.service.AuthenticationService
 import kr.weit.odya.service.ExistResourceException
 import kr.weit.odya.service.LoginFailedException
+import kr.weit.odya.support.ALREADY_REGISTER_USER_ERROR_MESSAGE
 import kr.weit.odya.support.EXIST_EMAIL_ERROR_MESSAGE
 import kr.weit.odya.support.EXIST_NICKNAME_ERROR_MESSAGE
 import kr.weit.odya.support.EXIST_PHONE_NUMBER_ERROR_MESSAGE
 import kr.weit.odya.support.EXIST_USER_ERROR_MESSAGE
 import kr.weit.odya.support.NOT_EXIST_USER_ERROR_MESSAGE
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
+import kr.weit.odya.support.TEST_EMAIL
 import kr.weit.odya.support.TEST_INVALID_EMAIL
 import kr.weit.odya.support.TEST_INVALID_PHONE_NUMBER
 import kr.weit.odya.support.TEST_NICKNAME
+import kr.weit.odya.support.TEST_PHONE_NUMBER
 import kr.weit.odya.support.TEST_USERNAME
 import kr.weit.odya.support.client.WebClientException
 import kr.weit.odya.support.createAppleLoginRequest
@@ -163,7 +166,7 @@ class AuthControllerTest(
                         "kakao-login-fail-not-registered-token",
                         requestBody("accessToken" type JsonFieldType.STRING description "유효하지만 회원가입되지 않은 OAUTH ACCESS TOKEN" example request.accessToken),
                         responseBody(
-                            "uid" type JsonFieldType.STRING description "회원 고유 아이디" example response.uid,
+                            "username" type JsonFieldType.STRING description "회원 고유 아이디" example response.username,
                             "email" type JsonFieldType.STRING description "회원 이메일" example response.email isOptional true,
                             "phoneNumber" type JsonFieldType.STRING description "회원 전화번호" example response.phoneNumber isOptional true,
                             "nickname" type JsonFieldType.STRING description "회원 닉네임" example response.nickname,
@@ -221,7 +224,8 @@ class AuthControllerTest(
         val targetUri = "/api/v1/auth/register/apple"
         context("유효한 회원가입 정보가 전달되면") {
             val request = createAppleRegisterRequest()
-            every { authenticationService.appleRegister(request) } just runs
+            every { authenticationService.getUsernameByIdToken(request.idToken) } returns TEST_USERNAME
+            every { authenticationService.register(request) } just runs
             it("201 응답한다.") {
                 restDocMockMvc.post(targetUri) {
                     jsonContent(request)
@@ -246,7 +250,7 @@ class AuthControllerTest(
 
         context("FIREBASE에 등록되지 않은 ID TOKEN이 주어지면") {
             val request = createAppleRegisterRequest()
-            every { authenticationService.appleRegister(request) } throws InvalidTokenException(
+            every { authenticationService.getUsernameByIdToken(request.idToken) } throws InvalidTokenException(
                 SOMETHING_ERROR_MESSAGE
             )
             it("401 응답한다.") {
@@ -276,7 +280,8 @@ class AuthControllerTest(
 
         context("유효한 토큰이지만, 이미 존재하는 사용자면") {
             val request = createAppleRegisterRequest()
-            every { authenticationService.appleRegister(request) } throws ExistResourceException(
+            every { authenticationService.getUsernameByIdToken(request.idToken) } returns TEST_USERNAME
+            every { authenticationService.register(request) } throws ExistResourceException(
                 EXIST_USER_ERROR_MESSAGE
             )
             it("409 응답한다.") {
@@ -306,7 +311,8 @@ class AuthControllerTest(
 
         context("유효한 토큰이지만, 이미 존재하는 이메일이면") {
             val request = createAppleRegisterRequest()
-            every { authenticationService.appleRegister(request) } throws ExistResourceException(
+            every { authenticationService.getUsernameByIdToken(request.idToken) } returns TEST_USERNAME
+            every { authenticationService.register(request) } throws ExistResourceException(
                 EXIST_EMAIL_ERROR_MESSAGE
             )
             it("409 응답한다.") {
@@ -336,7 +342,8 @@ class AuthControllerTest(
 
         context("유효한 토큰이지만, 이미 존재하는 전화번호이면") {
             val request = createAppleRegisterRequest()
-            every { authenticationService.appleRegister(request) } throws ExistResourceException(
+            every { authenticationService.getUsernameByIdToken(request.idToken) } returns TEST_USERNAME
+            every { authenticationService.register(request) } throws ExistResourceException(
                 EXIST_PHONE_NUMBER_ERROR_MESSAGE
             )
             it("409 응답한다.") {
@@ -366,7 +373,8 @@ class AuthControllerTest(
 
         context("유효한 토큰이지만, 이미 존재하는 닉네임이면") {
             val request = createAppleRegisterRequest()
-            every { authenticationService.appleRegister(request) } throws ExistResourceException(
+            every { authenticationService.getUsernameByIdToken(request.idToken) } returns TEST_USERNAME
+            every { authenticationService.register(request) } throws ExistResourceException(
                 EXIST_NICKNAME_ERROR_MESSAGE
             )
             it("409 응답한다.") {
@@ -453,7 +461,8 @@ class AuthControllerTest(
         val targetUri = "/api/v1/auth/register/kakao"
         context("유효한 회원가입 정보가 전달되면") {
             val request = createKakaoRegisterRequest()
-            every { authenticationService.kakaoRegister(request) } just runs
+            every { authenticationService.createFirebaseUser(request.username) } just runs
+            every { authenticationService.register(request) } just runs
             it("201 응답한다.") {
                 restDocMockMvc.post(targetUri) {
                     jsonContent(request)
@@ -463,7 +472,7 @@ class AuthControllerTest(
                     createDocument(
                         "kakao-register-success",
                         requestBody(
-                            "uid" type JsonFieldType.STRING description "UID" example request.uid,
+                            "username" type JsonFieldType.STRING description "USERNAME" example request.username,
                             "email" type JsonFieldType.STRING description "사용자 이메일" example request.email isOptional true,
                             "nickname" type JsonFieldType.STRING description "사용자 닉네임" example request.nickname,
                             "phoneNumber" type JsonFieldType.STRING description "사용자 전화번호" example request.phoneNumber isOptional true,
@@ -476,10 +485,10 @@ class AuthControllerTest(
             }
         }
 
-        context("FIREBASE USER 생성이 실패하면") {
+        context("FIREBASE에 이미 존재하는 USERNAME이 전달되면") {
             val request = createKakaoRegisterRequest()
-            every { authenticationService.kakaoRegister(request) } throws CreateFirebaseUserException(
-                SOMETHING_ERROR_MESSAGE
+            every { authenticationService.createFirebaseUser(request.username) } throws CreateFirebaseUserException(
+                ALREADY_REGISTER_USER_ERROR_MESSAGE
             )
             it("409 응답한다.") {
                 restDocMockMvc.post(targetUri) {
@@ -488,9 +497,9 @@ class AuthControllerTest(
                     status { isConflict() }
                 }.andDo {
                     createDocument(
-                        "kakao-register-fail-firebase-user-create-fail",
+                        "kakao-register-fail-exist-username-in-firebase",
                         requestBody(
-                            "uid" type JsonFieldType.STRING description "UID" example request.uid,
+                            "username" type JsonFieldType.STRING description "USERNAME" example request.username,
                             "email" type JsonFieldType.STRING description "사용자 이메일" example request.email isOptional true,
                             "nickname" type JsonFieldType.STRING description "사용자 닉네임" example request.nickname,
                             "phoneNumber" type JsonFieldType.STRING description "사용자 전화번호" example request.phoneNumber isOptional true,
@@ -499,7 +508,7 @@ class AuthControllerTest(
                             "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday
                         ),
                         responseBody(
-                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example EXIST_USER_ERROR_MESSAGE
+                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example ALREADY_REGISTER_USER_ERROR_MESSAGE
                         )
                     )
                 }
@@ -508,7 +517,8 @@ class AuthControllerTest(
 
         context("유효한 토큰이지만, 이미 존재하는 사용자면") {
             val request = createKakaoRegisterRequest()
-            every { authenticationService.kakaoRegister(request) } throws ExistResourceException(
+            every { authenticationService.createFirebaseUser(request.username) } just runs
+            every { authenticationService.register(request) } throws ExistResourceException(
                 EXIST_USER_ERROR_MESSAGE
             )
             it("409 응답한다.") {
@@ -520,7 +530,7 @@ class AuthControllerTest(
                     createDocument(
                         "kakao-register-fail-exist-user",
                         requestBody(
-                            "uid" type JsonFieldType.STRING description "이미 가입된 UID" example request.uid,
+                            "username" type JsonFieldType.STRING description "이미 가입된 USERNAME" example request.username,
                             "email" type JsonFieldType.STRING description "사용자 이메일" example request.email isOptional true,
                             "nickname" type JsonFieldType.STRING description "사용자 닉네임" example request.nickname,
                             "phoneNumber" type JsonFieldType.STRING description "사용자 전화번호" example request.phoneNumber isOptional true,
@@ -538,7 +548,8 @@ class AuthControllerTest(
 
         context("유효한 토큰이지만, 이미 존재하는 이메일이면") {
             val request = createKakaoRegisterRequest()
-            every { authenticationService.kakaoRegister(request) } throws ExistResourceException(
+            every { authenticationService.createFirebaseUser(request.username) } just runs
+            every { authenticationService.register(request) } throws ExistResourceException(
                 EXIST_EMAIL_ERROR_MESSAGE
             )
             it("409 응답한다.") {
@@ -550,7 +561,7 @@ class AuthControllerTest(
                     createDocument(
                         "kakao-register-fail-exist-email",
                         requestBody(
-                            "uid" type JsonFieldType.STRING description "UID" example request.uid,
+                            "username" type JsonFieldType.STRING description "USERNAME" example request.username,
                             "email" type JsonFieldType.STRING description "이미 존재하는 사용자 이메일" example request.email isOptional true,
                             "nickname" type JsonFieldType.STRING description "사용자 닉네임" example request.nickname,
                             "phoneNumber" type JsonFieldType.STRING description "사용자 전화번호" example request.phoneNumber isOptional true,
@@ -568,7 +579,8 @@ class AuthControllerTest(
 
         context("유효한 토큰이지만, 이미 존재하는 전화번호이면") {
             val request = createKakaoRegisterRequest()
-            every { authenticationService.kakaoRegister(request) } throws ExistResourceException(
+            every { authenticationService.createFirebaseUser(request.username) } just runs
+            every { authenticationService.register(request) } throws ExistResourceException(
                 EXIST_PHONE_NUMBER_ERROR_MESSAGE
             )
             it("409 응답한다.") {
@@ -580,7 +592,7 @@ class AuthControllerTest(
                     createDocument(
                         "kakao-register-fail-exist-phone-number",
                         requestBody(
-                            "uid" type JsonFieldType.STRING description "UID" example request.uid,
+                            "username" type JsonFieldType.STRING description "USERNAME" example request.username,
                             "email" type JsonFieldType.STRING description "사용자 이메일" example request.email isOptional true,
                             "nickname" type JsonFieldType.STRING description "사용자 닉네임" example request.nickname,
                             "phoneNumber" type JsonFieldType.STRING description "이미 존재하는 사용자 전화번호" example request.phoneNumber isOptional true,
@@ -598,7 +610,8 @@ class AuthControllerTest(
 
         context("유효한 토큰이지만, 이미 존재하는 닉네임이면") {
             val request = createKakaoRegisterRequest()
-            every { authenticationService.kakaoRegister(request) } throws ExistResourceException(
+            every { authenticationService.createFirebaseUser(request.username) } just runs
+            every { authenticationService.register(request) } throws ExistResourceException(
                 EXIST_NICKNAME_ERROR_MESSAGE
             )
             it("409 응답한다.") {
@@ -610,7 +623,7 @@ class AuthControllerTest(
                     createDocument(
                         "kakao-register-fail-exist-nickname",
                         requestBody(
-                            "uid" type JsonFieldType.STRING description "UID" example request.uid,
+                            "username" type JsonFieldType.STRING description "USERNAME" example request.username,
                             "email" type JsonFieldType.STRING description "사용자 이메일" example request.email isOptional true,
                             "nickname" type JsonFieldType.STRING description "이미 존재하는 사용자 닉네임" example request.nickname,
                             "phoneNumber" type JsonFieldType.STRING description "사용자 전화번호" example request.phoneNumber isOptional true,
@@ -637,7 +650,7 @@ class AuthControllerTest(
                     createDocument(
                         "kakao-register-fail-invalid-email",
                         requestBody(
-                            "uid" type JsonFieldType.STRING description "UID" example request.uid,
+                            "username" type JsonFieldType.STRING description "USERNAME" example request.username,
                             "email" type JsonFieldType.STRING description "올바르지 않은 형식의 사용자 이메일" example request.email isOptional true,
                             "nickname" type JsonFieldType.STRING description "사용자 닉네임" example request.nickname,
                             "phoneNumber" type JsonFieldType.STRING description "사용자 전화번호" example request.phoneNumber isOptional true,
@@ -664,7 +677,7 @@ class AuthControllerTest(
                     createDocument(
                         "kakao-register-fail-invalid-phone-number",
                         requestBody(
-                            "uid" type JsonFieldType.STRING description "UID" example request.uid,
+                            "username" type JsonFieldType.STRING description "USERNAME" example request.username,
                             "email" type JsonFieldType.STRING description "사용자 이메일" example request.email isOptional true,
                             "nickname" type JsonFieldType.STRING description "사용자 닉네임" example request.nickname,
                             "phoneNumber" type JsonFieldType.STRING description "올바르지 않은 형식의 사용자 전화번호" example request.phoneNumber isOptional true,
@@ -715,6 +728,88 @@ class AuthControllerTest(
                         "validate-nickname-fail-exist-nickname",
                         queryParameters(
                             "value" parameterDescription "중복된 사용자 닉네임" example TEST_NICKNAME
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    describe("POST /api/v1/auth/validate/email") {
+        val targetUri = "/api/v1/auth/validate/email"
+        context("중복되지 않는 이메일이면") {
+            every { authenticationService.validateEmail(TEST_EMAIL) } just runs
+            it("204 응답한다.") {
+                restDocMockMvc.get(targetUri) {
+                    param("value", TEST_EMAIL)
+                }.andExpect {
+                    status { isNoContent() }
+                }.andDo {
+                    createDocument(
+                        "validate-email-success",
+                        queryParameters(
+                            "value" parameterDescription "중복되지 않은 사용자 이메일" example TEST_EMAIL
+                        )
+                    )
+                }
+            }
+        }
+
+        context("중복인 이메일이면") {
+            every { authenticationService.validateEmail(TEST_EMAIL) } throws ExistResourceException(
+                EXIST_EMAIL_ERROR_MESSAGE
+            )
+            it("409 응답한다.") {
+                restDocMockMvc.get(targetUri) {
+                    param("value", TEST_EMAIL)
+                }.andExpect {
+                    status { isConflict() }
+                }.andDo {
+                    createDocument(
+                        "validate-email-fail-exist-nickname",
+                        queryParameters(
+                            "value" parameterDescription "중복된 사용자 이메일" example TEST_EMAIL
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    describe("POST /api/v1/auth/validate/phone-number") {
+        val targetUri = "/api/v1/auth/validate/phone-number"
+        context("중복되지 않는 이메일이면") {
+            every { authenticationService.validatePhoneNumber(TEST_PHONE_NUMBER) } just runs
+            it("204 응답한다.") {
+                restDocMockMvc.get(targetUri) {
+                    param("value", TEST_PHONE_NUMBER)
+                }.andExpect {
+                    status { isNoContent() }
+                }.andDo {
+                    createDocument(
+                        "validate-phone-number-success",
+                        queryParameters(
+                            "value" parameterDescription "중복되지 않은 사용자 전화번호" example TEST_PHONE_NUMBER
+                        )
+                    )
+                }
+            }
+        }
+
+        context("중복인 전화번호면") {
+            every { authenticationService.validatePhoneNumber(TEST_PHONE_NUMBER) } throws ExistResourceException(
+                EXIST_PHONE_NUMBER_ERROR_MESSAGE
+            )
+            it("409 응답한다.") {
+                restDocMockMvc.get(targetUri) {
+                    param("value", TEST_PHONE_NUMBER)
+                }.andExpect {
+                    status { isConflict() }
+                }.andDo {
+                    createDocument(
+                        "validate-phone-number-fail-exist-nickname",
+                        queryParameters(
+                            "value" parameterDescription "중복된 사용자 전화번호" example TEST_PHONE_NUMBER
                         )
                     )
                 }
