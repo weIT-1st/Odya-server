@@ -77,9 +77,9 @@ operation::auth-controller-test/apple-register-fail-invalid-phone-number[snippet
 
 operation::auth-controller-test/kakao-register-success[snippets='http-request,request-body,request-fields,http-response']
 
-=== *4-2 실패 - FIREBASE USER 생성이 실패하면*
+=== *4-2 실패 - FIREBASE에 이미 존재하는 USERNAME이 전달되면*
 
-operation::auth-controller-test/kakao-register-fail-firebase-user-create-fail[snippets='http-request,request-body,request-fields,http-response,response-fields']
+operation::auth-controller-test/kakao-register-fail-exist-username-in-firebase[snippets='http-request,request-body,request-fields,http-response,response-fields']
 
 === *4-3 실패 - 유효한 토큰이지만, 이미 존재하는 사용자면*
 
@@ -114,4 +114,26 @@ operation::auth-controller-test/validate-nickname-success[snippets='http-request
 
 === *5-2 실패 - 중복인 닉네임*
 
-operation::auth-controller-test/validate-nickname-success[snippets='http-request,query-parameters,http-response']
+operation::auth-controller-test/validate-nickname-fail-exist-nickname[snippets='http-request,query-parameters,http-response']
+
+[[이메일-중복-검사-API]]
+== *6. 이메일 중복 검사 API*
+
+=== *6-1 성공*
+
+operation::auth-controller-test/validate-email-success[snippets='http-request,query-parameters,http-response']
+
+=== *6-2 실패 - 중복인 이메일*
+
+operation::auth-controller-test/validate-email-fail-exist-nickname[snippets='http-request,query-parameters,http-response']
+
+[[전화번호-중복-검사-API]]
+== *7. 전화번호 중복 검사 API*
+
+=== *7-1 성공*
+
+operation::auth-controller-test/validate-phone-number-success[snippets='http-request,query-parameters,http-response']
+
+=== *7-2 실패 - 중복인 전화번호*
+
+operation::auth-controller-test/validate-phone-number-fail-exist-nickname[snippets='http-request,query-parameters,http-response']
