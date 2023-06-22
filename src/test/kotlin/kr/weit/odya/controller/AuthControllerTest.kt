@@ -25,7 +25,6 @@ import kr.weit.odya.support.TEST_INVALID_PHONE_NUMBER
 import kr.weit.odya.support.TEST_NICKNAME
 import kr.weit.odya.support.TEST_PHONE_NUMBER
 import kr.weit.odya.support.TEST_USERNAME
-import kr.weit.odya.support.client.WebClientException
 import kr.weit.odya.support.createAppleLoginRequest
 import kr.weit.odya.support.createAppleRegisterRequest
 import kr.weit.odya.support.createKakaoLoginRequest
@@ -179,7 +178,7 @@ class AuthControllerTest(
 
         context("회원 정보 요청 통신에 예외가 발생하면") {
             val request = createKakaoLoginRequest()
-            every { authenticationService.getKakaoUserInfo(request) } throws WebClientException(
+            every { authenticationService.getKakaoUserInfo(request) } throws RuntimeException(
                 SOMETHING_ERROR_MESSAGE
             )
             it("500 응답한다.") {

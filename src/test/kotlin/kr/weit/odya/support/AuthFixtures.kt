@@ -1,11 +1,11 @@
 package kr.weit.odya.support
 
+import kr.weit.odya.client.kakao.KakaoUserInfo
 import kr.weit.odya.service.dto.AppleLoginRequest
 import kr.weit.odya.service.dto.AppleRegisterRequest
 import kr.weit.odya.service.dto.KakaoLoginRequest
 import kr.weit.odya.service.dto.KakaoRegisterRequest
 import kr.weit.odya.service.dto.KakaoRegistrationResponse
-import kr.weit.odya.service.dto.KakaoUserInfo
 import kr.weit.odya.service.dto.TokenResponse
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -29,6 +29,8 @@ const val TEST_BEARER_ID_TOKEN = "Bearer $TEST_ID_TOKEN"
 const val TEST_BEARER_NOT_EXIST_USER_ID_TOKEN = "Bearer $TEST_NOT_EXIST_USER_ID_TOKEN"
 
 const val TEST_BEARER_INVALID_ID_TOKEN = "Bearer $TEST_INVALID_ID_TOKEN"
+
+const val TEST_BEARER_OAUTH_ACCESS_TOKEN = "BEARER oAuthAccessToken"
 
 const val SOMETHING_ERROR_MESSAGE = "something error message"
 

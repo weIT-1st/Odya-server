@@ -1,5 +1,7 @@
 package kr.weit.odya.service
 
+import kr.weit.odya.client.kakao.KakaoClient
+import kr.weit.odya.client.kakao.KakaoUserInfo
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.existsByEmail
@@ -7,16 +9,10 @@ import kr.weit.odya.domain.user.existsByNickname
 import kr.weit.odya.domain.user.existsByPhoneNumber
 import kr.weit.odya.security.FirebaseTokenHelper
 import kr.weit.odya.service.dto.KakaoLoginRequest
-import kr.weit.odya.service.dto.KakaoUserInfo
 import kr.weit.odya.service.dto.RegisterRequest
 import kr.weit.odya.service.dto.TokenResponse
-import kr.weit.odya.support.client.WebClientHelper
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-
-const val HTTPS_KAPI_KAKAO_COM_V_2_USER_ME = "https://kapi.kakao.com/v2/user/me"
 
 private const val OAUTH_ACCESS_TOKEN_TYPE = "BEARER"
 
@@ -24,7 +20,7 @@ private const val OAUTH_ACCESS_TOKEN_TYPE = "BEARER"
 class AuthenticationService(
     private val userRepository: UserRepository,
     private val firebaseTokenHelper: FirebaseTokenHelper,
-    private val webClientHelper: WebClientHelper
+    private val kakaoClient: KakaoClient
 ) {
     fun appleLoginProcess(appleUsername: String) {
         if (!userRepository.existsByUsername(appleUsername)) {
@@ -71,10 +67,7 @@ class AuthenticationService(
     }
 
     fun getKakaoUserInfo(kakaoLoginRequest: KakaoLoginRequest): KakaoUserInfo =
-        webClientHelper.getWithHeader(HTTPS_KAPI_KAKAO_COM_V_2_USER_ME, KakaoUserInfo::class.java) {
-            it.contentType = MediaType.APPLICATION_FORM_URLENCODED
-            it.set(HttpHeaders.AUTHORIZATION, getBearerToken(kakaoLoginRequest.accessToken))
-        }
+        kakaoClient.getKakaoUserInfo(getBearerToken(kakaoLoginRequest.accessToken))
 
     private fun getBearerToken(oAuthAccessToken: String) = "$OAUTH_ACCESS_TOKEN_TYPE $oAuthAccessToken"
 

@@ -8,6 +8,7 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
+import kr.weit.odya.client.kakao.KakaoClient
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.existsByEmail
 import kr.weit.odya.domain.user.existsByNickname
@@ -16,7 +17,7 @@ import kr.weit.odya.security.CreateFirebaseUserException
 import kr.weit.odya.security.CreateTokenException
 import kr.weit.odya.security.FirebaseTokenHelper
 import kr.weit.odya.security.InvalidTokenException
-import kr.weit.odya.service.dto.KakaoUserInfo
+import kr.weit.odya.support.TEST_BEARER_OAUTH_ACCESS_TOKEN
 import kr.weit.odya.support.TEST_CUSTOM_TOKEN
 import kr.weit.odya.support.TEST_EMAIL
 import kr.weit.odya.support.TEST_ID_TOKEN
@@ -24,8 +25,6 @@ import kr.weit.odya.support.TEST_KAKAO_UID
 import kr.weit.odya.support.TEST_NICKNAME
 import kr.weit.odya.support.TEST_PHONE_NUMBER
 import kr.weit.odya.support.TEST_USERNAME
-import kr.weit.odya.support.client.WebClientException
-import kr.weit.odya.support.client.WebClientHelper
 import kr.weit.odya.support.createAppleRegisterRequest
 import kr.weit.odya.support.createKakaoLoginRequest
 import kr.weit.odya.support.createKakaoUserInfo
@@ -34,9 +33,9 @@ import kr.weit.odya.support.createUser
 class AuthenticationServiceTest : DescribeSpec({
     val userRepository = mockk<UserRepository>()
     val firebaseTokenHelper = mockk<FirebaseTokenHelper>()
-    val webClientHelper = mockk<WebClientHelper>()
+    val kakaoClient = mockk<KakaoClient>()
 
-    val authenticationService = AuthenticationService(userRepository, firebaseTokenHelper, webClientHelper)
+    val authenticationService = AuthenticationService(userRepository, firebaseTokenHelper, kakaoClient)
 
     describe("appleLoginProcess") {
         context("유효한 USERNAME이 주어지는 경우") {
@@ -164,9 +163,7 @@ class AuthenticationServiceTest : DescribeSpec({
         context("유효한 요청이 주어지는 경우") {
             val request = createKakaoLoginRequest()
             val response = createKakaoUserInfo()
-            every {
-                webClientHelper.getWithHeader(HTTPS_KAPI_KAKAO_COM_V_2_USER_ME, KakaoUserInfo::class.java, any())
-            } returns response
+            every { kakaoClient.getKakaoUserInfo(TEST_BEARER_OAUTH_ACCESS_TOKEN) } returns response
             it("KakaoUserInfo를 반환한다") {
                 authenticationService.getKakaoUserInfo(request).username shouldBe TEST_KAKAO_UID
             }
@@ -174,11 +171,9 @@ class AuthenticationServiceTest : DescribeSpec({
 
         context("WebClient 요청 중 예외가 발생하는 경우") {
             val request = createKakaoLoginRequest()
-            every {
-                webClientHelper.getWithHeader(HTTPS_KAPI_KAKAO_COM_V_2_USER_ME, KakaoUserInfo::class.java, any())
-            } throws WebClientException()
-            it("[WebClientException] 예외가 발생한다") {
-                shouldThrow<WebClientException> { authenticationService.getKakaoUserInfo(request) }
+            every { kakaoClient.getKakaoUserInfo(TEST_BEARER_OAUTH_ACCESS_TOKEN) } throws RuntimeException()
+            it("[RuntimeException] 예외가 발생한다") {
+                shouldThrow<RuntimeException> { authenticationService.getKakaoUserInfo(request) }
             }
         }
     }
