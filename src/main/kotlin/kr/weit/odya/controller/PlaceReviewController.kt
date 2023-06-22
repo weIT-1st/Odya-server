@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @Validated
@@ -62,9 +63,15 @@ class PlaceReviewController(private val placeReviewService: PlaceReviewService) 
     fun getByPlaceReviewList(
         @NotNull(message = "장소 ID는 필수 입력값입니다.")
         @PathVariable("id")
-        placeId: String
-    ): ResponseEntity<List<PlaceReviewListResponse>> {
-        return ResponseEntity.ok(placeReviewService.getByPlaceReviewId(placeId))
+        placeId: String,
+        @RequestParam("startId")
+        @Positive(message = "시작 Id는 양수여야 합니다.")
+        startIndex: Long?,
+        @RequestParam("count", defaultValue = "10")
+        @Positive(message = "페이징 갯수는 양수여야 합니다.")
+        count: Int
+    ): ResponseEntity<PlaceReviewListResponse> {
+        return ResponseEntity.ok(placeReviewService.getByPlaceReviewList(placeId, startIndex, count))
     }
 
     @GetMapping("/user/{id}")
@@ -72,8 +79,14 @@ class PlaceReviewController(private val placeReviewService: PlaceReviewService) 
         @NotNull(message = "유저 ID는 필수 입력값입니다.")
         @Positive(message = "유저 ID는 양수여야 합니다.")
         @PathVariable("id")
-        userId: Long
-    ): ResponseEntity<List<PlaceReviewListResponse>> {
-        return ResponseEntity.ok(placeReviewService.getByUserReviewList(userId))
+        userId: Long,
+        @RequestParam("startId")
+        @Positive(message = "시작 Id는 양수여야 합니다.")
+        startIndex: Long?,
+        @RequestParam("count", defaultValue = "10")
+        @Positive(message = "페이징 갯수는 양수여야 합니다.")
+        count: Int
+    ): ResponseEntity<PlaceReviewListResponse> {
+        return ResponseEntity.ok(placeReviewService.getByUserReviewList(userId, startIndex, count))
     }
 }
