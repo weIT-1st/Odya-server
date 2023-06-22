@@ -111,31 +111,67 @@ operation::place-review-controller-test/placeReview-delete-invalid-token[snippet
 
 === *4-1 성공*
 
-operation::place-review-controller-test/placeReview-placeId-get-list-success[snippets='http-request,path-Parameters,request-Headers,response-body,http-response']
+operation::place-review-controller-test/placeReview-placeId-get-startId-list-success[snippets='http-request,path-Parameters,request-Headers,query-parameters,response-body,http-response']
 
-=== *4-2 실패 - 가입되지 않은 유저*
+=== *4-2 성공- 조회 시작 ID null*
 
-operation::place-review-controller-test/placeReview-placeId-get-fail-not-registered-user[snippets='http-request,path-Parameters,request-Headers,response-body,http-response']
+operation::place-review-controller-test/placeReview-placeId-get-initial-list-success[snippets='http-request,path-Parameters,request-Headers,query-parameters,response-body,http-response']
 
-=== *4-3 실패 - 유효하지 않은 토큰*
+=== *4-3 성공- 가져올 리뷰 갯수 null*
 
-operation::place-review-controller-test/placeReview-placeId-get-fail-invalid-token[snippets='http-request,path-Parameters,request-headers,response-body,http-response']
+operation::place-review-controller-test/placeReview-placeId-get-list-count-null-success[snippets='http-request,path-Parameters,request-Headers,query-parameters,response-body,http-response']
+
+=== *4-4 실패 - 유효한 토큰이지만 음수인 조회 시작 ID*
+
+operation::place-review-controller-test/placeReview-placeId-get-fail-invalid-startId[snippets='http-request,path-Parameters,request-Headers,query-parameters,response-body,http-response']
+
+=== *4-5 실패 - 가져올 리뷰 갯수가 음수인 경우*
+
+operation::place-review-controller-test/placeReview-placeId-get-fail-invalid-count[snippets='http-request,path-Parameters,request-Headers,query-parameters,response-body,http-response']
+
+=== *4-6 실패 - 가입되지 않은 유저*
+
+operation::place-review-controller-test/placeReview-placeId-get-fail-not-registered-user[snippets='http-request,path-Parameters,request-Headers,query-parameters,response-body,http-response']
+
+=== *4-7 실패 - 유효하지 않은 토큰*
+
+operation::place-review-controller-test/placeReview-placeId-get-fail-invalid-token[snippets='http-request,path-Parameters,request-headers,query-parameters,response-body,http-response']
 
 [[유저ID리뷰조회-API]]
 == *5. 유저 ID 리뷰 조회 API*
 
 === *5-1 성공*
 
-operation::place-review-controller-test/placeReview-userId-get-list-success[snippets='http-request,path-Parameters,request-Headers,response-body,http-response']
+operation::place-review-controller-test/placeReview-userId-get-startId-list-success[snippets='http-request,path-Parameters,request-Headers,query-parameters,response-body,http-response']
 
-=== *5-2 실패 - 가입되지 않은 유저*
+=== *5-2 성공 - starId null*
 
-operation::place-review-controller-test/placeReview-userId-get-fail-not-registered-user[snippets='http-request,path-Parameters,request-Headers,response-body,http-response']
+operation::place-review-controller-test/placeReview-userId-get-initial-list-success[snippets='http-request,path-Parameters,request-Headers,query-parameters,response-body,http-response']
 
-=== *5-3 실패 - 유효한 토큰이지만 가입되어 있지 않은 USER ID로 조회*
+=== *5-3 성공 - count null*
 
-operation::place-review-controller-test/placeReview-userId-get-fail-not-registered-id[snippets='http-request,path-Parameters,request-headers,response-body,http-response']
+operation::place-review-controller-test/placeReview-userId-get-list-count-null-success[snippets='http-request,path-Parameters,request-Headers,query-parameters,response-body,http-response']
 
-=== *5-4 실패 - 유효하지 않은 토큰*
+=== *5-4 실패 - 유효한 토큰이지만 음수인 유저 ID*
 
-operation::place-review-controller-test/placeReview-userId-get-fail-invalid-token[snippets='http-request,path-Parameters,request-headers,response-body,http-response']
+operation::place-review-controller-test/placeReview-userId-get-fail-negative-id[snippets='http-request,path-Parameters,request-Headers,query-parameters,response-body,http-response']
+
+=== *5-5 실패 - 유효한 토큰이지만 음수인 조회 시작 ID*
+
+operation::place-review-controller-test/placeReview-userId-get-fail-invalid-startId[snippets='http-request,path-Parameters,request-Headers,query-parameters,response-body,http-response']
+
+=== *5-6 실패 - 가져올 리뷰 갯수가 음수인 경우*
+
+operation::place-review-controller-test/placeReview-placeId-get-fail-invalid-count[snippets='http-request,path-Parameters,request-Headers,query-parameters,response-body,http-response']
+
+=== *5-7 실패 - 가입되지 않은 유저*
+
+operation::place-review-controller-test/placeReview-userId-get-fail-not-registered-user[snippets='http-request,path-Parameters,request-Headers,query-parameters,response-body,http-response']
+
+=== *5-8 실패 - 유효한 토큰이지만 가입되어 있지 않은 USER ID로 조회*
+
+operation::place-review-controller-test/placeReview-userId-get-fail-not-registered-id[snippets='http-request,path-Parameters,request-headers,query-parameters,response-body,http-response']
+
+=== *5-9 실패 - 유효하지 않은 토큰*
+
+operation::place-review-controller-test/placeReview-userId-get-fail-invalid-token[snippets='http-request,path-Parameters,request-headers,query-parameters,response-body,http-response']

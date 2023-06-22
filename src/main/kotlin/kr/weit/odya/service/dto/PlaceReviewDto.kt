@@ -46,16 +46,26 @@ data class PlaceReviewUpdateRequest(
     val review: String?
 )
 
-data class PlaceReviewListResponse(
+data class ConversionPlaceReview(
+    val id: Long,
     val placeId: String,
+    val userId: Long,
     val writerNickname: String,
     val starRating: Int,
     val review: String
 ) {
     constructor(placeReview: PlaceReview) : this(
+        placeReview.id,
         placeReview.placeId,
+        placeReview.writerId,
         placeReview.writerNickname,
         placeReview.starRating,
         placeReview.review
     )
 }
+
+data class PlaceReviewListResponse(
+    val reviews: List<ConversionPlaceReview>,
+    val lastId: Long,
+    val isLast: Boolean
+)

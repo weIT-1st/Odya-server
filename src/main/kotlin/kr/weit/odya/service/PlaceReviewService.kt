@@ -3,13 +3,19 @@ package kr.weit.odya.service
 import jakarta.ws.rs.ForbiddenException
 import kr.weit.odya.domain.placeReview.PlaceReview
 import kr.weit.odya.domain.placeReview.PlaceReviewRepository
+import kr.weit.odya.domain.placeReview.getByPlaceIdInitialList
+import kr.weit.odya.domain.placeReview.getByPlaceIdStartIdList
 import kr.weit.odya.domain.placeReview.getByPlaceReviewId
+import kr.weit.odya.domain.placeReview.getByUserInitialList
+import kr.weit.odya.domain.placeReview.getByUserStartIdList
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
+import kr.weit.odya.service.dto.ConversionPlaceReview
 import kr.weit.odya.service.dto.PlaceReviewCreateRequest
 import kr.weit.odya.service.dto.PlaceReviewListResponse
 import kr.weit.odya.service.dto.PlaceReviewUpdateRequest
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -51,15 +57,23 @@ class PlaceReviewService(
         }
     }
 
-    fun getByPlaceReviewId(placeId: String): List<PlaceReviewListResponse> {
-        return placeReviewRepository.findAllByPlaceId(placeId)
-            .map { PlaceReviewListResponse(it) }
+    fun getByPlaceReviewList(placeId: String, startId: Long?, count: Int): PlaceReviewListResponse {
+        val placeReviews = if (startId == null) {
+            placeReviewRepository.getByPlaceIdInitialList(placeId, PageRequest.of(0, count))
+        } else {
+            placeReviewRepository.getByPlaceIdStartIdList(placeId, startId, PageRequest.of(0, count))
+        }
+        return PlaceReviewListResponse(placeReviews.content.map { ConversionPlaceReview(it) }, placeReviews.last().id, placeReviews.isLast)
     }
 
     @Transactional
-    fun getByUserReviewList(userId: Long): List<PlaceReviewListResponse> {
+    fun getByUserReviewList(userId: Long, startId: Long?, count: Int): PlaceReviewListResponse {
         val user: User = userRepository.getByUserId(userId)
-        return placeReviewRepository.findAllByUser(user)
-            .map { PlaceReviewListResponse(it) }
+        val placeReviews = if (startId == null) {
+            placeReviewRepository.getByUserInitialList(user, PageRequest.of(0, count))
+        } else {
+            placeReviewRepository.getByUserStartIdList(user, startId, PageRequest.of(0, count))
+        }
+        return PlaceReviewListResponse(placeReviews.content.map { ConversionPlaceReview(it) }, placeReviews.last().id, placeReviews.isLast)
     }
 }
