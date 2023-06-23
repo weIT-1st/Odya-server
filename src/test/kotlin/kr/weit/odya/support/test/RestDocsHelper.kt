@@ -26,6 +26,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import org.springframework.web.filter.CharacterEncodingFilter
 
+private const val EXAMPLE_NULL = "null"
+
 class RestDocsHelper {
     companion object {
         const val EXAMPLE = "example"
@@ -86,8 +88,8 @@ class RestDocsField(
         return this
     }
 
-    infix fun example(value: String?): RestDocsField {
-        descriptor.attributes(field(EXAMPLE, value))
+    infix fun example(value: Any?): RestDocsField {
+        descriptor.attributes(field(EXAMPLE, if (value is String) value else value?.toString() ?: EXAMPLE_NULL))
         return this
     }
 }
@@ -104,6 +106,6 @@ infix fun String.parameterDescription(value: String): ParameterDescriptor {
     return RequestDocumentation.parameterWithName(this).description(value)
 }
 
-infix fun ParameterDescriptor.example(value: String): ParameterDescriptor {
-    return this.attributes(field(EXAMPLE, value))
+infix fun ParameterDescriptor.example(value: Any): ParameterDescriptor {
+    return this.attributes(field(EXAMPLE, if (value is String) value else value.toString()))
 }
