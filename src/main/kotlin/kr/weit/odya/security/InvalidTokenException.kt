@@ -1,3 +1,9 @@
 package kr.weit.odya.security
 
-class InvalidTokenException(message: String? = null) : RuntimeException(message)
+open class FirebaseAuthException(message: String? = null) : RuntimeException(message)
+
+class InvalidTokenException(message: String? = null) : FirebaseAuthException(message)
+
+class CreateFirebaseUserException(message: String? = null) : FirebaseAuthException(message)
+
+class CreateTokenException(message: String? = null) : FirebaseAuthException(message)

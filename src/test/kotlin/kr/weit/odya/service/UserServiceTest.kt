@@ -11,7 +11,7 @@ import kr.weit.odya.domain.user.existsByEmail
 import kr.weit.odya.domain.user.existsByNickname
 import kr.weit.odya.domain.user.existsByPhoneNumber
 import kr.weit.odya.domain.user.getByUserId
-import kr.weit.odya.security.FirebaseTokenParser
+import kr.weit.odya.security.FirebaseTokenHelper
 import kr.weit.odya.security.InvalidTokenException
 import kr.weit.odya.support.TEST_EMAIL
 import kr.weit.odya.support.TEST_ID_TOKEN
@@ -24,9 +24,9 @@ import kr.weit.odya.support.createUserResponse
 
 class UserServiceTest : DescribeSpec({
     val userRepository = mockk<UserRepository>()
-    val firebaseTokenParser = mockk<FirebaseTokenParser>()
+    val firebaseTokenHelper = mockk<FirebaseTokenHelper>()
 
-    val userService = UserService(userRepository, firebaseTokenParser)
+    val userService = UserService(userRepository, firebaseTokenHelper)
 
     describe("getInformation") {
         context("가입되어 있는 USER ID가 주어지는 경우") {
@@ -47,7 +47,7 @@ class UserServiceTest : DescribeSpec({
 
     describe("getEmailByIdToken") {
         context("유효하고 인증된 이메일이 있는 토큰이 주어지는 경우") {
-            every { firebaseTokenParser.getEmail(TEST_ID_TOKEN) } returns TEST_EMAIL
+            every { firebaseTokenHelper.getEmail(TEST_ID_TOKEN) } returns TEST_EMAIL
             it("이메일을 반환한다") {
                 val response = userService.getEmailByIdToken(TEST_ID_TOKEN)
                 response shouldBe TEST_EMAIL
@@ -55,14 +55,14 @@ class UserServiceTest : DescribeSpec({
         }
 
         context("유효하지만 인증된 이메일이 없는 토큰이 주어지는 경우") {
-            every { firebaseTokenParser.getEmail(TEST_ID_TOKEN) } throws NoSuchElementException()
+            every { firebaseTokenHelper.getEmail(TEST_ID_TOKEN) } throws NoSuchElementException()
             it("[NoSuchElementException] 반환한다") {
                 shouldThrow<NoSuchElementException> { userService.getEmailByIdToken(TEST_ID_TOKEN) }
             }
         }
 
         context("유효하지 않은 토큰이 주어지는 경우") {
-            every { firebaseTokenParser.getEmail(TEST_ID_TOKEN) } throws InvalidTokenException()
+            every { firebaseTokenHelper.getEmail(TEST_ID_TOKEN) } throws InvalidTokenException()
             it("[InvalidTokenException] 반환한다") {
                 shouldThrow<InvalidTokenException> { userService.getEmailByIdToken(TEST_ID_TOKEN) }
             }
@@ -71,7 +71,7 @@ class UserServiceTest : DescribeSpec({
 
     describe("getPhoneNumberByIdToken") {
         context("유효하고 인증된 전화번호가 있는 토큰이 주어지는 경우") {
-            every { firebaseTokenParser.getPhoneNumber(TEST_ID_TOKEN) } returns TEST_PHONE_NUMBER
+            every { firebaseTokenHelper.getPhoneNumber(TEST_ID_TOKEN) } returns TEST_PHONE_NUMBER
             it("전화번호를 반환한다") {
                 val response = userService.getPhoneNumberByIdToken(TEST_ID_TOKEN)
                 response shouldBe TEST_PHONE_NUMBER
@@ -79,14 +79,14 @@ class UserServiceTest : DescribeSpec({
         }
 
         context("유효하지만 인증된 전화번호가 없는 토큰이 주어지는 경우") {
-            every { firebaseTokenParser.getPhoneNumber(TEST_ID_TOKEN) } throws NoSuchElementException()
+            every { firebaseTokenHelper.getPhoneNumber(TEST_ID_TOKEN) } throws NoSuchElementException()
             it("[NoSuchElementException] 반환한다") {
                 shouldThrow<NoSuchElementException> { userService.getPhoneNumberByIdToken(TEST_ID_TOKEN) }
             }
         }
 
         context("유효하지 않은 토큰이 주어지는 경우") {
-            every { firebaseTokenParser.getPhoneNumber(TEST_ID_TOKEN) } throws InvalidTokenException()
+            every { firebaseTokenHelper.getPhoneNumber(TEST_ID_TOKEN) } throws InvalidTokenException()
             it("[InvalidTokenException] 반환한다") {
                 shouldThrow<InvalidTokenException> { userService.getPhoneNumberByIdToken(TEST_ID_TOKEN) }
             }
