@@ -10,11 +10,11 @@ import io.mockk.just
 import io.mockk.mockk
 import jakarta.ws.rs.ForbiddenException
 import kr.weit.odya.domain.placeReview.PlaceReviewRepository
-import kr.weit.odya.domain.placeReview.getByPlaceIdInitialList
-import kr.weit.odya.domain.placeReview.getByPlaceIdStartIdList
 import kr.weit.odya.domain.placeReview.getByPlaceReviewId
-import kr.weit.odya.domain.placeReview.getByUserInitialList
-import kr.weit.odya.domain.placeReview.getByUserStartIdList
+import kr.weit.odya.domain.placeReview.getListByPlaceIdInitial
+import kr.weit.odya.domain.placeReview.getListByPlaceIdStartId
+import kr.weit.odya.domain.placeReview.getListByUserInitial
+import kr.weit.odya.domain.placeReview.getListByUserStartId
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.support.TEST_COUNT
@@ -113,13 +113,13 @@ class PlaceReviewServiceTest : DescribeSpec(
 
         describe("getByPlaceReviewList 메소드") {
             context("유효한 placeId가 전달되면") {
-                every { placeReviewRepository.getByPlaceIdInitialList(TEST_PLACE_ID, createPlaceReviewPage()) } returns createSlicePlaceReview()
+                every { placeReviewRepository.getListByPlaceIdInitial(TEST_PLACE_ID, createPlaceReviewPage()) } returns createSlicePlaceReview()
                 it("리뷰를 조회한다.") {
                     sut.getByPlaceReviewList(TEST_PLACE_ID, null, TEST_COUNT) shouldBe creatPlaceReviewListResponse()
                 }
             }
             context("유효한 placeId와 startId가 전달되면") {
-                every { placeReviewRepository.getByPlaceIdStartIdList(TEST_PLACE_ID, TEST_START_ID, createPlaceReviewPage()) } returns createSlicePlaceReview()
+                every { placeReviewRepository.getListByPlaceIdStartId(TEST_PLACE_ID, TEST_START_ID, createPlaceReviewPage()) } returns createSlicePlaceReview()
                 it("리뷰를 조회한다.") {
                     sut.getByPlaceReviewList(TEST_PLACE_ID, TEST_START_ID, TEST_COUNT) shouldBe creatPlaceReviewListResponse()
                 }
@@ -129,7 +129,7 @@ class PlaceReviewServiceTest : DescribeSpec(
         describe("getByUserReviewList 메소드") {
             context("유효한 userId가 전달되면") {
                 every { userRepository.getByUserId(TEST_USER_ID) } returns createUser()
-                every { placeReviewRepository.getByUserInitialList(any(), createPlaceReviewPage()) } returns createSlicePlaceReview()
+                every { placeReviewRepository.getListByUserInitial(any(), createPlaceReviewPage()) } returns createSlicePlaceReview()
                 it("리뷰를 조회한다.") {
                     sut.getByUserReviewList(TEST_USER_ID, null, TEST_COUNT) shouldBe creatPlaceReviewListResponse()
                 }
@@ -137,7 +137,7 @@ class PlaceReviewServiceTest : DescribeSpec(
 
             context("유효한 userId와 startId가 전달되면") {
                 every { userRepository.getByUserId(TEST_USER_ID) } returns createUser()
-                every { placeReviewRepository.getByUserStartIdList(any(), TEST_START_ID, createPlaceReviewPage()) } returns createSlicePlaceReview()
+                every { placeReviewRepository.getListByUserStartId(any(), TEST_START_ID, createPlaceReviewPage()) } returns createSlicePlaceReview()
                 it("리뷰를 조회한다.") {
                     sut.getByUserReviewList(TEST_USER_ID, TEST_START_ID, TEST_COUNT) shouldBe creatPlaceReviewListResponse()
                 }
