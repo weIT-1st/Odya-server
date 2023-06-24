@@ -35,22 +35,22 @@ class PlaceReviewRepositoryTest(
         }
 
         expect("PLACE_ID와 일치하는 장소 리뷰를 조회한다") {
-            val result = placeReviewRepository.getByPlaceIdInitial(TEST_PLACE_ID, createPlaceReviewPage())
+            val result = placeReviewRepository.getListByPlaceIdInitial(TEST_PLACE_ID, createPlaceReviewPage())
             result.content[0].placeId shouldBe TEST_PLACE_ID
         }
 
         expect("PLACE_ID와 일치하는 시작 ID 이하의 장소 리뷰를 조회한다") {
-            val result = placeReviewRepository.getByPlaceIdStartId(TEST_PLACE_ID, TEST_START_ID, createPlaceReviewPage())
+            val result = placeReviewRepository.getListByPlaceIdStartId(TEST_PLACE_ID, TEST_START_ID, createPlaceReviewPage())
             result.content[0].placeId shouldBe TEST_PLACE_ID
         }
 
         expect("USER와 일치하는 장소 리뷰를 조회한다") {
-            val result = placeReviewRepository.getByUserInitial(createUser(), createPlaceReviewPage())
+            val result = placeReviewRepository.getListByUserInitial(createUser(), createPlaceReviewPage())
             result.content[0].writerId shouldBe TEST_USER_ID
         }
 
         expect("USER와 일치하는 시작 ID 이하의 장소 리뷰를 조회한다") {
-            val result = placeReviewRepository.getByUserStartId(createUser(), TEST_START_ID, createPlaceReviewPage())
+            val result = placeReviewRepository.getListByUserStartId(createUser(), TEST_START_ID, createPlaceReviewPage())
             result.content[0].writerId shouldBe TEST_USER_ID
         }
     }

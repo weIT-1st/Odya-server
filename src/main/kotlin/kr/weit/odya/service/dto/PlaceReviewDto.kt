@@ -57,10 +57,10 @@ data class PlaceReviewViewed(
     constructor(placeReview: PlaceReview) : this(
             placeReview.id,
             placeReview.placeId,
-        placeReview.writerId,
-        placeReview.writerNickname,
-        placeReview.starRating,
-        placeReview.review
+            placeReview.writerId,
+            placeReview.writerNickname,
+            placeReview.starRating,
+            placeReview.review
     )
 }
 

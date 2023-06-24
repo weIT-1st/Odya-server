@@ -3,11 +3,11 @@ package kr.weit.odya.service
 import jakarta.ws.rs.ForbiddenException
 import kr.weit.odya.domain.placeReview.PlaceReview
 import kr.weit.odya.domain.placeReview.PlaceReviewRepository
-import kr.weit.odya.domain.placeReview.getByPlaceIdInitial
-import kr.weit.odya.domain.placeReview.getByPlaceIdStartId
 import kr.weit.odya.domain.placeReview.getByPlaceReviewId
-import kr.weit.odya.domain.placeReview.getByUserInitial
-import kr.weit.odya.domain.placeReview.getByUserStartId
+import kr.weit.odya.domain.placeReview.getListByPlaceIdInitial
+import kr.weit.odya.domain.placeReview.getListByPlaceIdStartId
+import kr.weit.odya.domain.placeReview.getListByUserInitial
+import kr.weit.odya.domain.placeReview.getListByUserStartId
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
@@ -60,9 +60,9 @@ class PlaceReviewService(
 
     fun getByPlaceReviewList(placeId: String, startId: Long?, count: Int): PlaceReviewListResponse {
         val placeReviews = if (startId == null) {
-            placeReviewRepository.getByPlaceIdInitial(placeId, PageRequest.of(0, count, Sort.by("id").descending()))
+            placeReviewRepository.getListByPlaceIdInitial(placeId, PageRequest.of(0, count, Sort.by("id").descending()))
         } else {
-            placeReviewRepository.getByPlaceIdStartId(placeId, startId, PageRequest.of(0, count, Sort.by("id").descending()))
+            placeReviewRepository.getListByPlaceIdStartId(placeId, startId, PageRequest.of(0, count, Sort.by("id").descending()))
         }
         return PlaceReviewListResponse(placeReviews.content.map { PlaceReviewViewed(it) }, placeReviews.last().id, placeReviews.isLast)
     }
@@ -71,9 +71,9 @@ class PlaceReviewService(
     fun getByUserReviewList(userId: Long, startId: Long?, count: Int): PlaceReviewListResponse {
         val user: User = userRepository.getByUserId(userId)
         val placeReviews = if (startId == null) {
-            placeReviewRepository.getByUserInitial(user, PageRequest.of(0, count, Sort.by("id").descending()))
+            placeReviewRepository.getListByUserInitial(user, PageRequest.of(0, count, Sort.by("id").descending()))
         } else {
-            placeReviewRepository.getByUserStartId(user, startId, PageRequest.of(0, count, Sort.by("id").descending()))
+            placeReviewRepository.getListByUserStartId(user, startId, PageRequest.of(0, count, Sort.by("id").descending()))
         }
         return PlaceReviewListResponse(placeReviews.content.map { PlaceReviewViewed(it) }, placeReviews.last().id, placeReviews.isLast)
     }

@@ -10,16 +10,16 @@ import org.springframework.stereotype.Repository
 fun PlaceReviewRepository.getByPlaceReviewId(id: Long): PlaceReview =
     findByIdOrNull(id) ?: throw NoSuchElementException("$id: 존재하지 않는 장소 리뷰입니다.")
 
-fun PlaceReviewRepository.getByPlaceIdInitial(placeId: String, page: Pageable): Slice<PlaceReview> =
+fun PlaceReviewRepository.getListByPlaceIdInitial(placeId: String, page: Pageable): Slice<PlaceReview> =
         findByPlaceId(placeId, page)
 
-fun PlaceReviewRepository.getByPlaceIdStartId(placeId: String, startId: Long, page: Pageable): Slice<PlaceReview> =
+fun PlaceReviewRepository.getListByPlaceIdStartId(placeId: String, startId: Long, page: Pageable): Slice<PlaceReview> =
         findByPlaceIdAndIdLessThan(placeId, startId, page)
 
-fun PlaceReviewRepository.getByUserInitial(user: User, page: Pageable): Slice<PlaceReview> =
+fun PlaceReviewRepository.getListByUserInitial(user: User, page: Pageable): Slice<PlaceReview> =
         findByUser(user, page)
 
-fun PlaceReviewRepository.getByUserStartId(user: User, startId: Long, page: Pageable): Slice<PlaceReview> =
+fun PlaceReviewRepository.getListByUserStartId(user: User, startId: Long, page: Pageable): Slice<PlaceReview> =
         findByUserAndIdLessThan(user, startId, page)
 
 @Repository
