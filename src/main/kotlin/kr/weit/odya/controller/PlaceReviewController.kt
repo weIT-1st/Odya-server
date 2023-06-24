@@ -61,32 +61,32 @@ class PlaceReviewController(private val placeReviewService: PlaceReviewService) 
 
     @GetMapping("/place/{id}")
     fun getByPlaceReviewList(
-        @NotNull(message = "장소 ID는 필수 입력값입니다.")
-        @PathVariable("id")
-        placeId: String,
-        @RequestParam("startId")
-        @Positive(message = "시작 Id는 양수여야 합니다.")
-        startIndex: Long?,
-        @RequestParam("count", defaultValue = "10")
-        @Positive(message = "페이징 갯수는 양수여야 합니다.")
-        count: Int
+            @NotNull(message = "장소 ID는 필수 입력값입니다.")
+            @PathVariable("id")
+            placeId: String,
+            @RequestParam("startId")
+            @Positive(message = "시작 Id는 양수여야 합니다.")
+            startId: Long?,
+            @RequestParam("count", defaultValue = "10")
+            @Positive(message = "페이징 수는 양수여야 합니다.")
+            count: Int
     ): ResponseEntity<PlaceReviewListResponse> {
-        return ResponseEntity.ok(placeReviewService.getByPlaceReviewList(placeId, startIndex, count))
+        return ResponseEntity.ok(placeReviewService.getByPlaceReviewList(placeId, startId, count))
     }
 
     @GetMapping("/user/{id}")
     fun getByUserReviewList(
-        @NotNull(message = "유저 ID는 필수 입력값입니다.")
-        @Positive(message = "유저 ID는 양수여야 합니다.")
-        @PathVariable("id")
-        userId: Long,
-        @RequestParam("startId")
-        @Positive(message = "시작 Id는 양수여야 합니다.")
-        startIndex: Long?,
-        @RequestParam("count", defaultValue = "10")
-        @Positive(message = "페이징 갯수는 양수여야 합니다.")
-        count: Int
+            @NotNull(message = "유저 ID는 필수 입력값입니다.")
+            @Positive(message = "유저 ID는 양수여야 합니다.")
+            @PathVariable("id")
+            userId: Long,
+            @RequestParam("startId")
+            @Positive(message = "시작 Id는 양수여야 합니다.")
+            startId: Long?,
+            @RequestParam("count", defaultValue = "10")
+            @Positive(message = "페이징 수는 양수여야 합니다.")
+            count: Int
     ): ResponseEntity<PlaceReviewListResponse> {
-        return ResponseEntity.ok(placeReviewService.getByUserReviewList(userId, startIndex, count))
+        return ResponseEntity.ok(placeReviewService.getByUserReviewList(userId, startId, count))
     }
 }

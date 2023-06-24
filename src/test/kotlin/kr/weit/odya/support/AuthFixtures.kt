@@ -1,11 +1,24 @@
 package kr.weit.odya.support
 
-import kr.weit.odya.service.dto.LoginRequest
-import kr.weit.odya.service.dto.RegisterRequest
+import kr.weit.odya.client.kakao.KakaoUserInfo
+import kr.weit.odya.service.dto.AppleLoginRequest
+import kr.weit.odya.service.dto.AppleRegisterRequest
+import kr.weit.odya.service.dto.KakaoLoginRequest
+import kr.weit.odya.service.dto.KakaoRegisterRequest
+import kr.weit.odya.service.dto.KakaoRegistrationResponse
+import kr.weit.odya.service.dto.TokenResponse
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 
 const val TEST_ID_TOKEN = "testIdToken"
+
+const val TEST_CUSTOM_TOKEN = "testCustomToken"
+
+const val TEST_OAUTH_ACCESS_TOKEN = "oAuthAccessToken"
+
+const val TEST_OAUTH_ID = "1234"
+
+const val TEST_KAKAO_UID = "KAKAO_1234"
 
 const val TEST_NOT_EXIST_USER_ID_TOKEN = "testNotExistUserToken"
 
@@ -17,14 +30,26 @@ const val TEST_BEARER_NOT_EXIST_USER_ID_TOKEN = "Bearer $TEST_NOT_EXIST_USER_ID_
 
 const val TEST_BEARER_INVALID_ID_TOKEN = "Bearer $TEST_INVALID_ID_TOKEN"
 
+const val TEST_BEARER_OAUTH_ACCESS_TOKEN = "BEARER oAuthAccessToken"
+
 const val SOMETHING_ERROR_MESSAGE = "something error message"
 
-const val TEST_PROVIDER = "kakao"
+fun createAppleLoginRequest() = AppleLoginRequest(TEST_ID_TOKEN)
 
-fun createLoginRequest() = LoginRequest(TEST_ID_TOKEN)
+fun createKakaoLoginRequest() = KakaoLoginRequest(TEST_OAUTH_ACCESS_TOKEN)
 
-fun createRegisterRequest() =
-    RegisterRequest(TEST_ID_TOKEN, TEST_EMAIL, TEST_PHONE_NUMBER, TEST_NICKNAME, TEST_GENDER, TEST_BIRTHDAY)
+fun createKakaoUserInfo() =
+    KakaoUserInfo(TEST_OAUTH_ID, KakaoUserInfo.KakaoAccount(profile = KakaoUserInfo.Profile(TEST_NICKNAME)))
+
+fun createKakaoRegistrationResponse(kakaoUserInfo: KakaoUserInfo) = KakaoRegistrationResponse(kakaoUserInfo)
+
+fun createTokenResponse() = TokenResponse(TEST_CUSTOM_TOKEN)
+
+fun createAppleRegisterRequest() =
+        AppleRegisterRequest(TEST_ID_TOKEN, TEST_EMAIL, TEST_PHONE_NUMBER, TEST_NICKNAME, TEST_GENDER, TEST_BIRTHDAY)
+
+fun createKakaoRegisterRequest() =
+        KakaoRegisterRequest(TEST_KAKAO_UID, TEST_EMAIL, TEST_PHONE_NUMBER, TEST_NICKNAME, TEST_GENDER, TEST_BIRTHDAY)
 
 fun userAuthentication() =
-    UsernamePasswordAuthenticationToken(TEST_USER_ID, null, listOf(SimpleGrantedAuthority("ROLE_USER")))
+        UsernamePasswordAuthenticationToken(TEST_USER_ID, null, listOf(SimpleGrantedAuthority(TEST_USER_ROLE.name)))

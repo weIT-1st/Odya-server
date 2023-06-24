@@ -4,7 +4,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import kr.weit.odya.security.FirebaseTokenParser
+import kr.weit.odya.security.FirebaseTokenHelper
 import kr.weit.odya.security.UserDetailsService
 import kr.weit.odya.support.Logger
 import org.springframework.http.HttpHeaders
@@ -23,8 +23,8 @@ private const val BEARER = "Bearer "
 private const val TOKEN_INVALID_ERROR_MESSAGE = "TOKEN INVALID"
 
 class FirebaseTokenFilter(
-    private val userDetailsService: UserDetailsService,
-    private val firebaseTokenParser: FirebaseTokenParser
+        private val userDetailsService: UserDetailsService,
+        private val firebaseTokenHelper: FirebaseTokenHelper
 ) : OncePerRequestFilter() {
     override fun doFilterInternal(
         request: HttpServletRequest,
@@ -35,7 +35,7 @@ class FirebaseTokenFilter(
             try {
                 val firebaseToken = request.getHeader(HttpHeaders.AUTHORIZATION)
                 val idToken = getIdTokenByFirebaseToken(firebaseToken)
-                val username = firebaseTokenParser.getUsername(idToken)
+                val username = firebaseTokenHelper.getUid(idToken)
                 val userDetails = userDetailsService.loadUserByUsername(username)
                 val authenticationToken =
                     UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities)

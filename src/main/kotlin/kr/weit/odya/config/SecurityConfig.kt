@@ -1,7 +1,7 @@
 package kr.weit.odya.config
 
 import kr.weit.odya.config.handler.CustomAuthenticationEntryPoint
-import kr.weit.odya.security.FirebaseTokenParser
+import kr.weit.odya.security.FirebaseTokenHelper
 import kr.weit.odya.security.UserDetailsService
 import kr.weit.odya.security.filter.FIREBASE_TOKEN_FILTER_PERMITTED_PATTERNS
 import kr.weit.odya.security.filter.FirebaseTokenFilter
@@ -16,9 +16,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(
-    private val userDetailsService: UserDetailsService,
-    private val firebaseTokenParser: FirebaseTokenParser,
-    private val customAuthenticationEntryPoint: CustomAuthenticationEntryPoint
+        private val userDetailsService: UserDetailsService,
+        private val firebaseTokenHelper: FirebaseTokenHelper,
+        private val customAuthenticationEntryPoint: CustomAuthenticationEntryPoint
 ) {
     @Bean
     fun springSecurity(http: HttpSecurity): SecurityFilterChain = http
@@ -33,8 +33,8 @@ class SecurityConfig(
                 .anyRequest().authenticated()
         }
         .addFilterBefore(
-            FirebaseTokenFilter(userDetailsService, firebaseTokenParser),
-            UsernamePasswordAuthenticationFilter::class.java
+                FirebaseTokenFilter(userDetailsService, firebaseTokenHelper),
+                UsernamePasswordAuthenticationFilter::class.java
         )
         .exceptionHandling {
             it.authenticationEntryPoint(customAuthenticationEntryPoint)

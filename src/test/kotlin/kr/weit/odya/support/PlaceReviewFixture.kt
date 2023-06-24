@@ -2,13 +2,14 @@ package kr.weit.odya.support
 
 import kr.weit.odya.domain.placeReview.PlaceReview
 import kr.weit.odya.domain.user.User
-import kr.weit.odya.service.dto.ConversionPlaceReview
 import kr.weit.odya.service.dto.PlaceReviewCreateRequest
 import kr.weit.odya.service.dto.PlaceReviewListResponse
 import kr.weit.odya.service.dto.PlaceReviewUpdateRequest
+import kr.weit.odya.service.dto.PlaceReviewViewed
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Slice
 import org.springframework.data.domain.SliceImpl
+import org.springframework.data.domain.Sort
 
 const val TEST_PLACE_REVIEW_ID = 1L
 const val TEST_INVALID_PLACE_REVIEW_ID = -1L
@@ -38,8 +39,8 @@ fun createPlaceReview(user: User = createUser()): PlaceReview {
     return PlaceReview(TEST_PLACE_REVIEW_ID, TEST_PLACE_ID, user, TEST_RATING, TEST_REVIEW)
 }
 
-fun conversionPlaceReview(): ConversionPlaceReview {
-    return ConversionPlaceReview(TEST_PLACE_REVIEW_ID, TEST_PLACE_ID, TEST_USER_ID, TEST_NICKNAME, TEST_RATING, TEST_REVIEW)
+fun conversionPlaceReview(): PlaceReviewViewed {
+    return PlaceReviewViewed(TEST_PLACE_REVIEW_ID, TEST_PLACE_ID, TEST_USER_ID, TEST_NICKNAME, TEST_RATING, TEST_REVIEW)
 }
 
 fun creatPlaceReviewListResponse(): PlaceReviewListResponse {
@@ -47,7 +48,7 @@ fun creatPlaceReviewListResponse(): PlaceReviewListResponse {
 }
 
 fun createPlaceReviewPage(): PageRequest {
-    return PageRequest.of(0, TEST_COUNT)
+    return PageRequest.of(0, TEST_COUNT, Sort.by("id").descending())
 }
 
 fun createSlicePlaceReview(): Slice<PlaceReview> {

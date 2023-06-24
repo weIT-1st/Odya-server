@@ -866,27 +866,27 @@ class PlaceReviewControllerTest(
             }
         }
 
-        context("가져올 리뷰 갯수가 음수인 경우") {
+        context("가져올 리뷰 수가 음수인 경우") {
             it("400 응답한다.") {
                 restDocMockMvc.perform(
-                    RestDocumentationRequestBuilders
-                        .get(targetUri, TEST_PLACE_ID)
-                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
-                        .param("startId", TEST_START_ID.toString())
-                        .param("count", TEST_INVALID_COUNT.toString())
+                        RestDocumentationRequestBuilders
+                                .get(targetUri, TEST_PLACE_ID)
+                                .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                                .param("startId", TEST_START_ID.toString())
+                                .param("count", TEST_INVALID_COUNT.toString())
                 )
-                    .andExpect(status().isBadRequest)
-                    .andDo(
-                        createPathDocument(
-                            "placeReview-placeId-get-fail-invalid-count",
-                            pathParameters(
-                                "id" pathDescription "장소 ID" example TEST_PLACE_ID
-                            ),
-                            requestHeaders(
-                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
-                            ),
-                            queryParameters(
-                                "startId" parameterDescription "조회 시작할 리뷰 ID" example TEST_START_ID isOptional true,
+                        .andExpect(status().isBadRequest)
+                        .andDo(
+                                createPathDocument(
+                                        "placeReview-placeId-get-fail-invalid-count",
+                                        pathParameters(
+                                                "id" pathDescription "장소 ID" example TEST_PLACE_ID
+                                        ),
+                                        requestHeaders(
+                                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                                        ),
+                                        queryParameters(
+                                                "startId" parameterDescription "조회 시작할 리뷰 ID" example TEST_START_ID isOptional true,
                                 "count" parameterDescription "음수인 가져올 리뷰 개수" example TEST_INVALID_COUNT
                             ),
                             responseBody(
@@ -1140,27 +1140,27 @@ class PlaceReviewControllerTest(
             }
         }
 
-        context("가져올 리뷰 갯수가 음수인 경우") {
+        context("가져올 리뷰 수가 음수인 경우") {
             it("400 응답한다.") {
                 restDocMockMvc.perform(
-                    RestDocumentationRequestBuilders
-                        .get(targetUri, TEST_USER_ID)
-                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
-                        .param("startId", TEST_START_ID.toString())
-                        .param("count", TEST_INVALID_COUNT.toString())
+                        RestDocumentationRequestBuilders
+                                .get(targetUri, TEST_USER_ID)
+                                .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                                .param("startId", TEST_START_ID.toString())
+                                .param("count", TEST_INVALID_COUNT.toString())
                 )
-                    .andExpect(status().isBadRequest)
-                    .andDo(
-                        createPathDocument(
-                            "placeReview-userId-get-fail-invalid-count",
-                            pathParameters(
-                                "id" pathDescription "장소 ID" example TEST_PLACE_ID
-                            ),
-                            requestHeaders(
-                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
-                            ),
-                            queryParameters(
-                                "startId" parameterDescription "조회 시작할 리뷰 ID" example TEST_START_ID isOptional true,
+                        .andExpect(status().isBadRequest)
+                        .andDo(
+                                createPathDocument(
+                                        "placeReview-userId-get-fail-invalid-count",
+                                        pathParameters(
+                                                "id" pathDescription "장소 ID" example TEST_PLACE_ID
+                                        ),
+                                        requestHeaders(
+                                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                                        ),
+                                        queryParameters(
+                                                "startId" parameterDescription "조회 시작할 리뷰 ID" example TEST_START_ID isOptional true,
                                 "count" parameterDescription "음수인 가져올 리뷰 개수" example TEST_INVALID_COUNT
                             ),
                             responseBody(

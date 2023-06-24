@@ -5,7 +5,7 @@ import kr.weit.odya.domain.user.existsByEmail
 import kr.weit.odya.domain.user.existsByNickname
 import kr.weit.odya.domain.user.existsByPhoneNumber
 import kr.weit.odya.domain.user.getByUserId
-import kr.weit.odya.security.FirebaseTokenParser
+import kr.weit.odya.security.FirebaseTokenHelper
 import kr.weit.odya.service.dto.InformationRequest
 import kr.weit.odya.service.dto.UserResponse
 import org.springframework.stereotype.Service
@@ -13,12 +13,12 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class UserService(
-    private val userRepository: UserRepository,
-    private val firebaseTokenParser: FirebaseTokenParser
+        private val userRepository: UserRepository,
+        private val firebaseTokenHelper: FirebaseTokenHelper
 ) {
-    fun getEmailByIdToken(idToken: String) = firebaseTokenParser.getEmail(idToken)
+    fun getEmailByIdToken(idToken: String) = firebaseTokenHelper.getEmail(idToken)
 
-    fun getPhoneNumberByIdToken(idToken: String) = firebaseTokenParser.getPhoneNumber(idToken)
+    fun getPhoneNumberByIdToken(idToken: String) = firebaseTokenHelper.getPhoneNumber(idToken)
 
     fun getInformation(userId: Long): UserResponse {
         val findUser = userRepository.getByUserId(userId)
