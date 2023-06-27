@@ -1177,8 +1177,6 @@ class PlaceReviewControllerTest(
                     RestDocumentationRequestBuilders
                         .get(targetUri, TEST_USER_ID)
                         .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_NOT_EXIST_USER_ID_TOKEN)
-                        .param("startId", TEST_START_ID.toString())
-                        .param("count", TEST_COUNT.toString())
                 )
                     .andExpect(status().isUnauthorized)
                     .andDo(

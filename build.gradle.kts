@@ -10,6 +10,16 @@ plugins {
     kotlin("plugin.jpa") version "1.8.21"
 }
 
+allOpen {
+    annotation("jakarta.persistence.Entity")
+    annotation("jakarta.persistence.Embeddable")
+    annotation("jakarta.persistence.MappedSuperclass")
+}
+
+noArg {
+    annotation("kr.weit.odya.support.domain.NoArgsConstructor")
+}
+
 group = "kr.weit"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_17
@@ -54,6 +64,8 @@ dependencies {
 
     implementation("com.oracle.oci.sdk:oci-java-sdk-objectstorage:3.14.0")
     implementation("com.oracle.oci.sdk:oci-java-sdk-common-httpclient-jersey3:3.14.0")
+
+    implementation("com.linecorp.kotlin-jdsl:hibernate-kotlin-jdsl-jakarta:2.2.1.RELEASE")
 
     implementation("org.opensearch.client:spring-data-opensearch-starter:1.1.0") {
         exclude("org.opensearch.client", "opensearch-rest-client-sniffer")
