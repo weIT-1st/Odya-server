@@ -166,7 +166,7 @@ operation::place-review-controller-test/placeReview-placeId-get-fail-invalid-cou
 
 === *5-7 실패 - 가입되지 않은 유저*
 
-operation::place-review-controller-test/placeReview-userId-get-fail-not-registered-user[snippets='http-request,path-Parameters,request-Headers,query-parameters,response-body,http-response']
+operation::place-review-controller-test/placeReview-userId-get-fail-not-registered-user[snippets='http-request,path-Parameters,request-Headers,response-body,http-response']
 
 === *5-8 실패 - 유효한 토큰이지만 가입되어 있지 않은 USER ID로 조회*
 
