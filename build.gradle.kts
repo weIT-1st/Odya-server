@@ -63,6 +63,8 @@ dependencies {
     implementation("com.oracle.oci.sdk:oci-java-sdk-objectstorage:3.14.0")
     implementation("com.oracle.oci.sdk:oci-java-sdk-common-httpclient-jersey3:3.14.0")
 
+    implementation("com.linecorp.kotlin-jdsl:hibernate-kotlin-jdsl-jakarta:2.2.1.RELEASE")
+
     implementation("org.opensearch.client:spring-data-opensearch-starter:1.1.0") {
         exclude("org.opensearch.client", "opensearch-rest-client-sniffer")
     }
