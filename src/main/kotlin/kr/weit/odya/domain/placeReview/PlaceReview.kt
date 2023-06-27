@@ -11,8 +11,8 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
-import kr.weit.odya.domain.BaseModifiableEntity
 import kr.weit.odya.domain.user.User
+import kr.weit.odya.support.domain.BaseModifiableEntity
 
 @Table(
     uniqueConstraints = [
@@ -25,7 +25,12 @@ import kr.weit.odya.domain.user.User
         Index(name = "place_id_index", columnList = "place_id")
     ]
 )
-@SequenceGenerator(name = "PLACE_REVIEW_SEQ_GENERATOR", sequenceName = "PLACE_REVIEW_SEQ", initialValue = 1, allocationSize = 1)
+@SequenceGenerator(
+    name = "PLACE_REVIEW_SEQ_GENERATOR",
+    sequenceName = "PLACE_REVIEW_SEQ",
+    initialValue = 1,
+    allocationSize = 1
+)
 @Entity
 class PlaceReview(
     @Id

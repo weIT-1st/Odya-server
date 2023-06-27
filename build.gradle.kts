@@ -10,6 +10,16 @@ plugins {
     kotlin("plugin.jpa") version "1.8.21"
 }
 
+allOpen {
+    annotation("jakarta.persistence.Entity")
+    annotation("jakarta.persistence.Embeddable")
+    annotation("jakarta.persistence.MappedSuperclass")
+}
+
+noArg {
+    annotation("kr.weit.odya.support.domain.NoArgsConstructor")
+}
+
 group = "kr.weit"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_17

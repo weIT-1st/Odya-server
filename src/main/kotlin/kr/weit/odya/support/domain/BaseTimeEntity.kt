@@ -1,4 +1,4 @@
-package kr.weit.odya.domain
+package kr.weit.odya.support.domain
 
 import jakarta.persistence.Column
 import jakarta.persistence.EntityListeners

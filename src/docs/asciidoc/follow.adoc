@@ -1,0 +1,89 @@
+[[Follow-API]]
+= *Follow API*
+
+[[팔로우-생성-API]]
+== *1. 팔로우 생성 API*
+
+=== *1-1 성공*
+
+operation::follow-controller-test/create-follow-success[snippets='http-request,request-headers,request-fields,http-response']
+
+=== *1-2 실패 - 유효한 토큰이면서, 음수의 FOLLOWING ID인 경우*
+
+operation::follow-controller-test/create-follow-fail-request-resource-negative[snippets='http-request,request-headers,request-fields,http-response,response-fields']
+
+=== *1-3 실패 - 유효한 토큰이면서, 이미 팔로우 중인 FOLLOWING ID인 경우*
+
+operation::follow-controller-test/create-follow-fail-already-following[snippets='http-request,request-headers,request-fields,http-response,response-fields']
+
+=== *1-4 실패 - 유효하지 않은 토큰*
+
+operation::follow-controller-test/create-follow-fail-invalid-token[snippets='http-request,request-headers,request-fields,http-response,response-fields']
+
+[[팔로우-삭제-API]]
+== *2. 팔로우 삭제 API*
+
+=== *2-1 성공*
+
+operation::follow-controller-test/delete-follow-success[snippets='http-request,request-headers,request-fields,http-response']
+
+=== *2-2 실패 - 유효한 토큰이면서, 음수의 FOLLOWING ID인 경우*
+
+operation::follow-controller-test/delete-follow-fail-request-resource-negative[snippets='http-request,request-headers,request-fields,http-response,response-fields']
+
+=== *2-3 실패 - 유효하지 않은 토큰*
+
+operation::follow-controller-test/delete-follow-fail-invalid-token[snippets='http-request,request-headers,request-fields,http-response,response-fields']
+
+[[팔로워-팔로잉-수-조회-API]]
+== *3. 팔로워/팔로잉 수 조회 API*
+
+=== *3-1 성공*
+
+operation::follow-controller-test/get-follow-counts-success[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+
+=== *3-2 실패 - 유효한 토큰이면서, USER ID가 음수인 경우*
+
+operation::follow-controller-test/get-follow-counts-fail-user-id-negative[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+
+=== *3-3 실패 - 유효하지 않은 토큰*
+
+operation::follow-controller-test/get-follow-counts-fail-invalid-token[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+
+[[팔로잉-목록-조회-API]]
+== *4. 팔로잉 목록 조회 API*
+
+=== *4-1 성공 - 전체 목록 조회*
+
+operation::follow-controller-test/get-followings-success[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+
+=== *4-2 성공 - 페이지 단위 조회*
+
+operation::follow-controller-test/get-followers-page-success-with-page[snippets='http-request,request-headers,path-parameters,query-parameters,http-response,response-fields']
+
+=== *4-3 실패 - 유효한 토큰이면서, USER ID가 음수인 경우*
+
+operation::follow-controller-test/get-follower-page-fail-invalid-user-id[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+
+=== *4-4 실패 - 유효하지 않은 토큰인 경우*
+
+operation::follow-controller-test/get-follower-page-fail-invalid-token[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+
+[[팔로워-목록-조회-API]]
+== *5. 팔로워 목록 조회 API*
+
+=== *5-1 성공 - 전체 목록 조회*
+
+operation::follow-controller-test/get-followers-success[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+
+=== *5-2 성공 - 페이지 단위 조회*
+
+operation::follow-controller-test/get-followers-page-success-with-page[snippets='http-request,request-headers,path-parameters,query-parameters,http-response,response-fields']
+
+=== *5-3 실패 - 유효한 토큰이면서, USER ID가 음수인 경우*
+
+operation::follow-controller-test/get-follower-page-fail-invalid-user-id[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+
+=== *5-4 실패 - 유효하지 않은 토큰인 경우*
+
+operation::follow-controller-test/get-follower-page-fail-invalid-token[snippets='http-request,request-headers,path-parameters,http-response,response-fields']

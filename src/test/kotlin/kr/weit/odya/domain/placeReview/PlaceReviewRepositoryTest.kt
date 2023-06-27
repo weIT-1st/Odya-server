@@ -1,11 +1,11 @@
-package kr.weit.odya.domain.user
+package kr.weit.odya.domain.placeReview
 
 import io.kotest.core.spec.style.ExpectSpec
 import io.kotest.extensions.spring.SpringTestExtension
 import io.kotest.extensions.spring.SpringTestLifecycleMode
 import io.kotest.matchers.shouldBe
-import kr.weit.odya.domain.placeReview.PlaceReviewRepository
-import kr.weit.odya.domain.placeReview.getByPlaceReviewId
+import kr.weit.odya.domain.user.User
+import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_USER_ID
