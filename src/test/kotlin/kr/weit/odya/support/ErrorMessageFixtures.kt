@@ -2,15 +2,17 @@ package kr.weit.odya.support
 
 const val EXIST_USER_ERROR_MESSAGE = "$TEST_USERNAME: 이미 존재하는 회원입니다"
 
+const val ALREADY_REGISTER_USER_ERROR_MESSAGE = "$TEST_USERNAME: 이미 등록된 사용자입니다"
+
 const val NOT_EXIST_USER_ERROR_MESSAGE = "$TEST_USERNAME: 존재하지 않는 회원입니다"
 
 const val EXIST_NICKNAME_ERROR_MESSAGE = "$TEST_NICKNAME: 이미 존재하는 닉네임입니다"
 
-const val EXIST_EMAIL_ERROR_MESSAGE = "$TEST_EMAIL: 이미 존재하는 닉네임입니다"
+const val EXIST_EMAIL_ERROR_MESSAGE = "$TEST_EMAIL: 이미 존재하는 이메일입니다"
 
 const val NOT_EXIST_AUTHENTICATED_EMAIL_ERROR_MESSAGE = "인증된 이메일이 존재하지 않습니다"
 
-const val EXIST_PHONE_NUMBER_ERROR_MESSAGE = "$TEST_PHONE_NUMBER: 이미 존재하는 닉네임입니다"
+const val EXIST_PHONE_NUMBER_ERROR_MESSAGE = "$TEST_PHONE_NUMBER: 이미 존재하는 전화번호입니다"
 
 const val NOT_EXIST_AUTHENTICATED_PHONE_NUMBER_ERROR_MESSAGE = "인증된 전화번호가 존재하지 않습니다"
 
