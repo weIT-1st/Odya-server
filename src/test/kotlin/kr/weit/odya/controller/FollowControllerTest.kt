@@ -5,19 +5,25 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.mockk.every
 import io.mockk.just
 import io.mockk.runs
+import kr.weit.odya.domain.follow.FollowSortType
 import kr.weit.odya.service.ExistResourceException
 import kr.weit.odya.service.FollowService
 import kr.weit.odya.support.ALREADY_FOLLOW_ERROR_MESSAGE
+import kr.weit.odya.support.PAGE_PARAM
+import kr.weit.odya.support.SIZE_PARAM
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
+import kr.weit.odya.support.SORT_TYPE_PARAM
 import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
 import kr.weit.odya.support.TEST_INVALID_USER_ID
 import kr.weit.odya.support.TEST_PAGE
+import kr.weit.odya.support.TEST_PAGEABLE
 import kr.weit.odya.support.TEST_SIZE
+import kr.weit.odya.support.TEST_SORT_TYPE
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createFollowCountsResponse
 import kr.weit.odya.support.createFollowRequest
-import kr.weit.odya.support.createFollowUserPage
+import kr.weit.odya.support.createFollowSlice
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
 import kr.weit.odya.support.test.ControllerTestHelper.Companion.jsonContent
 import kr.weit.odya.support.test.RestDocsHelper
@@ -321,48 +327,23 @@ class FollowControllerTest(
     describe("GET /api/v1/follows/{userId}/followings") {
         val targetUri = "/api/v1/follows/{userId}/followings"
         context("유효한 토큰이면서, 유효한 요청인 경우") {
-            val response = createFollowUserPage()
-            every { followService.getFollowings(TEST_USER_ID, any()) } returns response
-            it("200, 전체 팔로잉 목록을 응답한다.") {
+            val response = createFollowSlice()
+            every {
+                followService.getSliceFollowings(TEST_USER_ID, TEST_PAGEABLE, TEST_SORT_TYPE)
+            } returns response
+            it("200, 팔로잉 목록을 응답한다.") {
                 restDocMockMvc.perform(
                     RestDocumentationRequestBuilders
                         .get(targetUri, TEST_USER_ID)
                         .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        .param(PAGE_PARAM, TEST_PAGE.toString())
+                        .param(SIZE_PARAM, TEST_SIZE.toString())
+                        .param(SORT_TYPE_PARAM, TEST_SORT_TYPE.name)
                 )
                     .andExpect(status().isOk)
                     .andDo(
                         createPathDocument(
-                            "get-followings-success",
-                            requestHeaders(
-                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
-                            ),
-                            pathParameters(
-                                "userId" pathDescription "팔로잉 목록을 조회할 USER ID" example TEST_USER_ID
-                            ),
-                            responseBody(
-                                "page" type JsonFieldType.NUMBER description "현재 페이지 번호" example response.page,
-                                "totalPages" type JsonFieldType.NUMBER description "전체 페이지 번호" example response.totalPages,
-                                "totalElements" type JsonFieldType.NUMBER description "전체 데이터 수" example response.totalElements,
-                                "content[].userId" type JsonFieldType.NUMBER description "사용자 ID" example response.content[0].userId,
-                                "content[].nickname" type JsonFieldType.STRING description "사용자 닉네임" example response.content[0].nickname,
-                                "content[].profileName" type JsonFieldType.STRING description "사용자 프로필" example response.content[0].profileName
-                            )
-                        )
-                    )
-            }
-
-            it("200, 페이지 단위 팔로잉 목록을 응답한다.") {
-                restDocMockMvc.perform(
-                    RestDocumentationRequestBuilders
-                        .get(targetUri, TEST_USER_ID)
-                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
-                        .param("page", TEST_PAGE.toString())
-                        .param("size", TEST_SIZE.toString())
-                )
-                    .andExpect(status().isOk)
-                    .andDo(
-                        createPathDocument(
-                            "get-following-page-success-with-page",
+                            "get-following-slice-success-with-params",
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                             ),
@@ -370,13 +351,13 @@ class FollowControllerTest(
                                 "userId" pathDescription "팔로잉 목록을 조회할 USER ID" example TEST_USER_ID
                             ),
                             queryParameters(
-                                "page" parameterDescription "조회할 페이지 번호" isOptional true example TEST_PAGE,
-                                "size" parameterDescription "조회할 페이지 사이즈" isOptional true example TEST_SIZE
+                                PAGE_PARAM parameterDescription "데이터 조회 시작점 (default = 0)" example TEST_PAGE isOptional true,
+                                SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_SIZE isOptional true,
+                                SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example FollowSortType.values()
+                                    .joinToString() isOptional true
                             ),
                             responseBody(
-                                "page" type JsonFieldType.NUMBER description "현재 페이지 번호" example response.page,
-                                "totalPages" type JsonFieldType.NUMBER description "전체 페이지 번호" example response.totalPages,
-                                "totalElements" type JsonFieldType.NUMBER description "전체 데이터 수" example response.totalElements,
+                                "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
                                 "content[].userId" type JsonFieldType.NUMBER description "사용자 ID" example response.content[0].userId,
                                 "content[].nickname" type JsonFieldType.STRING description "사용자 닉네임" example response.content[0].nickname,
                                 "content[].profileName" type JsonFieldType.STRING description "사용자 프로필" example response.content[0].profileName
@@ -396,7 +377,7 @@ class FollowControllerTest(
                     .andExpect(status().isBadRequest)
                     .andDo(
                         createPathDocument(
-                            "get-following-page-fail-invalid-user-id",
+                            "get-following-slice-fail-invalid-user-id",
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                             ),
@@ -421,7 +402,7 @@ class FollowControllerTest(
                     .andExpect(status().isUnauthorized)
                     .andDo(
                         createPathDocument(
-                            "get-following-page-fail-invalid-token",
+                            "get-following-slice-fail-invalid-token",
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN"
                             ),
@@ -440,48 +421,23 @@ class FollowControllerTest(
     describe("GET /api/v1/follows/{userId}/followers") {
         val targetUri = "/api/v1/follows/{userId}/followers"
         context("유효한 토큰이면서, 유효한 요청인 경우") {
-            val response = createFollowUserPage()
-            every { followService.getFollowers(TEST_USER_ID, any()) } returns response
-            it("200, 전체 팔로워 목록을 응답한다.") {
+            val response = createFollowSlice()
+            every {
+                followService.getSliceFollowers(TEST_USER_ID, TEST_PAGEABLE, TEST_SORT_TYPE)
+            } returns response
+            it("200, 팔로잉 목록을 응답한다.") {
                 restDocMockMvc.perform(
                     RestDocumentationRequestBuilders
                         .get(targetUri, TEST_USER_ID)
                         .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        .param(PAGE_PARAM, TEST_PAGE.toString())
+                        .param(SIZE_PARAM, TEST_SIZE.toString())
+                        .param(SORT_TYPE_PARAM, TEST_SORT_TYPE.name)
                 )
                     .andExpect(status().isOk)
                     .andDo(
                         createPathDocument(
-                            "get-followers-success",
-                            requestHeaders(
-                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
-                            ),
-                            pathParameters(
-                                "userId" pathDescription "팔로워 목록을 조회할 USER ID" example TEST_USER_ID
-                            ),
-                            responseBody(
-                                "page" type JsonFieldType.NUMBER description "현재 페이지 번호" example response.page,
-                                "totalPages" type JsonFieldType.NUMBER description "전체 페이지 번호" example response.totalPages,
-                                "totalElements" type JsonFieldType.NUMBER description "전체 데이터 수" example response.totalElements,
-                                "content[].userId" type JsonFieldType.NUMBER description "사용자 ID" example response.content[0].userId,
-                                "content[].nickname" type JsonFieldType.STRING description "사용자 닉네임" example response.content[0].nickname,
-                                "content[].profileName" type JsonFieldType.STRING description "사용자 프로필" example response.content[0].profileName
-                            )
-                        )
-                    )
-            }
-
-            it("200, 페이지 단위 팔로워 목록을 응답한다.") {
-                restDocMockMvc.perform(
-                    RestDocumentationRequestBuilders
-                        .get(targetUri, TEST_USER_ID)
-                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
-                        .param("page", TEST_PAGE.toString())
-                        .param("size", TEST_SIZE.toString())
-                )
-                    .andExpect(status().isOk)
-                    .andDo(
-                        createPathDocument(
-                            "get-followers-page-success-with-page",
+                            "get-follower-slice-success-with-params",
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                             ),
@@ -489,13 +445,13 @@ class FollowControllerTest(
                                 "userId" pathDescription "팔로워 목록을 조회할 USER ID" example TEST_USER_ID
                             ),
                             queryParameters(
-                                "page" parameterDescription "조회할 페이지 번호" isOptional true example TEST_PAGE,
-                                "size" parameterDescription "조회할 페이지 사이즈" isOptional true example TEST_SIZE
+                                PAGE_PARAM parameterDescription "페이지 (default = 0)" example TEST_PAGE isOptional true,
+                                SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_SIZE isOptional true,
+                                SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example FollowSortType.values()
+                                    .joinToString() isOptional true
                             ),
                             responseBody(
-                                "page" type JsonFieldType.NUMBER description "현재 페이지 번호" example response.page,
-                                "totalPages" type JsonFieldType.NUMBER description "전체 페이지 번호" example response.totalPages,
-                                "totalElements" type JsonFieldType.NUMBER description "전체 데이터 수" example response.totalElements,
+                                "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
                                 "content[].userId" type JsonFieldType.NUMBER description "사용자 ID" example response.content[0].userId,
                                 "content[].nickname" type JsonFieldType.STRING description "사용자 닉네임" example response.content[0].nickname,
                                 "content[].profileName" type JsonFieldType.STRING description "사용자 프로필" example response.content[0].profileName
@@ -515,7 +471,7 @@ class FollowControllerTest(
                     .andExpect(status().isBadRequest)
                     .andDo(
                         createPathDocument(
-                            "get-follower-page-fail-invalid-user-id",
+                            "get-follower-slice-fail-invalid-user-id",
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
                             ),
@@ -540,7 +496,7 @@ class FollowControllerTest(
                     .andExpect(status().isUnauthorized)
                     .andDo(
                         createPathDocument(
-                            "get-follower-page-fail-invalid-token",
+                            "get-follower-slice-fail-invalid-token",
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN"
                             ),
