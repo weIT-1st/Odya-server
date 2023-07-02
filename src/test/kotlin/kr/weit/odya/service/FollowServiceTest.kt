@@ -9,16 +9,19 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import kr.weit.odya.domain.follow.FollowRepository
+import kr.weit.odya.domain.follow.getFollowerListBySearchCond
+import kr.weit.odya.domain.follow.getFollowingListBySearchCond
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
+import kr.weit.odya.support.TEST_DEFAULT_PAGEABLE
+import kr.weit.odya.support.TEST_DEFAULT_SORT_TYPE
 import kr.weit.odya.support.TEST_FOLLOWER_COUNT
 import kr.weit.odya.support.TEST_FOLLOWING_COUNT
 import kr.weit.odya.support.TEST_OTHER_USER_ID
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createFollow
 import kr.weit.odya.support.createFollowCountsResponse
-import kr.weit.odya.support.createFollowPage
-import kr.weit.odya.support.createFollowPageable
+import kr.weit.odya.support.createFollowList
 import kr.weit.odya.support.createFollowRequest
 import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createUser
@@ -65,28 +68,36 @@ class FollowServiceTest : DescribeSpec({
         }
     }
 
-    describe("getFollowings") {
-        context("FOLLOWER ID와 PAGEABLE 정보가 주어지는 경우") {
-            val pageable = createFollowPageable()
-            every { followRepository.findPageByFollowerId(TEST_USER_ID, pageable) } returns createFollowPage(
-                createFollow(follower = createUser(), following = createOtherUser())
-            )
-            it("PageResponse<FollowUserResponse>를 반환한다.") {
-                val response = followService.getFollowings(TEST_USER_ID, pageable)
+    describe("getSliceFollowings") {
+        context("FOLLOWER ID, PAGEABLE, SORT TYPE 정보가 주어지는 경우") {
+            every {
+                followRepository.getFollowingListBySearchCond(
+                    TEST_USER_ID,
+                    TEST_DEFAULT_PAGEABLE,
+                    TEST_DEFAULT_SORT_TYPE
+                )
+            } returns createFollowList()
+            it("SliceResponse<FollowUserResponse>를 반환한다.") {
+                val response =
+                    followService.getSliceFollowings(TEST_USER_ID, TEST_DEFAULT_PAGEABLE, TEST_DEFAULT_SORT_TYPE)
                 response.content[0].userId shouldBe TEST_OTHER_USER_ID
             }
         }
     }
 
-    describe("getFollowers") {
-        context("FOLLOWER ID와 PAGEABLE 정보가 주어지는 경우") {
-            val pageable = createFollowPageable()
-            every { followRepository.findPageByFollowingId(TEST_USER_ID, pageable) } returns createFollowPage(
-                createFollow(follower = createOtherUser(), following = createUser())
-            )
-            it("PageResponse<FollowUserResponse>를 반환한다.") {
-                val response = followService.getFollowers(TEST_USER_ID, pageable)
-                response.content[0].userId shouldBe TEST_OTHER_USER_ID
+    describe("getSliceFollowers") {
+        context("FOLLOWER ID, PAGEABLE, SORT TYPE 정보가 주어지는 경우") {
+            every {
+                followRepository.getFollowerListBySearchCond(
+                    TEST_USER_ID,
+                    TEST_DEFAULT_PAGEABLE,
+                    TEST_DEFAULT_SORT_TYPE
+                )
+            } returns createFollowList()
+            it("SliceResponse<FollowUserResponse>를 반환한다.") {
+                val response =
+                    followService.getSliceFollowers(TEST_USER_ID, TEST_DEFAULT_PAGEABLE, TEST_DEFAULT_SORT_TYPE)
+                response.content[0].userId shouldBe TEST_USER_ID
             }
         }
     }

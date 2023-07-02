@@ -2,12 +2,15 @@ package kr.weit.odya.service
 
 import kr.weit.odya.domain.follow.Follow
 import kr.weit.odya.domain.follow.FollowRepository
+import kr.weit.odya.domain.follow.FollowSortType
+import kr.weit.odya.domain.follow.getFollowerListBySearchCond
+import kr.weit.odya.domain.follow.getFollowingListBySearchCond
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.service.dto.FollowCountsResponse
 import kr.weit.odya.service.dto.FollowRequest
 import kr.weit.odya.service.dto.FollowUserResponse
-import kr.weit.odya.service.dto.PageResponse
+import kr.weit.odya.service.dto.SliceResponse
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -33,17 +36,25 @@ class FollowService(
     }
 
     @Transactional(readOnly = true)
-    fun getFollowings(followerId: Long, pageable: Pageable): PageResponse<FollowUserResponse> {
-        val pageData =
-            followRepository.findPageByFollowerId(followerId, pageable).map { FollowUserResponse(it.following) }
-        return PageResponse(pageable, pageData)
+    fun getSliceFollowings(
+        followerId: Long,
+        pageable: Pageable,
+        sortType: FollowSortType
+    ): SliceResponse<FollowUserResponse> {
+        val followingList = followRepository.getFollowingListBySearchCond(followerId, pageable, sortType)
+            .map { FollowUserResponse(it.following) }
+        return SliceResponse(pageable, followingList)
     }
 
     @Transactional(readOnly = true)
-    fun getFollowers(followingId: Long, pageable: Pageable): PageResponse<FollowUserResponse> {
-        val pageData =
-            followRepository.findPageByFollowingId(followingId, pageable).map { FollowUserResponse(it.follower) }
-        return PageResponse(pageable, pageData)
+    fun getSliceFollowers(
+        followingId: Long,
+        pageable: Pageable,
+        sortType: FollowSortType
+    ): SliceResponse<FollowUserResponse> {
+        val followerList = followRepository.getFollowerListBySearchCond(followingId, pageable, sortType)
+            .map { FollowUserResponse(it.follower) }
+        return SliceResponse(pageable, followerList)
     }
 
     fun getFollowCounts(userId: Long): FollowCountsResponse {
