@@ -13,11 +13,14 @@ import kr.weit.odya.domain.follow.getFollowerListBySearchCond
 import kr.weit.odya.domain.follow.getFollowingListBySearchCond
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
+import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_DEFAULT_PAGEABLE
+import kr.weit.odya.support.TEST_DEFAULT_PROFILE_PNG
 import kr.weit.odya.support.TEST_DEFAULT_SORT_TYPE
 import kr.weit.odya.support.TEST_FOLLOWER_COUNT
 import kr.weit.odya.support.TEST_FOLLOWING_COUNT
 import kr.weit.odya.support.TEST_OTHER_USER_ID
+import kr.weit.odya.support.TEST_PROFILE_URL
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createFollow
 import kr.weit.odya.support.createFollowCountsResponse
@@ -29,7 +32,8 @@ import kr.weit.odya.support.createUser
 class FollowServiceTest : DescribeSpec({
     val userRepository = mockk<UserRepository>()
     val followRepository = mockk<FollowRepository>()
-    val followService = FollowService(followRepository, userRepository)
+    val objectStorageService = mockk<ObjectStorageService>()
+    val followService = FollowService(followRepository, userRepository, objectStorageService)
 
     describe("createFollow") {
         context("이미 존재하지 않는 팔로우를 생성하는 경우") {
@@ -77,10 +81,29 @@ class FollowServiceTest : DescribeSpec({
                     TEST_DEFAULT_SORT_TYPE
                 )
             } returns createFollowList()
+            every { objectStorageService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
             it("SliceResponse<FollowUserResponse>를 반환한다.") {
                 val response =
                     followService.getSliceFollowings(TEST_USER_ID, TEST_DEFAULT_PAGEABLE, TEST_DEFAULT_SORT_TYPE)
                 response.content[0].userId shouldBe TEST_OTHER_USER_ID
+            }
+        }
+
+        context("preAuthentication Access Url 생성에 실패한 경우") {
+            every {
+                followRepository.getFollowingListBySearchCond(
+                    TEST_USER_ID,
+                    TEST_DEFAULT_PAGEABLE,
+                    TEST_DEFAULT_SORT_TYPE
+                )
+            } returns createFollowList()
+            every { objectStorageService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } throws ObjectStorageException(
+                SOMETHING_ERROR_MESSAGE
+            )
+            it("[ObjectStorageException] 반환한다.") {
+                shouldThrow<ObjectStorageException> {
+                    followService.getSliceFollowings(TEST_USER_ID, TEST_DEFAULT_PAGEABLE, TEST_DEFAULT_SORT_TYPE)
+                }
             }
         }
     }
@@ -94,10 +117,29 @@ class FollowServiceTest : DescribeSpec({
                     TEST_DEFAULT_SORT_TYPE
                 )
             } returns createFollowList()
+            every { objectStorageService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
             it("SliceResponse<FollowUserResponse>를 반환한다.") {
                 val response =
                     followService.getSliceFollowers(TEST_USER_ID, TEST_DEFAULT_PAGEABLE, TEST_DEFAULT_SORT_TYPE)
                 response.content[0].userId shouldBe TEST_USER_ID
+            }
+        }
+
+        context("preAuthentication Access Url 생성에 실패한 경우") {
+            every {
+                followRepository.getFollowerListBySearchCond(
+                    TEST_USER_ID,
+                    TEST_DEFAULT_PAGEABLE,
+                    TEST_DEFAULT_SORT_TYPE
+                )
+            } returns createFollowList()
+            every { objectStorageService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } throws ObjectStorageException(
+                SOMETHING_ERROR_MESSAGE
+            )
+            it("[ObjectStorageException] 반환한다.") {
+                shouldThrow<ObjectStorageException> {
+                    followService.getSliceFollowers(TEST_USER_ID, TEST_DEFAULT_PAGEABLE, TEST_DEFAULT_SORT_TYPE)
+                }
             }
         }
     }
@@ -106,7 +148,7 @@ class FollowServiceTest : DescribeSpec({
         context("USER ID 정보가 주어지는 경우") {
             every { followRepository.countByFollowerId(TEST_USER_ID) } returns TEST_FOLLOWING_COUNT
             every { followRepository.countByFollowingId(TEST_USER_ID) } returns TEST_FOLLOWER_COUNT
-            it("FollowCountsResponse를 반환한다.") {
+            it("[FollowCountsResponse] 반환한다.") {
                 val response = followService.getFollowCounts(TEST_USER_ID)
                 response shouldBe createFollowCountsResponse()
             }

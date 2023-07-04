@@ -8,6 +8,7 @@ import io.mockk.runs
 import kr.weit.odya.domain.follow.FollowSortType
 import kr.weit.odya.service.ExistResourceException
 import kr.weit.odya.service.FollowService
+import kr.weit.odya.service.ObjectStorageException
 import kr.weit.odya.support.ALREADY_FOLLOW_ERROR_MESSAGE
 import kr.weit.odya.support.PAGE_PARAM
 import kr.weit.odya.support.SIZE_PARAM
@@ -360,7 +361,48 @@ class FollowControllerTest(
                                 "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
                                 "content[].userId" type JsonFieldType.NUMBER description "사용자 ID" example response.content[0].userId,
                                 "content[].nickname" type JsonFieldType.STRING description "사용자 닉네임" example response.content[0].nickname,
-                                "content[].profileName" type JsonFieldType.STRING description "사용자 프로필" example response.content[0].profileName
+                                "content[].profile.profileUrl" type JsonFieldType.STRING description "사용자 프로필 Url" example response.content[0].profile.profileUrl,
+                                "content[].profile.profileColor.colorHex" type JsonFieldType.STRING description "색상 Hex" example response.content[0].profile.profileColor?.colorHex isOptional true,
+                                "content[].profile.profileColor.red" type JsonFieldType.NUMBER description "RGB RED" example response.content[0].profile.profileColor?.red isOptional true,
+                                "content[].profile.profileColor.green" type JsonFieldType.NUMBER description "RGB GREEN" example response.content[0].profile.profileColor?.green isOptional true,
+                                "content[].profile.profileColor.blue" type JsonFieldType.NUMBER description "RGB BLUE" example response.content[0].profile.profileColor?.blue isOptional true
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("유효한 토큰이면서, 프로필 PreAuthentication Access Url 생성에 실패한 경우") {
+            every {
+                followService.getSliceFollowings(TEST_USER_ID, TEST_PAGEABLE, TEST_SORT_TYPE)
+            } throws ObjectStorageException(SOMETHING_ERROR_MESSAGE)
+            it("500 응답한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .get(targetUri, TEST_USER_ID)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        .param(PAGE_PARAM, TEST_PAGE.toString())
+                        .param(SIZE_PARAM, TEST_SIZE.toString())
+                        .param(SORT_TYPE_PARAM, TEST_SORT_TYPE.name)
+                )
+                    .andExpect(status().isInternalServerError)
+                    .andDo(
+                        createPathDocument(
+                            "get-following-slice-fail-create-pre-auth-url",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                            ),
+                            pathParameters(
+                                "userId" pathDescription "팔로잉 목록을 조회할 USER ID" example TEST_USER_ID
+                            ),
+                            queryParameters(
+                                PAGE_PARAM parameterDescription "데이터 조회 시작점 (default = 0)" example TEST_PAGE isOptional true,
+                                SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_SIZE isOptional true,
+                                SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example FollowSortType.values()
+                                    .joinToString() isOptional true
+                            ),
+                            responseBody(
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
                             )
                         )
                     )
@@ -454,7 +496,48 @@ class FollowControllerTest(
                                 "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
                                 "content[].userId" type JsonFieldType.NUMBER description "사용자 ID" example response.content[0].userId,
                                 "content[].nickname" type JsonFieldType.STRING description "사용자 닉네임" example response.content[0].nickname,
-                                "content[].profileName" type JsonFieldType.STRING description "사용자 프로필" example response.content[0].profileName
+                                "content[].profile.profileUrl" type JsonFieldType.STRING description "사용자 프로필 Url" example response.content[0].profile.profileUrl,
+                                "content[].profile.profileColor.colorHex" type JsonFieldType.STRING description "색상 Hex" example response.content[0].profile.profileColor?.colorHex isOptional true,
+                                "content[].profile.profileColor.red" type JsonFieldType.NUMBER description "RGB RED" example response.content[0].profile.profileColor?.red isOptional true,
+                                "content[].profile.profileColor.green" type JsonFieldType.NUMBER description "RGB GREEN" example response.content[0].profile.profileColor?.green isOptional true,
+                                "content[].profile.profileColor.blue" type JsonFieldType.NUMBER description "RGB BLUE" example response.content[0].profile.profileColor?.blue isOptional true
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("유효한 토큰이면서, 프로필 PreAuthentication Access Url 생성에 실패한 경우") {
+            every {
+                followService.getSliceFollowers(TEST_USER_ID, TEST_PAGEABLE, TEST_SORT_TYPE)
+            } throws ObjectStorageException(SOMETHING_ERROR_MESSAGE)
+            it("500 응답한다.") {
+                restDocMockMvc.perform(
+                    RestDocumentationRequestBuilders
+                        .get(targetUri, TEST_USER_ID)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        .param(PAGE_PARAM, TEST_PAGE.toString())
+                        .param(SIZE_PARAM, TEST_SIZE.toString())
+                        .param(SORT_TYPE_PARAM, TEST_SORT_TYPE.name)
+                )
+                    .andExpect(status().isInternalServerError)
+                    .andDo(
+                        createPathDocument(
+                            "get-follower-slice-fail-create-pre-auth-url",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                            ),
+                            pathParameters(
+                                "userId" pathDescription "팔로잉 목록을 조회할 USER ID" example TEST_USER_ID
+                            ),
+                            queryParameters(
+                                PAGE_PARAM parameterDescription "데이터 조회 시작점 (default = 0)" example TEST_PAGE isOptional true,
+                                SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_SIZE isOptional true,
+                                SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example FollowSortType.values()
+                                    .joinToString() isOptional true
+                            ),
+                            responseBody(
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
                             )
                         )
                     )
