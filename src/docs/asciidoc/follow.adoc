@@ -57,13 +57,17 @@ operation::follow-controller-test/get-follow-counts-fail-invalid-token[snippets=
 
 operation::follow-controller-test/get-following-slice-success-with-params[snippets='http-request,request-headers,path-parameters,query-parameters,http-response,response-fields']
 
-=== *4-2 실패 - 유효한 토큰이면서, USER ID가 음수인 경우*
+=== *4-2 실패 - 유효한 토큰이면서, 프로필 PreAuthentication Access Url 생성에 실패한 경우*
 
-operation::follow-controller-test/get-follower-slice-fail-invalid-user-id[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+operation::follow-controller-test/get-following-slice-fail-create-pre-auth-url[snippets='http-request,request-headers,path-parameters,query-parameters,http-response,response-fields']
 
-=== *4-3 실패 - 유효하지 않은 토큰인 경우*
+=== *4-3 실패 - 유효한 토큰이면서, USER ID가 음수인 경우*
 
-operation::follow-controller-test/get-follower-slice-fail-invalid-token[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+operation::follow-controller-test/get-following-slice-fail-invalid-user-id[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+
+=== *4-4 실패 - 유효하지 않은 토큰인 경우*
+
+operation::follow-controller-test/get-following-slice-fail-invalid-token[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
 
 [[팔로워-무한-스크롤-조회-API]]
 == *5. 팔로워 무한 스크롤 조회 API*
@@ -72,10 +76,14 @@ operation::follow-controller-test/get-follower-slice-fail-invalid-token[snippets
 
 operation::follow-controller-test/get-follower-slice-success-with-params[snippets='http-request,request-headers,path-parameters,query-parameters,http-response,response-fields']
 
-=== *5-2 실패 - 유효한 토큰이면서, USER ID가 음수인 경우*
+=== *5-2 실패 - 유효한 토큰이면서, 프로필 PreAuthentication Access Url 생성에 실패한 경우*
+
+operation::follow-controller-test/get-follower-slice-fail-create-pre-auth-url[snippets='http-request,request-headers,path-parameters,query-parameters,http-response,response-fields']
+
+=== *5-3 실패 - 유효한 토큰이면서, USER ID가 음수인 경우*
 
 operation::follow-controller-test/get-follower-slice-fail-invalid-user-id[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
 
-=== *5-3 실패 - 유효하지 않은 토큰인 경우*
+=== *5-4 실패 - 유효하지 않은 토큰인 경우*
 
 operation::follow-controller-test/get-follower-slice-fail-invalid-token[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
