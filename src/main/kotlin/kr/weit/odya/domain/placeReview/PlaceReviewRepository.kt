@@ -55,7 +55,7 @@ class PlaceReviewRepositoryImpl(private val queryFactory: QueryFactory) : Custom
     ): List<PlaceReview> = queryFactory.listQuery {
         select(entity(PlaceReview::class))
         from(entity(PlaceReview::class))
-        where(col(entity(PlaceReview::class), PlaceReview::placeId).equal(placeId))
+        where(col(PlaceReview::placeId).equal(placeId))
         orderBy(dynamicOrderingByPlaceReviewSortType(sortType))
         offset(pageable.offset.toInt())
         limit(pageable.pageSize + 1)
