@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -53,6 +55,21 @@ class UserController(
         @LoginUserId userId: Long
     ): ResponseEntity<Void> {
         userService.updateInformation(userId, informationRequest)
+        return ResponseEntity.noContent().build()
+    }
+
+    @PatchMapping("/profile")
+    fun updateProfile(
+        @RequestPart(name = "profile", required = false) multipartFile: MultipartFile?,
+        @LoginUserId userId: Long
+    ): ResponseEntity<Void> {
+        val profileName: String? = if (multipartFile != null) {
+            userService.uploadProfile(multipartFile.inputStream, multipartFile?.originalFilename)
+        } else {
+            userService.deleteProfile(userId)
+            null
+        }
+        userService.updateProfile(userId, profileName, multipartFile?.originalFilename)
         return ResponseEntity.noContent().build()
     }
 }

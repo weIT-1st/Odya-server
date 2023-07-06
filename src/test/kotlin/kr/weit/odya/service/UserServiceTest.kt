@@ -5,40 +5,68 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.existsByEmail
 import kr.weit.odya.domain.user.existsByNickname
 import kr.weit.odya.domain.user.existsByPhoneNumber
 import kr.weit.odya.domain.user.getByUserId
+import kr.weit.odya.domain.user.getByUserIdWithProfile
 import kr.weit.odya.security.FirebaseTokenHelper
 import kr.weit.odya.security.InvalidTokenException
+import kr.weit.odya.service.generator.FileNameGenerator
+import kr.weit.odya.support.DELETE_NOT_EXIST_PROFILE_ERROR_MESSAGE
+import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
+import kr.weit.odya.support.TEST_DEFAULT_PROFILE_NAME
+import kr.weit.odya.support.TEST_DEFAULT_PROFILE_PNG
 import kr.weit.odya.support.TEST_EMAIL
 import kr.weit.odya.support.TEST_ID_TOKEN
+import kr.weit.odya.support.TEST_INVALID_PROFILE_ORIGINAL_NAME
 import kr.weit.odya.support.TEST_NICKNAME
 import kr.weit.odya.support.TEST_PHONE_NUMBER
+import kr.weit.odya.support.TEST_PROFILE_CONTENT_BYTE_ARRAY
+import kr.weit.odya.support.TEST_PROFILE_PNG
+import kr.weit.odya.support.TEST_PROFILE_URL
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createInformationRequest
+import kr.weit.odya.support.createNoneProfileColor
+import kr.weit.odya.support.createProfileColor
 import kr.weit.odya.support.createUser
 import kr.weit.odya.support.createUserResponse
 
 class UserServiceTest : DescribeSpec({
     val userRepository = mockk<UserRepository>()
+    val objectStorageService = mockk<ObjectStorageService>()
     val firebaseTokenHelper = mockk<FirebaseTokenHelper>()
-
-    val userService = UserService(userRepository, firebaseTokenHelper)
+    val fileNameGenerator = mockk<FileNameGenerator>()
+    val profileColorService = mockk<ProfileColorService>()
+    val userService =
+        UserService(userRepository, objectStorageService, firebaseTokenHelper, fileNameGenerator, profileColorService)
 
     describe("getInformation") {
         context("가입되어 있는 USER ID가 주어지는 경우") {
-            every { userRepository.getByUserId(TEST_USER_ID) } returns createUser()
+            every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser()
+            every { objectStorageService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
             it("UserResponse를 반환한다") {
                 val userResponse = userService.getInformation(TEST_USER_ID)
                 userResponse shouldBe createUserResponse()
             }
         }
 
+        context("preAuthentication Access Url 생성에 실패한 경우") {
+            every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser()
+            every { objectStorageService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } throws ObjectStorageException(
+                SOMETHING_ERROR_MESSAGE
+            )
+            it("[ObjectStorageException] 반환한다") {
+                shouldThrow<ObjectStorageException> { userService.getInformation(TEST_USER_ID) }
+            }
+        }
+
         context("가입되어 있지 않은 USER ID가 주어지는 경우") {
-            every { userRepository.getByUserId(TEST_USER_ID) } throws NoSuchElementException()
+            every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } throws NoSuchElementException()
             it("[NoSuchElementException] 예외가 발생한다") {
                 shouldThrow<NoSuchElementException> { userService.getInformation(TEST_USER_ID) }
             }
@@ -165,6 +193,127 @@ class UserServiceTest : DescribeSpec({
             every { userRepository.getByUserId(TEST_USER_ID) } throws NoSuchElementException()
             it("[NoSuchElementException] 반환한다") {
                 shouldThrow<NoSuchElementException> { userService.updateInformation(TEST_USER_ID, informationRequest) }
+            }
+        }
+    }
+
+    describe("uploadProfile") {
+        context("유효한 프로필 INPUT STREAM과 ORIGINAL FILE NAME이 주어지는 경우") {
+            every { objectStorageService.save(any(), TEST_DEFAULT_PROFILE_PNG) } just runs
+            every { fileNameGenerator.generate() } returns TEST_DEFAULT_PROFILE_NAME
+            it("정상적으로 종료한다") {
+                shouldNotThrow<Exception> {
+                    userService.uploadProfile(
+                        TEST_PROFILE_CONTENT_BYTE_ARRAY,
+                        TEST_DEFAULT_PROFILE_PNG
+                    )
+                }
+            }
+        }
+
+        context("올바르지 않은 형식의 ORIGINAL FILE NAME이 주어지는 경우") {
+            it("[IllegalArgumentException] 반환한다") {
+                shouldThrow<IllegalArgumentException> {
+                    userService.uploadProfile(TEST_PROFILE_CONTENT_BYTE_ARRAY, TEST_INVALID_PROFILE_ORIGINAL_NAME)
+                }
+            }
+        }
+
+        context("ORIGINAL FILE NAME이 주어지지 않는 경우") {
+            it("[IllegalArgumentException] 반환한다") {
+                shouldThrow<IllegalArgumentException> {
+                    userService.uploadProfile(TEST_PROFILE_CONTENT_BYTE_ARRAY, null)
+                }
+            }
+        }
+
+        context("프로필 업로드에 실패하는 경우") {
+            every { fileNameGenerator.generate() } returns TEST_DEFAULT_PROFILE_NAME
+            every {
+                objectStorageService.save(TEST_PROFILE_CONTENT_BYTE_ARRAY, TEST_DEFAULT_PROFILE_PNG)
+            } throws ObjectStorageException(
+                SOMETHING_ERROR_MESSAGE
+            )
+            it("[ObjectStorageException] 반환한다") {
+                shouldThrow<ObjectStorageException> {
+                    userService.uploadProfile(TEST_PROFILE_CONTENT_BYTE_ARRAY, TEST_DEFAULT_PROFILE_PNG)
+                }
+            }
+        }
+    }
+
+    describe("deleteProfile") {
+        context("유효한 USER ID가 주어지는 경우") {
+            every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser(TEST_PROFILE_PNG)
+            every { objectStorageService.delete(TEST_PROFILE_PNG) } just runs
+            it("정상적으로 종료한다") {
+                shouldNotThrow<Exception> {
+                    userService.deleteProfile(TEST_USER_ID)
+                }
+            }
+        }
+
+        context("사용자의 프로필이 기본 이미지일 경우") {
+            every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser()
+            it("[IllegalArgumentException] 반환한다") {
+                shouldThrow<IllegalArgumentException> {
+                    userService.deleteProfile(TEST_USER_ID)
+                }
+            }
+        }
+
+        context("OBJECT STORAGE에 프로필이 없어 프로필 삭제에 실패하는 경우") {
+            every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser(TEST_PROFILE_PNG)
+            every { objectStorageService.delete(TEST_PROFILE_PNG) } throws IllegalArgumentException(
+                DELETE_NOT_EXIST_PROFILE_ERROR_MESSAGE
+            )
+            it("[IllegalArgumentException] 반환한다") {
+                shouldThrow<IllegalArgumentException> {
+                    userService.deleteProfile(TEST_USER_ID)
+                }
+            }
+        }
+
+        context("프로필 업로드에 실패하는 경우") {
+            every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser(TEST_PROFILE_PNG)
+            every { objectStorageService.delete(TEST_PROFILE_PNG) } throws ObjectStorageException(
+                SOMETHING_ERROR_MESSAGE
+            )
+            it("[ObjectStorageException] 반환한다") {
+                shouldThrow<ObjectStorageException> {
+                    userService.deleteProfile(TEST_USER_ID)
+                }
+            }
+        }
+    }
+
+    describe("updateProfile") {
+        context("유효한 USER ID, PROFILE NAME, ORIGINAL FILE NAME이 주어지는 경우") {
+            every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser()
+            every { profileColorService.getNoneProfileColor() } returns createNoneProfileColor()
+            it("정상적으로 종료한다") {
+                shouldNotThrow<Exception> {
+                    userService.updateProfile(TEST_USER_ID, TEST_PROFILE_PNG, TEST_PROFILE_PNG)
+                }
+            }
+        }
+
+        context("유효한 USER ID와 NULL 값인 PROFILE NAME, ORIGINAL FILE NAME이 주어지는 경우") {
+            every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser()
+            every { profileColorService.getRandomProfileColor() } returns createProfileColor()
+            it("정상적으로 종료한다") {
+                shouldNotThrow<Exception> {
+                    userService.updateProfile(TEST_USER_ID, null, null)
+                }
+            }
+        }
+
+        context("유효하지 않은 USER ID가 주어지는 경우") {
+            every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } throws NoSuchElementException()
+            it("[NoSuchElementException] 반환한다") {
+                shouldThrow<NoSuchElementException> {
+                    userService.updateProfile(TEST_USER_ID, TEST_PROFILE_PNG, TEST_PROFILE_PNG)
+                }
             }
         }
     }
