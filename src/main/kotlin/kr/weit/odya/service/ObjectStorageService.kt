@@ -11,11 +11,13 @@ import com.oracle.bmc.objectstorage.requests.CreatePreauthenticatedRequestReques
 import com.oracle.bmc.objectstorage.requests.DeleteObjectRequest
 import com.oracle.bmc.objectstorage.requests.PutObjectRequest
 import kr.weit.odya.config.properties.ObjectStorageProperties
+import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.io.InputStream
 import java.util.*
 
+@Profile("!test")
 @Service
 class ObjectStorageService(private val properties: ObjectStorageProperties) {
     private val configFile: ConfigFileReader.ConfigFile = ConfigFileReader.parse(properties.configurationFilePath)
@@ -25,8 +27,6 @@ class ObjectStorageService(private val properties: ObjectStorageProperties) {
         .namespaceName(properties.namespaceName)
         .bucketName(properties.bucketName)
         .storageTier(StorageTier.Standard)
-
-
     private val deleteRequestBuilder = DeleteObjectRequest.builder()
         .namespaceName(properties.namespaceName)
         .bucketName(properties.bucketName)

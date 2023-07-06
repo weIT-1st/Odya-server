@@ -2,6 +2,7 @@ package kr.weit.odya.support.test
 
 import kr.weit.odya.config.JpaAuditingConfiguration
 import kr.weit.odya.config.QueryFactoryConfig
+import kr.weit.odya.support.config.TestMockBeanConfig
 import kr.weit.odya.support.config.TestSecurityConfig
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -34,5 +35,6 @@ class BaseTests {
 
     @TestEnvironment
     @SpringBootTest
-    annotation class SpringTestEnvironment
+    @Import(TestMockBeanConfig::class)
+    annotation class IntegrationTest
 }
