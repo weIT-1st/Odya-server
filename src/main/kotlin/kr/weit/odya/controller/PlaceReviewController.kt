@@ -69,9 +69,12 @@ class PlaceReviewController(private val placeReviewService: PlaceReviewService) 
         @PathVariable("id")
         placeId: String,
         @PageableDefault(page = 0, size = 10) pageable: Pageable,
-        @RequestParam(name = "sortType", required = false, defaultValue = "LATEST") sortType: PlaceReviewSortType
+        @RequestParam(name = "sortType", required = false, defaultValue = "LATEST") sortType: PlaceReviewSortType,
+        @Positive(message = "마지막 Id는 양수여야 합니다.")
+        @RequestParam(name = "lastId", required = false)
+        lastId: Long?
     ): ResponseEntity<SliceResponse<PlaceReviewListResponse>> {
-        return ResponseEntity.ok(placeReviewService.getByPlaceReviewList(placeId, pageable, sortType))
+        return ResponseEntity.ok(placeReviewService.getByPlaceReviewList(placeId, pageable, sortType, lastId))
     }
 
     @GetMapping("/users/{id}")
@@ -81,8 +84,11 @@ class PlaceReviewController(private val placeReviewService: PlaceReviewService) 
         @PathVariable("id")
         userId: Long,
         @PageableDefault(page = 0, size = 10) pageable: Pageable,
-        @RequestParam(name = "sortType", required = false, defaultValue = "LATEST") sortType: PlaceReviewSortType
+        @RequestParam(name = "sortType", required = false, defaultValue = "LATEST") sortType: PlaceReviewSortType,
+        @Positive(message = "마지막 Id는 양수여야 합니다.")
+        @RequestParam(name = "lastId", required = false)
+        lastId: Long?
     ): ResponseEntity<SliceResponse<PlaceReviewListResponse>> {
-        return ResponseEntity.ok(placeReviewService.getByUserReviewList(userId, pageable, sortType))
+        return ResponseEntity.ok(placeReviewService.getByUserReviewList(userId, pageable, sortType, lastId))
     }
 }

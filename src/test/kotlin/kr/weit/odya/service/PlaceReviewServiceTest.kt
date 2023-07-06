@@ -14,6 +14,7 @@ import kr.weit.odya.domain.placeReview.getByPlaceReviewId
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.support.TEST_EXIST_PLACE_REVIEW_ID
+import kr.weit.odya.support.TEST_LAST_ID
 import kr.weit.odya.support.TEST_PAGEABLE
 import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_PLACE_REVIEW_ID
@@ -107,9 +108,9 @@ class PlaceReviewServiceTest : DescribeSpec(
 
         describe("getByPlaceReviewList 메소드") {
             context("유효한 placeId가 전달되면") {
-                every { placeReviewRepository.findSliceByPlaceIdOrderBySortType(TEST_PLACE_ID, TEST_PAGEABLE, TEST_PLACE_SORT_TYPE) } returns listOf(createPlaceReview())
+                every { placeReviewRepository.findSliceByPlaceIdOrderBySortType(TEST_PLACE_ID, TEST_PAGEABLE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) } returns listOf(createPlaceReview())
                 it("리뷰를 조회한다.") {
-                    sut.getByPlaceReviewList(TEST_PLACE_ID, TEST_PAGEABLE, TEST_PLACE_SORT_TYPE) shouldBe creatSlicePlaceReviewResponse()
+                    sut.getByPlaceReviewList(TEST_PLACE_ID, TEST_PAGEABLE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) shouldBe creatSlicePlaceReviewResponse()
                 }
             }
         }
@@ -117,16 +118,16 @@ class PlaceReviewServiceTest : DescribeSpec(
         describe("getByUserReviewList 메소드") {
             context("유효한 userId가 전달되면") {
                 every { userRepository.getByUserId(TEST_USER_ID) } returns createUser()
-                every { placeReviewRepository.findSliceByUserOrderBySortType(any(), TEST_PAGEABLE, TEST_PLACE_SORT_TYPE) } returns listOf(createPlaceReview())
+                every { placeReviewRepository.findSliceByUserOrderBySortType(any(), TEST_PAGEABLE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) } returns listOf(createPlaceReview())
                 it("리뷰를 조회한다.") {
-                    sut.getByUserReviewList(TEST_USER_ID, TEST_PAGEABLE, TEST_PLACE_SORT_TYPE) shouldBe creatSlicePlaceReviewResponse()
+                    sut.getByUserReviewList(TEST_USER_ID, TEST_PAGEABLE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) shouldBe creatSlicePlaceReviewResponse()
                 }
             }
 
             context("존재하지 않는 userId가 전달되면") {
                 every { userRepository.getByUserId(TEST_USER_ID) } throws NoSuchElementException()
                 it("[NoSuchElementException] 예외가 발생한다") {
-                    shouldThrow<NoSuchElementException> { sut.getByUserReviewList(TEST_USER_ID, TEST_PAGEABLE, TEST_PLACE_SORT_TYPE) }
+                    shouldThrow<NoSuchElementException> { sut.getByUserReviewList(TEST_USER_ID, TEST_PAGEABLE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) }
                 }
             }
         }
