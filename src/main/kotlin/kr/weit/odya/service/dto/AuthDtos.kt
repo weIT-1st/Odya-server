@@ -14,12 +14,12 @@ import java.time.LocalDate
 
 data class AppleLoginRequest(
     @field:NotBlank
-    val idToken: String
+    val idToken: String,
 )
 
 data class KakaoLoginRequest(
     @field:NotBlank
-    val accessToken: String
+    val accessToken: String,
 )
 
 data class KakaoRegistrationResponse(
@@ -27,14 +27,14 @@ data class KakaoRegistrationResponse(
     val email: String?,
     val phoneNumber: String?,
     val nickname: String,
-    val gender: Gender?
+    val gender: Gender?,
 ) {
     constructor(kakaoUserInfo: KakaoUserInfo) : this(
         username = kakaoUserInfo.username,
         email = kakaoUserInfo.email,
         phoneNumber = kakaoUserInfo.phoneNumber,
         nickname = kakaoUserInfo.nickname,
-        gender = kakaoUserInfo.gender
+        gender = kakaoUserInfo.gender,
     )
 }
 
@@ -55,7 +55,7 @@ data class AppleRegisterRequest(
     override var gender: Gender,
 
     @field:Past
-    override var birthday: LocalDate
+    override var birthday: LocalDate,
 ) : RegisterRequest() {
     @JsonIgnore
     override var username: String = ""
@@ -84,7 +84,7 @@ data class KakaoRegisterRequest(
     override var gender: Gender,
 
     @field:Past
-    override var birthday: LocalDate
+    override var birthday: LocalDate,
 ) : RegisterRequest() {
     @JsonIgnore
     override var socialType: SocialType = SocialType.KAKAO
@@ -106,5 +106,5 @@ open class RegisterRequest {
 }
 
 data class TokenResponse(
-    val firebaseCustomToken: String
+    val firebaseCustomToken: String,
 )

@@ -13,7 +13,7 @@ data class UserResponse(
     val phoneNumber: String?,
     val gender: Gender,
     val birthday: LocalDate,
-    val socialType: SocialType
+    val socialType: SocialType,
 ) {
     constructor(user: User) : this(
         user.id,
@@ -22,11 +22,11 @@ data class UserResponse(
         user.phoneNumber,
         user.gender,
         user.birthday,
-        user.socialType
+        user.socialType,
     )
 }
 
 data class InformationRequest(
     @field:Nickname
-    val nickname: String
+    val nickname: String,
 )

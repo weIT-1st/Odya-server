@@ -20,7 +20,7 @@ private const val OAUTH_ACCESS_TOKEN_TYPE = "BEARER"
 class AuthenticationService(
     private val userRepository: UserRepository,
     private val firebaseTokenHelper: FirebaseTokenHelper,
-    private val kakaoClient: KakaoClient
+    private val kakaoClient: KakaoClient,
 ) {
     fun appleLoginProcess(appleUsername: String) {
         if (!userRepository.existsByUsername(appleUsername)) {
@@ -84,7 +84,7 @@ class AuthenticationService(
     }
 
     private fun createUser(
-        registerRequest: RegisterRequest
+        registerRequest: RegisterRequest,
     ) = User(
         username = registerRequest.username,
         email = registerRequest.email?.trim(),
@@ -92,6 +92,6 @@ class AuthenticationService(
         phoneNumber = registerRequest.phoneNumber?.trim(),
         gender = registerRequest.gender,
         birthday = registerRequest.birthday,
-        socialType = registerRequest.socialType
+        socialType = registerRequest.socialType,
     )
 }

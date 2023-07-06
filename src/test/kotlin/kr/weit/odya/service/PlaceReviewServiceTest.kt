@@ -67,12 +67,19 @@ class PlaceReviewServiceTest : DescribeSpec(
             context("존재하지 않는 장소리뷰ID인 경우") {
                 every { placeReviewRepository.getByPlaceReviewId(TEST_EXIST_PLACE_REVIEW_ID) } throws NoSuchElementException()
                 it("[NoSuchElementException] 예외가 발생한다") {
-                    shouldThrow<NoSuchElementException> { sut.updateReview(updatePlaceReviewRequest().copy(id = TEST_EXIST_PLACE_REVIEW_ID), TEST_USER_ID) }
+                    shouldThrow<NoSuchElementException> {
+                        sut.updateReview(
+                            updatePlaceReviewRequest().copy(id = TEST_EXIST_PLACE_REVIEW_ID),
+                            TEST_USER_ID,
+                        )
+                    }
                 }
             }
 
             context("수정할 권한이 없는 경우") {
-                every { placeReviewRepository.getByPlaceReviewId(TEST_PLACE_REVIEW_ID) } returns createPlaceReview(createOtherUser())
+                every { placeReviewRepository.getByPlaceReviewId(TEST_PLACE_REVIEW_ID) } returns createPlaceReview(
+                    createOtherUser(),
+                )
                 it("[ForbiddenException] 예외가 발생한다") {
                     shouldThrow<ForbiddenException> { sut.updateReview(updatePlaceReviewRequest(), TEST_USER_ID) }
                 }
@@ -96,7 +103,9 @@ class PlaceReviewServiceTest : DescribeSpec(
             }
 
             context("삭제할 권한이 없는 경우") {
-                every { placeReviewRepository.getByPlaceReviewId(TEST_PLACE_REVIEW_ID) } returns createPlaceReview(createOtherUser())
+                every { placeReviewRepository.getByPlaceReviewId(TEST_PLACE_REVIEW_ID) } returns createPlaceReview(
+                    createOtherUser(),
+                )
                 it("[ForbiddenException] 예외가 발생한다") {
                     shouldThrow<ForbiddenException> { sut.deleteReview(TEST_PLACE_REVIEW_ID, TEST_USER_ID) }
                 }
@@ -128,5 +137,5 @@ class PlaceReviewServiceTest : DescribeSpec(
                 }
             }
         }
-    }
+    },
 )

@@ -41,7 +41,7 @@ class User(
     @Column
     val withdrawDate: LocalDateTime? = null,
 
-    userInformation: UserInformation
+    userInformation: UserInformation,
 ) : BaseTimeEntity() {
     @Embedded
     var information: UserInformation = userInformation
@@ -57,14 +57,14 @@ class User(
         birthday: LocalDate,
         profileName: String = "default_profile.png",
         socialType: SocialType,
-        userRole: UserRole = UserRole.ROLE_USER
+        userRole: UserRole = UserRole.ROLE_USER,
     ) : this(
         id = id,
         username = username,
         socialType = socialType,
         withdrawDate = null,
         userRole = userRole,
-        userInformation = UserInformation(email, nickname, phoneNumber, gender, birthday, profileName)
+        userInformation = UserInformation(email, nickname, phoneNumber, gender, birthday, profileName),
     )
 
     val email: String?

@@ -18,7 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 class SecurityConfig(
     private val userDetailsService: UserDetailsService,
     private val firebaseTokenHelper: FirebaseTokenHelper,
-    private val customAuthenticationEntryPoint: CustomAuthenticationEntryPoint
+    private val customAuthenticationEntryPoint: CustomAuthenticationEntryPoint,
 ) {
     @Bean
     fun springSecurity(http: HttpSecurity): SecurityFilterChain = http
@@ -34,7 +34,7 @@ class SecurityConfig(
         }
         .addFilterBefore(
             FirebaseTokenFilter(userDetailsService, firebaseTokenHelper),
-            UsernamePasswordAuthenticationFilter::class.java
+            UsernamePasswordAuthenticationFilter::class.java,
         )
         .exceptionHandling {
             it.authenticationEntryPoint(customAuthenticationEntryPoint)

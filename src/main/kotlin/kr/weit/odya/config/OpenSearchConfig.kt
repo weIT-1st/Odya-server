@@ -25,14 +25,14 @@ class OpenSearchConfig(private val properties: OpenSearchProperties) : AbstractO
 
         credentialsProvider.setCredentials(
             AuthScope.ANY,
-            UsernamePasswordCredentials(properties.username, properties.password)
+            UsernamePasswordCredentials(properties.username, properties.password),
         )
         val builder: RestClientBuilder = RestClient.builder(
             HttpHost(
                 properties.serverUrl,
                 443,
-                "https"
-            )
+                "https",
+            ),
         ).setHttpClientConfigCallback { httpClientBuilder ->
             httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider)
         }
