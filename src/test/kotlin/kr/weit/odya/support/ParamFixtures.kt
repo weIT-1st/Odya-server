@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest
 const val PAGE_PARAM = "page"
 const val SIZE_PARAM = "size"
 const val SORT_TYPE_PARAM = "sortType"
+const val LAST_ID_PARAM = "lastId"
 const val TEST_DEFAULT_PAGE = 0
 const val TEST_DEFAULT_SIZE = 10
 const val TEST_PAGE: Int = 1

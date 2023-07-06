@@ -56,15 +56,15 @@ class PlaceReviewService(
         }
     }
 
-    fun getByPlaceReviewList(placeId: String, pageable: Pageable, sortType: PlaceReviewSortType): SliceResponse<PlaceReviewListResponse> {
-        val placeReviews = placeReviewRepository.getPlaceReviewListByPlaceId(placeId, pageable, sortType).map { PlaceReviewListResponse(it) }
+    fun getByPlaceReviewList(placeId: String, pageable: Pageable, sortType: PlaceReviewSortType, lastId: Long?): SliceResponse<PlaceReviewListResponse> {
+        val placeReviews = placeReviewRepository.getPlaceReviewListByPlaceId(placeId, pageable, sortType, lastId).map { PlaceReviewListResponse(it) }
         return SliceResponse(pageable, placeReviews)
     }
 
     @Transactional
-    fun getByUserReviewList(userId: Long, pageable: Pageable, sortType: PlaceReviewSortType): SliceResponse<PlaceReviewListResponse> {
+    fun getByUserReviewList(userId: Long, pageable: Pageable, sortType: PlaceReviewSortType, lastId: Long?): SliceResponse<PlaceReviewListResponse> {
         val user: User = userRepository.getByUserId(userId)
-        val placeReviews = placeReviewRepository.getPlaceReviewListByUser(user, pageable, sortType).map { PlaceReviewListResponse(it) }
+        val placeReviews = placeReviewRepository.getPlaceReviewListByUser(user, pageable, sortType, lastId).map { PlaceReviewListResponse(it) }
         return SliceResponse(pageable, placeReviews)
     }
 }

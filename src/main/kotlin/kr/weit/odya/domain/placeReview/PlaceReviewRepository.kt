@@ -3,6 +3,7 @@ package kr.weit.odya.domain.placeReview
 import com.linecorp.kotlinjdsl.QueryFactory
 import com.linecorp.kotlinjdsl.listQuery
 import com.linecorp.kotlinjdsl.query.spec.OrderSpec
+import com.linecorp.kotlinjdsl.query.spec.predicate.PredicateSpec
 import com.linecorp.kotlinjdsl.querydsl.CriteriaQueryDsl
 import com.linecorp.kotlinjdsl.querydsl.expression.col
 import kr.weit.odya.domain.user.User
@@ -17,16 +18,18 @@ fun PlaceReviewRepository.getByPlaceReviewId(id: Long): PlaceReview =
 fun PlaceReviewRepository.getPlaceReviewListByPlaceId(
     placeId: String,
     pageable: Pageable,
-    sortType: PlaceReviewSortType
+    sortType: PlaceReviewSortType,
+    lastId: Long?
 ): List<PlaceReview> =
-    findSliceByPlaceIdOrderBySortType(placeId, pageable, sortType)
+    findSliceByPlaceIdOrderBySortType(placeId, pageable, sortType, lastId)
 
 fun PlaceReviewRepository.getPlaceReviewListByUser(
     user: User,
     pageable: Pageable,
-    sortType: PlaceReviewSortType
+    sortType: PlaceReviewSortType,
+    lastId: Long?
 ): List<PlaceReview> =
-    findSliceByUserOrderBySortType(user, pageable, sortType)
+    findSliceByUserOrderBySortType(user, pageable, sortType, lastId)
 
 @Repository
 interface PlaceReviewRepository : JpaRepository<PlaceReview, Long>, CustomPlaceReviewRepository {
@@ -37,13 +40,15 @@ interface CustomPlaceReviewRepository {
     fun findSliceByPlaceIdOrderBySortType(
         placeId: String,
         pageable: Pageable,
-        sortType: PlaceReviewSortType
+        sortType: PlaceReviewSortType,
+        lastId: Long?
     ): List<PlaceReview>
 
     fun findSliceByUserOrderBySortType(
         user: User,
         pageable: Pageable,
-        sortType: PlaceReviewSortType
+        sortType: PlaceReviewSortType,
+        lastId: Long?
     ): List<PlaceReview>
 }
 
@@ -51,27 +56,43 @@ class PlaceReviewRepositoryImpl(private val queryFactory: QueryFactory) : Custom
     override fun findSliceByPlaceIdOrderBySortType(
         placeId: String,
         pageable: Pageable,
-        sortType: PlaceReviewSortType
+        sortType: PlaceReviewSortType,
+        lastId: Long?
     ): List<PlaceReview> = queryFactory.listQuery {
         select(entity(PlaceReview::class))
         from(entity(PlaceReview::class))
+        where(dynamicPredicatePlaceReviewSortType(sortType, lastId))
         where(col(PlaceReview::placeId).equal(placeId))
         orderBy(dynamicOrderingByPlaceReviewSortType(sortType))
-        offset(pageable.offset.toInt())
         limit(pageable.pageSize + 1)
     }
 
     override fun findSliceByUserOrderBySortType(
         user: User,
         pageable: Pageable,
-        sortType: PlaceReviewSortType
+        sortType: PlaceReviewSortType,
+        lastId: Long?
     ): List<PlaceReview> = queryFactory.listQuery {
         select(entity(PlaceReview::class))
         from(entity(PlaceReview::class))
+        where(dynamicPredicatePlaceReviewSortType(sortType, lastId))
         where(col(PlaceReview::user).equal(user))
         orderBy(dynamicOrderingByPlaceReviewSortType(sortType))
-        offset(pageable.offset.toInt())
         limit(pageable.pageSize + 1)
+    }
+
+    private fun <T> CriteriaQueryDsl<T>.dynamicPredicatePlaceReviewSortType(
+        sortType: PlaceReviewSortType,
+        lastId: Long?
+    ): PredicateSpec {
+        return if (lastId != null) {
+            when (sortType) {
+                PlaceReviewSortType.LATEST -> col(PlaceReview::id).lessThan(lastId)
+                PlaceReviewSortType.OLDEST -> col(PlaceReview::id).greaterThan(lastId)
+            }
+        } else {
+            col(PlaceReview::id).isNotNull()
+        }
     }
 
     private fun <T> CriteriaQueryDsl<T>.dynamicOrderingByPlaceReviewSortType(

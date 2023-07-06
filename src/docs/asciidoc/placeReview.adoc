@@ -113,11 +113,15 @@ operation::place-review-controller-test/placeReview-delete-invalid-token[snippet
 
 operation::place-review-controller-test/placeReview-placeId-get-list-success[snippets='http-request,path-Parameters,request-Headers,query-parameters,response-body,http-response']
 
-=== *4-2 실패 - 가입되지 않은 유저*
+=== *4-2 실패 - 유효한 토큰이지만 음수인 마지막 ID*
+
+operation::place-review-controller-test/placeReview-placeId-get-fail-invalid-lastId[snippets='http-request,path-Parameters,request-Headers,query-parameters,response-body,http-response']
+
+=== *4-3 실패 - 가입되지 않은 유저*
 
 operation::place-review-controller-test/placeReview-placeId-get-fail-not-registered-user[snippets='http-request,path-Parameters,request-Headers,query-parameters,response-body,http-response']
 
-=== *4-3 실패 - 유효하지 않은 토큰*
+=== *4-4 실패 - 유효하지 않은 토큰*
 
 operation::place-review-controller-test/placeReview-placeId-get-fail-invalid-token[snippets='http-request,path-Parameters,request-headers,query-parameters,response-body,http-response']
 
@@ -132,14 +136,18 @@ operation::place-review-controller-test/placeReview-userId-get-list-success[snip
 
 operation::place-review-controller-test/placeReview-userId-get-fail-negative-id[snippets='http-request,path-Parameters,request-Headers,query-parameters,response-body,http-response']
 
-=== *5-3 실패 - 가입되지 않은 유저*
+=== *5-3 실패 - 유효한 토큰이지만 음수인 마지막 ID*
+
+operation::place-review-controller-test/placeReview-userId-get-fail-invalid-lastId[snippets='http-request,path-Parameters,request-Headers,query-parameters,response-body,http-response']
+
+=== *5-4 실패 - 가입되지 않은 유저*
 
 operation::place-review-controller-test/placeReview-userId-get-fail-not-registered-user[snippets='http-request,path-Parameters,request-Headers,query-parameters,response-body,http-response']
 
-=== *5-4 실패 - 유효한 토큰이지만 가입되어 있지 않은 USER ID로 조회*
+=== *5-5 실패 - 유효한 토큰이지만 가입되어 있지 않은 USER ID로 조회*
 
 operation::place-review-controller-test/placeReview-userId-get-fail-lookup-not-registered-id[snippets='http-request,path-Parameters,request-headers,query-parameters,response-body,http-response']
 
-=== *5-5 실패 - 유효하지 않은 토큰*
+=== *5-6 실패 - 유효하지 않은 토큰*
 
 operation::place-review-controller-test/placeReview-userId-get-fail-invalid-token[snippets='http-request,path-Parameters,request-headers,query-parameters,response-body,http-response']
