@@ -27,9 +27,11 @@ data class FollowUserResponse(
         user.nickname,
         FollowProfileResponse(
             profileUrl,
-            if (user.profile.profileColor.colorHex != NONE_PROFILE_COLOR_HEX)
+            if (user.profile.profileColor.colorHex != NONE_PROFILE_COLOR_HEX) {
                 FollowProfileResponse.ProfileColorResponse(user.profile.profileColor)
-            else null
+            } else {
+                null
+            }
         )
     )
 }

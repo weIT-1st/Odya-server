@@ -28,9 +28,11 @@ data class UserResponse(
         user.socialType,
         UserProfileResponse(
             profileUrl,
-            if (user.profile.profileColor.colorHex != NONE_PROFILE_COLOR_HEX)
+            if (user.profile.profileColor.colorHex != NONE_PROFILE_COLOR_HEX) {
                 UserProfileResponse.ProfileColorResponse(user.profile.profileColor)
-            else null
+            } else {
+                null
+            }
         )
     )
 }

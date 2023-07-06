@@ -1,10 +1,2 @@
 object:
   configuration-file-path: ${OBJECT_STORAGE_CONFIG_FILE_PATH}
-
----
-spring.config.activate.on-profile: test
-object:
-  namespaceName: testNamespace
-  bucketName: testBucket
-  preAuthenticatedRequestExpiredSec: 100
-  objectGetUrl: testObjectGetUrl

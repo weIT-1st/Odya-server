@@ -84,9 +84,7 @@ class UserService(
             this.changeProfile(
                 profileName ?: DEFAULT_PROFILE_PNG,
                 originalFileName ?: DEFAULT_PROFILE_PNG,
-                if (profileName == null)
-                    profileColorService.getRandomProfileColor()
-                else profileColorService.getNoneProfileColor()
+                getProfileColor(profileName)
             )
         }
     }
@@ -106,5 +104,11 @@ class UserService(
                 }
             }
         }
+    }
+
+    private fun getProfileColor(profileName: String?) = if (profileName == null) {
+        profileColorService.getRandomProfileColor()
+    } else {
+        profileColorService.getNoneProfileColor()
     }
 }

@@ -111,7 +111,6 @@ infix fun String.requestPartDescription(value: String): RequestPartDescriptor {
     return RequestDocumentation.partWithName(this).description(value)
 }
 
-
 infix fun ParameterDescriptor.example(value: Any): ParameterDescriptor {
     return this.attributes(field(EXAMPLE, if (value is String) value else value.toString()))
 }
