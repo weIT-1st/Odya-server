@@ -59,7 +59,7 @@ fun createOtherUser(): User = User(
     gender = TEST_GENDER,
     birthday = TEST_BIRTHDAY,
     socialType = TEST_SOCIAL_TYPE,
-    profile = createProfile(TEST_PROFILE_ID),
+    profile = createProfile(TEST_PROFILE_ID)
 )
 
 fun createUserResponse(): UserResponse = UserResponse(createUser(), TEST_PROFILE_URL)

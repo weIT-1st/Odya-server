@@ -65,7 +65,7 @@ class UserController(
         @LoginUserId userId: Long
     ): ResponseEntity<Void> {
         val profileName: String? = if (multipartFile != null) {
-            userService.uploadProfile(multipartFile.inputStream, multipartFile?.originalFilename)
+            userService.uploadProfile(multipartFile.inputStream, multipartFile.originalFilename)
         } else {
             userService.deleteProfile(userId)
             null
