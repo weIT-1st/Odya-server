@@ -46,7 +46,7 @@ data class PlaceReviewUpdateRequest(
     val review: String?
 )
 
-data class PlaceReviewViewed(
+data class PlaceReviewListResponse(
     val id: Long,
     val placeId: String,
     val userId: Long,
@@ -63,9 +63,3 @@ data class PlaceReviewViewed(
         placeReview.review
     )
 }
-
-data class PlaceReviewListResponse(
-    val reviews: List<PlaceReviewViewed>,
-    val lastId: Long,
-    val isLast: Boolean
-)

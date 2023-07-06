@@ -3,20 +3,18 @@ package kr.weit.odya.service
 import jakarta.ws.rs.ForbiddenException
 import kr.weit.odya.domain.placeReview.PlaceReview
 import kr.weit.odya.domain.placeReview.PlaceReviewRepository
+import kr.weit.odya.domain.placeReview.PlaceReviewSortType
 import kr.weit.odya.domain.placeReview.getByPlaceReviewId
-import kr.weit.odya.domain.placeReview.getListByPlaceIdInitial
-import kr.weit.odya.domain.placeReview.getListByPlaceIdStartId
-import kr.weit.odya.domain.placeReview.getListByUserInitial
-import kr.weit.odya.domain.placeReview.getListByUserStartId
+import kr.weit.odya.domain.placeReview.getPlaceReviewListByPlaceId
+import kr.weit.odya.domain.placeReview.getPlaceReviewListByUser
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.service.dto.PlaceReviewCreateRequest
 import kr.weit.odya.service.dto.PlaceReviewListResponse
 import kr.weit.odya.service.dto.PlaceReviewUpdateRequest
-import kr.weit.odya.service.dto.PlaceReviewViewed
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
+import kr.weit.odya.service.dto.SliceResponse
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -58,23 +56,15 @@ class PlaceReviewService(
         }
     }
 
-    fun getByPlaceReviewList(placeId: String, startId: Long?, count: Int): PlaceReviewListResponse {
-        val placeReviews = if (startId == null) {
-            placeReviewRepository.getListByPlaceIdInitial(placeId, PageRequest.of(0, count, Sort.by("id").descending()))
-        } else {
-            placeReviewRepository.getListByPlaceIdStartId(placeId, startId, PageRequest.of(0, count, Sort.by("id").descending()))
-        }
-        return PlaceReviewListResponse(placeReviews.content.map { PlaceReviewViewed(it) }, placeReviews.last().id, placeReviews.isLast)
+    fun getByPlaceReviewList(placeId: String, pageable: Pageable, sortType: PlaceReviewSortType): SliceResponse<PlaceReviewListResponse> {
+        val placeReviews = placeReviewRepository.getPlaceReviewListByPlaceId(placeId, pageable, sortType).map { PlaceReviewListResponse(it) }
+        return SliceResponse(pageable, placeReviews)
     }
 
     @Transactional
-    fun getByUserReviewList(userId: Long, startId: Long?, count: Int): PlaceReviewListResponse {
+    fun getByUserReviewList(userId: Long, pageable: Pageable, sortType: PlaceReviewSortType): SliceResponse<PlaceReviewListResponse> {
         val user: User = userRepository.getByUserId(userId)
-        val placeReviews = if (startId == null) {
-            placeReviewRepository.getListByUserInitial(user, PageRequest.of(0, count, Sort.by("id").descending()))
-        } else {
-            placeReviewRepository.getListByUserStartId(user, startId, PageRequest.of(0, count, Sort.by("id").descending()))
-        }
-        return PlaceReviewListResponse(placeReviews.content.map { PlaceReviewViewed(it) }, placeReviews.last().id, placeReviews.isLast)
+        val placeReviews = placeReviewRepository.getPlaceReviewListByUser(user, pageable, sortType).map { PlaceReviewListResponse(it) }
+        return SliceResponse(pageable, placeReviews)
     }
 }

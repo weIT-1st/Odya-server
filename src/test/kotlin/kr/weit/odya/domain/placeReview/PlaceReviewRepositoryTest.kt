@@ -6,12 +6,11 @@ import io.kotest.extensions.spring.SpringTestLifecycleMode
 import io.kotest.matchers.shouldBe
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
+import kr.weit.odya.support.TEST_DEFAULT_PAGEABLE
 import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_PLACE_REVIEW_ID
-import kr.weit.odya.support.TEST_START_ID
-import kr.weit.odya.support.TEST_USER_ID
+import kr.weit.odya.support.TEST_PLACE_SORT_TYPE
 import kr.weit.odya.support.createPlaceReview
-import kr.weit.odya.support.createPlaceReviewPage
 import kr.weit.odya.support.createUser
 import kr.weit.odya.support.test.BaseTests.RepositoryTest
 
@@ -35,23 +34,13 @@ class PlaceReviewRepositoryTest(
         }
 
         expect("PLACE_ID와 일치하는 장소 리뷰를 조회한다") {
-            val result = placeReviewRepository.getListByPlaceIdInitial(TEST_PLACE_ID, createPlaceReviewPage())
-            result.content[0].placeId shouldBe TEST_PLACE_ID
-        }
-
-        expect("PLACE_ID와 일치하는 시작 ID 이하의 장소 리뷰를 조회한다") {
-            val result = placeReviewRepository.getListByPlaceIdStartId(TEST_PLACE_ID, TEST_START_ID, createPlaceReviewPage())
-            result.content[0].placeId shouldBe TEST_PLACE_ID
+            val result = placeReviewRepository.getPlaceReviewListByPlaceId(TEST_PLACE_ID, TEST_DEFAULT_PAGEABLE, TEST_PLACE_SORT_TYPE)
+            result.first().placeId shouldBe TEST_PLACE_ID
         }
 
         expect("USER와 일치하는 장소 리뷰를 조회한다") {
-            val result = placeReviewRepository.getListByUserInitial(createUser(), createPlaceReviewPage())
-            result.content[0].writerId shouldBe TEST_USER_ID
-        }
-
-        expect("USER와 일치하는 시작 ID 이하의 장소 리뷰를 조회한다") {
-            val result = placeReviewRepository.getListByUserStartId(createUser(), TEST_START_ID, createPlaceReviewPage())
-            result.content[0].writerId shouldBe TEST_USER_ID
+            val result = placeReviewRepository.getPlaceReviewListByUser(user, TEST_DEFAULT_PAGEABLE, TEST_PLACE_SORT_TYPE)
+            result.first().writerId shouldBe user.id
         }
     }
 

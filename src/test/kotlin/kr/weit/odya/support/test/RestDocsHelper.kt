@@ -106,8 +106,13 @@ infix fun String.parameterDescription(value: String): ParameterDescriptor {
     return RequestDocumentation.parameterWithName(this).description(value)
 }
 
-infix fun ParameterDescriptor.example(value: Any): ParameterDescriptor {
-    return this.attributes(field(EXAMPLE, if (value is String) value else value.toString()))
+infix fun ParameterDescriptor.example(value: Any?): ParameterDescriptor {
+    return this.attributes(field(EXAMPLE, if (value is String) value else value?.toString()))
+}
+
+infix fun ParameterDescriptor.isOptional(value: Boolean): ParameterDescriptor {
+    if (value) this.optional()
+    return this
 }
 
 infix fun ParameterDescriptor.isOptional(value: Boolean): ParameterDescriptor {
