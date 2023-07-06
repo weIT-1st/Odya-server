@@ -74,7 +74,7 @@ class PlaceReviewController(private val placeReviewService: PlaceReviewService) 
         return ResponseEntity.ok(placeReviewService.getByPlaceReviewList(placeId, pageable, sortType))
     }
 
-    @GetMapping("/user/{id}")
+    @GetMapping("/users/{id}")
     fun getByUserReviewList(
         @NotNull(message = "유저 ID는 필수 입력값입니다.")
         @Positive(message = "유저 ID는 양수여야 합니다.")
