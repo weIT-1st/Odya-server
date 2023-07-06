@@ -47,7 +47,7 @@ fun createUser(profileName: String = TEST_DEFAULT_PROFILE_PNG): User = User(
     gender = TEST_GENDER,
     birthday = TEST_BIRTHDAY,
     socialType = TEST_SOCIAL_TYPE,
-    profile = createProfile(TEST_PROFILE_ID, profileName)
+    profile = createProfile(TEST_PROFILE_ID, profileName),
 )
 
 fun createOtherUser(): User = User(
@@ -59,7 +59,7 @@ fun createOtherUser(): User = User(
     gender = TEST_GENDER,
     birthday = TEST_BIRTHDAY,
     socialType = TEST_SOCIAL_TYPE,
-    profile = createProfile(TEST_PROFILE_ID)
+    profile = createProfile(TEST_PROFILE_ID),
 )
 
 fun createUserResponse(): UserResponse = UserResponse(createUser(), TEST_PROFILE_URL)
@@ -69,7 +69,7 @@ fun createInformationRequest(): InformationRequest = InformationRequest(TEST_NIC
 fun createProfile(profileId: Long = 0L, profileName: String = TEST_DEFAULT_PROFILE_PNG): Profile = Profile(
     id = profileId,
     profileName = profileName,
-    profileColor = createProfileColor(TEST_PROFILE_COLOR_ID)
+    profileColor = createProfileColor(TEST_PROFILE_COLOR_ID),
 )
 
 fun createMockProfile(
@@ -81,6 +81,6 @@ fun createMockProfile(
         name,
         originalFileName,
         contentType,
-        TEST_PROFILE_CONTENT_BYTE_ARRAY
+        TEST_PROFILE_CONTENT_BYTE_ARRAY,
     )
 }

@@ -32,8 +32,8 @@ data class UserResponse(
                 UserProfileResponse.ProfileColorResponse(user.profile.profileColor)
             } else {
                 null
-            }
-        )
+            },
+        ),
     )
 }
 
@@ -56,7 +56,7 @@ data class UserProfileResponse(
             profileColor.colorHex,
             profileColor.red,
             profileColor.green,
-            profileColor.blue
+            profileColor.blue,
         )
     }
 }

@@ -55,7 +55,7 @@ class FirebaseTokenFilter(
         response.contentType = MediaType.APPLICATION_JSON_VALUE
         jacksonObjectMapper().writeValue(
             response.outputStream,
-            TokenInvalidErrorResponse(ex.message ?: TOKEN_INVALID_ERROR_MESSAGE)
+            TokenInvalidErrorResponse(ex.message ?: TOKEN_INVALID_ERROR_MESSAGE),
         )
     }
 

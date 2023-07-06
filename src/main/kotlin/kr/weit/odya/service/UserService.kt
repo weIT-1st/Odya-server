@@ -84,7 +84,7 @@ class UserService(
             this.changeProfile(
                 profileName ?: DEFAULT_PROFILE_PNG,
                 originalFileName ?: DEFAULT_PROFILE_PNG,
-                getProfileColor(profileName)
+                getProfileColor(profileName),
             )
         }
     }

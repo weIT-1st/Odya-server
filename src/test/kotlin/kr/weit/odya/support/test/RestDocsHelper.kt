@@ -44,7 +44,7 @@ class RestDocsHelper {
                 MockMvcRestDocumentation.documentationConfiguration(restDocumentationContextProvider)
                     .operationPreprocessors()
                     .withRequestDefaults(Preprocessors.prettyPrint())
-                    .withResponseDefaults(Preprocessors.prettyPrint())
+                    .withResponseDefaults(Preprocessors.prettyPrint()),
             )
             .build()
 

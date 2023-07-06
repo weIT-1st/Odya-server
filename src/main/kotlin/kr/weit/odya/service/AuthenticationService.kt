@@ -98,6 +98,6 @@ class AuthenticationService(
         gender = registerRequest.gender,
         birthday = registerRequest.birthday,
         socialType = registerRequest.socialType,
-        profile = Profile(profileColor = randomProfileColor)
+        profile = Profile(profileColor = randomProfileColor),
     )
 }

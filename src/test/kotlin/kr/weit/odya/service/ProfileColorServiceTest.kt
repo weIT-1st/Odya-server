@@ -41,7 +41,7 @@ class ProfileColorServiceTest : DescribeSpec({
     describe("getNoneProfileColor") {
         context("NONE 프로필 색상이 정상적으로 존재할 경우") {
             every { profileColorRepository.getProfileColorById(TEST_PROFILE_COLOR_ID) } returns createProfileColor(
-                TEST_PROFILE_COLOR_ID
+                TEST_PROFILE_COLOR_ID,
             )
             it("NONE 프로필 색상이 반환된다") {
                 val result = profileColorService.getNoneProfileColor()
@@ -51,11 +51,11 @@ class ProfileColorServiceTest : DescribeSpec({
 
         context("NONE 프로필 색상이 존재하지 않을 경우") {
             every { profileColorRepository.getProfileColorById(TEST_PROFILE_COLOR_ID) } throws NotFoundDefaultResourceException(
-                NOT_EXIST_NONE_PROFILE_COLOR_ERROR_MESSAGE
+                NOT_EXIST_NONE_PROFILE_COLOR_ERROR_MESSAGE,
             )
             it("[NotFoundDefaultResourceException] 반환한다") {
                 shouldThrow<NotFoundDefaultResourceException> { profileColorService.getNoneProfileColor() }
             }
         }
     }
-})
+},)

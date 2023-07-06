@@ -15,7 +15,7 @@ const val NONE_PROFILE_COLOR_HEX = "NONE"
     name = "PROFILE_COLOR_SEQ_GENERATOR",
     sequenceName = "PROFILE_COLOR_SEQ",
     initialValue = 1,
-    allocationSize = 1
+    allocationSize = 1,
 )
 class ProfileColor(
     @Id

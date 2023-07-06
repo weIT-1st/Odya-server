@@ -28,7 +28,7 @@ data class PlaceReviewCreateRequest(
         user = user,
         starRating = rating,
         review = review,
-        id = 0L
+        id = 0L,
     )
 }
 
@@ -60,6 +60,6 @@ data class PlaceReviewListResponse(
         placeReview.writerId,
         placeReview.writerNickname,
         placeReview.starRating,
-        placeReview.review
+        placeReview.review,
     )
 }

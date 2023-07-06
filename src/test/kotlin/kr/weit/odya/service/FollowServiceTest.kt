@@ -78,7 +78,7 @@ class FollowServiceTest : DescribeSpec({
                 followRepository.getFollowingListBySearchCond(
                     TEST_USER_ID,
                     TEST_DEFAULT_PAGEABLE,
-                    TEST_DEFAULT_SORT_TYPE
+                    TEST_DEFAULT_SORT_TYPE,
                 )
             } returns createFollowList()
             every { objectStorageService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
@@ -94,11 +94,11 @@ class FollowServiceTest : DescribeSpec({
                 followRepository.getFollowingListBySearchCond(
                     TEST_USER_ID,
                     TEST_DEFAULT_PAGEABLE,
-                    TEST_DEFAULT_SORT_TYPE
+                    TEST_DEFAULT_SORT_TYPE,
                 )
             } returns createFollowList()
             every { objectStorageService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } throws ObjectStorageException(
-                SOMETHING_ERROR_MESSAGE
+                SOMETHING_ERROR_MESSAGE,
             )
             it("[ObjectStorageException] 반환한다.") {
                 shouldThrow<ObjectStorageException> {
@@ -114,7 +114,7 @@ class FollowServiceTest : DescribeSpec({
                 followRepository.getFollowerListBySearchCond(
                     TEST_USER_ID,
                     TEST_DEFAULT_PAGEABLE,
-                    TEST_DEFAULT_SORT_TYPE
+                    TEST_DEFAULT_SORT_TYPE,
                 )
             } returns createFollowList()
             every { objectStorageService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
@@ -130,11 +130,11 @@ class FollowServiceTest : DescribeSpec({
                 followRepository.getFollowerListBySearchCond(
                     TEST_USER_ID,
                     TEST_DEFAULT_PAGEABLE,
-                    TEST_DEFAULT_SORT_TYPE
+                    TEST_DEFAULT_SORT_TYPE,
                 )
             } returns createFollowList()
             every { objectStorageService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } throws ObjectStorageException(
-                SOMETHING_ERROR_MESSAGE
+                SOMETHING_ERROR_MESSAGE,
             )
             it("[ObjectStorageException] 반환한다.") {
                 shouldThrow<ObjectStorageException> {
@@ -154,4 +154,4 @@ class FollowServiceTest : DescribeSpec({
             }
         }
     }
-})
+},)

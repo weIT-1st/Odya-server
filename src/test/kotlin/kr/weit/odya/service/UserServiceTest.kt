@@ -58,7 +58,7 @@ class UserServiceTest : DescribeSpec({
         context("preAuthentication Access Url 생성에 실패한 경우") {
             every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser()
             every { objectStorageService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } throws ObjectStorageException(
-                SOMETHING_ERROR_MESSAGE
+                SOMETHING_ERROR_MESSAGE,
             )
             it("[ObjectStorageException] 반환한다") {
                 shouldThrow<ObjectStorageException> { userService.getInformation(TEST_USER_ID) }
@@ -205,7 +205,7 @@ class UserServiceTest : DescribeSpec({
                 shouldNotThrow<Exception> {
                     userService.uploadProfile(
                         TEST_PROFILE_CONTENT_BYTE_ARRAY,
-                        TEST_DEFAULT_PROFILE_PNG
+                        TEST_DEFAULT_PROFILE_PNG,
                     )
                 }
             }
@@ -232,7 +232,7 @@ class UserServiceTest : DescribeSpec({
             every {
                 objectStorageService.save(TEST_PROFILE_CONTENT_BYTE_ARRAY, TEST_DEFAULT_PROFILE_PNG)
             } throws ObjectStorageException(
-                SOMETHING_ERROR_MESSAGE
+                SOMETHING_ERROR_MESSAGE,
             )
             it("[ObjectStorageException] 반환한다") {
                 shouldThrow<ObjectStorageException> {
@@ -265,7 +265,7 @@ class UserServiceTest : DescribeSpec({
         context("OBJECT STORAGE에 프로필이 없어 프로필 삭제에 실패하는 경우") {
             every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser(TEST_PROFILE_PNG)
             every { objectStorageService.delete(TEST_PROFILE_PNG) } throws IllegalArgumentException(
-                DELETE_NOT_EXIST_PROFILE_ERROR_MESSAGE
+                DELETE_NOT_EXIST_PROFILE_ERROR_MESSAGE,
             )
             it("[IllegalArgumentException] 반환한다") {
                 shouldThrow<IllegalArgumentException> {
@@ -277,7 +277,7 @@ class UserServiceTest : DescribeSpec({
         context("프로필 업로드에 실패하는 경우") {
             every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser(TEST_PROFILE_PNG)
             every { objectStorageService.delete(TEST_PROFILE_PNG) } throws ObjectStorageException(
-                SOMETHING_ERROR_MESSAGE
+                SOMETHING_ERROR_MESSAGE,
             )
             it("[ObjectStorageException] 반환한다") {
                 shouldThrow<ObjectStorageException> {
@@ -317,4 +317,4 @@ class UserServiceTest : DescribeSpec({
             }
         }
     }
-})
+},)

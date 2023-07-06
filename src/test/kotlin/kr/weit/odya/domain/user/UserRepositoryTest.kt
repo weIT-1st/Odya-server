@@ -57,4 +57,4 @@ class UserRepositoryTest(
             result shouldBe true
         }
     }
-})
+},)

@@ -23,14 +23,20 @@ class AuthController(
     private val authenticationService: AuthenticationService
 ) {
     @PostMapping("/login/apple")
-    fun appleLogin(@RequestBody @Valid appleLoginRequest: AppleLoginRequest): ResponseEntity<Void> {
+    fun appleLogin(
+        @RequestBody @Valid
+        appleLoginRequest: AppleLoginRequest
+    ): ResponseEntity<Void> {
         val appleUsername = authenticationService.getUsernameByIdToken(appleLoginRequest.idToken)
         authenticationService.appleLoginProcess(appleUsername)
         return ResponseEntity.noContent().build()
     }
 
     @PostMapping("/login/kakao")
-    fun kakaoLogin(@RequestBody @Valid kakaoLoginRequest: KakaoLoginRequest): ResponseEntity<Any> {
+    fun kakaoLogin(
+        @RequestBody @Valid
+        kakaoLoginRequest: KakaoLoginRequest
+    ): ResponseEntity<Any> {
         val kakaoUserInfo = authenticationService.getKakaoUserInfo(kakaoLoginRequest)
         return try {
             val tokenResponse = authenticationService.kakaoLoginProcess(kakaoUserInfo)
@@ -42,7 +48,8 @@ class AuthController(
 
     @PostMapping("/register/apple")
     fun appleRegister(
-        @RequestBody @Valid appleRegisterRequest: AppleRegisterRequest
+        @RequestBody @Valid
+        appleRegisterRequest: AppleRegisterRequest
     ): ResponseEntity<Void> {
         authenticationService.getUsernameByIdToken(appleRegisterRequest.idToken).apply {
             appleRegisterRequest.updateUsername(this)
@@ -53,7 +60,8 @@ class AuthController(
 
     @PostMapping("/register/kakao")
     fun kakaoRegister(
-        @RequestBody @Valid kakaoRegisterRequest: KakaoRegisterRequest
+        @RequestBody @Valid
+        kakaoRegisterRequest: KakaoRegisterRequest
     ): ResponseEntity<Void> {
         authenticationService.createFirebaseUser(kakaoRegisterRequest.username)
         authenticationService.register(kakaoRegisterRequest)

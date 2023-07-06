@@ -49,4 +49,4 @@ class PlaceReviewRepositoryTest(
             result shouldBe true
         }
     }
-})
+},)

@@ -31,8 +31,8 @@ data class FollowUserResponse(
                 FollowProfileResponse.ProfileColorResponse(user.profile.profileColor)
             } else {
                 null
-            }
-        )
+            },
+        ),
     )
 }
 
@@ -50,7 +50,7 @@ data class FollowProfileResponse(
             profileColor.colorHex,
             profileColor.red,
             profileColor.green,
-            profileColor.blue
+            profileColor.blue,
         )
     }
 }

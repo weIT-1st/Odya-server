@@ -74,7 +74,7 @@ class User(
         withdrawDate = null,
         userRole = userRole,
         userInformation = UserInformation(email, nickname, phoneNumber, gender, birthday),
-        profile = profile
+        profile = profile,
     )
 
     val email: String?

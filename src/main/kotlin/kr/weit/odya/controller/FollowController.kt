@@ -32,7 +32,8 @@ class FollowController(
     @PostMapping
     fun createFollow(
         @LoginUserId userId: Long,
-        @RequestBody @Valid followRequest: FollowRequest
+        @RequestBody @Valid
+        followRequest: FollowRequest
     ): ResponseEntity<Void> {
         followService.createFollow(userId, followRequest)
         return ResponseEntity.status(HttpStatus.CREATED).build()
@@ -41,7 +42,8 @@ class FollowController(
     @DeleteMapping
     fun deleteFollow(
         @LoginUserId userId: Long,
-        @RequestBody @Valid followRequest: FollowRequest
+        @RequestBody @Valid
+        followRequest: FollowRequest
     ): ResponseEntity<Void> {
         followService.deleteFollow(userId, followRequest)
         return ResponseEntity.noContent().build()
@@ -49,14 +51,18 @@ class FollowController(
 
     @GetMapping("/{userId}/counts")
     fun getFollowCounts(
-        @Positive(message = "USER ID는 양수여야 합니다.") @PathVariable("userId") userId: Long
+        @Positive(message = "USER ID는 양수여야 합니다.")
+        @PathVariable("userId")
+        userId: Long
     ): ResponseEntity<FollowCountsResponse> {
         return ResponseEntity.ok(followService.getFollowCounts(userId))
     }
 
     @GetMapping("/{userId}/followings")
     fun getFollowings(
-        @Positive(message = "USER ID는 양수여야 합니다.") @PathVariable("userId") userId: Long,
+        @Positive(message = "USER ID는 양수여야 합니다.")
+        @PathVariable("userId")
+        userId: Long,
         @PageableDefault(page = 0, size = 10) pageable: Pageable,
         @RequestParam(name = "sortType", required = false, defaultValue = "LATEST") sortType: FollowSortType
     ): ResponseEntity<SliceResponse<FollowUserResponse>> {
@@ -65,7 +71,9 @@ class FollowController(
 
     @GetMapping("/{userId}/followers")
     fun getFollowers(
-        @Positive(message = "USER ID는 양수여야 합니다.") @PathVariable("userId") userId: Long,
+        @Positive(message = "USER ID는 양수여야 합니다.")
+        @PathVariable("userId")
+        userId: Long,
         @PageableDefault(page = 0, size = 10) pageable: Pageable,
         @RequestParam(name = "sortType", required = false, defaultValue = "LATEST") sortType: FollowSortType
     ): ResponseEntity<SliceResponse<FollowUserResponse>> {

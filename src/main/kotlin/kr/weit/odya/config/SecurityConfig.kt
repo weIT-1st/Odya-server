@@ -34,7 +34,7 @@ class SecurityConfig(
         }
         .addFilterBefore(
             FirebaseTokenFilter(userDetailsService, firebaseTokenHelper),
-            UsernamePasswordAuthenticationFilter::class.java
+            UsernamePasswordAuthenticationFilter::class.java,
         )
         .exceptionHandling {
             it.authenticationEntryPoint(customAuthenticationEntryPoint)

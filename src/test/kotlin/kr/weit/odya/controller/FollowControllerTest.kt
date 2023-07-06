@@ -79,11 +79,11 @@ class FollowControllerTest(
                     createDocument(
                         "create-follow-success",
                         requestHeaders(
-                            HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                            HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                         ),
                         requestBody(
-                            "followingId" type JsonFieldType.NUMBER description "팔로우를 신청할 USER ID" example request.followingId
-                        )
+                            "followingId" type JsonFieldType.NUMBER description "팔로우를 신청할 USER ID" example request.followingId,
+                        ),
                     )
                 }
             }
@@ -101,14 +101,14 @@ class FollowControllerTest(
                     createDocument(
                         "create-follow-fail-request-resource-negative",
                         requestHeaders(
-                            HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                            HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                         ),
                         requestBody(
-                            "followingId" type JsonFieldType.NUMBER description "음수의 FOLLOWING ID" example request.followingId
+                            "followingId" type JsonFieldType.NUMBER description "음수의 FOLLOWING ID" example request.followingId,
                         ),
                         responseBody(
-                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
-                        )
+                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
+                        ),
                     )
                 }
             }
@@ -117,7 +117,7 @@ class FollowControllerTest(
         context("유효한 토큰이면서, 이미 팔로우 중인 FOLLOWING ID인 경우") {
             val request = createFollowRequest()
             every { followService.createFollow(TEST_USER_ID, request) } throws ExistResourceException(
-                ALREADY_FOLLOW_ERROR_MESSAGE
+                ALREADY_FOLLOW_ERROR_MESSAGE,
             )
             it("409 응답한다.") {
                 restDocMockMvc.post(targetUri) {
@@ -129,14 +129,14 @@ class FollowControllerTest(
                     createDocument(
                         "create-follow-fail-already-following",
                         requestHeaders(
-                            HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                            HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                         ),
                         requestBody(
-                            "followingId" type JsonFieldType.NUMBER description "이미 팔로우된 USER ID" example request.followingId
+                            "followingId" type JsonFieldType.NUMBER description "이미 팔로우된 USER ID" example request.followingId,
                         ),
                         responseBody(
-                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
-                        )
+                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
+                        ),
                     )
                 }
             }
@@ -154,14 +154,14 @@ class FollowControllerTest(
                     createDocument(
                         "create-follow-fail-invalid-token",
                         requestHeaders(
-                            HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN"
+                            HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
                         ),
                         requestBody(
-                            "followingId" type JsonFieldType.NUMBER description "팔로우를 신청할 USER ID" example request.followingId
+                            "followingId" type JsonFieldType.NUMBER description "팔로우를 신청할 USER ID" example request.followingId,
                         ),
                         responseBody(
-                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
-                        )
+                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
+                        ),
                     )
                 }
             }
@@ -183,11 +183,11 @@ class FollowControllerTest(
                     createDocument(
                         "delete-follow-success",
                         requestHeaders(
-                            HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                            HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                         ),
                         requestBody(
-                            "followingId" type JsonFieldType.NUMBER description "팔로우를 취소할 USER ID" example request.followingId
-                        )
+                            "followingId" type JsonFieldType.NUMBER description "팔로우를 취소할 USER ID" example request.followingId,
+                        ),
                     )
                 }
             }
@@ -205,14 +205,14 @@ class FollowControllerTest(
                     createDocument(
                         "delete-follow-fail-request-resource-negative",
                         requestHeaders(
-                            HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                            HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                         ),
                         requestBody(
-                            "followingId" type JsonFieldType.NUMBER description "음수의 FOLLOWING ID" example request.followingId
+                            "followingId" type JsonFieldType.NUMBER description "음수의 FOLLOWING ID" example request.followingId,
                         ),
                         responseBody(
-                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
-                        )
+                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
+                        ),
                     )
                 }
             }
@@ -230,14 +230,14 @@ class FollowControllerTest(
                     createDocument(
                         "delete-follow-fail-invalid-token",
                         requestHeaders(
-                            HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN"
+                            HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
                         ),
                         requestBody(
-                            "followingId" type JsonFieldType.NUMBER description "팔로우를 취소할 USER ID" example request.followingId
+                            "followingId" type JsonFieldType.NUMBER description "팔로우를 취소할 USER ID" example request.followingId,
                         ),
                         responseBody(
-                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
-                        )
+                            "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
+                        ),
                     )
                 }
             }
@@ -253,23 +253,23 @@ class FollowControllerTest(
                 restDocMockMvc.perform(
                     RestDocumentationRequestBuilders
                         .get(targetUri, TEST_USER_ID)
-                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
                 )
                     .andExpect(status().isOk)
                     .andDo(
                         createPathDocument(
                             "get-follow-counts-success",
                             requestHeaders(
-                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
                             pathParameters(
-                                "userId" pathDescription "팔로워/팔로잉 수를 조회할 USER ID" example TEST_USER_ID
+                                "userId" pathDescription "팔로워/팔로잉 수를 조회할 USER ID" example TEST_USER_ID,
                             ),
                             responseBody(
                                 "followingCount" type JsonFieldType.NUMBER description "팔로잉 수" example response.followingCount,
-                                "followerCount" type JsonFieldType.NUMBER description "팔로워 수" example response.followerCount
-                            )
-                        )
+                                "followerCount" type JsonFieldType.NUMBER description "팔로워 수" example response.followerCount,
+                            ),
+                        ),
                     )
             }
         }
@@ -279,22 +279,22 @@ class FollowControllerTest(
                 restDocMockMvc.perform(
                     RestDocumentationRequestBuilders
                         .get(targetUri, TEST_INVALID_USER_ID)
-                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
                 )
                     .andExpect(status().isBadRequest)
                     .andDo(
                         createPathDocument(
                             "get-follow-counts-fail-user-id-negative",
                             requestHeaders(
-                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
                             pathParameters(
-                                "userId" pathDescription "음수의 USER ID" example TEST_INVALID_USER_ID
+                                "userId" pathDescription "음수의 USER ID" example TEST_INVALID_USER_ID,
                             ),
                             responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
-                            )
-                        )
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
+                            ),
+                        ),
                     )
             }
         }
@@ -304,22 +304,22 @@ class FollowControllerTest(
                 restDocMockMvc.perform(
                     RestDocumentationRequestBuilders
                         .get(targetUri, TEST_USER_ID)
-                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN),
                 )
                     .andExpect(status().isUnauthorized)
                     .andDo(
                         createPathDocument(
                             "get-follow-counts-fail-invalid-token",
                             requestHeaders(
-                                HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN"
+                                HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
                             ),
                             pathParameters(
-                                "userId" pathDescription "팔로워/팔로잉 수를 조회할 USER ID" example TEST_USER_ID
+                                "userId" pathDescription "팔로워/팔로잉 수를 조회할 USER ID" example TEST_USER_ID,
                             ),
                             responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
-                            )
-                        )
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
+                            ),
+                        ),
                     )
             }
         }
@@ -339,23 +339,23 @@ class FollowControllerTest(
                         .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         .param(PAGE_PARAM, TEST_PAGE.toString())
                         .param(SIZE_PARAM, TEST_SIZE.toString())
-                        .param(SORT_TYPE_PARAM, TEST_SORT_TYPE.name)
+                        .param(SORT_TYPE_PARAM, TEST_SORT_TYPE.name),
                 )
                     .andExpect(status().isOk)
                     .andDo(
                         createPathDocument(
                             "get-following-slice-success-with-params",
                             requestHeaders(
-                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
                             pathParameters(
-                                "userId" pathDescription "팔로잉 목록을 조회할 USER ID" example TEST_USER_ID
+                                "userId" pathDescription "팔로잉 목록을 조회할 USER ID" example TEST_USER_ID,
                             ),
                             queryParameters(
                                 PAGE_PARAM parameterDescription "데이터 조회 시작점 (default = 0)" example TEST_PAGE isOptional true,
                                 SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_SIZE isOptional true,
                                 SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example FollowSortType.values()
-                                    .joinToString() isOptional true
+                                    .joinToString() isOptional true,
                             ),
                             responseBody(
                                 "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
@@ -365,9 +365,9 @@ class FollowControllerTest(
                                 "content[].profile.profileColor.colorHex" type JsonFieldType.STRING description "색상 Hex" example response.content[0].profile.profileColor?.colorHex isOptional true,
                                 "content[].profile.profileColor.red" type JsonFieldType.NUMBER description "RGB RED" example response.content[0].profile.profileColor?.red isOptional true,
                                 "content[].profile.profileColor.green" type JsonFieldType.NUMBER description "RGB GREEN" example response.content[0].profile.profileColor?.green isOptional true,
-                                "content[].profile.profileColor.blue" type JsonFieldType.NUMBER description "RGB BLUE" example response.content[0].profile.profileColor?.blue isOptional true
-                            )
-                        )
+                                "content[].profile.profileColor.blue" type JsonFieldType.NUMBER description "RGB BLUE" example response.content[0].profile.profileColor?.blue isOptional true,
+                            ),
+                        ),
                     )
             }
         }
@@ -383,28 +383,28 @@ class FollowControllerTest(
                         .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         .param(PAGE_PARAM, TEST_PAGE.toString())
                         .param(SIZE_PARAM, TEST_SIZE.toString())
-                        .param(SORT_TYPE_PARAM, TEST_SORT_TYPE.name)
+                        .param(SORT_TYPE_PARAM, TEST_SORT_TYPE.name),
                 )
                     .andExpect(status().isInternalServerError)
                     .andDo(
                         createPathDocument(
                             "get-following-slice-fail-create-pre-auth-url",
                             requestHeaders(
-                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
                             pathParameters(
-                                "userId" pathDescription "팔로잉 목록을 조회할 USER ID" example TEST_USER_ID
+                                "userId" pathDescription "팔로잉 목록을 조회할 USER ID" example TEST_USER_ID,
                             ),
                             queryParameters(
                                 PAGE_PARAM parameterDescription "데이터 조회 시작점 (default = 0)" example TEST_PAGE isOptional true,
                                 SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_SIZE isOptional true,
                                 SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example FollowSortType.values()
-                                    .joinToString() isOptional true
+                                    .joinToString() isOptional true,
                             ),
                             responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
-                            )
-                        )
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
+                            ),
+                        ),
                     )
             }
         }
@@ -414,22 +414,22 @@ class FollowControllerTest(
                 restDocMockMvc.perform(
                     RestDocumentationRequestBuilders
                         .get(targetUri, TEST_INVALID_USER_ID)
-                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
                 )
                     .andExpect(status().isBadRequest)
                     .andDo(
                         createPathDocument(
                             "get-following-slice-fail-invalid-user-id",
                             requestHeaders(
-                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
                             pathParameters(
-                                "userId" pathDescription "음수의 USER ID" example TEST_INVALID_USER_ID
+                                "userId" pathDescription "음수의 USER ID" example TEST_INVALID_USER_ID,
                             ),
                             responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
-                            )
-                        )
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
+                            ),
+                        ),
                     )
             }
         }
@@ -439,22 +439,22 @@ class FollowControllerTest(
                 restDocMockMvc.perform(
                     RestDocumentationRequestBuilders
                         .get(targetUri, TEST_USER_ID)
-                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN),
                 )
                     .andExpect(status().isUnauthorized)
                     .andDo(
                         createPathDocument(
                             "get-following-slice-fail-invalid-token",
                             requestHeaders(
-                                HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN"
+                                HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
                             ),
                             pathParameters(
-                                "userId" pathDescription "팔로잉 목록을 조회할 USER ID" example TEST_USER_ID
+                                "userId" pathDescription "팔로잉 목록을 조회할 USER ID" example TEST_USER_ID,
                             ),
                             responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
-                            )
-                        )
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
+                            ),
+                        ),
                     )
             }
         }
@@ -474,23 +474,23 @@ class FollowControllerTest(
                         .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         .param(PAGE_PARAM, TEST_PAGE.toString())
                         .param(SIZE_PARAM, TEST_SIZE.toString())
-                        .param(SORT_TYPE_PARAM, TEST_SORT_TYPE.name)
+                        .param(SORT_TYPE_PARAM, TEST_SORT_TYPE.name),
                 )
                     .andExpect(status().isOk)
                     .andDo(
                         createPathDocument(
                             "get-follower-slice-success-with-params",
                             requestHeaders(
-                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
                             pathParameters(
-                                "userId" pathDescription "팔로워 목록을 조회할 USER ID" example TEST_USER_ID
+                                "userId" pathDescription "팔로워 목록을 조회할 USER ID" example TEST_USER_ID,
                             ),
                             queryParameters(
                                 PAGE_PARAM parameterDescription "페이지 (default = 0)" example TEST_PAGE isOptional true,
                                 SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_SIZE isOptional true,
                                 SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example FollowSortType.values()
-                                    .joinToString() isOptional true
+                                    .joinToString() isOptional true,
                             ),
                             responseBody(
                                 "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
@@ -500,9 +500,9 @@ class FollowControllerTest(
                                 "content[].profile.profileColor.colorHex" type JsonFieldType.STRING description "색상 Hex" example response.content[0].profile.profileColor?.colorHex isOptional true,
                                 "content[].profile.profileColor.red" type JsonFieldType.NUMBER description "RGB RED" example response.content[0].profile.profileColor?.red isOptional true,
                                 "content[].profile.profileColor.green" type JsonFieldType.NUMBER description "RGB GREEN" example response.content[0].profile.profileColor?.green isOptional true,
-                                "content[].profile.profileColor.blue" type JsonFieldType.NUMBER description "RGB BLUE" example response.content[0].profile.profileColor?.blue isOptional true
-                            )
-                        )
+                                "content[].profile.profileColor.blue" type JsonFieldType.NUMBER description "RGB BLUE" example response.content[0].profile.profileColor?.blue isOptional true,
+                            ),
+                        ),
                     )
             }
         }
@@ -518,28 +518,28 @@ class FollowControllerTest(
                         .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         .param(PAGE_PARAM, TEST_PAGE.toString())
                         .param(SIZE_PARAM, TEST_SIZE.toString())
-                        .param(SORT_TYPE_PARAM, TEST_SORT_TYPE.name)
+                        .param(SORT_TYPE_PARAM, TEST_SORT_TYPE.name),
                 )
                     .andExpect(status().isInternalServerError)
                     .andDo(
                         createPathDocument(
                             "get-follower-slice-fail-create-pre-auth-url",
                             requestHeaders(
-                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
                             pathParameters(
-                                "userId" pathDescription "팔로잉 목록을 조회할 USER ID" example TEST_USER_ID
+                                "userId" pathDescription "팔로잉 목록을 조회할 USER ID" example TEST_USER_ID,
                             ),
                             queryParameters(
                                 PAGE_PARAM parameterDescription "데이터 조회 시작점 (default = 0)" example TEST_PAGE isOptional true,
                                 SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_SIZE isOptional true,
                                 SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example FollowSortType.values()
-                                    .joinToString() isOptional true
+                                    .joinToString() isOptional true,
                             ),
                             responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
-                            )
-                        )
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
+                            ),
+                        ),
                     )
             }
         }
@@ -549,22 +549,22 @@ class FollowControllerTest(
                 restDocMockMvc.perform(
                     RestDocumentationRequestBuilders
                         .get(targetUri, TEST_INVALID_USER_ID)
-                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
                 )
                     .andExpect(status().isBadRequest)
                     .andDo(
                         createPathDocument(
                             "get-follower-slice-fail-invalid-user-id",
                             requestHeaders(
-                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN"
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
                             pathParameters(
-                                "userId" pathDescription "음수의 USER ID" example TEST_INVALID_USER_ID
+                                "userId" pathDescription "음수의 USER ID" example TEST_INVALID_USER_ID,
                             ),
                             responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
-                            )
-                        )
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
+                            ),
+                        ),
                     )
             }
         }
@@ -574,22 +574,22 @@ class FollowControllerTest(
                 restDocMockMvc.perform(
                     RestDocumentationRequestBuilders
                         .get(targetUri, TEST_USER_ID)
-                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN),
                 )
                     .andExpect(status().isUnauthorized)
                     .andDo(
                         createPathDocument(
                             "get-follower-slice-fail-invalid-token",
                             requestHeaders(
-                                HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN"
+                                HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
                             ),
                             pathParameters(
-                                "userId" pathDescription "팔로워 목록을 조회할 USER ID" example TEST_USER_ID
+                                "userId" pathDescription "팔로워 목록을 조회할 USER ID" example TEST_USER_ID,
                             ),
                             responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE
-                            )
-                        )
+                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
+                            ),
+                        ),
                     )
             }
         }
@@ -598,4 +598,4 @@ class FollowControllerTest(
     afterEach {
         restDocumentation.afterTest()
     }
-})
+},)

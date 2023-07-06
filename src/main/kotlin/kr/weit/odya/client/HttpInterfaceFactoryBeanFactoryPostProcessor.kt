@@ -46,7 +46,7 @@ class HttpInterfaceFactoryBeanFactoryPostProcessor : BeanFactoryPostProcessor {
         val beanClassName = getBeanClassName(beanDefinition)
         beanFactory.registerSingleton(
             beanClassName,
-            factory.create(findHttpInterfaceClass(beanDefinition))
+            factory.create(findHttpInterfaceClass(beanDefinition)),
         )
     }
 

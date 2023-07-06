@@ -34,7 +34,7 @@ data class KakaoRegistrationResponse(
         email = kakaoUserInfo.email,
         phoneNumber = kakaoUserInfo.phoneNumber,
         nickname = kakaoUserInfo.nickname,
-        gender = kakaoUserInfo.gender
+        gender = kakaoUserInfo.gender,
     )
 }
 

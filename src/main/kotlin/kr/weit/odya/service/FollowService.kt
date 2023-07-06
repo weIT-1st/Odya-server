@@ -46,7 +46,7 @@ class FollowService(
             .map {
                 FollowUserResponse(
                     it.following,
-                    objectStorageService.getPreAuthenticatedObjectUrl(it.following.profile.profileName)
+                    objectStorageService.getPreAuthenticatedObjectUrl(it.following.profile.profileName),
                 )
             }
         return SliceResponse(pageable, followingList)
@@ -62,7 +62,7 @@ class FollowService(
             .map {
                 FollowUserResponse(
                     it.follower,
-                    objectStorageService.getPreAuthenticatedObjectUrl(it.follower.profile.profileName)
+                    objectStorageService.getPreAuthenticatedObjectUrl(it.follower.profile.profileName),
                 )
             }
         return SliceResponse(pageable, followerList)

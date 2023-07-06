@@ -137,7 +137,7 @@ class AuthenticationServiceTest : DescribeSpec({
             every { userRepository.existsByPhoneNumber(request.phoneNumber!!) } returns false
             every { userRepository.existsByNickname(request.nickname) } returns false
             every { profileColorService.getRandomProfileColor() } throws NotFoundDefaultResourceException(
-                NOT_EXIST_PROFILE_COLOR_ERROR_MESSAGE
+                NOT_EXIST_PROFILE_COLOR_ERROR_MESSAGE,
             )
             it("[NotFoundDefaultResourceException] 예외가 발생한다") {
                 shouldThrow<NotFoundDefaultResourceException> { authenticationService.register(request) }
@@ -243,4 +243,4 @@ class AuthenticationServiceTest : DescribeSpec({
             }
         }
     }
-})
+},)

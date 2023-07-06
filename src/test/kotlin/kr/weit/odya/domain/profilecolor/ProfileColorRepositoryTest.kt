@@ -21,4 +21,4 @@ class ProfileColorRepositoryTest(
             result.colorHex shouldBe TEST_NONE_COLOR_HEX
         }
     }
-})
+},)
