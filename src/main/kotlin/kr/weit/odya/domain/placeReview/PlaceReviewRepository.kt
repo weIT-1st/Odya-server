@@ -59,12 +59,8 @@ class PlaceReviewRepositoryImpl(private val queryFactory: QueryFactory) : Custom
         sortType: PlaceReviewSortType,
         lastId: Long?
     ): List<PlaceReview> = queryFactory.listQuery {
-        select(entity(PlaceReview::class))
-        from(entity(PlaceReview::class))
-        where(dynamicPredicatePlaceReviewSortType(sortType, lastId))
+        baseSearchQuery(pageable, sortType, lastId)
         where(col(PlaceReview::placeId).equal(placeId))
-        orderBy(dynamicOrderingByPlaceReviewSortType(sortType))
-        limit(pageable.pageSize + 1)
     }
 
     override fun findSliceByUserOrderBySortType(
@@ -73,10 +69,18 @@ class PlaceReviewRepositoryImpl(private val queryFactory: QueryFactory) : Custom
         sortType: PlaceReviewSortType,
         lastId: Long?
     ): List<PlaceReview> = queryFactory.listQuery {
+        baseSearchQuery(pageable, sortType, lastId)
+        where(col(PlaceReview::user).equal(user))
+    }
+
+    private fun CriteriaQueryDsl<PlaceReview>.baseSearchQuery(
+        pageable: Pageable,
+        sortType: PlaceReviewSortType,
+        lastId: Long?
+    ) {
         select(entity(PlaceReview::class))
         from(entity(PlaceReview::class))
         where(dynamicPredicatePlaceReviewSortType(sortType, lastId))
-        where(col(PlaceReview::user).equal(user))
         orderBy(dynamicOrderingByPlaceReviewSortType(sortType))
         limit(pageable.pageSize + 1)
     }
@@ -91,7 +95,7 @@ class PlaceReviewRepositoryImpl(private val queryFactory: QueryFactory) : Custom
                 PlaceReviewSortType.OLDEST -> col(PlaceReview::id).greaterThan(lastId)
             }
         } else {
-            col(PlaceReview::id).isNotNull()
+            PredicateSpec.empty
         }
     }
 
