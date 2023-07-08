@@ -24,12 +24,12 @@ private const val TOKEN_INVALID_ERROR_MESSAGE = "TOKEN INVALID"
 
 class FirebaseTokenFilter(
     private val userDetailsService: UserDetailsService,
-    private val firebaseTokenHelper: FirebaseTokenHelper
+    private val firebaseTokenHelper: FirebaseTokenHelper,
 ) : OncePerRequestFilter() {
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
-        filterChain: FilterChain
+        filterChain: FilterChain,
     ) {
         if (!isPermittedRequest(request)) {
             try {
@@ -55,7 +55,7 @@ class FirebaseTokenFilter(
         response.contentType = MediaType.APPLICATION_JSON_VALUE
         jacksonObjectMapper().writeValue(
             response.outputStream,
-            TokenInvalidErrorResponse(ex.message ?: TOKEN_INVALID_ERROR_MESSAGE)
+            TokenInvalidErrorResponse(ex.message ?: TOKEN_INVALID_ERROR_MESSAGE),
         )
     }
 

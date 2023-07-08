@@ -10,7 +10,7 @@ import org.springframework.core.io.ResourceLoader
 
 @Configuration
 class FirebaseAuthConfig(
-    private val resourceLoader: ResourceLoader
+    private val resourceLoader: ResourceLoader,
 ) {
     @Bean
     fun firebaseApp(): FirebaseApp {

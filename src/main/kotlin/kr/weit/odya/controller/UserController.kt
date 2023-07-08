@@ -19,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile
 @RestController
 @RequestMapping("/api/v1/users")
 class UserController(
-    private val userService: UserService
+    private val userService: UserService,
 ) {
     @GetMapping("/me")
     fun getMyInfo(@LoginUserId userId: Long): ResponseEntity<UserResponse> {
@@ -30,7 +30,7 @@ class UserController(
     @PatchMapping("/email")
     fun updateEmail(
         @RequestHeader(HttpHeaders.AUTHORIZATION) bearerToken: String,
-        @LoginUserId userId: Long
+        @LoginUserId userId: Long,
     ): ResponseEntity<Void> {
         val idToken = bearerToken.split(" ")[1]
         val email = userService.getEmailByIdToken(idToken)
@@ -41,7 +41,7 @@ class UserController(
     @PatchMapping("/phone-number")
     fun updatePhoneNumber(
         @RequestHeader(HttpHeaders.AUTHORIZATION) bearerToken: String,
-        @LoginUserId userId: Long
+        @LoginUserId userId: Long,
     ): ResponseEntity<Void> {
         val idToken = bearerToken.split(" ")[1]
         val phoneNumber = userService.getPhoneNumberByIdToken(idToken)
@@ -53,7 +53,7 @@ class UserController(
     fun updateInformation(
         @RequestBody @Valid
         informationRequest: InformationRequest,
-        @LoginUserId userId: Long
+        @LoginUserId userId: Long,
     ): ResponseEntity<Void> {
         userService.updateInformation(userId, informationRequest)
         return ResponseEntity.noContent().build()

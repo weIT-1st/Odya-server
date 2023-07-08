@@ -6,7 +6,7 @@ import kr.weit.odya.domain.user.Gender
 data class KakaoUserInfo(
     val id: String = "",
     @JsonProperty("kakao_account")
-    val kakaoAccount: KakaoAccount = KakaoAccount()
+    val kakaoAccount: KakaoAccount = KakaoAccount(),
 ) {
     data class KakaoAccount(
         val name: String? = null,
@@ -14,11 +14,11 @@ data class KakaoUserInfo(
         val gender: String? = null,
         @JsonProperty("phone_number")
         val phoneNumber: String? = null,
-        val profile: Profile = Profile()
+        val profile: Profile = Profile(),
     )
 
     data class Profile(
-        val nickname: String = ""
+        val nickname: String = "",
     )
 
     val username: String = "KAKAO_$id"
