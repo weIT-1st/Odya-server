@@ -20,7 +20,7 @@ fun createFollow(follower: User = createUser(), following: User = createOtherUse
 
 fun createFollowUserResponse(
     userId: Long = TEST_USER_ID,
-    nickname: String = TEST_NICKNAME
+    nickname: String = TEST_NICKNAME,
 ) = FollowUserResponse(userId, nickname, createFollowProfileResponse())
 
 fun createFollowList(): List<Follow> = listOf(createFollow())
@@ -30,8 +30,8 @@ fun createFollowSlice(): SliceResponse<FollowUserResponse> =
         TEST_PAGEABLE,
         listOf(
             createFollowUserResponse(),
-            createFollowUserResponse(TEST_OTHER_USER_ID, TEST_OTHER_NICKNAME)
-        )
+            createFollowUserResponse(TEST_OTHER_USER_ID, TEST_OTHER_NICKNAME),
+        ),
     )
 
 fun createFollowProfileResponse(): FollowProfileResponse =

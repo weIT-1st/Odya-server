@@ -23,7 +23,7 @@ class AuthenticationService(
     private val userRepository: UserRepository,
     private val profileColorService: ProfileColorService,
     private val firebaseTokenHelper: FirebaseTokenHelper,
-    private val kakaoClient: KakaoClient
+    private val kakaoClient: KakaoClient,
 ) {
     fun appleLoginProcess(appleUsername: String) {
         if (!userRepository.existsByUsername(appleUsername)) {
@@ -89,7 +89,7 @@ class AuthenticationService(
 
     private fun createUser(
         registerRequest: RegisterRequest,
-        randomProfileColor: ProfileColor
+        randomProfileColor: ProfileColor,
     ) = User(
         username = registerRequest.username,
         email = registerRequest.email?.trim(),
@@ -98,6 +98,6 @@ class AuthenticationService(
         gender = registerRequest.gender,
         birthday = registerRequest.birthday,
         socialType = registerRequest.socialType,
-        profile = Profile(profileColor = randomProfileColor)
+        profile = Profile(profileColor = randomProfileColor),
     )
 }

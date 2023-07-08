@@ -94,7 +94,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         Exception::class,
         FirebaseAuthException::class,
         NotFoundDefaultResourceException::class,
-        ObjectStorageException::class
+        ObjectStorageException::class,
     )
     fun exception(ex: Exception): ResponseEntity<ApiErrorResponse> {
         logger.error("[Exception]", ex)

@@ -16,7 +16,7 @@ fun createProfileColor(profileColorId: Long = TEST_OTHER_PROFILE_COLOR_ID): Prof
     colorHex = TEST_DEFAULT_COLOR_HEX,
     red = TEST_DEFAULT_RED,
     green = TEST_DEFAULT_GREEN,
-    blue = TEST_DEFAULT_BLUE
+    blue = TEST_DEFAULT_BLUE,
 )
 
 fun createNoneProfileColor(profileColorId: Long = TEST_PROFILE_COLOR_ID): ProfileColor = ProfileColor(
@@ -24,7 +24,7 @@ fun createNoneProfileColor(profileColorId: Long = TEST_PROFILE_COLOR_ID): Profil
     colorHex = TEST_NONE_COLOR_HEX,
     red = TEST_NONE_RGB,
     green = TEST_NONE_RGB,
-    blue = TEST_NONE_RGB
+    blue = TEST_NONE_RGB,
 )
 
 fun createProfileColorList() = listOf(createNoneProfileColor(), createProfileColor())

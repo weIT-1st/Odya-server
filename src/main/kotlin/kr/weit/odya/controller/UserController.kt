@@ -62,7 +62,7 @@ class UserController(
     @PatchMapping("/profile")
     fun updateProfile(
         @RequestPart(name = "profile", required = false) multipartFile: MultipartFile?,
-        @LoginUserId userId: Long
+        @LoginUserId userId: Long,
     ): ResponseEntity<Void> {
         val profileName: String? = if (multipartFile != null) {
             userService.uploadProfile(multipartFile.inputStream, multipartFile.originalFilename)
