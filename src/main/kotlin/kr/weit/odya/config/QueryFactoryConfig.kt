@@ -14,7 +14,7 @@ class QueryFactoryConfig {
     fun queryFactory(entityManager: EntityManager): QueryFactory {
         return QueryFactoryImpl(
             criteriaQueryCreator = CriteriaQueryCreatorImpl(entityManager),
-            subqueryCreator = SubqueryCreatorImpl()
+            subqueryCreator = SubqueryCreatorImpl(),
         )
     }
 }

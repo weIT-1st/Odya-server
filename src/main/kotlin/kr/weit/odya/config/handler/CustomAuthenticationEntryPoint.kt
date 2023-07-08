@@ -17,7 +17,7 @@ class CustomAuthenticationEntryPoint : AuthenticationEntryPoint {
     override fun commence(
         request: HttpServletRequest?,
         response: HttpServletResponse?,
-        authException: AuthenticationException?
+        authException: AuthenticationException?,
     ) {
         Logger.error(authException) { "[AuthenticationEntryPoint] ${authException?.message}" }
         response?.status = HttpStatus.UNAUTHORIZED.value()

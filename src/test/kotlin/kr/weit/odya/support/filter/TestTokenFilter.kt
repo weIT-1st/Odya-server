@@ -13,7 +13,7 @@ class TestTokenFilter : OncePerRequestFilter() {
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
-        filterChain: FilterChain
+        filterChain: FilterChain,
     ) {
         val loginToken = request.getHeader(HttpHeaders.AUTHORIZATION)
         if (loginToken == TEST_BEARER_ID_TOKEN) {

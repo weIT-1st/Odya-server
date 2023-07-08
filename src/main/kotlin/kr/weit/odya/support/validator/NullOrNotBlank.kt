@@ -13,14 +13,14 @@ import kotlin.reflect.KClass
 annotation class NullOrNotBlank(
     val message: String = "",
     val groups: Array<KClass<*>> = [],
-    val payload: Array<KClass<out Payload>> = []
+    val payload: Array<KClass<out Payload>> = [],
 )
 
 class NullOrNotBlankValidator : ConstraintValidator<NullOrNotBlank, String?> {
     override fun initialize(contactNumber: NullOrNotBlank) {}
     override fun isValid(
         contactField: String?,
-        cxt: ConstraintValidatorContext?
+        cxt: ConstraintValidatorContext?,
     ): Boolean {
         return contactField == null || contactField.isNotBlank()
     }
