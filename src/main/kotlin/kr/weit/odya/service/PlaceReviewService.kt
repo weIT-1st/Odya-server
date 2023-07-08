@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class PlaceReviewService(
     private val placeReviewRepository: PlaceReviewRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
 ) {
     @Transactional
     fun createReview(request: PlaceReviewCreateRequest, userId: Long) {

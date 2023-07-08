@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class UserService(
     private val userRepository: UserRepository,
-    private val firebaseTokenHelper: FirebaseTokenHelper
+    private val firebaseTokenHelper: FirebaseTokenHelper,
 ) {
     fun getEmailByIdToken(idToken: String) = firebaseTokenHelper.getEmail(idToken)
 

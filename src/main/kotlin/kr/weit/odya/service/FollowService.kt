@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class FollowService(
     private val followRepository: FollowRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
 ) {
     @Transactional
     fun createFollow(followerId: Long, followRequest: FollowRequest) {
@@ -39,7 +39,7 @@ class FollowService(
     fun getSliceFollowings(
         followerId: Long,
         pageable: Pageable,
-        sortType: FollowSortType
+        sortType: FollowSortType,
     ): SliceResponse<FollowUserResponse> {
         val followingList = followRepository.getFollowingListBySearchCond(followerId, pageable, sortType)
             .map { FollowUserResponse(it.following) }
@@ -50,7 +50,7 @@ class FollowService(
     fun getSliceFollowers(
         followingId: Long,
         pageable: Pageable,
-        sortType: FollowSortType
+        sortType: FollowSortType,
     ): SliceResponse<FollowUserResponse> {
         val followerList = followRepository.getFollowerListBySearchCond(followingId, pageable, sortType)
             .map { FollowUserResponse(it.follower) }

@@ -8,5 +8,5 @@ import org.springframework.context.annotation.Profile
 data class ObjectStorageProperties(
     val configurationFilePath: String,
     val namespaceName: String,
-    val bucketName: String
+    val bucketName: String,
 )

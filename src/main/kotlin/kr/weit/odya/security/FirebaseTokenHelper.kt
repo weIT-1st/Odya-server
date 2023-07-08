@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class FirebaseTokenHelper(
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuth: FirebaseAuth,
 ) {
     fun createFirebaseUser(username: String) {
         try {

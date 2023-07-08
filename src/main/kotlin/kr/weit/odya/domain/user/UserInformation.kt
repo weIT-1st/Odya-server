@@ -25,5 +25,5 @@ data class UserInformation(
     val birthday: LocalDate,
 
     @Column(nullable = false)
-    val profileName: String
+    val profileName: String,
 )

@@ -29,7 +29,7 @@ class PlaceReviewController(private val placeReviewService: PlaceReviewService) 
         @Valid
         @RequestBody
         request: PlaceReviewCreateRequest,
-        @LoginUserId userId: Long
+        @LoginUserId userId: Long,
     ): ResponseEntity<Void> {
         placeReviewService.createReview(request, userId)
         return ResponseEntity.status(HttpStatus.CREATED).build()
@@ -40,7 +40,7 @@ class PlaceReviewController(private val placeReviewService: PlaceReviewService) 
         @Valid
         @RequestBody
         request: PlaceReviewUpdateRequest,
-        @LoginUserId userId: Long
+        @LoginUserId userId: Long,
     ): ResponseEntity<Void> {
         placeReviewService.updateReview(request, userId)
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
@@ -52,7 +52,7 @@ class PlaceReviewController(private val placeReviewService: PlaceReviewService) 
         @Positive(message = "장소 리뷰 ID는 양수여야 합니다.")
         @PathVariable("id")
         placeReviewId: Long,
-        @LoginUserId userId: Long
+        @LoginUserId userId: Long,
     ): ResponseEntity<Void> {
         placeReviewService.deleteReview(placeReviewId, userId)
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
@@ -62,7 +62,7 @@ class PlaceReviewController(private val placeReviewService: PlaceReviewService) 
     fun getByPlaceReviewList(
         @NotNull(message = "장소 ID는 필수 입력값입니다.")
         @PathVariable("id")
-        placeId: String
+        placeId: String,
     ): ResponseEntity<List<PlaceReviewListResponse>> {
         return ResponseEntity.ok(placeReviewService.getByPlaceReviewId(placeId))
     }
@@ -72,7 +72,7 @@ class PlaceReviewController(private val placeReviewService: PlaceReviewService) 
         @NotNull(message = "유저 ID는 필수 입력값입니다.")
         @Positive(message = "유저 ID는 양수여야 합니다.")
         @PathVariable("id")
-        userId: Long
+        userId: Long,
     ): ResponseEntity<List<PlaceReviewListResponse>> {
         return ResponseEntity.ok(placeReviewService.getByUserReviewList(userId))
     }

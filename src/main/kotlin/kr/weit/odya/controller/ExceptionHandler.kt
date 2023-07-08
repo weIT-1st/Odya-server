@@ -28,7 +28,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         ex: MethodArgumentNotValidException,
         headers: HttpHeaders,
         status: HttpStatusCode,
-        request: WebRequest
+        request: WebRequest,
     ): ResponseEntity<Any>? {
         logger.error("[MethodArgumentNotValidException] ${ex.messages()}")
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiErrorResponse(ex.messages().joinToString(" ")))
@@ -38,7 +38,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         ex: HttpMessageNotReadableException,
         headers: HttpHeaders,
         status: HttpStatusCode,
-        request: WebRequest
+        request: WebRequest,
     ): ResponseEntity<Any>? {
         logger.error("[HttpMessageNotReadableException] ${ex.message}")
         val errorMessage = when (val cause = ex.cause) {
@@ -52,7 +52,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         ex: HttpRequestMethodNotSupportedException,
         headers: HttpHeaders,
         status: HttpStatusCode,
-        request: WebRequest
+        request: WebRequest,
     ): ResponseEntity<Any>? {
         logger.error("[HttpRequestMethodNotSupportedException] ${ex.message}")
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiErrorResponse(ex.message))
