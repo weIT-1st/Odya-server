@@ -35,7 +35,7 @@ class RestDocsHelper {
 
         fun generateRestDocMockMvc(
             webApplicationContext: WebApplicationContext,
-            restDocumentationContextProvider: RestDocumentationContextProvider
+            restDocumentationContextProvider: RestDocumentationContextProvider,
         ): MockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
             .apply<DefaultMockMvcBuilder>(springSecurity())
             .addFilter<DefaultMockMvcBuilder>(CharacterEncodingFilter("UTF-8", true))
@@ -68,16 +68,16 @@ class RestDocsHelper {
 }
 
 infix fun String.type(
-    type: JsonFieldType
+    type: JsonFieldType,
 ): RestDocsField = createField(this, type)
 
 private fun createField(
     path: String,
-    type: JsonFieldType
+    type: JsonFieldType,
 ): RestDocsField = RestDocsField(PayloadDocumentation.fieldWithPath(path).type(type))
 
 class RestDocsField(
-    val descriptor: FieldDescriptor
+    val descriptor: FieldDescriptor,
 ) {
     infix fun isOptional(value: Boolean): RestDocsField {
         if (value) descriptor.optional()

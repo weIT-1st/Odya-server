@@ -22,5 +22,5 @@ data class UserInformation(
     val gender: Gender,
 
     @Column(nullable = false, updatable = false)
-    val birthday: LocalDate
+    val birthday: LocalDate,
 )

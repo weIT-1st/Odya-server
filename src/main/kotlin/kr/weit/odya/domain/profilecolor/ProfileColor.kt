@@ -33,5 +33,5 @@ class ProfileColor(
     val green: Int,
 
     @Column(nullable = false, updatable = false)
-    val blue: Int
+    val blue: Int,
 ) : BaseModifiableEntity()

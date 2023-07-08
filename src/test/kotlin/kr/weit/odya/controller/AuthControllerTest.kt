@@ -53,7 +53,7 @@ import org.springframework.web.context.WebApplicationContext
 @WebMvcTest(AuthController::class)
 class AuthControllerTest(
     private val context: WebApplicationContext,
-    @MockkBean private val authenticationService: AuthenticationService
+    @MockkBean private val authenticationService: AuthenticationService,
 ) : DescribeSpec(
     {
         val restDocumentation = ManualRestDocumentation()

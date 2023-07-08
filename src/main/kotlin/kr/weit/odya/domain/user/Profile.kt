@@ -25,7 +25,7 @@ class Profile(
 
     originFileName: String = DEFAULT_PROFILE_PNG,
 
-    profileColor: ProfileColor
+    profileColor: ProfileColor,
 ) : BaseModifiableEntity() {
     @Column(nullable = false, length = 30)
     var profileName: String = profileName
@@ -43,7 +43,7 @@ class Profile(
     fun changeProfile(
         profileName: String,
         originFileName: String,
-        profileColor: ProfileColor
+        profileColor: ProfileColor,
     ) {
         this.profileName = profileName
         this.originFileName = originFileName

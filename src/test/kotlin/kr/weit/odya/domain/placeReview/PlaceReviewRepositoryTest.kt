@@ -17,7 +17,7 @@ import kr.weit.odya.support.test.BaseTests.RepositoryTest
 @RepositoryTest
 class PlaceReviewRepositoryTest(
     private val placeReviewRepository: PlaceReviewRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
 ) : ExpectSpec({
     extensions(SpringTestExtension(SpringTestLifecycleMode.Root))
     lateinit var user: User

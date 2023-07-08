@@ -55,7 +55,7 @@ import org.springframework.web.context.WebApplicationContext
 @WebMvcTest(FollowController::class)
 class FollowControllerTest(
     private val context: WebApplicationContext,
-    @MockkBean private val followService: FollowService
+    @MockkBean private val followService: FollowService,
 ) : DescribeSpec({
     val restDocumentation = ManualRestDocumentation()
     val restDocMockMvc = RestDocsHelper.generateRestDocMockMvc(context, restDocumentation)

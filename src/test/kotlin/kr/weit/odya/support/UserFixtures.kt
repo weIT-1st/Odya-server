@@ -75,7 +75,7 @@ fun createProfile(profileId: Long = 0L, profileName: String = TEST_DEFAULT_PROFI
 fun createMockProfile(
     name: String = TEST_MOCK_PROFILE_NAME,
     originalFileName: String? = TEST_DEFAULT_PROFILE_PNG,
-    contentType: String? = TEST_PROFILE_CONTENT_TYPE
+    contentType: String? = TEST_PROFILE_CONTENT_TYPE,
 ): MockMultipartFile {
     return MockMultipartFile(
         name,

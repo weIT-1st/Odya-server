@@ -24,7 +24,7 @@ class UserService(
     private val objectStorageService: ObjectStorageService,
     private val firebaseTokenHelper: FirebaseTokenHelper,
     private val fileNameGenerator: FileNameGenerator,
-    private val profileColorService: ProfileColorService
+    private val profileColorService: ProfileColorService,
 ) {
     fun getEmailByIdToken(idToken: String) = firebaseTokenHelper.getEmail(idToken)
 

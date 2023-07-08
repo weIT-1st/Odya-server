@@ -17,7 +17,7 @@ class LoginUserIdResolver : HandlerMethodArgumentResolver {
         parameter: MethodParameter,
         mavContainer: ModelAndViewContainer?,
         webRequest: NativeWebRequest,
-        binderFactory: WebDataBinderFactory?
+        binderFactory: WebDataBinderFactory?,
     ): Long {
         return SecurityContextHolder.getContext().authentication.name.toLong()
     }

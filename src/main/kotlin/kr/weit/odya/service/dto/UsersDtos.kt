@@ -16,7 +16,7 @@ data class UserResponse(
     val gender: Gender,
     val birthday: LocalDate,
     val socialType: SocialType,
-    val profile: UserProfileResponse
+    val profile: UserProfileResponse,
 ) {
     constructor(user: User, profileUrl: String) : this(
         user.id,
@@ -39,18 +39,18 @@ data class UserResponse(
 
 data class InformationRequest(
     @field:Nickname
-    val nickname: String
+    val nickname: String,
 )
 
 data class UserProfileResponse(
     val profileUrl: String,
-    val profileColor: ProfileColorResponse?
+    val profileColor: ProfileColorResponse?,
 ) {
     data class ProfileColorResponse(
         val colorHex: String,
         val red: Int,
         val green: Int,
-        val blue: Int
+        val blue: Int,
     ) {
         constructor(profileColor: ProfileColor) : this(
             profileColor.colorHex,

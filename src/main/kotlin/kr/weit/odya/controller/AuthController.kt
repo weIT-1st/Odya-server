@@ -20,12 +20,12 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/v1/auth")
 class AuthController(
-    private val authenticationService: AuthenticationService
+    private val authenticationService: AuthenticationService,
 ) {
     @PostMapping("/login/apple")
     fun appleLogin(
         @RequestBody @Valid
-        appleLoginRequest: AppleLoginRequest
+        appleLoginRequest: AppleLoginRequest,
     ): ResponseEntity<Void> {
         val appleUsername = authenticationService.getUsernameByIdToken(appleLoginRequest.idToken)
         authenticationService.appleLoginProcess(appleUsername)
@@ -35,7 +35,7 @@ class AuthController(
     @PostMapping("/login/kakao")
     fun kakaoLogin(
         @RequestBody @Valid
-        kakaoLoginRequest: KakaoLoginRequest
+        kakaoLoginRequest: KakaoLoginRequest,
     ): ResponseEntity<Any> {
         val kakaoUserInfo = authenticationService.getKakaoUserInfo(kakaoLoginRequest)
         return try {
@@ -49,7 +49,7 @@ class AuthController(
     @PostMapping("/register/apple")
     fun appleRegister(
         @RequestBody @Valid
-        appleRegisterRequest: AppleRegisterRequest
+        appleRegisterRequest: AppleRegisterRequest,
     ): ResponseEntity<Void> {
         authenticationService.getUsernameByIdToken(appleRegisterRequest.idToken).apply {
             appleRegisterRequest.updateUsername(this)
@@ -61,7 +61,7 @@ class AuthController(
     @PostMapping("/register/kakao")
     fun kakaoRegister(
         @RequestBody @Valid
-        kakaoRegisterRequest: KakaoRegisterRequest
+        kakaoRegisterRequest: KakaoRegisterRequest,
     ): ResponseEntity<Void> {
         authenticationService.createFirebaseUser(kakaoRegisterRequest.username)
         authenticationService.register(kakaoRegisterRequest)

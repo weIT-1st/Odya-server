@@ -59,7 +59,7 @@ import org.springframework.web.context.WebApplicationContext
 @WebMvcTest(UserController::class)
 class UserControllerTest(
     private val context: WebApplicationContext,
-    @MockkBean private val userService: UserService
+    @MockkBean private val userService: UserService,
 ) : DescribeSpec({
     val restDocumentation = ManualRestDocumentation()
     val restDocMockMvc = RestDocsHelper.generateRestDocMockMvc(context, restDocumentation)

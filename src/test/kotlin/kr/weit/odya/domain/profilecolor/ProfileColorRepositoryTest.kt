@@ -9,7 +9,7 @@ import kr.weit.odya.support.test.BaseTests.RepositoryTest
 
 @RepositoryTest
 class ProfileColorRepositoryTest(
-    private val profileColorRepository: ProfileColorRepository
+    private val profileColorRepository: ProfileColorRepository,
 ) : ExpectSpec({
     beforeEach {
         profileColorRepository.save(createProfileColor())

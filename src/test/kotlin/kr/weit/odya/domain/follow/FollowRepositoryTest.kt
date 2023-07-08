@@ -16,7 +16,7 @@ import kr.weit.odya.support.test.BaseTests.RepositoryTest
 @RepositoryTest
 class FollowRepositoryTest(
     private val followRepository: FollowRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
 ) : ExpectSpec(
     {
         extensions(SpringTestExtension(SpringTestLifecycleMode.Root))

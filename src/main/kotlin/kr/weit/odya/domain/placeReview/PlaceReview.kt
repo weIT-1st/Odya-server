@@ -49,7 +49,7 @@ class PlaceReview(
     var starRating: Int,
 
     @Column(length = 90, nullable = false)
-    var review: String
+    var review: String,
 ) : BaseModifiableEntity() {
     val writerId: Long
         get() = user.id

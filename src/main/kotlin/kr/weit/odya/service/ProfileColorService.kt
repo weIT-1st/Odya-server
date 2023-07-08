@@ -11,7 +11,7 @@ const val NONE_PROFILE_COLOR_PK = 1L
 @Service
 class ProfileColorService(
     private val profileColorRepository: ProfileColorRepository,
-    private val profileColorRandomIndexGenerator: ProfileColorRandomIndexGenerator
+    private val profileColorRandomIndexGenerator: ProfileColorRandomIndexGenerator,
 ) {
     fun getRandomProfileColor(): ProfileColor {
         val profileColors = profileColorRepository.findAll().toList()

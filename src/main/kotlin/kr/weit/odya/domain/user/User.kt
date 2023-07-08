@@ -50,7 +50,7 @@ class User(
     @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE])
     val profile: Profile,
 
-    userInformation: UserInformation
+    userInformation: UserInformation,
 ) : BaseTimeEntity() {
     @Embedded
     var information: UserInformation = userInformation
@@ -66,7 +66,7 @@ class User(
         birthday: LocalDate,
         socialType: SocialType,
         userRole: UserRole = UserRole.ROLE_USER,
-        profile: Profile
+        profile: Profile,
     ) : this(
         id = id,
         username = username,

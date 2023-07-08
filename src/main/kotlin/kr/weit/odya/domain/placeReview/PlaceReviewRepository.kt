@@ -19,7 +19,7 @@ fun PlaceReviewRepository.getPlaceReviewListByPlaceId(
     placeId: String,
     pageable: Pageable,
     sortType: PlaceReviewSortType,
-    lastId: Long?
+    lastId: Long?,
 ): List<PlaceReview> =
     findSliceByPlaceIdOrderBySortType(placeId, pageable, sortType, lastId)
 
@@ -27,7 +27,7 @@ fun PlaceReviewRepository.getPlaceReviewListByUser(
     user: User,
     pageable: Pageable,
     sortType: PlaceReviewSortType,
-    lastId: Long?
+    lastId: Long?,
 ): List<PlaceReview> =
     findSliceByUserOrderBySortType(user, pageable, sortType, lastId)
 
@@ -41,14 +41,14 @@ interface CustomPlaceReviewRepository {
         placeId: String,
         pageable: Pageable,
         sortType: PlaceReviewSortType,
-        lastId: Long?
+        lastId: Long?,
     ): List<PlaceReview>
 
     fun findSliceByUserOrderBySortType(
         user: User,
         pageable: Pageable,
         sortType: PlaceReviewSortType,
-        lastId: Long?
+        lastId: Long?,
     ): List<PlaceReview>
 }
 
@@ -57,7 +57,7 @@ class PlaceReviewRepositoryImpl(private val queryFactory: QueryFactory) : Custom
         placeId: String,
         pageable: Pageable,
         sortType: PlaceReviewSortType,
-        lastId: Long?
+        lastId: Long?,
     ): List<PlaceReview> = queryFactory.listQuery {
         baseSearchQuery(pageable, sortType, lastId)
         where(col(PlaceReview::placeId).equal(placeId))
@@ -67,7 +67,7 @@ class PlaceReviewRepositoryImpl(private val queryFactory: QueryFactory) : Custom
         user: User,
         pageable: Pageable,
         sortType: PlaceReviewSortType,
-        lastId: Long?
+        lastId: Long?,
     ): List<PlaceReview> = queryFactory.listQuery {
         baseSearchQuery(pageable, sortType, lastId)
         where(col(PlaceReview::user).equal(user))
@@ -76,7 +76,7 @@ class PlaceReviewRepositoryImpl(private val queryFactory: QueryFactory) : Custom
     private fun CriteriaQueryDsl<PlaceReview>.baseSearchQuery(
         pageable: Pageable,
         sortType: PlaceReviewSortType,
-        lastId: Long?
+        lastId: Long?,
     ) {
         select(entity(PlaceReview::class))
         from(entity(PlaceReview::class))
@@ -87,7 +87,7 @@ class PlaceReviewRepositoryImpl(private val queryFactory: QueryFactory) : Custom
 
     private fun <T> CriteriaQueryDsl<T>.dynamicPredicatePlaceReviewSortType(
         sortType: PlaceReviewSortType,
-        lastId: Long?
+        lastId: Long?,
     ): PredicateSpec {
         return if (lastId != null) {
             when (sortType) {
@@ -100,7 +100,7 @@ class PlaceReviewRepositoryImpl(private val queryFactory: QueryFactory) : Custom
     }
 
     private fun <T> CriteriaQueryDsl<T>.dynamicOrderingByPlaceReviewSortType(
-        sortType: PlaceReviewSortType
+        sortType: PlaceReviewSortType,
     ): List<OrderSpec> =
         when (sortType) {
             PlaceReviewSortType.LATEST -> listOf(col(PlaceReview::id).desc())

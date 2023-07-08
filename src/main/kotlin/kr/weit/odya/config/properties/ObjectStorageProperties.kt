@@ -10,5 +10,5 @@ data class ObjectStorageProperties(
     val namespaceName: String,
     val bucketName: String,
     val preAuthenticatedRequestExpiredSec: Long,
-    val objectGetUrl: String
+    val objectGetUrl: String,
 )

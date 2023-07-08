@@ -14,5 +14,5 @@ data class TestDocument(
     val id: Long,
 
     @Field(type = FieldType.Text)
-    val name: String
+    val name: String,
 )

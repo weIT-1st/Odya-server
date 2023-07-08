@@ -8,5 +8,5 @@ import org.springframework.context.annotation.Profile
 data class OpenSearchProperties(
     val serverUrl: String,
     val username: String,
-    val password: String
+    val password: String,
 )

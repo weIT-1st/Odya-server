@@ -13,7 +13,7 @@ import kr.weit.odya.support.test.BaseTests.RepositoryTest
 
 @RepositoryTest
 class UserRepositoryTest(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
 ) : ExpectSpec({
     beforeEach {
         userRepository.save(createUser())

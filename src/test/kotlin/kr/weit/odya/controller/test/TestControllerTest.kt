@@ -21,7 +21,7 @@ import org.springframework.web.context.WebApplicationContext
 @UnitControllerTestEnvironment
 @WebMvcTest(TestController::class)
 class TestControllerTest(
-    private val context: WebApplicationContext
+    private val context: WebApplicationContext,
 ) : DescribeSpec(
     {
         val restDocumentation = ManualRestDocumentation()
