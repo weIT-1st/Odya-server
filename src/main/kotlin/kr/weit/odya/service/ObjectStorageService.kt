@@ -11,11 +11,12 @@ import com.oracle.bmc.objectstorage.requests.CreatePreauthenticatedRequestReques
 import com.oracle.bmc.objectstorage.requests.DeleteObjectRequest
 import com.oracle.bmc.objectstorage.requests.PutObjectRequest
 import kr.weit.odya.config.properties.ObjectStorageProperties
+import kr.weit.odya.util.getOrThrow
 import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.io.InputStream
-import java.util.*
+import java.util.Date
 
 @Profile("!test")
 @Service
@@ -50,7 +51,7 @@ class ObjectStorageService(private val properties: ObjectStorageProperties) {
         runCatching {
             client.deleteObject(request)
         }.onFailure {
-            if (it is BmcException && it.statusCode == HttpStatus.NOT_FOUND.value()) {
+            require(!(it is BmcException && it.statusCode == HttpStatus.NOT_FOUND.value())) {
                 throw IllegalArgumentException("$fileName: Object Storage에 존재하지 않는 파일입니다")
             }
             throw ObjectStorageException("$fileName: 삭제에 실패했습니다(${it.message})")
@@ -61,9 +62,9 @@ class ObjectStorageService(private val properties: ObjectStorageProperties) {
         val createPreAuthenticatedRequestRequest = getCreatePreAuthenticatedRequestRequest(objectName)
         val preAuthenticatedRequest = runCatching {
             client.createPreauthenticatedRequest(createPreAuthenticatedRequestRequest).preauthenticatedRequest
-        }.onFailure {
+        }.getOrThrow {
             throw ObjectStorageException("$objectName: pre-authenticated request 생성에 실패했습니다")
-        }.getOrThrow()
+        }
         return "${properties.objectGetUrl}${preAuthenticatedRequest.accessUri}"
     }
 
