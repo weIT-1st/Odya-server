@@ -14,14 +14,13 @@ import kr.weit.odya.service.dto.PlaceReviewCreateRequest
 import kr.weit.odya.service.dto.PlaceReviewListResponse
 import kr.weit.odya.service.dto.PlaceReviewUpdateRequest
 import kr.weit.odya.service.dto.SliceResponse
-import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class PlaceReviewService(
     private val placeReviewRepository: PlaceReviewRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
 ) {
     @Transactional
     fun createReview(request: PlaceReviewCreateRequest, userId: Long) {
@@ -56,15 +55,15 @@ class PlaceReviewService(
         }
     }
 
-    fun getByPlaceReviewList(placeId: String, pageable: Pageable, sortType: PlaceReviewSortType, lastId: Long?): SliceResponse<PlaceReviewListResponse> {
-        val placeReviews = placeReviewRepository.getPlaceReviewListByPlaceId(placeId, pageable, sortType, lastId).map { PlaceReviewListResponse(it) }
-        return SliceResponse(pageable, placeReviews)
+    fun getByPlaceReviewList(placeId: String, size: Int, sortType: PlaceReviewSortType, lastId: Long?): SliceResponse<PlaceReviewListResponse> {
+        val placeReviews = placeReviewRepository.getPlaceReviewListByPlaceId(placeId, size, sortType, lastId).map { PlaceReviewListResponse(it) }
+        return SliceResponse(size, placeReviews)
     }
 
     @Transactional
-    fun getByUserReviewList(userId: Long, pageable: Pageable, sortType: PlaceReviewSortType, lastId: Long?): SliceResponse<PlaceReviewListResponse> {
+    fun getByUserReviewList(userId: Long, size: Int, sortType: PlaceReviewSortType, lastId: Long?): SliceResponse<PlaceReviewListResponse> {
         val user: User = userRepository.getByUserId(userId)
-        val placeReviews = placeReviewRepository.getPlaceReviewListByUser(user, pageable, sortType, lastId).map { PlaceReviewListResponse(it) }
-        return SliceResponse(pageable, placeReviews)
+        val placeReviews = placeReviewRepository.getPlaceReviewListByUser(user, size, sortType, lastId).map { PlaceReviewListResponse(it) }
+        return SliceResponse(size, placeReviews)
     }
 }

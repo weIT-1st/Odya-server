@@ -74,7 +74,7 @@ class FollowServiceTest : DescribeSpec({
                 followRepository.getFollowingListBySearchCond(
                     TEST_USER_ID,
                     TEST_DEFAULT_PAGEABLE,
-                    TEST_DEFAULT_SORT_TYPE
+                    TEST_DEFAULT_SORT_TYPE,
                 )
             } returns createFollowList()
             it("SliceResponse<FollowUserResponse>를 반환한다.") {
@@ -91,7 +91,7 @@ class FollowServiceTest : DescribeSpec({
                 followRepository.getFollowerListBySearchCond(
                     TEST_USER_ID,
                     TEST_DEFAULT_PAGEABLE,
-                    TEST_DEFAULT_SORT_TYPE
+                    TEST_DEFAULT_SORT_TYPE,
                 )
             } returns createFollowList()
             it("SliceResponse<FollowUserResponse>를 반환한다.") {
