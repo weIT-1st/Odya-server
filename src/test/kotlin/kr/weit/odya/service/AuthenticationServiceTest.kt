@@ -17,6 +17,7 @@ import kr.weit.odya.security.CreateFirebaseUserException
 import kr.weit.odya.security.CreateTokenException
 import kr.weit.odya.security.FirebaseTokenHelper
 import kr.weit.odya.security.InvalidTokenException
+import kr.weit.odya.support.NOT_EXIST_PROFILE_COLOR_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_BEARER_OAUTH_ACCESS_TOKEN
 import kr.weit.odya.support.TEST_CUSTOM_TOKEN
 import kr.weit.odya.support.TEST_EMAIL
@@ -28,15 +29,18 @@ import kr.weit.odya.support.TEST_USERNAME
 import kr.weit.odya.support.createAppleRegisterRequest
 import kr.weit.odya.support.createKakaoLoginRequest
 import kr.weit.odya.support.createKakaoUserInfo
+import kr.weit.odya.support.createProfileColor
 import kr.weit.odya.support.createUser
 
 class AuthenticationServiceTest : DescribeSpec(
     {
         val userRepository = mockk<UserRepository>()
         val firebaseTokenHelper = mockk<FirebaseTokenHelper>()
+        val profileColorService = mockk<ProfileColorService>()
         val kakaoClient = mockk<KakaoClient>()
 
-        val authenticationService = AuthenticationService(userRepository, firebaseTokenHelper, kakaoClient)
+        val authenticationService =
+            AuthenticationService(userRepository, profileColorService, firebaseTokenHelper, kakaoClient)
 
         describe("appleLoginProcess") {
             context("유효한 USERNAME이 주어지는 경우") {
@@ -87,6 +91,7 @@ class AuthenticationServiceTest : DescribeSpec(
                 every { userRepository.existsByEmail(request.email!!) } returns false
                 every { userRepository.existsByPhoneNumber(request.phoneNumber!!) } returns false
                 every { userRepository.existsByNickname(request.nickname) } returns false
+                every { profileColorService.getRandomProfileColor() } returns createProfileColor()
                 every { userRepository.save(any()) } returns createUser()
                 it("정상적으로 종료한다") {
                     shouldNotThrow<Exception> { authenticationService.register(request) }
@@ -124,6 +129,19 @@ class AuthenticationServiceTest : DescribeSpec(
                 every { userRepository.existsByNickname(request.nickname) } returns true
                 it("[ExistResourceException] 예외가 발생한다") {
                     shouldThrow<ExistResourceException> { authenticationService.register(request) }
+                }
+            }
+
+            context("DB에 등록된 프로필 색상이 없을 경우") {
+                every { userRepository.existsByUsername(request.username) } returns false
+                every { userRepository.existsByEmail(request.email!!) } returns false
+                every { userRepository.existsByPhoneNumber(request.phoneNumber!!) } returns false
+                every { userRepository.existsByNickname(request.nickname) } returns false
+                every { profileColorService.getRandomProfileColor() } throws NotFoundDefaultResourceException(
+                    NOT_EXIST_PROFILE_COLOR_ERROR_MESSAGE,
+                )
+                it("[NotFoundDefaultResourceException] 예외가 발생한다") {
+                    shouldThrow<NotFoundDefaultResourceException> { authenticationService.register(request) }
                 }
             }
         }

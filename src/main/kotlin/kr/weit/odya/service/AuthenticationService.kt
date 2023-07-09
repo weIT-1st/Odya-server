@@ -2,6 +2,8 @@ package kr.weit.odya.service
 
 import kr.weit.odya.client.kakao.KakaoClient
 import kr.weit.odya.client.kakao.KakaoUserInfo
+import kr.weit.odya.domain.profilecolor.ProfileColor
+import kr.weit.odya.domain.user.Profile
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.existsByEmail
@@ -19,6 +21,7 @@ private const val OAUTH_ACCESS_TOKEN_TYPE = "BEARER"
 @Service
 class AuthenticationService(
     private val userRepository: UserRepository,
+    private val profileColorService: ProfileColorService,
     private val firebaseTokenHelper: FirebaseTokenHelper,
     private val kakaoClient: KakaoClient,
 ) {
@@ -38,7 +41,8 @@ class AuthenticationService(
     @Transactional
     fun register(registerRequest: RegisterRequest) {
         validateRegisterInformation(registerRequest)
-        userRepository.save(createUser(registerRequest))
+        val randomProfileColor = profileColorService.getRandomProfileColor()
+        userRepository.save(createUser(registerRequest, randomProfileColor))
     }
 
     fun validateNickname(nickname: String) {
@@ -85,6 +89,7 @@ class AuthenticationService(
 
     private fun createUser(
         registerRequest: RegisterRequest,
+        randomProfileColor: ProfileColor,
     ) = User(
         username = registerRequest.username,
         email = registerRequest.email?.trim(),
@@ -93,5 +98,6 @@ class AuthenticationService(
         gender = registerRequest.gender,
         birthday = registerRequest.birthday,
         socialType = registerRequest.socialType,
+        profile = Profile(profileColor = randomProfileColor),
     )
 }

@@ -9,4 +9,6 @@ data class ObjectStorageProperties(
     val configurationFilePath: String,
     val namespaceName: String,
     val bucketName: String,
+    val preAuthenticatedRequestExpiredSec: Long,
+    val objectGetUrl: String,
 )

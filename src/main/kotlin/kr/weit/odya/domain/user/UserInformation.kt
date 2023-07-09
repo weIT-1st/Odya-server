@@ -23,7 +23,4 @@ data class UserInformation(
 
     @Column(nullable = false, updatable = false)
     val birthday: LocalDate,
-
-    @Column(nullable = false)
-    val profileName: String,
 )

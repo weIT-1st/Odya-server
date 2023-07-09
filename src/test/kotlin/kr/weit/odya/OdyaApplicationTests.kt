@@ -1,11 +1,9 @@
 package kr.weit.odya
 
+import kr.weit.odya.support.test.BaseTests.IntegrationTest
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
 
-@SpringBootTest
-@ActiveProfiles("test")
+@IntegrationTest
 class OdyaApplicationTests {
 
     @Test

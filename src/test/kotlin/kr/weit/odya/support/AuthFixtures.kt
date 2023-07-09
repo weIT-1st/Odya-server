@@ -32,8 +32,6 @@ const val TEST_BEARER_INVALID_ID_TOKEN = "Bearer $TEST_INVALID_ID_TOKEN"
 
 const val TEST_BEARER_OAUTH_ACCESS_TOKEN = "BEARER oAuthAccessToken"
 
-const val SOMETHING_ERROR_MESSAGE = "something error message"
-
 fun createAppleLoginRequest() = AppleLoginRequest(TEST_ID_TOKEN)
 
 fun createKakaoLoginRequest() = KakaoLoginRequest(TEST_OAUTH_ACCESS_TOKEN)

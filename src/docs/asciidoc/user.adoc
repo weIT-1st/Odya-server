@@ -12,7 +12,11 @@ operation::user-controller-test/get-my-information-success[snippets='http-reques
 
 operation::user-controller-test/get-my-information-fail-not-registered-user[snippets='http-request,request-headers,http-response,response-fields']
 
-=== *1-3 실패 - 유효하지 않은 토큰*
+=== *1-3 실패 - 유효한 토큰이면서, 프로필 PreAuthentication Access Url 생성에 실패한 경우*
+
+operation::user-controller-test/get-my-information-fail-create-pre-authentication-access-url[snippets='http-request,request-headers,http-response,response-fields']
+
+=== *1-4 실패 - 유효하지 않은 토큰*
 
 operation::user-controller-test/get-my-information-fail-invalid-token[snippets='http-request,request-headers,http-response,response-fields']
 
@@ -68,3 +72,46 @@ operation::user-controller-test/update-information-fail-exist-nickname[snippets=
 === *4-3 실패 - 유효하지 않은 토큰*
 
 operation::user-controller-test/update-information-fail-invalid-token[snippets='http-request,request-headers,http-response']
+
+[[프로필-변경-API]]
+== *5. 프로필 변경 API*
+
+=== *5-1 성공 프로필 사진을 전송한 경우*
+
+operation::user-controller-test/update-profile-image-success[snippets='http-request,request-headers,request-parts,http-response']
+
+=== *5-2 성공 프로필 사진을 전송하지 않은 경우 (기본 프로필로 변경)*
+
+operation::user-controller-test/update-profile-image-success-without-profile-image[snippets='http-request,request-headers,http-response']
+
+=== *5-3 실패 - 유효한 토큰이면서, 프로필 사진의 형식이 잘못된 경우*
+
+operation::user-controller-test/update-profile-image-fail-invalid-format[snippets='http-request,request-headers,request-parts,http-response,response-fields']
+
+=== *5-4 실패 - 유효한 토큰이면서, 프로필 사진의 원본 파일 이름이 존재하지 않는 경우*
+
+operation::user-controller-test/update-profile-image-fail-not-exist-origin-file-name[snippets='http-request,request-headers,request-parts,http-response,response-fields']
+
+=== *5-5 실패 - 유효한 토큰이면서, Object Storage에 저장하는데 실패한 경우*
+
+operation::user-controller-test/update-profile-image-fail-object-storage-error[snippets='http-request,request-headers,request-parts,http-response,response-fields']
+
+=== *5-6 실패 - 유효한 토큰이면서, 프로필 사진을 첨부하지 않고 이미 기본 프로필인 경우*
+
+operation::user-controller-test/update-profile-image-fail-invalid-delete-default-profile[snippets='http-request,request-headers,http-response,response-fields']
+
+=== *5-7 실패 - 유효한 토큰이면서, Object Storage에 프로필이 없어 삭제에 실패한 경우*
+
+operation::user-controller-test/update-profile-image-fail-delete-not-exist-profile[snippets='http-request,request-headers,http-response,response-fields']
+
+=== *5-8 실패 - 유효한 토큰이면서, 프로필 삭제에 실패한 경우*
+
+operation::user-controller-test/update-profile-image-fail-delete-profile-error[snippets='http-request,request-headers,http-response,response-fields']
+
+=== *5-9 실패 - 유효한 토큰이면서, DB에 프로필 색상이 없는 경우*
+
+operation::user-controller-test/update-profile-image-fail-object-storage-error[snippets='http-request,request-headers,request-parts,http-response,response-fields']
+
+=== *5-10 실패 - 유효하지 않은 토큰이면*
+
+operation::user-controller-test/update-profile-image-fail-unauthorized[snippets='http-request,request-headers,request-parts,http-response,response-fields']
