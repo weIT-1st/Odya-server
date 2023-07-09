@@ -52,7 +52,7 @@ class ObjectStorageService(private val properties: ObjectStorageProperties) {
             client.deleteObject(request)
         }.onFailure {
             require(!(it is BmcException && it.statusCode == HttpStatus.NOT_FOUND.value())) {
-                throw IllegalArgumentException("$fileName: Object Storage에 존재하지 않는 파일입니다")
+                "$fileName: Object Storage에 존재하지 않는 파일입니다"
             }
             throw ObjectStorageException("$fileName: 삭제에 실패했습니다(${it.message})")
         }

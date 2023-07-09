@@ -19,7 +19,6 @@ CREATE TABLE profile_color
     green        INTEGER        NOT NULL,
     blue         INTEGER        NOT NULL,
     created_date DATE           NOT NULL,
-    updated_date DATE           NOT NULL,
     CONSTRAINT pk_profile_color PRIMARY KEY (id)
 );
 
@@ -29,7 +28,7 @@ alter table users
     drop column profile_name;
 
 alter table users
-    add profile_id numeric(19, 0) not null;
+    add profile_id numeric(19, 0);
 
 alter table profile
     add constraint FK_PROFILE_ON_PROFILE_COLOR foreign key (profile_color_id) references profile_color (id);
