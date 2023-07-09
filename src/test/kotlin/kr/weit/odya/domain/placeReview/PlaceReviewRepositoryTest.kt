@@ -18,19 +18,20 @@ import kr.weit.odya.support.test.BaseTests.RepositoryTest
 class PlaceReviewRepositoryTest(
     private val placeReviewRepository: PlaceReviewRepository,
     private val userRepository: UserRepository,
-) : ExpectSpec({
-    extensions(SpringTestExtension(SpringTestLifecycleMode.Root))
-    lateinit var user: User
-    beforeEach {
-        user = userRepository.save(createUser())
-        placeReviewRepository.save(createPlaceReview(user))
-    }
-
-    context("장소 리뷰 조회") {
-        expect("PLACE_REVIEW_ID와 일치하는 장소 리뷰를 조회한다") {
-            val result = placeReviewRepository.getByPlaceReviewId(TEST_PLACE_REVIEW_ID)
-            result.id shouldBe TEST_PLACE_REVIEW_ID
+) : ExpectSpec(
+    {
+        extensions(SpringTestExtension(SpringTestLifecycleMode.Root))
+        lateinit var user: User
+        beforeEach {
+            user = userRepository.save(createUser())
+            placeReviewRepository.save(createPlaceReview(user))
         }
+
+        context("장소 리뷰 조회") {
+            expect("PLACE_REVIEW_ID와 일치하는 장소 리뷰를 조회한다") {
+                val result = placeReviewRepository.getByPlaceReviewId(TEST_PLACE_REVIEW_ID)
+                result.id shouldBe TEST_PLACE_REVIEW_ID
+            }
 
         expect("PLACE_ID와 일치하는 장소 리뷰를 조회한다") {
             val result = placeReviewRepository.getPlaceReviewListByPlaceId(TEST_PLACE_ID, TEST_DEFAULT_PAGEABLE, TEST_PLACE_SORT_TYPE, null)
@@ -43,10 +44,11 @@ class PlaceReviewRepositoryTest(
         }
     }
 
-    context("장소 리뷰 여부 확인") {
-        expect("USER_ID와 PLACE_ID이 일치하는 장소 리뷰 여부를 확인한다") {
-            val result = placeReviewRepository.existsByUserIdAndPlaceId(user.id, TEST_PLACE_ID)
-            result shouldBe true
+        context("장소 리뷰 여부 확인") {
+            expect("USER_ID와 PLACE_ID이 일치하는 장소 리뷰 여부를 확인한다") {
+                val result = placeReviewRepository.existsByUserIdAndPlaceId(user.id, TEST_PLACE_ID)
+                result shouldBe true
+            }
         }
-    }
-},)
+    },
+)

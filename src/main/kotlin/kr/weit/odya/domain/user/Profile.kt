@@ -6,7 +6,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
-import jakarta.persistence.OneToOne
+import jakarta.persistence.ManyToOne
 import jakarta.persistence.SequenceGenerator
 import kr.weit.odya.domain.profilecolor.ProfileColor
 import kr.weit.odya.support.domain.BaseModifiableEntity
@@ -35,7 +35,7 @@ class Profile(
     var originFileName: String = originFileName
         protected set
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "profile_color_id", nullable = false)
     var profileColor: ProfileColor = profileColor
         protected set

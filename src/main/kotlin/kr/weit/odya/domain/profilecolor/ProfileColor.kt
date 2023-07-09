@@ -6,7 +6,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.SequenceGenerator
-import kr.weit.odya.support.domain.BaseModifiableEntity
+import kr.weit.odya.support.domain.BaseTimeEntity
 
 const val NONE_PROFILE_COLOR_HEX = "NONE"
 
@@ -34,4 +34,4 @@ class ProfileColor(
 
     @Column(nullable = false, updatable = false)
     val blue: Int,
-) : BaseModifiableEntity()
+) : BaseTimeEntity()

@@ -75,7 +75,6 @@ CREATE TABLE profile_color
     green        INTEGER        NOT NULL,
     blue         INTEGER        NOT NULL,
     created_date DATE           NOT NULL,
-    updated_date DATE           NOT NULL,
     CONSTRAINT pk_profile_color PRIMARY KEY (id)
 );
 

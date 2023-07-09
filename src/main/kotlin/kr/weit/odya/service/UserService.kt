@@ -14,9 +14,9 @@ import kr.weit.odya.service.generator.FileNameGenerator
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.io.InputStream
-import java.util.*
+import java.util.Locale
 
-val ALLOW_FILE_FORMAT_LIST: List<String> = listOf("png", "jpg", "jpeg")
+val ALLOW_FILE_FORMAT_LIST: List<String> = listOf("png", "jpg", "jpeg", "webp")
 
 @Service
 class UserService(
@@ -72,8 +72,8 @@ class UserService(
     }
 
     fun deleteProfile(userId: Long) {
-        val profileName = userRepository.getByUserIdWithProfile(userId).profile.profileName.apply {
-            require(this != DEFAULT_PROFILE_PNG) { "기본 프로필은 삭제할 수 없습니다" }
+        val profileName = userRepository.getByUserIdWithProfile(userId).profile.profileName.also {
+            require(it != DEFAULT_PROFILE_PNG) { "기본 프로필은 삭제할 수 없습니다" }
         }
         objectStorageService.delete(profileName)
     }

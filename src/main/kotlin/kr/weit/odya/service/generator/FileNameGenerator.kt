@@ -1,7 +1,7 @@
 package kr.weit.odya.service.generator
 
 import org.springframework.stereotype.Component
-import java.util.*
+import java.util.UUID
 
 private const val DEFAULT_PROFILE_NAME_END_INDEX = 16
 
