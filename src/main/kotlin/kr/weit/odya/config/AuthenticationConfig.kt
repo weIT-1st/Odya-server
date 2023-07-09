@@ -7,7 +7,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @Configuration
 class AuthenticationConfig(
-    private val loginUserIdResolver: LoginUserIdResolver
+    private val loginUserIdResolver: LoginUserIdResolver,
 ) : WebMvcConfigurer {
     override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
         resolvers.add(loginUserIdResolver)

@@ -20,5 +20,5 @@ class Follow(
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "following_id", columnDefinition = "NUMERIC(19, 0)", nullable = false, updatable = false)
-    val following: User
+    val following: User,
 ) : BaseTimeEntity()

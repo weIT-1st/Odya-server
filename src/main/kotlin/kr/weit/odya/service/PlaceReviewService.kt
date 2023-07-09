@@ -56,14 +56,12 @@ class PlaceReviewService(
     }
 
     fun getByPlaceReviewList(placeId: String, size: Int, sortType: PlaceReviewSortType, lastId: Long?): SliceResponse<PlaceReviewListResponse> {
-        val placeReviews = placeReviewRepository.getPlaceReviewListByPlaceId(placeId, size, sortType, lastId).map { PlaceReviewListResponse(it) }
-        return SliceResponse(size, placeReviews)
+        return SliceResponse(size, placeReviewRepository.getPlaceReviewListByPlaceId(placeId, size, sortType, lastId).map { PlaceReviewListResponse(it) })
     }
 
     @Transactional
     fun getByUserReviewList(userId: Long, size: Int, sortType: PlaceReviewSortType, lastId: Long?): SliceResponse<PlaceReviewListResponse> {
         val user: User = userRepository.getByUserId(userId)
-        val placeReviews = placeReviewRepository.getPlaceReviewListByUser(user, size, sortType, lastId).map { PlaceReviewListResponse(it) }
-        return SliceResponse(size, placeReviews)
+        return SliceResponse(size, placeReviewRepository.getPlaceReviewListByUser(user, size, sortType, lastId).map { PlaceReviewListResponse(it) })
     }
 }

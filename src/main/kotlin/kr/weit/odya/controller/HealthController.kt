@@ -19,5 +19,5 @@ class HealthController {
 }
 
 data class HealthResponse(
-    val status: Int
+    val status: Int,
 )

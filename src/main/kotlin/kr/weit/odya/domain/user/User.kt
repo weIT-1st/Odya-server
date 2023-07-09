@@ -1,15 +1,20 @@
 package kr.weit.odya.domain.user
 
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Embedded
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
+import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.OneToOne
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
+import kr.weit.odya.domain.profilecolor.ProfileColor
 import kr.weit.odya.support.domain.BaseTimeEntity
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
@@ -41,7 +46,11 @@ class User(
     @Column
     val withdrawDate: LocalDateTime? = null,
 
-    userInformation: UserInformation
+    @JoinColumn(name = "profile_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE])
+    val profile: Profile,
+
+    userInformation: UserInformation,
 ) : BaseTimeEntity() {
     @Embedded
     var information: UserInformation = userInformation
@@ -55,16 +64,17 @@ class User(
         phoneNumber: String? = null,
         gender: Gender,
         birthday: LocalDate,
-        profileName: String = "default_profile.png",
         socialType: SocialType,
-        userRole: UserRole = UserRole.ROLE_USER
+        userRole: UserRole = UserRole.ROLE_USER,
+        profile: Profile,
     ) : this(
         id = id,
         username = username,
         socialType = socialType,
         withdrawDate = null,
         userRole = userRole,
-        userInformation = UserInformation(email, nickname, phoneNumber, gender, birthday, profileName)
+        userInformation = UserInformation(email, nickname, phoneNumber, gender, birthday),
+        profile = profile,
     )
 
     val email: String?
@@ -82,9 +92,6 @@ class User(
     val birthday: LocalDate
         get() = information.birthday
 
-    val profileName: String
-        get() = information.profileName
-
     fun changePhoneNumber(phoneNumber: String) {
         information = information.copy(phoneNumber = phoneNumber)
     }
@@ -95,5 +102,9 @@ class User(
 
     fun changeInformation(nickname: String) {
         information = information.copy(nickname = nickname)
+    }
+
+    fun changeProfile(profileName: String, originFileName: String, profileColor: ProfileColor) {
+        profile.changeProfile(profileName, originFileName, profileColor)
     }
 }

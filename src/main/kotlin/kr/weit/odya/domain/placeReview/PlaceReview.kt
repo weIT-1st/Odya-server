@@ -18,18 +18,18 @@ import kr.weit.odya.support.domain.BaseModifiableEntity
     uniqueConstraints = [
         UniqueConstraint(
             name = "place_id_user_id_unique",
-            columnNames = ["place_id", "user_id"]
-        )
+            columnNames = ["place_id", "user_id"],
+        ),
     ],
     indexes = [
-        Index(name = "place_id_index", columnList = "place_id")
-    ]
+        Index(name = "place_id_index", columnList = "place_id"),
+    ],
 )
 @SequenceGenerator(
     name = "PLACE_REVIEW_SEQ_GENERATOR",
     sequenceName = "PLACE_REVIEW_SEQ",
     initialValue = 1,
-    allocationSize = 1
+    allocationSize = 1,
 )
 @Entity
 class PlaceReview(
@@ -49,7 +49,7 @@ class PlaceReview(
     var starRating: Int,
 
     @Column(length = 90, nullable = false)
-    var review: String
+    var review: String,
 ) : BaseModifiableEntity() {
     val writerId: Long
         get() = user.id

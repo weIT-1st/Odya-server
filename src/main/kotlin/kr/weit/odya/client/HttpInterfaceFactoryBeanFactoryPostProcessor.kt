@@ -41,12 +41,12 @@ class HttpInterfaceFactoryBeanFactoryPostProcessor : BeanFactoryPostProcessor {
     private fun findClassAndRegisterAsSingletonBean(
         beanFactory: ConfigurableListableBeanFactory,
         factory: HttpInterfaceFactory,
-        beanDefinition: BeanDefinition
+        beanDefinition: BeanDefinition,
     ) {
         val beanClassName = getBeanClassName(beanDefinition)
         beanFactory.registerSingleton(
             beanClassName,
-            factory.create(findHttpInterfaceClass(beanDefinition))
+            factory.create(findHttpInterfaceClass(beanDefinition)),
         )
     }
 

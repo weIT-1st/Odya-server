@@ -8,6 +8,8 @@ import kr.weit.odya.security.FirebaseAuthException
 import kr.weit.odya.security.InvalidTokenException
 import kr.weit.odya.service.ExistResourceException
 import kr.weit.odya.service.LoginFailedException
+import kr.weit.odya.service.NotFoundDefaultResourceException
+import kr.weit.odya.service.ObjectStorageException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
@@ -28,7 +30,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         ex: MethodArgumentNotValidException,
         headers: HttpHeaders,
         status: HttpStatusCode,
-        request: WebRequest
+        request: WebRequest,
     ): ResponseEntity<Any>? {
         logger.error("[MethodArgumentNotValidException] ${ex.messages()}")
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiErrorResponse(ex.messages().joinToString(" ")))
@@ -38,7 +40,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         ex: HttpMessageNotReadableException,
         headers: HttpHeaders,
         status: HttpStatusCode,
-        request: WebRequest
+        request: WebRequest,
     ): ResponseEntity<Any>? {
         logger.error("[HttpMessageNotReadableException] ${ex.message}")
         val errorMessage = when (val cause = ex.cause) {
@@ -52,7 +54,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         ex: HttpRequestMethodNotSupportedException,
         headers: HttpHeaders,
         status: HttpStatusCode,
-        request: WebRequest
+        request: WebRequest,
     ): ResponseEntity<Any>? {
         logger.error("[HttpRequestMethodNotSupportedException] ${ex.message}")
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiErrorResponse(ex.message))
@@ -88,7 +90,12 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiErrorResponse(ex.message))
     }
 
-    @ExceptionHandler(Exception::class, FirebaseAuthException::class)
+    @ExceptionHandler(
+        Exception::class,
+        FirebaseAuthException::class,
+        NotFoundDefaultResourceException::class,
+        ObjectStorageException::class,
+    )
     fun exception(ex: Exception): ResponseEntity<ApiErrorResponse> {
         logger.error("[Exception]", ex)
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiErrorResponse(ex.message))

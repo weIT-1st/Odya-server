@@ -15,6 +15,7 @@ import org.springframework.restdocs.payload.RequestFieldsSnippet
 import org.springframework.restdocs.payload.ResponseFieldsSnippet
 import org.springframework.restdocs.request.ParameterDescriptor
 import org.springframework.restdocs.request.RequestDocumentation
+import org.springframework.restdocs.request.RequestPartDescriptor
 import org.springframework.restdocs.snippet.Attributes.Attribute
 import org.springframework.restdocs.snippet.Snippet
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
@@ -34,7 +35,7 @@ class RestDocsHelper {
 
         fun generateRestDocMockMvc(
             webApplicationContext: WebApplicationContext,
-            restDocumentationContextProvider: RestDocumentationContextProvider
+            restDocumentationContextProvider: RestDocumentationContextProvider,
         ): MockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
             .apply<DefaultMockMvcBuilder>(springSecurity())
             .addFilter<DefaultMockMvcBuilder>(CharacterEncodingFilter("UTF-8", true))
@@ -43,7 +44,7 @@ class RestDocsHelper {
                 MockMvcRestDocumentation.documentationConfiguration(restDocumentationContextProvider)
                     .operationPreprocessors()
                     .withRequestDefaults(Preprocessors.prettyPrint())
-                    .withResponseDefaults(Preprocessors.prettyPrint())
+                    .withResponseDefaults(Preprocessors.prettyPrint()),
             )
             .build()
 
@@ -67,16 +68,16 @@ class RestDocsHelper {
 }
 
 infix fun String.type(
-    type: JsonFieldType
+    type: JsonFieldType,
 ): RestDocsField = createField(this, type)
 
 private fun createField(
     path: String,
-    type: JsonFieldType
+    type: JsonFieldType,
 ): RestDocsField = RestDocsField(PayloadDocumentation.fieldWithPath(path).type(type))
 
 class RestDocsField(
-    val descriptor: FieldDescriptor
+    val descriptor: FieldDescriptor,
 ) {
     infix fun isOptional(value: Boolean): RestDocsField {
         if (value) descriptor.optional()
@@ -106,11 +107,20 @@ infix fun String.parameterDescription(value: String): ParameterDescriptor {
     return RequestDocumentation.parameterWithName(this).description(value)
 }
 
-infix fun ParameterDescriptor.example(value: Any?): ParameterDescriptor {
-    return this.attributes(field(EXAMPLE, if (value is String) value else value?.toString()))
+infix fun String.requestPartDescription(value: String): RequestPartDescriptor {
+    return RequestDocumentation.partWithName(this).description(value)
+}
+
+infix fun ParameterDescriptor.example(value: Any): ParameterDescriptor {
+    return this.attributes(field(EXAMPLE, if (value is String) value else value.toString()))
 }
 
 infix fun ParameterDescriptor.isOptional(value: Boolean): ParameterDescriptor {
+    if (value) this.optional()
+    return this
+}
+
+infix fun RequestPartDescriptor.isOptional(value: Boolean): RequestPartDescriptor {
     if (value) this.optional()
     return this
 }

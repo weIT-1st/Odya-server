@@ -12,14 +12,14 @@ import org.springframework.data.jpa.repository.JpaRepository
 fun FollowRepository.getFollowingListBySearchCond(
     followerId: Long,
     pageable: Pageable,
-    sortType: FollowSortType
+    sortType: FollowSortType,
 ): List<Follow> =
     findSliceByFollowerIdOrderBySortType(followerId, pageable, sortType)
 
 fun FollowRepository.getFollowerListBySearchCond(
     followingId: Long,
     pageable: Pageable,
-    sortType: FollowSortType
+    sortType: FollowSortType,
 ): List<Follow> =
     findSliceByFollowingIdOrderBySortType(followingId, pageable, sortType)
 
@@ -37,13 +37,13 @@ interface CustomFollowRepository {
     fun findSliceByFollowerIdOrderBySortType(
         followerId: Long,
         pageable: Pageable,
-        sortType: FollowSortType
+        sortType: FollowSortType,
     ): List<Follow>
 
     fun findSliceByFollowingIdOrderBySortType(
         followingId: Long,
         pageable: Pageable,
-        sortType: FollowSortType
+        sortType: FollowSortType,
     ): List<Follow>
 }
 
@@ -51,7 +51,7 @@ class FollowRepositoryImpl(private val queryFactory: QueryFactory) : CustomFollo
     override fun findSliceByFollowerIdOrderBySortType(
         followerId: Long,
         pageable: Pageable,
-        sortType: FollowSortType
+        sortType: FollowSortType,
     ): List<Follow> = queryFactory.listQuery {
         select(entity(Follow::class))
         from(entity(Follow::class))
@@ -65,7 +65,7 @@ class FollowRepositoryImpl(private val queryFactory: QueryFactory) : CustomFollo
     override fun findSliceByFollowingIdOrderBySortType(
         followingId: Long,
         pageable: Pageable,
-        sortType: FollowSortType
+        sortType: FollowSortType,
     ): List<Follow> = queryFactory.listQuery {
         select(entity(Follow::class))
         from(entity(Follow::class))
@@ -77,7 +77,7 @@ class FollowRepositoryImpl(private val queryFactory: QueryFactory) : CustomFollo
     }
 
     private fun <T> CriteriaQueryDsl<T>.dynamicOrderingByFollowSortType(
-        sortType: FollowSortType
+        sortType: FollowSortType,
     ): List<OrderSpec> =
         when (sortType) {
             FollowSortType.LATEST -> listOf(col(Follow::createdDate).desc())
