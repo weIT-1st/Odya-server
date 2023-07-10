@@ -24,7 +24,7 @@ import reactor.netty.http.client.HttpClient
 import java.time.Duration
 import java.util.concurrent.TimeUnit
 
-private const val DEFAULT_TIME_OUT_MS: Long = 5000
+private const val DEFAULT_TIME_OUT_MS: Long = 10000
 
 @Component
 class HttpInterfaceFactoryBeanFactoryPostProcessor : BeanFactoryPostProcessor {
