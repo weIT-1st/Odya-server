@@ -4,6 +4,7 @@ spring.config.activate.on-profile: sandbox
 open-search:
   indices:
     test: sandbox-logstash-logs
+    place-search-history: sandbox-place-search-history
 
 ---
 spring.config.activate.on-profile: stable
@@ -11,3 +12,4 @@ spring.config.activate.on-profile: stable
 open-search:
   indices:
     test: stable-logstash-logs
+    place-search-history: stable-place-search-history
