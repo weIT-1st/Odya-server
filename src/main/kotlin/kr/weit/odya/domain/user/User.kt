@@ -107,4 +107,13 @@ class User(
     fun changeProfile(profileName: String, originFileName: String, profileColor: ProfileColor) {
         profile.changeProfile(profileName, originFileName, profileColor)
     }
+
+    fun getAgeRange(): Int {
+        val now = LocalDate.now()
+        var age = now.year - birthday.year
+        if (birthday.plusYears(age.toLong()) < now) {
+            age -= 1
+        }
+        return age / 10
+    }
 }

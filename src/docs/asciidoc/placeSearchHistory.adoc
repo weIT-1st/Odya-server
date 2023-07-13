@@ -1,0 +1,51 @@
+[[PlaceSearchHistory-API]]
+= *PlaceSearchHistory API*
+
+[[장소검색기록저장-API]]
+== *1. 장소 검색 기록 저장 API*
+
+=== *1-1 성공*
+
+operation::place-search-history-controller-test/create-place-search-history-success[snippets='http-request,request-headers,request-body,request-fields,http-response']
+
+=== *1-2 실패 - 가입되지 않은 유저*
+
+operation::place-search-history-controller-test/create-place-search-history-fail-not-registered-user[snippets='http-request,request-headers,request-body,request-fields,response-body,http-response']
+
+=== *1-3 실패 - 유효하지 않은 토큰*
+
+operation::place-search-history-controller-test/create-place-search-history-fail-invalid-token[snippets='http-request,request-headers,request-body,request-fields,response-body,http-response']
+
+[[전체검색순위-API]]
+== *2. 전체 검색 순위 API*
+
+=== *2-1 성공*
+
+operation::place-search-history-controller-test/place-search-overall-ranking-success[snippets='http-request,request-headers,response-body,response-fields,http-response']
+
+=== *2-2 실패 - 가입되지 않은 유저*
+
+operation::place-search-history-controller-test/place-search-overall-ranking-fail-not-registered-user[snippets='http-request,request-headers,response-body,http-response']
+
+=== *2-3 실패 - 유효하지 않은 토큰*
+
+operation::place-search-history-controller-test/place-search-overall-ranking-fail-invalid-token[snippets='http-request,request-headers,response-body,http-response']
+
+[[나이대별검색순위-API]]
+== *3. 나이대별 검색 순위 API*
+
+=== *3-1 성공*
+
+operation::place-search-history-controller-test/place-search-age-rang-ranking-success[snippets='http-request,path-Parameters,request-headers,response-body,response-fields,http-response']
+
+=== *3-2 실패 - 양수가 아닌 연령대*
+
+operation::place-search-history-controller-test/place-search-age-rang-ranking-fail-invalid-age-range[snippets='http-request,path-Parameters,request-headers,response-body,http-response']
+
+=== *3-3 실패 - 가입되지 않은 유저*
+
+operation::place-search-history-controller-test/place-search-age-rang-ranking-fail-not-registered-user[snippets='http-request,path-Parameters,request-headers,response-body,http-response']
+
+=== *3-4 실패 - 유효하지 않은 토큰*
+
+operation::place-search-history-controller-test/place-search-age-rang-ranking-fail-invalid-token[snippets='http-request,path-Parameters,request-headers,response-body,http-response']
