@@ -63,34 +63,34 @@ class PlaceReviewController(private val placeReviewService: PlaceReviewService) 
 
     @GetMapping("/places/{id}")
     fun getByPlaceReviewList(
-            @NotNull(message = "장소 ID는 필수 입력값입니다.")
-            @PathVariable("id")
-            placeId: String,
-            @Positive(message = "사이즈는 양수여야 합니다.")
-            @RequestParam(name = "size", required = false, defaultValue = "10")
-            size: Int,
-            @RequestParam(name = "sortType", required = false, defaultValue = "LATEST") sortType: PlaceReviewSortType,
-            @Positive(message = "마지막 Id는 양수여야 합니다.")
-            @RequestParam(name = "lastId", required = false)
-            lastId: Long?,
+        @NotNull(message = "장소 ID는 필수 입력값입니다.")
+        @PathVariable("id")
+        placeId: String,
+        @Positive(message = "사이즈는 양수여야 합니다.")
+        @RequestParam(name = "size", required = false, defaultValue = "10")
+        size: Int,
+        @RequestParam(name = "sortType", required = false, defaultValue = "LATEST") sortType: PlaceReviewSortType,
+        @Positive(message = "마지막 Id는 양수여야 합니다.")
+        @RequestParam(name = "lastId", required = false)
+        lastId: Long?,
     ): ResponseEntity<SliceResponse<PlaceReviewListResponse>> {
         return ResponseEntity.ok(placeReviewService.getByPlaceReviewList(placeId, size, sortType, lastId))
     }
 
     @GetMapping("/users/{id}")
     fun getByUserReviewList(
-            @NotNull(message = "유저 ID는 필수 입력값입니다.")
-            @Positive(message = "유저 ID는 양수여야 합니다.")
-            @PathVariable("id")
-            userId: Long,
-            @Positive(message = "사이즈는 양수여야 합니다.")
-            @RequestParam(name = "size", required = false, defaultValue = "10")
-            size: Int,
-            @RequestParam(name = "sortType", required = false, defaultValue = "LATEST")
-            sortType: PlaceReviewSortType,
-            @Positive(message = "마지막 Id는 양수여야 합니다.")
-            @RequestParam(name = "lastId", required = false)
-            lastId: Long?,
+        @NotNull(message = "유저 ID는 필수 입력값입니다.")
+        @Positive(message = "유저 ID는 양수여야 합니다.")
+        @PathVariable("id")
+        userId: Long,
+        @Positive(message = "사이즈는 양수여야 합니다.")
+        @RequestParam(name = "size", required = false, defaultValue = "10")
+        size: Int,
+        @RequestParam(name = "sortType", required = false, defaultValue = "LATEST")
+        sortType: PlaceReviewSortType,
+        @Positive(message = "마지막 Id는 양수여야 합니다.")
+        @RequestParam(name = "lastId", required = false)
+        lastId: Long?,
     ): ResponseEntity<SliceResponse<PlaceReviewListResponse>> {
         return ResponseEntity.ok(placeReviewService.getByUserReviewList(userId, size, sortType, lastId))
     }
