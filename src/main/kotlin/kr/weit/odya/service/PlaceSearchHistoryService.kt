@@ -2,35 +2,26 @@ package kr.weit.odya.service
 
 import kr.weit.odya.domain.placeSearchHistory.PlaceSearchHistory
 import kr.weit.odya.domain.placeSearchHistory.PlaceSearchHistoryRepository
-import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
 
 @Service
 class PlaceSearchHistoryService(
     private val placeSearchHistoryRepository: PlaceSearchHistoryRepository,
     private val userRepository: UserRepository,
 ) {
-    @Transactional
     fun saveSearchHistory(searchTerm: String, userId: Long) {
-        val user = userRepository.getByUserId(userId)
-        placeSearchHistoryRepository.save(PlaceSearchHistory(searchTerm, getAgeRange(user)))
+        val ageRange = userRepository.getByUserId(userId).getAgeRange()
+        placeSearchHistoryRepository.save(PlaceSearchHistory(searchTerm, ageRange))
     }
 
-    fun getAgeRange(user: User): Int {
-        val now = LocalDate.now()
-        val birthYear = user.birthday
-        var age = now.year - birthYear.year
-        if (birthYear.plusYears(age.toLong()) < now) {
-            age -= 1
-        }
-        return age / 10
+    fun getOverallRanking(): List<String> {
+        return placeSearchHistoryRepository.getRecentTop10Keywords(null)
     }
 
-    fun getSearchHistory(): MutableIterable<PlaceSearchHistory> {
-        return placeSearchHistoryRepository.findAll()
+    fun getAgeRangeRanking(userId: Long, ageRange: Int?): List<String> {
+        val ageRange = ageRange ?: userRepository.getByUserId(userId).getAgeRange()
+        return placeSearchHistoryRepository.getRecentTop10Keywords(ageRange)
     }
 }

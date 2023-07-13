@@ -1,7 +1,9 @@
 package kr.weit.odya.service.dto
 
-class PlaceSearchHistoryDto {
-    data class PlaceSearchHistoryRequest(
-        val searchTerm: String,
-    )
-}
+data class PlaceSearchHistoryRequest(
+    val searchTerm: String,
+)
+
+data class OverallRankingResponse(
+    val searchTerm: String,
+)
