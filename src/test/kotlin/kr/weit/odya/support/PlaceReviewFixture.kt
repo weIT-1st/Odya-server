@@ -4,9 +4,8 @@ import kr.weit.odya.domain.placeReview.PlaceReview
 import kr.weit.odya.domain.placeReview.PlaceReviewSortType
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.service.dto.PlaceReviewCreateRequest
-import kr.weit.odya.service.dto.PlaceReviewListResponse
 import kr.weit.odya.service.dto.PlaceReviewUpdateRequest
-import kr.weit.odya.service.dto.SliceResponse
+import kr.weit.odya.service.dto.SlicePlaceReviewResponse
 
 const val TEST_PLACE_REVIEW_ID = 1L
 const val TEST_OTHER_PLACE_REVIEW_ID_2 = 2L
@@ -41,10 +40,6 @@ fun createOtherPlaceReview(user: User, placeReviewId: Long = TEST_OTHER_PLACE_RE
     return PlaceReview(placeReviewId, placeId, user, TEST_RATING, TEST_REVIEW)
 }
 
-fun createPlaceReviewResponseList(): List<PlaceReviewListResponse> {
-    return listOf(createPlaceReview(createUser())).map { PlaceReviewListResponse(it) }
-}
-
-fun creatSlicePlaceReviewResponse(): SliceResponse<PlaceReviewListResponse> {
-    return SliceResponse(TEST_SIZE, createPlaceReviewResponseList())
+fun creatSlicePlaceReviewResponse(): SlicePlaceReviewResponse {
+    return SlicePlaceReviewResponse.of(TEST_SIZE, listOf(createPlaceReview(createUser())))
 }

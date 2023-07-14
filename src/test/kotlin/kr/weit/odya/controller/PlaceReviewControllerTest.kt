@@ -598,7 +598,7 @@ class PlaceReviewControllerTest(
                 }
             }
 
-            context("유효한 토큰이지만 장소리뷰ID가 음수인 경우") {
+            context("유효한 토큰이지만 장소리뷰ID가 양수가 아닌 경우") {
                 it("400를 반환한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -610,7 +610,7 @@ class PlaceReviewControllerTest(
                             createPathDocument(
                                 "placeReview-delete-fail-negative-id",
                                 pathParameters(
-                                    "id" pathDescription "음수인 장소 리뷰 ID" example TEST_INVALID_PLACE_REVIEW_ID,
+                                    "id" pathDescription "양수가 아닌 장소 리뷰 ID" example TEST_INVALID_PLACE_REVIEW_ID,
                                 ),
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
@@ -755,7 +755,8 @@ class PlaceReviewControllerTest(
                                     LAST_ID_PARAM parameterDescription "마지막 데이터의 ID" example TEST_LAST_ID isOptional true,
                                 ),
                                 responseBody(
-                                    "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부",
+                                    "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
+                                    "averageRating" type JsonFieldType.NUMBER description "장소 평균 별점" example response.averageRating,
                                     "content[].id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example content.id,
                                     "content[].placeId" type JsonFieldType.STRING description "장소 ID" example content.placeId,
                                     "content[].userId" type JsonFieldType.NUMBER description "유저 ID" example content.userId,
@@ -937,7 +938,8 @@ class PlaceReviewControllerTest(
                                     LAST_ID_PARAM parameterDescription "마지막 데이터의 ID" example TEST_LAST_ID isOptional true,
                                 ),
                                 responseBody(
-                                    "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부",
+                                    "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
+                                    "averageRating" type JsonFieldType.NUMBER description "장소 평균 별점" example response.averageRating,
                                     "content[].id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example content.id,
                                     "content[].placeId" type JsonFieldType.STRING description "장소 ID" example content.placeId,
                                     "content[].userId" type JsonFieldType.NUMBER description "유저 ID" example content.userId,

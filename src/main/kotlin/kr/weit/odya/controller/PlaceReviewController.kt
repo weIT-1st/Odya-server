@@ -7,9 +7,8 @@ import kr.weit.odya.domain.placeReview.PlaceReviewSortType
 import kr.weit.odya.security.LoginUserId
 import kr.weit.odya.service.PlaceReviewService
 import kr.weit.odya.service.dto.PlaceReviewCreateRequest
-import kr.weit.odya.service.dto.PlaceReviewListResponse
 import kr.weit.odya.service.dto.PlaceReviewUpdateRequest
-import kr.weit.odya.service.dto.SliceResponse
+import kr.weit.odya.service.dto.SlicePlaceReviewResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -73,7 +72,7 @@ class PlaceReviewController(private val placeReviewService: PlaceReviewService) 
         @Positive(message = "마지막 Id는 양수여야 합니다.")
         @RequestParam(name = "lastId", required = false)
         lastId: Long?,
-    ): ResponseEntity<SliceResponse<PlaceReviewListResponse>> {
+    ): ResponseEntity<SlicePlaceReviewResponse> {
         return ResponseEntity.ok(placeReviewService.getByPlaceReviewList(placeId, size, sortType, lastId))
     }
 
@@ -91,7 +90,7 @@ class PlaceReviewController(private val placeReviewService: PlaceReviewService) 
         @Positive(message = "마지막 Id는 양수여야 합니다.")
         @RequestParam(name = "lastId", required = false)
         lastId: Long?,
-    ): ResponseEntity<SliceResponse<PlaceReviewListResponse>> {
+    ): ResponseEntity<SlicePlaceReviewResponse> {
         return ResponseEntity.ok(placeReviewService.getByUserReviewList(userId, size, sortType, lastId))
     }
 }
