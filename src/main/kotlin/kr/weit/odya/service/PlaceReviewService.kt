@@ -11,9 +11,8 @@ import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.service.dto.PlaceReviewCreateRequest
-import kr.weit.odya.service.dto.PlaceReviewListResponse
 import kr.weit.odya.service.dto.PlaceReviewUpdateRequest
-import kr.weit.odya.service.dto.SliceResponse
+import kr.weit.odya.service.dto.SlicePlaceReviewResponse
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -55,13 +54,13 @@ class PlaceReviewService(
         }
     }
 
-    fun getByPlaceReviewList(placeId: String, size: Int, sortType: PlaceReviewSortType, lastId: Long?): SliceResponse<PlaceReviewListResponse> {
-        return SliceResponse(size, placeReviewRepository.getPlaceReviewListByPlaceId(placeId, size, sortType, lastId).map { PlaceReviewListResponse(it) })
+    fun getByPlaceReviewList(placeId: String, size: Int, sortType: PlaceReviewSortType, lastId: Long?): SlicePlaceReviewResponse {
+        return SlicePlaceReviewResponse.of(size, placeReviewRepository.getPlaceReviewListByPlaceId(placeId, size, sortType, lastId))
     }
 
     @Transactional
-    fun getByUserReviewList(userId: Long, size: Int, sortType: PlaceReviewSortType, lastId: Long?): SliceResponse<PlaceReviewListResponse> {
+    fun getByUserReviewList(userId: Long, size: Int, sortType: PlaceReviewSortType, lastId: Long?): SlicePlaceReviewResponse {
         val user: User = userRepository.getByUserId(userId)
-        return SliceResponse(size, placeReviewRepository.getPlaceReviewListByUser(user, size, sortType, lastId).map { PlaceReviewListResponse(it) })
+        return SlicePlaceReviewResponse.of(size, placeReviewRepository.getPlaceReviewListByUser(user, size, sortType, lastId))
     }
 }
