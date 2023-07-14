@@ -6,29 +6,38 @@ import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import jakarta.ws.rs.ForbiddenException
+import kr.weit.odya.domain.placeReview.PlaceReviewSortType
 import kr.weit.odya.service.ExistResourceException
 import kr.weit.odya.service.PlaceReviewService
 import kr.weit.odya.support.EXIST_PLACE_REVIEW_ERROR_MESSAGE
 import kr.weit.odya.support.FORBIDDEN_PLACE_REVIEW_ERROR_MESSAGE
+import kr.weit.odya.support.LAST_ID_PARAM
 import kr.weit.odya.support.NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE
 import kr.weit.odya.support.NOT_EXIST_USER_ERROR_MESSAGE
+import kr.weit.odya.support.SIZE_PARAM
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
+import kr.weit.odya.support.SORT_TYPE_PARAM
 import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_NOT_EXIST_USER_ID_TOKEN
 import kr.weit.odya.support.TEST_EXIST_PLACE_REVIEW_ID
+import kr.weit.odya.support.TEST_INVALID_LAST_ID
 import kr.weit.odya.support.TEST_INVALID_PLACE_REVIEW_ID
+import kr.weit.odya.support.TEST_INVALID_SIZE
 import kr.weit.odya.support.TEST_INVALID_USER_ID
+import kr.weit.odya.support.TEST_LAST_ID
 import kr.weit.odya.support.TEST_NOT_EXIST_USER_ID
 import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_PLACE_REVIEW_ID
+import kr.weit.odya.support.TEST_PLACE_SORT_TYPE
 import kr.weit.odya.support.TEST_RATING
 import kr.weit.odya.support.TEST_REVIEW
+import kr.weit.odya.support.TEST_SIZE
 import kr.weit.odya.support.TEST_TOO_HIGH_RATING
 import kr.weit.odya.support.TEST_TOO_LONG_REVIEW
 import kr.weit.odya.support.TEST_TOO_LOW_RATING
 import kr.weit.odya.support.TEST_USER_ID
-import kr.weit.odya.support.creatPlaceReviewListResponse
+import kr.weit.odya.support.creatSlicePlaceReviewResponse
 import kr.weit.odya.support.createPlaceReviewRequest
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
 import kr.weit.odya.support.test.ControllerTestHelper.Companion.jsonContent
@@ -39,6 +48,8 @@ import kr.weit.odya.support.test.RestDocsHelper.Companion.requestBody
 import kr.weit.odya.support.test.RestDocsHelper.Companion.responseBody
 import kr.weit.odya.support.test.example
 import kr.weit.odya.support.test.headerDescription
+import kr.weit.odya.support.test.isOptional
+import kr.weit.odya.support.test.parameterDescription
 import kr.weit.odya.support.test.pathDescription
 import kr.weit.odya.support.test.type
 import kr.weit.odya.support.updatePlaceReviewRequest
@@ -49,6 +60,7 @@ import org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.request.RequestDocumentation.pathParameters
+import org.springframework.restdocs.request.RequestDocumentation.queryParameters
 import org.springframework.test.web.servlet.patch
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -315,7 +327,7 @@ class PlaceReviewControllerTest(
                 }
             }
 
-            context("유효한 토큰이지만 장소리뷰ID가 음수인 경우") {
+            context("유효한 토큰이지만 장소리뷰ID가 양수가 아닌 경우") {
                 val request = updatePlaceReviewRequest().copy(id = TEST_INVALID_PLACE_REVIEW_ID)
                 it("400을 반환한다.") {
                     restDocMockMvc.patch(targetUri) {
@@ -330,7 +342,7 @@ class PlaceReviewControllerTest(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
                             requestBody(
-                                "id" type JsonFieldType.NUMBER description "음수인 장소 리뷰 ID" example TEST_INVALID_PLACE_REVIEW_ID,
+                                "id" type JsonFieldType.NUMBER description "양수가 아닌 장소 리뷰 ID" example TEST_INVALID_PLACE_REVIEW_ID,
                                 "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING isOptional true,
                                 "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true,
                             ),
@@ -479,9 +491,7 @@ class PlaceReviewControllerTest(
 
             context("유효한 토큰이지만, 존재하지 않는 장소리뷰ID인 경우") {
                 val request = updatePlaceReviewRequest().copy(id = TEST_EXIST_PLACE_REVIEW_ID)
-                every { placeReviewService.updateReview(request, TEST_USER_ID) } throws NoSuchElementException(
-                    NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE,
-                )
+                every { placeReviewService.updateReview(request, TEST_USER_ID) } throws NoSuchElementException(NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE)
                 it("404를 반환한다.") {
                     restDocMockMvc.patch(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -509,9 +519,7 @@ class PlaceReviewControllerTest(
 
             context("유효한 토큰이지만, 수정할 권한이 없는 경우") {
                 val request = updatePlaceReviewRequest()
-                every { placeReviewService.updateReview(request, TEST_USER_ID) } throws ForbiddenException(
-                    FORBIDDEN_PLACE_REVIEW_ERROR_MESSAGE,
-                )
+                every { placeReviewService.updateReview(request, TEST_USER_ID) } throws ForbiddenException(FORBIDDEN_PLACE_REVIEW_ERROR_MESSAGE)
                 it("403을 반환한다.") {
                     restDocMockMvc.patch(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -590,7 +598,7 @@ class PlaceReviewControllerTest(
                 }
             }
 
-            context("유효한 토큰이지만 장소리뷰ID가 음수인 경우") {
+            context("유효한 토큰이지만 장소리뷰ID가 양수가 아닌 경우") {
                 it("400를 반환한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -602,7 +610,7 @@ class PlaceReviewControllerTest(
                             createPathDocument(
                                 "placeReview-delete-fail-negative-id",
                                 pathParameters(
-                                    "id" pathDescription "음수인 장소 리뷰 ID" example TEST_INVALID_PLACE_REVIEW_ID,
+                                    "id" pathDescription "양수가 아닌 장소 리뷰 ID" example TEST_INVALID_PLACE_REVIEW_ID,
                                 ),
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
@@ -638,12 +646,7 @@ class PlaceReviewControllerTest(
             }
 
             context("유효한 토큰이지만 존재하지 않는 장소리뷰ID인 경우") {
-                every {
-                    placeReviewService.deleteReview(
-                        TEST_EXIST_PLACE_REVIEW_ID,
-                        TEST_USER_ID,
-                    )
-                } throws NoSuchElementException(NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE)
+                every { placeReviewService.deleteReview(TEST_EXIST_PLACE_REVIEW_ID, TEST_USER_ID) } throws NoSuchElementException(NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE)
                 it("404를 반환한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -669,9 +672,7 @@ class PlaceReviewControllerTest(
             }
 
             context("유효한 토큰이지만, 삭제할 권한이 없는 경우") {
-                every { placeReviewService.deleteReview(TEST_PLACE_REVIEW_ID, TEST_USER_ID) } throws ForbiddenException(
-                    FORBIDDEN_PLACE_REVIEW_ERROR_MESSAGE,
-                )
+                every { placeReviewService.deleteReview(TEST_PLACE_REVIEW_ID, TEST_USER_ID) } throws ForbiddenException(FORBIDDEN_PLACE_REVIEW_ERROR_MESSAGE)
                 it("403를 반환한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -722,16 +723,20 @@ class PlaceReviewControllerTest(
             }
         }
 
-        describe("GET /api/v1/place-reviews/place/{id}") {
-            val targetUri = "/api/v1/place-reviews/place/{id}"
+        describe("GET /api/v1/place-reviews/places/{id}") {
+            val targetUri = "/api/v1/place-reviews/places/{id}"
             context("유효한 요청 데이터가 전달되면") {
-                val response = listOf(creatPlaceReviewListResponse())
-                every { placeReviewService.getByPlaceReviewId(TEST_PLACE_ID) } returns response
-                it("200 응답한다.") {
+                val response = creatSlicePlaceReviewResponse()
+                val content = response.content[0]
+                every { placeReviewService.getByPlaceReviewList(TEST_PLACE_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) } returns response
+                it("200 및 장소 리스트를 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
                             .get(targetUri, TEST_PLACE_ID)
-                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_SIZE.toString())
+                            .param(SORT_TYPE_PARAM, TEST_PLACE_SORT_TYPE.name)
+                            .param(LAST_ID_PARAM, TEST_LAST_ID.toString()),
                     )
                         .andExpect(status().isOk)
                         .andDo(
@@ -743,11 +748,89 @@ class PlaceReviewControllerTest(
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                                 ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_SIZE isOptional true,
+                                    SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example PlaceReviewSortType.values()
+                                        .joinToString() isOptional true,
+                                    LAST_ID_PARAM parameterDescription "마지막 데이터의 ID" example TEST_LAST_ID isOptional true,
+                                ),
                                 responseBody(
-                                    "[].placeId" type JsonFieldType.STRING description "장소 ID" example response[0].placeId,
-                                    "[].writerNickname" type JsonFieldType.STRING description "장소 이름" example response[0].writerNickname,
-                                    "[].starRating" type JsonFieldType.NUMBER description "별점" example response[0].starRating,
-                                    "[].review" type JsonFieldType.STRING description "리뷰" example response[0].review,
+                                    "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
+                                    "averageRating" type JsonFieldType.NUMBER description "장소 평균 별점" example response.averageRating,
+                                    "content[].id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example content.id,
+                                    "content[].placeId" type JsonFieldType.STRING description "장소 ID" example content.placeId,
+                                    "content[].userId" type JsonFieldType.NUMBER description "유저 ID" example content.userId,
+                                    "content[].writerNickname" type JsonFieldType.STRING description "유저 닉네임" example content.writerNickname,
+                                    "content[].starRating" type JsonFieldType.NUMBER description "별점" example content.starRating,
+                                    "content[].review" type JsonFieldType.STRING description "리뷰" example content.review,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효한 토큰이지만 조회할 마지막 ID가 양수가 아닌 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_PLACE_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_SIZE.toString())
+                            .param(SORT_TYPE_PARAM, TEST_PLACE_SORT_TYPE.name)
+                            .param(LAST_ID_PARAM, TEST_INVALID_LAST_ID.toString()),
+                    )
+                        .andExpect(status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "placeReview-placeId-get-fail-invalid-lastId",
+                                pathParameters(
+                                    "id" pathDescription "장소 ID" example TEST_PLACE_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_SIZE isOptional true,
+                                    SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example PlaceReviewSortType.values()
+                                        .joinToString() isOptional true,
+                                    LAST_ID_PARAM parameterDescription "양수가 아닌 마지막 데이터의 ID" example TEST_INVALID_LAST_ID isOptional true,
+                                ),
+                                responseBody(
+                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효한 토큰이지만 size가 양수가 아닌 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_PLACE_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_INVALID_SIZE.toString())
+                            .param(SORT_TYPE_PARAM, TEST_PLACE_SORT_TYPE.name)
+                            .param(LAST_ID_PARAM, TEST_LAST_ID.toString()),
+                    )
+                        .andExpect(status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "placeReview-placeId-get-fail-invalid-size",
+                                pathParameters(
+                                    "id" pathDescription "장소 ID" example TEST_PLACE_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "양수가 아닌 데이터 개수" example TEST_INVALID_SIZE isOptional true,
+                                    SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example PlaceReviewSortType.values()
+                                        .joinToString() isOptional true,
+                                    LAST_ID_PARAM parameterDescription "마지막 데이터의 ID" example TEST_LAST_ID isOptional true,
+                                ),
+                                responseBody(
+                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                                 ),
                             ),
                         )
@@ -759,7 +842,10 @@ class PlaceReviewControllerTest(
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
                             .get(targetUri, TEST_PLACE_ID)
-                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_NOT_EXIST_USER_ID_TOKEN),
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_NOT_EXIST_USER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_SIZE.toString())
+                            .param(SORT_TYPE_PARAM, TEST_PLACE_SORT_TYPE.name)
+                            .param(LAST_ID_PARAM, TEST_LAST_ID.toString()),
                     )
                         .andExpect(status().isUnauthorized)
                         .andDo(
@@ -770,6 +856,12 @@ class PlaceReviewControllerTest(
                                 ),
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_SIZE isOptional true,
+                                    SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example PlaceReviewSortType.values()
+                                        .joinToString() isOptional true,
+                                    LAST_ID_PARAM parameterDescription "마지막 데이터의 ID" example TEST_LAST_ID isOptional true,
                                 ),
                                 responseBody(
                                     "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
@@ -784,7 +876,10 @@ class PlaceReviewControllerTest(
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
                             .get(targetUri, TEST_PLACE_ID)
-                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN),
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_SIZE.toString())
+                            .param(SORT_TYPE_PARAM, TEST_PLACE_SORT_TYPE.name)
+                            .param(LAST_ID_PARAM, TEST_LAST_ID.toString()),
                     )
                         .andExpect(status().isUnauthorized)
                         .andDo(
@@ -796,6 +891,12 @@ class PlaceReviewControllerTest(
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
                                 ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_SIZE isOptional true,
+                                    SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example PlaceReviewSortType.values()
+                                        .joinToString() isOptional true,
+                                    LAST_ID_PARAM parameterDescription "마지막 데이터의 ID" example TEST_LAST_ID isOptional true,
+                                ),
                                 responseBody(
                                     "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                                 ),
@@ -805,16 +906,20 @@ class PlaceReviewControllerTest(
             }
         }
 
-        describe("GET /api/v1/place-reviews/user/{id}") {
-            val targetUri = "/api/v1/place-reviews/user/{id}"
+        describe("GET /api/v1/place-reviews/users/{id}") {
+            val targetUri = "/api/v1/place-reviews/users/{id}"
             context("유효한 요청 데이터가 전달되면") {
-                val response = listOf(creatPlaceReviewListResponse())
-                every { placeReviewService.getByUserReviewList(TEST_USER_ID) } returns response
+                val response = creatSlicePlaceReviewResponse()
+                val content = response.content[0]
+                every { placeReviewService.getByUserReviewList(TEST_USER_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) } returns response
                 it("200 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
                             .get(targetUri, TEST_USER_ID)
-                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_SIZE.toString())
+                            .param(SORT_TYPE_PARAM, TEST_PLACE_SORT_TYPE.name)
+                            .param(LAST_ID_PARAM, TEST_LAST_ID.toString()),
                     )
                         .andExpect(status().isOk)
                         .andDo(
@@ -826,33 +931,120 @@ class PlaceReviewControllerTest(
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                                 ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_SIZE isOptional true,
+                                    SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example PlaceReviewSortType.values()
+                                        .joinToString() isOptional true,
+                                    LAST_ID_PARAM parameterDescription "마지막 데이터의 ID" example TEST_LAST_ID isOptional true,
+                                ),
                                 responseBody(
-                                    "[].placeId" type JsonFieldType.STRING description "장소 ID" example response[0].placeId,
-                                    "[].writerNickname" type JsonFieldType.STRING description "장소 이름" example response[0].writerNickname,
-                                    "[].starRating" type JsonFieldType.NUMBER description "별점" example response[0].starRating,
-                                    "[].review" type JsonFieldType.STRING description "리뷰" example response[0].review,
+                                    "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
+                                    "averageRating" type JsonFieldType.NUMBER description "장소 평균 별점" example response.averageRating,
+                                    "content[].id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example content.id,
+                                    "content[].placeId" type JsonFieldType.STRING description "장소 ID" example content.placeId,
+                                    "content[].userId" type JsonFieldType.NUMBER description "유저 ID" example content.userId,
+                                    "content[].writerNickname" type JsonFieldType.STRING description "유저 닉네임" example content.writerNickname,
+                                    "content[].starRating" type JsonFieldType.NUMBER description "별점" example content.starRating,
+                                    "content[].review" type JsonFieldType.STRING description "리뷰" example content.review,
                                 ),
                             ),
                         )
                 }
             }
 
-            context("유효한 토큰이지만 유저 ID가 음수인 경우") {
+            context("유효한 토큰이지만 유저 ID가 양수가 아닌 경우") {
                 it("400 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
                             .get(targetUri, TEST_INVALID_USER_ID)
-                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_SIZE.toString())
+                            .param(SORT_TYPE_PARAM, TEST_PLACE_SORT_TYPE.name)
+                            .param(LAST_ID_PARAM, TEST_LAST_ID.toString()),
                     )
                         .andExpect(status().isBadRequest)
                         .andDo(
                             createPathDocument(
                                 "placeReview-userId-get-fail-negative-id",
                                 pathParameters(
-                                    "id" pathDescription "음수인 유저 ID" example TEST_INVALID_USER_ID,
+                                    "id" pathDescription "양수가 아닌 유저 ID" example TEST_INVALID_USER_ID,
                                 ),
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_SIZE isOptional true,
+                                    SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example PlaceReviewSortType.values()
+                                        .joinToString() isOptional true,
+                                    LAST_ID_PARAM parameterDescription "마지막 데이터의 ID" example TEST_LAST_ID isOptional true,
+                                ),
+                                responseBody(
+                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효한 토큰이지만 조회할 마지막 ID가 양수가 아닌 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_SIZE.toString())
+                            .param(SORT_TYPE_PARAM, TEST_PLACE_SORT_TYPE.name)
+                            .param(LAST_ID_PARAM, TEST_INVALID_LAST_ID.toString()),
+                    )
+                        .andExpect(status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "placeReview-userId-get-fail-invalid-lastId",
+                                pathParameters(
+                                    "id" pathDescription "유저 ID" example TEST_USER_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_SIZE isOptional true,
+                                    SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example PlaceReviewSortType.values()
+                                        .joinToString() isOptional true,
+                                    LAST_ID_PARAM parameterDescription "양수가 아닌 마지막 데이터의 ID" example TEST_INVALID_LAST_ID isOptional true,
+                                ),
+                                responseBody(
+                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효한 토큰이지만 조회할 size가 양수가 아닌 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_INVALID_SIZE.toString())
+                            .param(SORT_TYPE_PARAM, TEST_PLACE_SORT_TYPE.name)
+                            .param(LAST_ID_PARAM, TEST_LAST_ID.toString()),
+                    )
+                        .andExpect(status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "placeReview-userId-get-fail-invalid-size",
+                                pathParameters(
+                                    "id" pathDescription "유저 ID" example TEST_USER_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "양수가 아닌 데이터 개수" example TEST_INVALID_SIZE isOptional true,
+                                    SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example PlaceReviewSortType.values()
+                                        .joinToString() isOptional true,
+                                    LAST_ID_PARAM parameterDescription "마지막 데이터의 ID" example TEST_LAST_ID isOptional true,
                                 ),
                                 responseBody(
                                     "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
@@ -867,7 +1059,9 @@ class PlaceReviewControllerTest(
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
                             .get(targetUri, TEST_USER_ID)
-                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_NOT_EXIST_USER_ID_TOKEN),
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_NOT_EXIST_USER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_SIZE.toString())
+                            .param("sortType", TEST_PLACE_SORT_TYPE.name),
                     )
                         .andExpect(status().isUnauthorized)
                         .andDo(
@@ -879,6 +1073,11 @@ class PlaceReviewControllerTest(
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                                 ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_SIZE isOptional true,
+                                    SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example PlaceReviewSortType.values()
+                                        .joinToString() isOptional true,
+                                ),
                                 responseBody(
                                     "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                                 ),
@@ -887,25 +1086,32 @@ class PlaceReviewControllerTest(
                 }
             }
 
-            context("유효한 토큰이지만 가입되어 있지 않은 USER ID이 주어지는 경우") {
-                every { placeReviewService.getByUserReviewList(TEST_NOT_EXIST_USER_ID) } throws NoSuchElementException(
-                    NOT_EXIST_USER_ERROR_MESSAGE,
-                )
+            context("유효한 토큰이지만 가입되지 않은 USER ID로 조회하려는 경우") {
+                every { placeReviewService.getByUserReviewList(TEST_NOT_EXIST_USER_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) } throws NoSuchElementException(NOT_EXIST_USER_ERROR_MESSAGE)
                 it("404 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
                             .get(targetUri, TEST_NOT_EXIST_USER_ID)
-                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_SIZE.toString())
+                            .param(SORT_TYPE_PARAM, TEST_PLACE_SORT_TYPE.name)
+                            .param(LAST_ID_PARAM, TEST_LAST_ID.toString()),
                     )
                         .andExpect(status().isNotFound)
                         .andDo(
                             createPathDocument(
-                                "placeReview-userId-get-fail-not-registered-id",
+                                "placeReview-userId-get-fail-lookup-not-registered-id",
                                 pathParameters(
                                     "id" pathDescription "가입되어 있지 않은 유저 ID" example TEST_NOT_EXIST_USER_ID,
                                 ),
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_SIZE isOptional true,
+                                    SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example PlaceReviewSortType.values()
+                                        .joinToString() isOptional true,
+                                    LAST_ID_PARAM parameterDescription "마지막 데이터의 ID" example TEST_LAST_ID isOptional true,
                                 ),
                                 responseBody(
                                     "errorMessage" type JsonFieldType.STRING description "에러 메시지" example NOT_EXIST_USER_ERROR_MESSAGE,
@@ -920,7 +1126,10 @@ class PlaceReviewControllerTest(
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
                             .get(targetUri, TEST_USER_ID)
-                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN),
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_SIZE.toString())
+                            .param(SORT_TYPE_PARAM, TEST_PLACE_SORT_TYPE.name)
+                            .param(LAST_ID_PARAM, TEST_LAST_ID.toString()),
                     )
                         .andExpect(status().isUnauthorized)
                         .andDo(
@@ -931,6 +1140,12 @@ class PlaceReviewControllerTest(
                                 ),
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_SIZE isOptional true,
+                                    SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example PlaceReviewSortType.values()
+                                        .joinToString() isOptional true,
+                                    LAST_ID_PARAM parameterDescription "마지막 데이터의 ID" example TEST_LAST_ID isOptional true,
                                 ),
                                 responseBody(
                                     "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,

@@ -3,13 +3,16 @@ package kr.weit.odya.service
 import jakarta.ws.rs.ForbiddenException
 import kr.weit.odya.domain.placeReview.PlaceReview
 import kr.weit.odya.domain.placeReview.PlaceReviewRepository
+import kr.weit.odya.domain.placeReview.PlaceReviewSortType
 import kr.weit.odya.domain.placeReview.getByPlaceReviewId
+import kr.weit.odya.domain.placeReview.getPlaceReviewListByPlaceId
+import kr.weit.odya.domain.placeReview.getPlaceReviewListByUser
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.service.dto.PlaceReviewCreateRequest
-import kr.weit.odya.service.dto.PlaceReviewListResponse
 import kr.weit.odya.service.dto.PlaceReviewUpdateRequest
+import kr.weit.odya.service.dto.SlicePlaceReviewResponse
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -51,15 +54,13 @@ class PlaceReviewService(
         }
     }
 
-    fun getByPlaceReviewId(placeId: String): List<PlaceReviewListResponse> {
-        return placeReviewRepository.findAllByPlaceId(placeId)
-            .map { PlaceReviewListResponse(it) }
+    fun getByPlaceReviewList(placeId: String, size: Int, sortType: PlaceReviewSortType, lastId: Long?): SlicePlaceReviewResponse {
+        return SlicePlaceReviewResponse.of(size, placeReviewRepository.getPlaceReviewListByPlaceId(placeId, size, sortType, lastId))
     }
 
     @Transactional
-    fun getByUserReviewList(userId: Long): List<PlaceReviewListResponse> {
+    fun getByUserReviewList(userId: Long, size: Int, sortType: PlaceReviewSortType, lastId: Long?): SlicePlaceReviewResponse {
         val user: User = userRepository.getByUserId(userId)
-        return placeReviewRepository.findAllByUser(user)
-            .map { PlaceReviewListResponse(it) }
+        return SlicePlaceReviewResponse.of(size, placeReviewRepository.getPlaceReviewListByUser(user, size, sortType, lastId))
     }
 }
