@@ -15,6 +15,7 @@ import kr.weit.odya.service.dto.PlaceReviewUpdateRequest
 import kr.weit.odya.service.dto.SlicePlaceReviewResponse
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import kotlin.math.roundToInt
 
 @Service
 class PlaceReviewService(
@@ -54,13 +55,18 @@ class PlaceReviewService(
         }
     }
 
+    @Transactional
     fun getByPlaceReviewList(placeId: String, size: Int, sortType: PlaceReviewSortType, lastId: Long?): SlicePlaceReviewResponse {
-        return SlicePlaceReviewResponse.of(size, placeReviewRepository.getPlaceReviewListByPlaceId(placeId, size, sortType, lastId))
+        return SlicePlaceReviewResponse.of(size, placeReviewRepository.getPlaceReviewListByPlaceId(placeId, size, sortType, lastId), getAverage(placeReviewRepository.getAverageRatingByPlaceId(placeId)))
     }
 
     @Transactional
     fun getByUserReviewList(userId: Long, size: Int, sortType: PlaceReviewSortType, lastId: Long?): SlicePlaceReviewResponse {
         val user: User = userRepository.getByUserId(userId)
-        return SlicePlaceReviewResponse.of(size, placeReviewRepository.getPlaceReviewListByUser(user, size, sortType, lastId))
+        return SlicePlaceReviewResponse.of(size, placeReviewRepository.getPlaceReviewListByUser(user, size, sortType, lastId), getAverage(placeReviewRepository.getAverageRatingByUser(user)))
+    }
+
+    private fun getAverage(averageRating: Double?): Double {
+        return ((averageRating ?: 0.0) * 10).roundToInt() / 10.0
     }
 }

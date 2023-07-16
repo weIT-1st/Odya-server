@@ -70,7 +70,7 @@ data class SlicePlaceReviewResponse private constructor(
     override val content: List<PlaceReviewListResponse>,
 ) : SliceResponse<PlaceReviewListResponse>(hasNext, content) {
     companion object {
-        fun of(size: Int, content: List<PlaceReview>): SlicePlaceReviewResponse {
+        fun of(size: Int, content: List<PlaceReview>, averageRating: Double): SlicePlaceReviewResponse {
             val contents: List<PlaceReview>
             val hasNext: Boolean
             if (content.size > size) {
@@ -80,11 +80,7 @@ data class SlicePlaceReviewResponse private constructor(
                 hasNext = false
                 contents = content
             }
-            return SlicePlaceReviewResponse(hasNext, getAverageRating(contents), contents.map { PlaceReviewListResponse(it) })
+            return SlicePlaceReviewResponse(hasNext, averageRating, contents.map { PlaceReviewListResponse(it) })
         }
     }
-}
-
-private fun getAverageRating(contents: List<PlaceReview>): Double {
-    return (contents.map { it.starRating }.average() * 10).toInt() / 10.0
 }

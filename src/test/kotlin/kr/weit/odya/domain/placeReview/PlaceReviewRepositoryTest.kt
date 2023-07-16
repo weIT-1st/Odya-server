@@ -7,6 +7,7 @@ import io.kotest.matchers.longs.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
+import kr.weit.odya.support.TEST_AVERAGE_RATING
 import kr.weit.odya.support.TEST_DEFAULT_SIZE
 import kr.weit.odya.support.TEST_LAST_ID
 import kr.weit.odya.support.TEST_OTHER_PLACE_ID
@@ -43,6 +44,16 @@ class PlaceReviewRepositoryTest(
             expect("PLACE_REVIEW_ID와 일치하는 장소 리뷰를 조회한다") {
                 val result = placeReviewRepository.getByPlaceReviewId(TEST_PLACE_REVIEW_ID)
                 result.id shouldBe TEST_PLACE_REVIEW_ID
+            }
+
+            expect("PLACE_ID와 일치하는 장소의 평균 별점을 조회한다") {
+                val result = placeReviewRepository.getAverageRatingByPlaceId(TEST_PLACE_ID)
+                result shouldBe TEST_AVERAGE_RATING
+            }
+
+            expect("USER와 일치하는 장소의 평균 별점을 조회한다") {
+                val result = placeReviewRepository.getAverageRatingByUser(user1)
+                result shouldBe TEST_AVERAGE_RATING
             }
 
             expect("PLACE_ID와 일치하는 lastId 초과의 id인 장소 리뷰를 조회한다") {
