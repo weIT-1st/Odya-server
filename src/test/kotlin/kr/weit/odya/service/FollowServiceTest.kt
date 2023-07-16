@@ -1,6 +1,6 @@
 package kr.weit.odya.service
 
-import io.kotest.assertions.throwables.shouldNotThrow
+import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
@@ -48,7 +48,7 @@ class FollowServiceTest : DescribeSpec(
                 every { userRepository.getByUserId(TEST_OTHER_USER_ID) } returns createOtherUser()
                 every { followRepository.save(any()) } returns createFollow()
                 it("정상적으로 종료한다.") {
-                    shouldNotThrow<Exception> { followService.createFollow(TEST_USER_ID, createFollowRequest()) }
+                    shouldNotThrowAny { followService.createFollow(TEST_USER_ID, createFollowRequest()) }
                 }
             }
 
@@ -93,7 +93,7 @@ class FollowServiceTest : DescribeSpec(
             context("FOLLOWER ID와 FOLLOWING ID가 주어지는 경우") {
                 every { followRepository.deleteByFollowerIdAndFollowingId(TEST_USER_ID, TEST_OTHER_USER_ID) } just runs
                 it("정상적으로 종료한다.") {
-                    shouldNotThrow<Exception> { followService.deleteFollow(TEST_USER_ID, createFollowRequest()) }
+                    shouldNotThrowAny { followService.deleteFollow(TEST_USER_ID, createFollowRequest()) }
                 }
             }
         }
