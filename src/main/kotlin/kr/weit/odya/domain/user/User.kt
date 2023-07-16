@@ -111,7 +111,7 @@ class User(
     fun getAgeRange(): Int {
         val now = LocalDate.now()
         var age = now.year - birthday.year
-        if (birthday.plusYears(age.toLong()) < now) {
+        if (birthday.plusYears(age.toLong()) > now) {
             age -= 1
         }
         return age / 10

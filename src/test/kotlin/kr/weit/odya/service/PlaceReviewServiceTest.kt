@@ -1,6 +1,6 @@
 package kr.weit.odya.service
 
-import io.kotest.assertions.throwables.shouldNotThrow
+import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
@@ -35,7 +35,7 @@ class PlaceReviewServiceTest : DescribeSpec(
                 every { placeReviewRepository.save(any()) } returns createPlaceReview()
                 every { placeReviewRepository.existsByUserIdAndPlaceId(TEST_USER_ID, TEST_PLACE_ID) } returns false
                 it("리뷰를 생성한다.") {
-                    shouldNotThrow<Exception> { sut.createReview(createPlaceReviewRequest(), TEST_USER_ID) }
+                    shouldNotThrowAny { sut.createReview(createPlaceReviewRequest(), TEST_USER_ID) }
                 }
             }
 
@@ -60,7 +60,7 @@ class PlaceReviewServiceTest : DescribeSpec(
                 every { placeReviewRepository.getByPlaceReviewId(TEST_USER_ID) } returns createPlaceReview()
                 every { placeReviewRepository.save(any()) } returns createPlaceReview()
                 it("리뷰를 수정한다.") {
-                    shouldNotThrow<Exception> { sut.updateReview(updatePlaceReviewRequest(), TEST_USER_ID) }
+                    shouldNotThrowAny { sut.updateReview(updatePlaceReviewRequest(), TEST_USER_ID) }
                 }
             }
 
@@ -91,7 +91,7 @@ class PlaceReviewServiceTest : DescribeSpec(
                 every { placeReviewRepository.getByPlaceReviewId(TEST_USER_ID) } returns createPlaceReview()
                 every { placeReviewRepository.delete(any()) } just Runs
                 it("리뷰를 삭제한다.") {
-                    shouldNotThrow<Exception> { sut.deleteReview(TEST_PLACE_REVIEW_ID, TEST_USER_ID) }
+                    shouldNotThrowAny { sut.deleteReview(TEST_PLACE_REVIEW_ID, TEST_USER_ID) }
                 }
             }
 
