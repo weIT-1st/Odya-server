@@ -13,11 +13,15 @@ import kr.weit.odya.domain.placeReview.PlaceReviewRepository
 import kr.weit.odya.domain.placeReview.getByPlaceReviewId
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
+import kr.weit.odya.support.TEST_AVERAGE_RATING
 import kr.weit.odya.support.TEST_EXIST_PLACE_REVIEW_ID
+import kr.weit.odya.support.TEST_LAST_ID
 import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_PLACE_REVIEW_ID
+import kr.weit.odya.support.TEST_PLACE_SORT_TYPE
+import kr.weit.odya.support.TEST_SIZE
 import kr.weit.odya.support.TEST_USER_ID
-import kr.weit.odya.support.creatPlaceReviewListResponse
+import kr.weit.odya.support.creatSlicePlaceReviewResponse
 import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createPlaceReview
 import kr.weit.odya.support.createPlaceReviewRequest
@@ -29,10 +33,12 @@ class PlaceReviewServiceTest : DescribeSpec(
         val userRepository = mockk<UserRepository>()
         val placeReviewRepository = mockk<PlaceReviewRepository>()
         val sut = PlaceReviewService(placeReviewRepository, userRepository)
+        val user = createUser()
+
         describe("createPlaceReview 메소드") {
             context("유효한 데이터가 전달되면") {
-                every { userRepository.getByUserId(TEST_USER_ID) } returns createUser()
-                every { placeReviewRepository.save(any()) } returns createPlaceReview()
+                every { userRepository.getByUserId(TEST_USER_ID) } returns user
+                every { placeReviewRepository.save(any()) } returns createPlaceReview(user)
                 every { placeReviewRepository.existsByUserIdAndPlaceId(TEST_USER_ID, TEST_PLACE_ID) } returns false
                 it("리뷰를 생성한다.") {
                     shouldNotThrow<Exception> { sut.createReview(createPlaceReviewRequest(), TEST_USER_ID) }
@@ -47,7 +53,7 @@ class PlaceReviewServiceTest : DescribeSpec(
             }
 
             context("이미 리뷰를 작성한 장소인 경우") {
-                every { userRepository.getByUserId(TEST_USER_ID) } returns createUser()
+                every { userRepository.getByUserId(TEST_USER_ID) } returns user
                 every { placeReviewRepository.existsByUserIdAndPlaceId(TEST_USER_ID, TEST_PLACE_ID) } returns true
                 it("[ExistResourceException] 예외가 발생한다") {
                     shouldThrow<ExistResourceException> { sut.createReview(createPlaceReviewRequest(), TEST_USER_ID) }
@@ -57,8 +63,8 @@ class PlaceReviewServiceTest : DescribeSpec(
 
         describe("UpdatePlaceReview 메소드") {
             context("유효한 데이터가 전달되면") {
-                every { placeReviewRepository.getByPlaceReviewId(TEST_USER_ID) } returns createPlaceReview()
-                every { placeReviewRepository.save(any()) } returns createPlaceReview()
+                every { placeReviewRepository.getByPlaceReviewId(TEST_USER_ID) } returns createPlaceReview(user)
+                every { placeReviewRepository.save(any()) } returns createPlaceReview(user)
                 it("리뷰를 수정한다.") {
                     shouldNotThrow<Exception> { sut.updateReview(updatePlaceReviewRequest(), TEST_USER_ID) }
                 }
@@ -88,7 +94,7 @@ class PlaceReviewServiceTest : DescribeSpec(
 
         describe("DeletePlaceReview 메소드") {
             context("유효한 데이터가 전달되면") {
-                every { placeReviewRepository.getByPlaceReviewId(TEST_USER_ID) } returns createPlaceReview()
+                every { placeReviewRepository.getByPlaceReviewId(TEST_USER_ID) } returns createPlaceReview(user)
                 every { placeReviewRepository.delete(any()) } just Runs
                 it("리뷰를 삭제한다.") {
                     shouldNotThrow<Exception> { sut.deleteReview(TEST_PLACE_REVIEW_ID, TEST_USER_ID) }
@@ -114,26 +120,28 @@ class PlaceReviewServiceTest : DescribeSpec(
 
         describe("getByPlaceReviewList 메소드") {
             context("유효한 placeId가 전달되면") {
-                every { placeReviewRepository.findAllByPlaceId(TEST_PLACE_ID) } returns listOf(createPlaceReview())
+                every { placeReviewRepository.findSliceByPlaceIdOrderBySortType(TEST_PLACE_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) } returns listOf(createPlaceReview(user))
+                every { placeReviewRepository.getAverageRatingByPlaceId(TEST_PLACE_ID) } returns TEST_AVERAGE_RATING
                 it("리뷰를 조회한다.") {
-                    sut.getByPlaceReviewId(TEST_PLACE_ID)[0] shouldBe creatPlaceReviewListResponse()
+                    sut.getByPlaceReviewList(TEST_PLACE_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) shouldBe creatSlicePlaceReviewResponse()
                 }
             }
         }
 
         describe("getByUserReviewList 메소드") {
             context("유효한 userId가 전달되면") {
-                every { userRepository.getByUserId(TEST_USER_ID) } returns createUser()
-                every { placeReviewRepository.findAllByUser(any()) } returns listOf(createPlaceReview())
+                every { userRepository.getByUserId(TEST_USER_ID) } returns user
+                every { placeReviewRepository.findSliceByUserOrderBySortType(any(), TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) } returns listOf(createPlaceReview(user))
+                every { placeReviewRepository.getAverageRatingByUser(user) } returns TEST_AVERAGE_RATING
                 it("리뷰를 조회한다.") {
-                    sut.getByUserReviewList(TEST_USER_ID)[0] shouldBe creatPlaceReviewListResponse()
+                    sut.getByUserReviewList(TEST_USER_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) shouldBe creatSlicePlaceReviewResponse()
                 }
             }
 
             context("존재하지 않는 userId가 전달되면") {
                 every { userRepository.getByUserId(TEST_USER_ID) } throws NoSuchElementException()
                 it("[NoSuchElementException] 예외가 발생한다") {
-                    shouldThrow<NoSuchElementException> { sut.getByUserReviewList(TEST_USER_ID) }
+                    shouldThrow<NoSuchElementException> { sut.getByUserReviewList(TEST_USER_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) }
                 }
             }
         }
