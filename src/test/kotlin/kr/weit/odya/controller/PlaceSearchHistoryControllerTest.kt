@@ -155,7 +155,7 @@ class PlaceSearchHistoryControllerTest(
             }
 
             context("유효한 토큰이지만 가입되지 않은 유저인 경우") {
-                it("200 응답한다.") {
+                it("401 응답한다.") {
                     restDocMockMvc.get(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_NOT_EXIST_USER_ID_TOKEN)
                     }.andExpect {
