@@ -23,6 +23,8 @@ interface CustomPlaceSearchHistoryRepository {
 }
 
 class CustomPlaceSearchHistoryRepositoryImpl(private val elasticsearchOperations: ElasticsearchOperations) : CustomPlaceSearchHistoryRepository {
+    val dayToSeconds = 24 * 3600
+
     override fun getRecentTop10Keywords(ageRange: Int?): List<String> {
         val agg = AggregationBuilders.terms("GroupBySearchTerm")
             .field("searchTerm").size(10)
@@ -38,12 +40,12 @@ class CustomPlaceSearchHistoryRepositoryImpl(private val elasticsearchOperations
     }
 
     private fun getSearchCondition(ageRange: Int?): BoolQueryBuilder {
-        val now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
+        val now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
         val query = boolQuery()
             .must(
                 rangeQuery("@timestamp")
-                    .gte(now.minusDays(1).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli())
-                    .lte(now.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()),
+                    .gte(now - dayToSeconds)
+                    .lte(now),
             )
         if (ageRange != null) {
             return query.must(matchQuery("ageRange", ageRange))

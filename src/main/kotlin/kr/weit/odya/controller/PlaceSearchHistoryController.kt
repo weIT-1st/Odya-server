@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/v1/place-search-histories")
 class PlaceSearchHistoryController(private val placeSearchHistoryService: PlaceSearchHistoryService) {
-    @PostMapping()
+    @PostMapping
     fun saveSearchHistory(
         @RequestBody
         placeSearchHistoryRequest: PlaceSearchHistoryRequest,
@@ -33,12 +33,12 @@ class PlaceSearchHistoryController(private val placeSearchHistoryService: PlaceS
         return placeSearchHistoryService.getOverallRanking()
     }
 
-    @GetMapping("/ranking/ageRange/{ageRange}")
+    @GetMapping(*["/ranking/ageRange", "/ranking/ageRange/{ageRange}"])
     fun getRankByAgeRange(
         @LoginUserId
         userId: Long,
         @Positive(message = "연령대는 양수여야 합니다.")
-        @PathVariable
+        @PathVariable("ageRange")
         ageRange: Int?,
     ): List<String> {
         return placeSearchHistoryService.getAgeRangeRanking(userId, ageRange)

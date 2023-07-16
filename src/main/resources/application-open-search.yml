@@ -3,7 +3,6 @@ spring.config.activate.on-profile: sandbox
 
 open-search:
   indices:
-    test: sandbox-logstash-logs
     place-search-history: sandbox-place-search-history
 
 ---
