@@ -8,6 +8,7 @@ import com.linecorp.kotlinjdsl.querydsl.CriteriaQueryDsl
 import com.linecorp.kotlinjdsl.querydsl.expression.col
 import kr.weit.odya.domain.user.User
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 
@@ -33,6 +34,12 @@ fun PlaceReviewRepository.getPlaceReviewListByUser(
 @Repository
 interface PlaceReviewRepository : JpaRepository<PlaceReview, Long>, CustomPlaceReviewRepository {
     fun existsByUserIdAndPlaceId(userId: Long, placeId: String): Boolean
+
+    @Query("select avg(pr.starRating) from PlaceReview pr where pr.placeId = :placeId")
+    fun getAverageRatingByPlaceId(placeId: String): Double?
+
+    @Query("select avg(pr.starRating) from PlaceReview pr where pr.user = :user")
+    fun getAverageRatingByUser(user: User): Double?
 }
 
 interface CustomPlaceReviewRepository {

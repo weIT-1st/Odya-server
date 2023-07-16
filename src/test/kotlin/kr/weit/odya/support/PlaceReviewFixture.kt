@@ -24,6 +24,8 @@ const val TEST_TOO_LONG_REVIEW = "Lorem ipsum dolor sit amet, consectetur adipis
 const val TEST_LAST_ID = 1L
 const val TEST_INVALID_LAST_ID = -1L
 val TEST_PLACE_SORT_TYPE: PlaceReviewSortType = PlaceReviewSortType.OLDEST
+const val TEST_AVERAGE_RATING = 5.0
+
 fun createPlaceReviewRequest(): PlaceReviewCreateRequest {
     return PlaceReviewCreateRequest(TEST_PLACE_ID, TEST_RATING, TEST_REVIEW)
 }
@@ -41,5 +43,5 @@ fun createOtherPlaceReview(user: User, placeReviewId: Long = TEST_OTHER_PLACE_RE
 }
 
 fun creatSlicePlaceReviewResponse(): SlicePlaceReviewResponse {
-    return SlicePlaceReviewResponse.of(TEST_SIZE, listOf(createPlaceReview(createUser())))
+    return SlicePlaceReviewResponse.of(TEST_SIZE, listOf(createPlaceReview(createUser())), TEST_AVERAGE_RATING)
 }

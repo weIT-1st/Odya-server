@@ -51,10 +51,10 @@ class UserController(
 
     @PatchMapping("/information")
     fun updateInformation(
-            @RequestBody
-            @Valid
-            informationRequest: InformationRequest,
-            @LoginUserId userId: Long,
+        @RequestBody
+        @Valid
+        informationRequest: InformationRequest,
+        @LoginUserId userId: Long,
     ): ResponseEntity<Void> {
         userService.updateInformation(userId, informationRequest)
         return ResponseEntity.noContent().build()

@@ -13,6 +13,7 @@ import kr.weit.odya.domain.placeReview.PlaceReviewRepository
 import kr.weit.odya.domain.placeReview.getByPlaceReviewId
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
+import kr.weit.odya.support.TEST_AVERAGE_RATING
 import kr.weit.odya.support.TEST_EXIST_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_LAST_ID
 import kr.weit.odya.support.TEST_PLACE_ID
@@ -120,6 +121,7 @@ class PlaceReviewServiceTest : DescribeSpec(
         describe("getByPlaceReviewList 메소드") {
             context("유효한 placeId가 전달되면") {
                 every { placeReviewRepository.findSliceByPlaceIdOrderBySortType(TEST_PLACE_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) } returns listOf(createPlaceReview(user))
+                every { placeReviewRepository.getAverageRatingByPlaceId(TEST_PLACE_ID) } returns TEST_AVERAGE_RATING
                 it("리뷰를 조회한다.") {
                     sut.getByPlaceReviewList(TEST_PLACE_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) shouldBe creatSlicePlaceReviewResponse()
                 }
@@ -130,6 +132,7 @@ class PlaceReviewServiceTest : DescribeSpec(
             context("유효한 userId가 전달되면") {
                 every { userRepository.getByUserId(TEST_USER_ID) } returns user
                 every { placeReviewRepository.findSliceByUserOrderBySortType(any(), TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) } returns listOf(createPlaceReview(user))
+                every { placeReviewRepository.getAverageRatingByUser(user) } returns TEST_AVERAGE_RATING
                 it("리뷰를 조회한다.") {
                     sut.getByUserReviewList(TEST_USER_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) shouldBe creatSlicePlaceReviewResponse()
                 }
