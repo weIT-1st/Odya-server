@@ -144,6 +144,20 @@ class AuthenticationServiceTest : DescribeSpec(
                     shouldThrow<NotFoundDefaultResourceException> { authenticationService.register(request) }
                 }
             }
+
+            context("유효한 USERNAME이 주어지는 경우") {
+                every { firebaseTokenHelper.createFirebaseUser(TEST_USERNAME) } just runs
+                it("정상적으로 종료한다") {
+                    shouldNotThrow<Exception> { firebaseTokenHelper.createFirebaseUser(TEST_USERNAME) }
+                }
+            }
+
+            context("USER 생성 중 에러가 발생하는 경우") {
+                every { firebaseTokenHelper.createFirebaseUser(TEST_USERNAME) } throws CreateFirebaseUserException()
+                it("[CreateFirebaseUserException] 예외가 발생한다") {
+                    shouldThrow<CreateFirebaseUserException> { firebaseTokenHelper.createFirebaseUser(TEST_USERNAME) }
+                }
+            }
         }
 
         describe("getUsernameByIdToken") {
@@ -158,22 +172,6 @@ class AuthenticationServiceTest : DescribeSpec(
                 every { firebaseTokenHelper.getUid(TEST_ID_TOKEN) } throws InvalidTokenException()
                 it("[InvalidTokenException] 예외가 발생한다") {
                     shouldThrow<InvalidTokenException> { authenticationService.getUsernameByIdToken(TEST_ID_TOKEN) }
-                }
-            }
-        }
-
-        describe("createFirebaseUser") {
-            context("유효한 USERNAME이 주어지는 경우") {
-                every { firebaseTokenHelper.createFirebaseUser(TEST_USERNAME) } just runs
-                it("정상적으로 종료한다") {
-                    shouldNotThrow<Exception> { authenticationService.createFirebaseUser(TEST_USERNAME) }
-                }
-            }
-
-            context("USER 생성 중 에러가 발생하는 경우") {
-                every { firebaseTokenHelper.createFirebaseUser(TEST_USERNAME) } throws CreateFirebaseUserException()
-                it("[CreateFirebaseUserException] 예외가 발생한다") {
-                    shouldThrow<CreateFirebaseUserException> { authenticationService.createFirebaseUser(TEST_USERNAME) }
                 }
             }
         }
