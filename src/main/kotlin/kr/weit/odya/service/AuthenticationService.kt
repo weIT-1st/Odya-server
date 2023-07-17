@@ -4,6 +4,7 @@ import kr.weit.odya.client.kakao.KakaoClient
 import kr.weit.odya.client.kakao.KakaoUserInfo
 import kr.weit.odya.domain.profilecolor.ProfileColor
 import kr.weit.odya.domain.user.Profile
+import kr.weit.odya.domain.user.SocialType
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.existsByEmail
@@ -43,6 +44,9 @@ class AuthenticationService(
         validateRegisterInformation(registerRequest)
         val randomProfileColor = profileColorService.getRandomProfileColor()
         userRepository.save(createUser(registerRequest, randomProfileColor))
+        if (registerRequest.socialType == SocialType.KAKAO) {
+            firebaseTokenHelper.createFirebaseUser(registerRequest.username)
+        }
     }
 
     fun validateNickname(nickname: String) {
@@ -63,12 +67,7 @@ class AuthenticationService(
         }
     }
 
-    fun getUsernameByIdToken(idToken: String): String =
-        firebaseTokenHelper.getUid(idToken)
-
-    fun createFirebaseUser(username: String) {
-        firebaseTokenHelper.createFirebaseUser(username)
-    }
+    fun getUsernameByIdToken(idToken: String): String = firebaseTokenHelper.getUid(idToken)
 
     fun getKakaoUserInfo(kakaoLoginRequest: KakaoLoginRequest): KakaoUserInfo =
         kakaoClient.getKakaoUserInfo(getBearerToken(kakaoLoginRequest.accessToken))

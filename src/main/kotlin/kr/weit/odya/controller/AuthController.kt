@@ -63,7 +63,6 @@ class AuthController(
         @RequestBody @Valid
         kakaoRegisterRequest: KakaoRegisterRequest,
     ): ResponseEntity<Void> {
-        authenticationService.createFirebaseUser(kakaoRegisterRequest.username)
         authenticationService.register(kakaoRegisterRequest)
         return ResponseEntity.status(HttpStatus.CREATED).build()
     }
