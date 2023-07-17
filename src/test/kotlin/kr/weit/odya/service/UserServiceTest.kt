@@ -1,6 +1,6 @@
 package kr.weit.odya.service
 
-import io.kotest.assertions.throwables.shouldNotThrow
+import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
@@ -133,7 +133,7 @@ class UserServiceTest : DescribeSpec(
                 every { userRepository.existsByEmail(TEST_EMAIL) } returns false
                 every { userRepository.getByUserId(TEST_USER_ID) } returns createUser()
                 it("정상적으로 종료한다") {
-                    shouldNotThrow<Exception> { userService.updateEmail(TEST_USER_ID, TEST_EMAIL) }
+                    shouldNotThrowAny { userService.updateEmail(TEST_USER_ID, TEST_EMAIL) }
                 }
             }
 
@@ -158,7 +158,7 @@ class UserServiceTest : DescribeSpec(
                 every { userRepository.existsByPhoneNumber(TEST_PHONE_NUMBER) } returns false
                 every { userRepository.getByUserId(TEST_USER_ID) } returns createUser()
                 it("정상적으로 종료한다") {
-                    shouldNotThrow<Exception> { userService.updatePhoneNumber(TEST_USER_ID, TEST_PHONE_NUMBER) }
+                    shouldNotThrowAny { userService.updatePhoneNumber(TEST_USER_ID, TEST_PHONE_NUMBER) }
                 }
             }
 
@@ -166,10 +166,7 @@ class UserServiceTest : DescribeSpec(
                 every { userRepository.existsByPhoneNumber(TEST_PHONE_NUMBER) } returns true
                 it("[ExistResourceException] 반환한다") {
                     shouldThrow<ExistResourceException> {
-                        userService.updatePhoneNumber(
-                            TEST_USER_ID,
-                            TEST_PHONE_NUMBER,
-                        )
+                        userService.updatePhoneNumber(TEST_USER_ID, TEST_PHONE_NUMBER)
                     }
                 }
             }
@@ -179,10 +176,7 @@ class UserServiceTest : DescribeSpec(
                 every { userRepository.getByUserId(TEST_USER_ID) } throws NoSuchElementException()
                 it("[NoSuchElementException] 반환한다") {
                     shouldThrow<NoSuchElementException> {
-                        userService.updatePhoneNumber(
-                            TEST_USER_ID,
-                            TEST_PHONE_NUMBER,
-                        )
+                        userService.updatePhoneNumber(TEST_USER_ID, TEST_PHONE_NUMBER)
                     }
                 }
             }
@@ -194,7 +188,7 @@ class UserServiceTest : DescribeSpec(
                 every { userRepository.existsByNickname(TEST_NICKNAME) } returns false
                 every { userRepository.getByUserId(TEST_USER_ID) } returns createUser()
                 it("정상적으로 종료한다") {
-                    shouldNotThrow<Exception> { userService.updateInformation(TEST_USER_ID, informationRequest) }
+                    shouldNotThrowAny { userService.updateInformation(TEST_USER_ID, informationRequest) }
                 }
             }
 
@@ -202,10 +196,7 @@ class UserServiceTest : DescribeSpec(
                 every { userRepository.existsByNickname(TEST_NICKNAME) } returns true
                 it("[ExistResourceException] 반환한다") {
                     shouldThrow<ExistResourceException> {
-                        userService.updateInformation(
-                            TEST_USER_ID,
-                            informationRequest,
-                        )
+                        userService.updateInformation(TEST_USER_ID, informationRequest)
                     }
                 }
             }
@@ -215,10 +206,7 @@ class UserServiceTest : DescribeSpec(
                 every { userRepository.getByUserId(TEST_USER_ID) } throws NoSuchElementException()
                 it("[NoSuchElementException] 반환한다") {
                     shouldThrow<NoSuchElementException> {
-                        userService.updateInformation(
-                            TEST_USER_ID,
-                            informationRequest,
-                        )
+                        userService.updateInformation(TEST_USER_ID, informationRequest)
                     }
                 }
             }
@@ -229,11 +217,8 @@ class UserServiceTest : DescribeSpec(
                 every { objectStorageService.save(any(), TEST_DEFAULT_PROFILE_PNG) } just runs
                 every { fileNameGenerator.generate() } returns TEST_DEFAULT_PROFILE_NAME
                 it("정상적으로 종료한다") {
-                    shouldNotThrow<Exception> {
-                        userService.uploadProfile(
-                            TEST_PROFILE_CONTENT_BYTE_ARRAY,
-                            TEST_DEFAULT_PROFILE_PNG,
-                        )
+                    shouldNotThrowAny {
+                        userService.uploadProfile(TEST_PROFILE_CONTENT_BYTE_ARRAY, TEST_DEFAULT_PROFILE_PNG)
                     }
                 }
             }
@@ -263,7 +248,10 @@ class UserServiceTest : DescribeSpec(
                 )
                 it("[ObjectStorageException] 반환한다") {
                     shouldThrow<ObjectStorageException> {
-                        userService.uploadProfile(TEST_PROFILE_CONTENT_BYTE_ARRAY, TEST_DEFAULT_PROFILE_PNG)
+                        userService.uploadProfile(
+                            TEST_PROFILE_CONTENT_BYTE_ARRAY,
+                            TEST_DEFAULT_PROFILE_PNG,
+                        )
                     }
                 }
             }
@@ -274,9 +262,7 @@ class UserServiceTest : DescribeSpec(
                 every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser(TEST_PROFILE_PNG)
                 every { objectStorageService.delete(TEST_PROFILE_PNG) } just runs
                 it("정상적으로 종료한다") {
-                    shouldNotThrow<Exception> {
-                        userService.deleteProfile(TEST_USER_ID)
-                    }
+                    shouldNotThrowAny { userService.deleteProfile(TEST_USER_ID) }
                 }
             }
 
@@ -295,9 +281,7 @@ class UserServiceTest : DescribeSpec(
                     DELETE_NOT_EXIST_PROFILE_ERROR_MESSAGE,
                 )
                 it("[IllegalArgumentException] 반환한다") {
-                    shouldThrow<IllegalArgumentException> {
-                        userService.deleteProfile(TEST_USER_ID)
-                    }
+                    shouldThrow<IllegalArgumentException> { userService.deleteProfile(TEST_USER_ID) }
                 }
             }
 
@@ -307,9 +291,7 @@ class UserServiceTest : DescribeSpec(
                     SOMETHING_ERROR_MESSAGE,
                 )
                 it("[ObjectStorageException] 반환한다") {
-                    shouldThrow<ObjectStorageException> {
-                        userService.deleteProfile(TEST_USER_ID)
-                    }
+                    shouldThrow<ObjectStorageException> { userService.deleteProfile(TEST_USER_ID) }
                 }
             }
         }
@@ -319,9 +301,7 @@ class UserServiceTest : DescribeSpec(
                 every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser()
                 every { profileColorService.getNoneProfileColor() } returns createNoneProfileColor()
                 it("정상적으로 종료한다") {
-                    shouldNotThrow<Exception> {
-                        userService.updateProfile(TEST_USER_ID, TEST_PROFILE_PNG, TEST_PROFILE_PNG)
-                    }
+                    shouldNotThrowAny { userService.updateProfile(TEST_USER_ID, TEST_PROFILE_PNG, TEST_PROFILE_PNG) }
                 }
             }
 
@@ -329,9 +309,7 @@ class UserServiceTest : DescribeSpec(
                 every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser()
                 every { profileColorService.getRandomProfileColor() } returns createProfileColor()
                 it("정상적으로 종료한다") {
-                    shouldNotThrow<Exception> {
-                        userService.updateProfile(TEST_USER_ID, null, null)
-                    }
+                    shouldNotThrowAny { userService.updateProfile(TEST_USER_ID, null, null) }
                 }
             }
 
