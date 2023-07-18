@@ -87,7 +87,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
     }
 
     @ExceptionHandler(ClientException::class)
-    fun odyaException(ex: ClientException): ResponseEntity<ErrorResponse> {
+    fun clientException(ex: ClientException): ResponseEntity<ErrorResponse> {
         logger.error("[ClientException]", ex)
         return ResponseEntity.status(ex.errorCode.httpStatus).body(ErrorResponse.of(ex.errorCode, ex.message))
     }
