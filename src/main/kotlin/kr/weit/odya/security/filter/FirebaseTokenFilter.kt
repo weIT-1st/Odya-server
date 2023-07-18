@@ -6,7 +6,8 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import kr.weit.odya.security.FirebaseTokenHelper
 import kr.weit.odya.security.UserDetailsService
-import kr.weit.odya.support.Logger
+import kr.weit.odya.support.exception.ErrorCode
+import kr.weit.odya.support.log.Logger
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -17,10 +18,12 @@ import org.springframework.web.filter.OncePerRequestFilter
 val FIREBASE_TOKEN_FILTER_PERMITTED_PATTERNS: List<String> =
     listOf("/api/v1/auth/**", "/test", "/ready", "/health", "/docs/index.html")
 
-data class TokenInvalidErrorResponse(val errorMessage: String)
+data class TokenInvalidErrorResponse(
+    val code: Int = ErrorCode.INVALID_FIREBASE_ID_TOKEN.code,
+    val errorMessage: String = ErrorCode.INVALID_FIREBASE_ID_TOKEN.errorMessage,
+)
 
 private const val BEARER = "Bearer "
-private const val TOKEN_INVALID_ERROR_MESSAGE = "TOKEN INVALID"
 
 class FirebaseTokenFilter(
     private val userDetailsService: UserDetailsService,
@@ -55,7 +58,7 @@ class FirebaseTokenFilter(
         response.contentType = MediaType.APPLICATION_JSON_VALUE
         jacksonObjectMapper().writeValue(
             response.outputStream,
-            TokenInvalidErrorResponse(ex.message ?: TOKEN_INVALID_ERROR_MESSAGE),
+            TokenInvalidErrorResponse(),
         )
     }
 

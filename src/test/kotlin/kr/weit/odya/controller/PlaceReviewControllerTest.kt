@@ -15,7 +15,6 @@ import kr.weit.odya.support.LAST_ID_PARAM
 import kr.weit.odya.support.NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE
 import kr.weit.odya.support.NOT_EXIST_USER_ERROR_MESSAGE
 import kr.weit.odya.support.SIZE_PARAM
-import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.SORT_TYPE_PARAM
 import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
@@ -126,9 +125,6 @@ class PlaceReviewControllerTest(
                                 "rating" type JsonFieldType.NUMBER description "최소보다 미만인 별점" example TEST_TOO_LOW_RATING,
                                 "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW,
                             ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                            ),
                         )
                     }
                 }
@@ -152,9 +148,6 @@ class PlaceReviewControllerTest(
                                 "placeId" type JsonFieldType.STRING description "장소 ID" example TEST_PLACE_ID,
                                 "rating" type JsonFieldType.NUMBER description "최대보다 초과인 별점" example TEST_TOO_HIGH_RATING,
                                 "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW,
-                            ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                             ),
                         )
                     }
@@ -180,9 +173,6 @@ class PlaceReviewControllerTest(
                                 "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING,
                                 "review" type JsonFieldType.STRING description "공백인 리뷰" example " ",
                             ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                            ),
                         )
                     }
                 }
@@ -207,9 +197,6 @@ class PlaceReviewControllerTest(
                                 "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING,
                                 "review" type JsonFieldType.STRING description "최대 길이를 초과한 리뷰" example TEST_TOO_LONG_REVIEW,
                             ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                            ),
                         )
                     }
                 }
@@ -233,9 +220,6 @@ class PlaceReviewControllerTest(
                                 "placeId" type JsonFieldType.STRING description "장소 ID" example TEST_PLACE_ID,
                                 "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING,
                                 "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW,
-                            ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                             ),
                         )
                     }
@@ -264,9 +248,6 @@ class PlaceReviewControllerTest(
                                 "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING,
                                 "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW,
                             ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example EXIST_PLACE_REVIEW_ERROR_MESSAGE,
-                            ),
                         )
                     }
                 }
@@ -290,9 +271,6 @@ class PlaceReviewControllerTest(
                                 "placeId" type JsonFieldType.STRING description "장소 ID" example TEST_PLACE_ID,
                                 "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING,
                                 "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW,
-                            ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                             ),
                         )
                     }
@@ -346,9 +324,6 @@ class PlaceReviewControllerTest(
                                 "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING isOptional true,
                                 "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true,
                             ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                            ),
                         )
                     }
                 }
@@ -372,9 +347,6 @@ class PlaceReviewControllerTest(
                                 "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID,
                                 "rating" type JsonFieldType.NUMBER description "최소보다 미만인 별점" example TEST_TOO_LOW_RATING isOptional true,
                                 "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true,
-                            ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                             ),
                         )
                     }
@@ -400,9 +372,6 @@ class PlaceReviewControllerTest(
                                 "rating" type JsonFieldType.NUMBER description "최대보다 초과인 별점" example TEST_TOO_HIGH_RATING isOptional true,
                                 "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true,
                             ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                            ),
                         )
                     }
                 }
@@ -426,9 +395,6 @@ class PlaceReviewControllerTest(
                                 "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID,
                                 "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING isOptional true,
                                 "review" type JsonFieldType.STRING description "공백인 리뷰" example " " isOptional true,
-                            ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                             ),
                         )
                     }
@@ -454,9 +420,6 @@ class PlaceReviewControllerTest(
                                 "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING isOptional true,
                                 "review" type JsonFieldType.STRING description "최대 길이를 초과한 리뷰" example TEST_TOO_LONG_REVIEW isOptional true,
                             ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                            ),
                         )
                     }
                 }
@@ -480,9 +443,6 @@ class PlaceReviewControllerTest(
                                 "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID,
                                 "rating" type JsonFieldType.NUMBER description "별점" example TEST_PLACE_REVIEW_ID isOptional true,
                                 "review" type JsonFieldType.STRING description "리뷰" example TEST_PLACE_REVIEW_ID isOptional true,
-                            ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                             ),
                         )
                     }
@@ -509,9 +469,6 @@ class PlaceReviewControllerTest(
                                 "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING isOptional true,
                                 "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true,
                             ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE,
-                            ),
                         )
                     }
                 }
@@ -537,9 +494,6 @@ class PlaceReviewControllerTest(
                                 "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING isOptional true,
                                 "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true,
                             ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example FORBIDDEN_PLACE_REVIEW_ERROR_MESSAGE,
-                            ),
                         )
                     }
                 }
@@ -563,9 +517,6 @@ class PlaceReviewControllerTest(
                                 "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID,
                                 "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING isOptional true,
                                 "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true,
-                            ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                             ),
                         )
                     }
@@ -637,9 +588,6 @@ class PlaceReviewControllerTest(
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                                 ),
-                                responseBody(
-                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                                ),
                             ),
                         )
                 }
@@ -662,9 +610,6 @@ class PlaceReviewControllerTest(
                                 ),
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
-                                ),
-                                responseBody(
-                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE,
                                 ),
                             ),
                         )
@@ -689,9 +634,6 @@ class PlaceReviewControllerTest(
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                                 ),
-                                responseBody(
-                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example FORBIDDEN_PLACE_REVIEW_ERROR_MESSAGE,
-                                ),
                             ),
                         )
                 }
@@ -713,9 +655,6 @@ class PlaceReviewControllerTest(
                                 ),
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
-                                ),
-                                responseBody(
-                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                                 ),
                             ),
                         )
@@ -795,9 +734,6 @@ class PlaceReviewControllerTest(
                                         .joinToString() isOptional true,
                                     LAST_ID_PARAM parameterDescription "양수가 아닌 마지막 데이터의 ID" example TEST_INVALID_LAST_ID isOptional true,
                                 ),
-                                responseBody(
-                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                                ),
                             ),
                         )
                 }
@@ -828,9 +764,6 @@ class PlaceReviewControllerTest(
                                     SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example PlaceReviewSortType.values()
                                         .joinToString() isOptional true,
                                     LAST_ID_PARAM parameterDescription "마지막 데이터의 ID" example TEST_LAST_ID isOptional true,
-                                ),
-                                responseBody(
-                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                                 ),
                             ),
                         )
@@ -863,9 +796,6 @@ class PlaceReviewControllerTest(
                                         .joinToString() isOptional true,
                                     LAST_ID_PARAM parameterDescription "마지막 데이터의 ID" example TEST_LAST_ID isOptional true,
                                 ),
-                                responseBody(
-                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                                ),
                             ),
                         )
                 }
@@ -896,9 +826,6 @@ class PlaceReviewControllerTest(
                                     SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example PlaceReviewSortType.values()
                                         .joinToString() isOptional true,
                                     LAST_ID_PARAM parameterDescription "마지막 데이터의 ID" example TEST_LAST_ID isOptional true,
-                                ),
-                                responseBody(
-                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                                 ),
                             ),
                         )
@@ -978,9 +905,6 @@ class PlaceReviewControllerTest(
                                         .joinToString() isOptional true,
                                     LAST_ID_PARAM parameterDescription "마지막 데이터의 ID" example TEST_LAST_ID isOptional true,
                                 ),
-                                responseBody(
-                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                                ),
                             ),
                         )
                 }
@@ -1011,9 +935,6 @@ class PlaceReviewControllerTest(
                                     SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example PlaceReviewSortType.values()
                                         .joinToString() isOptional true,
                                     LAST_ID_PARAM parameterDescription "양수가 아닌 마지막 데이터의 ID" example TEST_INVALID_LAST_ID isOptional true,
-                                ),
-                                responseBody(
-                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                                 ),
                             ),
                         )
@@ -1046,9 +967,6 @@ class PlaceReviewControllerTest(
                                         .joinToString() isOptional true,
                                     LAST_ID_PARAM parameterDescription "마지막 데이터의 ID" example TEST_LAST_ID isOptional true,
                                 ),
-                                responseBody(
-                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                                ),
                             ),
                         )
                 }
@@ -1077,9 +995,6 @@ class PlaceReviewControllerTest(
                                     SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_SIZE isOptional true,
                                     SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example PlaceReviewSortType.values()
                                         .joinToString() isOptional true,
-                                ),
-                                responseBody(
-                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                                 ),
                             ),
                         )
@@ -1113,9 +1028,6 @@ class PlaceReviewControllerTest(
                                         .joinToString() isOptional true,
                                     LAST_ID_PARAM parameterDescription "마지막 데이터의 ID" example TEST_LAST_ID isOptional true,
                                 ),
-                                responseBody(
-                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example NOT_EXIST_USER_ERROR_MESSAGE,
-                                ),
                             ),
                         )
                 }
@@ -1146,9 +1058,6 @@ class PlaceReviewControllerTest(
                                     SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example PlaceReviewSortType.values()
                                         .joinToString() isOptional true,
                                     LAST_ID_PARAM parameterDescription "마지막 데이터의 ID" example TEST_LAST_ID isOptional true,
-                                ),
-                                responseBody(
-                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                                 ),
                             ),
                         )

@@ -32,6 +32,52 @@
 | Internal server error
 |===
 
+[[custom-error-codes]]
+== *Custom error codes*
+
+|===
+| ErrorCode | Description
+
+| `-10000`
+| Invalid request
+
+| `-10001`
+| Unauthorized
+
+| `-10002`
+| Forbidden
+
+| `-10003`
+| No such element
+
+| `-10004`
+| Internal server error
+
+| `-10005`
+| Unregistered user
+
+| `-10006`
+| Exist resource
+
+| `-10007`
+| Not found default resource
+
+| `-11000`
+| Invalid Firebase ID token
+
+| `-11001`
+| Firebase user creation fail
+
+| `-11002`
+| Firebase custom token creation fail
+
+| `-12000`
+| Object storage exception
+
+| `-13000`
+| Kakao client exception
+|===
+
 [[참고사항]]
 == *참고사항*
 

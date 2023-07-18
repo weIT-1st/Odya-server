@@ -26,7 +26,6 @@ import kr.weit.odya.support.TEST_BEARER_NOT_EXIST_USER_ID_TOKEN
 import kr.weit.odya.support.TEST_DEFAULT_PROFILE_PNG
 import kr.weit.odya.support.TEST_EMAIL
 import kr.weit.odya.support.TEST_ID_TOKEN
-import kr.weit.odya.support.TEST_INVALID_ID_TOKEN
 import kr.weit.odya.support.TEST_MOCK_PROFILE_NAME
 import kr.weit.odya.support.TEST_PHONE_NUMBER
 import kr.weit.odya.support.TEST_USER_ID
@@ -116,9 +115,6 @@ class UserControllerTest(
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                            ),
                         )
                     }
                 }
@@ -137,9 +133,6 @@ class UserControllerTest(
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                            ),
                         )
                     }
                 }
@@ -156,9 +149,6 @@ class UserControllerTest(
                             "get-my-information-fail-invalid-token",
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
-                            ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                             ),
                         )
                     }
@@ -202,9 +192,6 @@ class UserControllerTest(
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN WITHOUT AUTHENTICATED EMAIL",
                             ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example NOT_EXIST_AUTHENTICATED_EMAIL_ERROR_MESSAGE,
-                            ),
                         )
                     }
                 }
@@ -242,9 +229,6 @@ class UserControllerTest(
                             "update-email-fail-invalid-token",
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
-                            ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                             ),
                         )
                     }
@@ -288,9 +272,6 @@ class UserControllerTest(
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN WITHOUT AUTHENTICATED PHONE NUMBER",
                             ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example NOT_EXIST_AUTHENTICATED_PHONE_NUMBER_ERROR_MESSAGE,
-                            ),
                         )
                     }
                 }
@@ -328,9 +309,6 @@ class UserControllerTest(
                             "update-phone-number-fail-invalid-token",
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
-                            ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                             ),
                         )
                     }
@@ -399,9 +377,6 @@ class UserControllerTest(
                             "update-information-fail-invalid-token",
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
-                            ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                             ),
                         )
                     }
@@ -490,9 +465,6 @@ class UserControllerTest(
                             requestParts(
                                 "profile" requestPartDescription "잘못된 형식의 프로필 사진" isOptional true,
                             ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example NOT_ALLOW_FILE_FORMAT_ERROR_MESSAGE,
-                            ),
                         )
                     }
                 }
@@ -522,9 +494,6 @@ class UserControllerTest(
                             ),
                             requestParts(
                                 "profile" requestPartDescription "원본 이름이 없는 프로필 사진" isOptional true,
-                            ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example NOT_EXIST_ORIGIN_FILE_NAME_ERROR_MESSAGE,
                             ),
                         )
                     }
@@ -556,9 +525,6 @@ class UserControllerTest(
                             requestParts(
                                 "profile" requestPartDescription "프로필 사진" isOptional true,
                             ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                            ),
                         )
                     }
                 }
@@ -578,9 +544,6 @@ class UserControllerTest(
                             "update-profile-image-fail-invalid-delete-default-profile",
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
-                            ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example INVALID_DELETE_DEFAULT_PROFILE_ERROR_MESSAGE,
                             ),
                         )
                     }
@@ -602,9 +565,6 @@ class UserControllerTest(
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example DELETE_NOT_EXIST_PROFILE_ERROR_MESSAGE,
-                            ),
                         )
                     }
                 }
@@ -624,9 +584,6 @@ class UserControllerTest(
                             "update-profile-image-fail-delete-profile-error",
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
-                            ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                             ),
                         )
                     }
@@ -657,9 +614,6 @@ class UserControllerTest(
                             requestParts(
                                 "profile" requestPartDescription "프로필 사진" isOptional true,
                             ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example NOT_EXIST_PROFILE_COLOR_ERROR_MESSAGE,
-                            ),
                         )
                     }
                 }
@@ -669,7 +623,7 @@ class UserControllerTest(
                 val mockProfile = createMockProfile()
                 it("401 응답한다.") {
                     restDocMockMvc.multipart(HttpMethod.PATCH, targetUri) {
-                        header(HttpHeaders.AUTHORIZATION, TEST_INVALID_ID_TOKEN)
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
                         file(mockProfile)
                     }.andExpect {
                         status { isUnauthorized() }
@@ -681,9 +635,6 @@ class UserControllerTest(
                             ),
                             requestParts(
                                 "profile" requestPartDescription "프로필 사진" isOptional true,
-                            ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                             ),
                         )
                     }
