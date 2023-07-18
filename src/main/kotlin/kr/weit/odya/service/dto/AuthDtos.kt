@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Past
 import kr.weit.odya.client.kakao.KakaoUserInfo
 import kr.weit.odya.domain.user.Gender
 import kr.weit.odya.domain.user.SocialType
+import kr.weit.odya.support.exception.ErrorCode
 import kr.weit.odya.support.validator.Nickname
 import kr.weit.odya.support.validator.PhoneNumber
 import java.time.LocalDate
@@ -28,7 +29,7 @@ data class KakaoRegistrationResponse(
     val phoneNumber: String?,
     val nickname: String,
     val gender: Gender?,
-) {
+) : ErrorResponse(ErrorCode.UNREGISTERED_USER) {
     constructor(kakaoUserInfo: KakaoUserInfo) : this(
         username = kakaoUserInfo.username,
         email = kakaoUserInfo.email,

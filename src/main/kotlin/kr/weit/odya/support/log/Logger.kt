@@ -1,4 +1,4 @@
-package kr.weit.odya.support
+package kr.weit.odya.support.log
 
 import mu.KLogger
 import mu.KotlinLogging
