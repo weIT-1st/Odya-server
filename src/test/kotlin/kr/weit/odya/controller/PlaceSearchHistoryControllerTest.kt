@@ -6,7 +6,6 @@ import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import kr.weit.odya.service.PlaceSearchHistoryService
-import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_AGE_RANGE
 import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
@@ -96,9 +95,6 @@ class PlaceSearchHistoryControllerTest(
                             requestBody(
                                 "searchTerm" type JsonFieldType.STRING description "검색어" example TEST_PLACE_SEARCH_TERM,
                             ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                            ),
                         )
                     }
                 }
@@ -120,9 +116,6 @@ class PlaceSearchHistoryControllerTest(
                             ),
                             requestBody(
                                 "searchTerm" type JsonFieldType.STRING description "검색어" example TEST_PLACE_SEARCH_TERM,
-                            ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                             ),
                         )
                     }
@@ -166,9 +159,6 @@ class PlaceSearchHistoryControllerTest(
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                            ),
                         )
                     }
                 }
@@ -185,9 +175,6 @@ class PlaceSearchHistoryControllerTest(
                             "place-search-overall-ranking-fail-invalid-token",
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
-                            ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                             ),
                         )
                     }
@@ -239,9 +226,6 @@ class PlaceSearchHistoryControllerTest(
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                                 ),
-                                responseBody(
-                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                                ),
                             ),
                         )
                 }
@@ -263,9 +247,6 @@ class PlaceSearchHistoryControllerTest(
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                                 ),
-                                responseBody(
-                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                                ),
                             ),
                         )
                 }
@@ -286,9 +267,6 @@ class PlaceSearchHistoryControllerTest(
                                 ),
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
-                                ),
-                                responseBody(
-                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                                 ),
                             ),
                         )
