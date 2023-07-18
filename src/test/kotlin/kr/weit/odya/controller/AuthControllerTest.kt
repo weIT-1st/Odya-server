@@ -29,8 +29,8 @@ import kr.weit.odya.support.TEST_USERNAME
 import kr.weit.odya.support.createAppleLoginRequest
 import kr.weit.odya.support.createAppleRegisterRequest
 import kr.weit.odya.support.createKakaoLoginRequest
+import kr.weit.odya.support.createKakaoRegisterErrorResponse
 import kr.weit.odya.support.createKakaoRegisterRequest
-import kr.weit.odya.support.createKakaoRegistrationResponse
 import kr.weit.odya.support.createKakaoUserInfo
 import kr.weit.odya.support.createTokenResponse
 import kr.weit.odya.support.exception.ErrorCode
@@ -151,7 +151,7 @@ class AuthControllerTest(
             context("유효하지만 가입되지 않은 토큰이 전달되면") {
                 val request = createKakaoLoginRequest()
                 val kakaoUserInfo = createKakaoUserInfo()
-                val response = createKakaoRegistrationResponse(kakaoUserInfo)
+                val response = createKakaoRegisterErrorResponse(kakaoUserInfo)
                 every { authenticationService.getKakaoUserInfo(request) } returns kakaoUserInfo
                 every { authenticationService.kakaoLoginProcess(kakaoUserInfo) } throws UnRegisteredUserException(
                     NOT_EXIST_USER_ERROR_MESSAGE,
@@ -168,11 +168,11 @@ class AuthControllerTest(
                             responseBody(
                                 "code" type JsonFieldType.NUMBER description "에러 코드" example ErrorCode.UNREGISTERED_USER.code,
                                 "errorMessage" type JsonFieldType.STRING description "에러 메시지" example NOT_EXIST_USER_ERROR_MESSAGE,
-                                "username" type JsonFieldType.STRING description "회원 고유 아이디" example response.username,
-                                "email" type JsonFieldType.STRING description "회원 이메일" example response.email isOptional true,
-                                "phoneNumber" type JsonFieldType.STRING description "회원 전화번호" example response.phoneNumber isOptional true,
-                                "nickname" type JsonFieldType.STRING description "회원 닉네임" example response.nickname,
-                                "gender" type JsonFieldType.STRING description "회원 성별" example response.gender isOptional true,
+                                "data.username" type JsonFieldType.STRING description "회원 고유 아이디" example response.data.username,
+                                "data.email" type JsonFieldType.STRING description "회원 이메일" example response.data.email isOptional true,
+                                "data.phoneNumber" type JsonFieldType.STRING description "회원 전화번호" example response.data.phoneNumber isOptional true,
+                                "data.nickname" type JsonFieldType.STRING description "회원 닉네임" example response.data.nickname,
+                                "data.gender" type JsonFieldType.STRING description "회원 성별" example response.data.gender isOptional true,
                             ),
                         )
                     }
