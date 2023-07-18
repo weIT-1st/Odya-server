@@ -23,21 +23,27 @@ data class KakaoLoginRequest(
     val accessToken: String,
 )
 
+data class KakaoRegisterErrorResponse(
+    val data: KakaoRegistrationResponse,
+) : ErrorResponse(ErrorCode.UNREGISTERED_USER) {
+    constructor(kakaoUserInfo: KakaoUserInfo) : this(
+        data = KakaoRegistrationResponse(
+            username = kakaoUserInfo.username,
+            email = kakaoUserInfo.email,
+            phoneNumber = kakaoUserInfo.phoneNumber,
+            nickname = kakaoUserInfo.nickname,
+            gender = kakaoUserInfo.gender,
+        ),
+    )
+}
+
 data class KakaoRegistrationResponse(
     val username: String,
     val email: String?,
     val phoneNumber: String?,
     val nickname: String,
     val gender: Gender?,
-) : ErrorResponse(ErrorCode.UNREGISTERED_USER) {
-    constructor(kakaoUserInfo: KakaoUserInfo) : this(
-        username = kakaoUserInfo.username,
-        email = kakaoUserInfo.email,
-        phoneNumber = kakaoUserInfo.phoneNumber,
-        nickname = kakaoUserInfo.nickname,
-        gender = kakaoUserInfo.gender,
-    )
-}
+)
 
 data class AppleRegisterRequest(
     @field:NotBlank

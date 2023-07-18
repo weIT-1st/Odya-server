@@ -4,8 +4,8 @@ import kr.weit.odya.client.kakao.KakaoUserInfo
 import kr.weit.odya.service.dto.AppleLoginRequest
 import kr.weit.odya.service.dto.AppleRegisterRequest
 import kr.weit.odya.service.dto.KakaoLoginRequest
+import kr.weit.odya.service.dto.KakaoRegisterErrorResponse
 import kr.weit.odya.service.dto.KakaoRegisterRequest
-import kr.weit.odya.service.dto.KakaoRegistrationResponse
 import kr.weit.odya.service.dto.TokenResponse
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -39,7 +39,7 @@ fun createKakaoLoginRequest() = KakaoLoginRequest(TEST_OAUTH_ACCESS_TOKEN)
 fun createKakaoUserInfo() =
     KakaoUserInfo(TEST_OAUTH_ID, KakaoUserInfo.KakaoAccount(profile = KakaoUserInfo.Profile(TEST_NICKNAME)))
 
-fun createKakaoRegistrationResponse(kakaoUserInfo: KakaoUserInfo) = KakaoRegistrationResponse(kakaoUserInfo)
+fun createKakaoRegisterErrorResponse(kakaoUserInfo: KakaoUserInfo) = KakaoRegisterErrorResponse(kakaoUserInfo)
 
 fun createTokenResponse() = TokenResponse(TEST_CUSTOM_TOKEN)
 

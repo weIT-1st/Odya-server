@@ -6,8 +6,8 @@ import kr.weit.odya.service.UnRegisteredUserException
 import kr.weit.odya.service.dto.AppleLoginRequest
 import kr.weit.odya.service.dto.AppleRegisterRequest
 import kr.weit.odya.service.dto.KakaoLoginRequest
+import kr.weit.odya.service.dto.KakaoRegisterErrorResponse
 import kr.weit.odya.service.dto.KakaoRegisterRequest
-import kr.weit.odya.service.dto.KakaoRegistrationResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -42,7 +42,7 @@ class AuthController(
             val tokenResponse = authenticationService.kakaoLoginProcess(kakaoUserInfo)
             ResponseEntity.ok(tokenResponse)
         } catch (e: UnRegisteredUserException) {
-            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(KakaoRegistrationResponse(kakaoUserInfo))
+            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(KakaoRegisterErrorResponse(kakaoUserInfo))
         }
     }
 
