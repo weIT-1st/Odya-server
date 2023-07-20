@@ -1,11 +1,14 @@
 package kr.weit.odya.service
 
-open class OdyaException(message: String) : RuntimeException(message)
+import kr.weit.odya.support.exception.ErrorCode
 
-class ExistResourceException(message: String) : OdyaException(message)
+open class OdyaException(val errorCode: ErrorCode, message: String) : RuntimeException(message)
 
-class LoginFailedException(message: String) : OdyaException(message)
+class ExistResourceException(message: String) : OdyaException(ErrorCode.EXIST_RESOURCE, message)
 
-class ObjectStorageException(message: String) : OdyaException(message)
+class UnRegisteredUserException(message: String) : OdyaException(ErrorCode.UNREGISTERED_USER, message)
 
-class NotFoundDefaultResourceException(message: String) : OdyaException(message)
+class ObjectStorageException(message: String) : OdyaException(ErrorCode.OBJECT_STORAGE_EXCEPTION, message)
+
+class NotFoundDefaultResourceException(message: String) :
+    OdyaException(ErrorCode.NOT_FOUND_DEFAULT_RESOURCE, message)

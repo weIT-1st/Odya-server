@@ -33,11 +33,11 @@ operation::user-controller-test/update-email-fail-not-exist-email-in-token[snipp
 
 === *2-3 실패 - 유효한 토큰이면서, 가입되어 있는 이메일인 경우*
 
-operation::user-controller-test/update-email-fail-exist-email[snippets='http-request,request-headers,http-response']
+operation::user-controller-test/update-email-fail-exist-email[snippets='http-request,request-headers,http-response,response-fields']
 
 === *2-4 실패 - 유효하지 않은 토큰*
 
-operation::user-controller-test/update-email-fail-invalid-token[snippets='http-request,request-headers,http-response']
+operation::user-controller-test/update-email-fail-invalid-token[snippets='http-request,request-headers,http-response,response-fields']
 
 [[전화번호-변경-API]]
 == *3. 전화번호 변경 API*
