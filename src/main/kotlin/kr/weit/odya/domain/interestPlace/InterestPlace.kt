@@ -17,12 +17,12 @@ import kr.weit.odya.support.domain.BaseTimeEntity
 @Table(
     uniqueConstraints = [
         UniqueConstraint(
-            name = "place_id_user_id_unique",
+            name = "interest_place_id_user_id_unique",
             columnNames = ["place_id", "user_id"],
         ),
     ],
     indexes = [
-        Index(name = "place_id_index", columnList = "place_id"),
+        Index(name = "interest_place_id_index", columnList = "place_id"),
     ],
 )
 @SequenceGenerator(
@@ -35,7 +35,7 @@ import kr.weit.odya.support.domain.BaseTimeEntity
 class InterestPlace(
     @Id
     @Column(columnDefinition = "NUMERIC(19, 0)")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PLACE_REVIEW_SEQ_GENERATOR")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "INTEREST_PLACE_SEQ_GENERATOR")
     val id: Long,
 
     @Column(name = "place_id", length = 400, nullable = false, updatable = false)
@@ -44,4 +44,7 @@ class InterestPlace(
     @ManyToOne
     @JoinColumn(name = "user_id", columnDefinition = "NUMERIC(19, 0)", updatable = false, nullable = false)
     val user: User,
-) : BaseTimeEntity()
+) : BaseTimeEntity() {
+    val registrantsId: Long
+        get() = user.id
+}

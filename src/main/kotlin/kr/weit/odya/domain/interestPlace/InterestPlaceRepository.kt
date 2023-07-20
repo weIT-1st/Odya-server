@@ -1,12 +1,13 @@
 package kr.weit.odya.domain.interestPlace
 
-import kr.weit.odya.domain.user.User
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
+
+fun InterestPlaceRepository.getByInterestPlaceId(interestPlaceId: Long): InterestPlace =
+    findByIdOrNull(interestPlaceId) ?: throw NoSuchElementException("해당 장소는 관심 장소가 아닙니다")
 
 @Repository
 interface InterestPlaceRepository : JpaRepository<InterestPlace, Long> {
-    fun existsByUserAndPlaceId(user: User, placeId: String): Boolean
-
-    fun deleteByUserAndPlaceId(user: User, placeId: String)
+    fun existsByUserIdAndPlaceId(userId: Long, placeId: String): Boolean
 }
