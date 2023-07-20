@@ -10,8 +10,8 @@ operation::test-controller-test/test-success[snippets='http-request,request-body
 
 === *1-2 실패 - 이름이 비어 있는 경우*
 
-operation::test-controller-test/test-fail-empty-name[snippets='http-request,request-body,request-fields,http-response,response-fields']
+operation::test-controller-test/test-fail-empty-name[snippets='http-request,request-body,request-fields,http-response']
 
 === *1-3 실패 - 이름이 김한빈인 경우*
 
-operation::test-controller-test/test-fail-error-name[snippets='http-request,request-body,request-fields,http-response,response-fields']
+operation::test-controller-test/test-fail-error-name[snippets='http-request,request-body,request-fields,http-response']

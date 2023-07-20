@@ -107,9 +107,6 @@ class FollowControllerTest(
                             requestBody(
                                 "followingId" type JsonFieldType.NUMBER description "음수의 FOLLOWING ID" example request.followingId,
                             ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                            ),
                         )
                     }
                 }
@@ -135,9 +132,6 @@ class FollowControllerTest(
                             requestBody(
                                 "followingId" type JsonFieldType.NUMBER description "이미 팔로우된 USER ID" example request.followingId,
                             ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                            ),
                         )
                     }
                 }
@@ -159,9 +153,6 @@ class FollowControllerTest(
                             ),
                             requestBody(
                                 "followingId" type JsonFieldType.NUMBER description "팔로우를 신청할 USER ID" example request.followingId,
-                            ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                             ),
                         )
                     }
@@ -211,9 +202,6 @@ class FollowControllerTest(
                             requestBody(
                                 "followingId" type JsonFieldType.NUMBER description "음수의 FOLLOWING ID" example request.followingId,
                             ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                            ),
                         )
                     }
                 }
@@ -235,9 +223,6 @@ class FollowControllerTest(
                             ),
                             requestBody(
                                 "followingId" type JsonFieldType.NUMBER description "팔로우를 취소할 USER ID" example request.followingId,
-                            ),
-                            responseBody(
-                                "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                             ),
                         )
                     }
@@ -292,9 +277,6 @@ class FollowControllerTest(
                                 pathParameters(
                                     "userId" pathDescription "음수의 USER ID" example TEST_INVALID_USER_ID,
                                 ),
-                                responseBody(
-                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                                ),
                             ),
                         )
                 }
@@ -316,9 +298,6 @@ class FollowControllerTest(
                                 ),
                                 pathParameters(
                                     "userId" pathDescription "팔로워/팔로잉 수를 조회할 USER ID" example TEST_USER_ID,
-                                ),
-                                responseBody(
-                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                                 ),
                             ),
                         )
@@ -402,9 +381,6 @@ class FollowControllerTest(
                                     SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example FollowSortType.values()
                                         .joinToString() isOptional true,
                                 ),
-                                responseBody(
-                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                                ),
                             ),
                         )
                 }
@@ -427,9 +403,6 @@ class FollowControllerTest(
                                 pathParameters(
                                     "userId" pathDescription "음수의 USER ID" example TEST_INVALID_USER_ID,
                                 ),
-                                responseBody(
-                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                                ),
                             ),
                         )
                 }
@@ -451,9 +424,6 @@ class FollowControllerTest(
                                 ),
                                 pathParameters(
                                     "userId" pathDescription "팔로잉 목록을 조회할 USER ID" example TEST_USER_ID,
-                                ),
-                                responseBody(
-                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                                 ),
                             ),
                         )
@@ -537,9 +507,6 @@ class FollowControllerTest(
                                     SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example FollowSortType.values()
                                         .joinToString() isOptional true,
                                 ),
-                                responseBody(
-                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                                ),
                             ),
                         )
                 }
@@ -562,9 +529,6 @@ class FollowControllerTest(
                                 pathParameters(
                                     "userId" pathDescription "음수의 USER ID" example TEST_INVALID_USER_ID,
                                 ),
-                                responseBody(
-                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
-                                ),
                             ),
                         )
                 }
@@ -586,9 +550,6 @@ class FollowControllerTest(
                                 ),
                                 pathParameters(
                                     "userId" pathDescription "팔로워 목록을 조회할 USER ID" example TEST_USER_ID,
-                                ),
-                                responseBody(
-                                    "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                                 ),
                             ),
                         )

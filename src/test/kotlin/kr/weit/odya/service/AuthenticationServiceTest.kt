@@ -13,8 +13,8 @@ import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.existsByEmail
 import kr.weit.odya.domain.user.existsByNickname
 import kr.weit.odya.domain.user.existsByPhoneNumber
+import kr.weit.odya.security.CreateFirebaseCustomTokenException
 import kr.weit.odya.security.CreateFirebaseUserException
-import kr.weit.odya.security.CreateTokenException
 import kr.weit.odya.security.FirebaseTokenHelper
 import kr.weit.odya.security.InvalidTokenException
 import kr.weit.odya.support.NOT_EXIST_PROFILE_COLOR_ERROR_MESSAGE
@@ -53,7 +53,7 @@ class AuthenticationServiceTest : DescribeSpec(
             context("가입되어 있지 않은 USERNAME이 주어지는 경우") {
                 every { userRepository.existsByUsername(TEST_USERNAME) } returns false
                 it("[LoginFailedException] 예외가 발생한다") {
-                    shouldThrow<LoginFailedException> { authenticationService.appleLoginProcess(TEST_USERNAME) }
+                    shouldThrow<UnRegisteredUserException> { authenticationService.appleLoginProcess(TEST_USERNAME) }
                 }
             }
         }
@@ -71,15 +71,19 @@ class AuthenticationServiceTest : DescribeSpec(
             context("가입되어 있지 않은 USERNAME이 주어지는 경우") {
                 every { userRepository.existsByUsername(kakaoUserInfo.username) } returns false
                 it("[LoginFailedException] 예외가 발생한다") {
-                    shouldThrow<LoginFailedException> { authenticationService.kakaoLoginProcess(kakaoUserInfo) }
+                    shouldThrow<UnRegisteredUserException> { authenticationService.kakaoLoginProcess(kakaoUserInfo) }
                 }
             }
 
             context("FIREBASE CUSTOM TOKEN 생성에 실패하는 경우") {
                 every { userRepository.existsByUsername(kakaoUserInfo.username) } returns true
-                every { firebaseTokenHelper.createFirebaseCustomToken(kakaoUserInfo.username) } throws CreateTokenException()
+                every { firebaseTokenHelper.createFirebaseCustomToken(kakaoUserInfo.username) } throws CreateFirebaseCustomTokenException()
                 it("[CreateTokenException] 예외가 발생한다") {
-                    shouldThrow<CreateTokenException> { authenticationService.kakaoLoginProcess(kakaoUserInfo) }
+                    shouldThrow<CreateFirebaseCustomTokenException> {
+                        authenticationService.kakaoLoginProcess(
+                            kakaoUserInfo,
+                        )
+                    }
                 }
             }
         }

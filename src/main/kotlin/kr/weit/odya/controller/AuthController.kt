@@ -2,12 +2,12 @@ package kr.weit.odya.controller
 
 import jakarta.validation.Valid
 import kr.weit.odya.service.AuthenticationService
-import kr.weit.odya.service.LoginFailedException
+import kr.weit.odya.service.UnRegisteredUserException
 import kr.weit.odya.service.dto.AppleLoginRequest
 import kr.weit.odya.service.dto.AppleRegisterRequest
 import kr.weit.odya.service.dto.KakaoLoginRequest
+import kr.weit.odya.service.dto.KakaoRegisterErrorResponse
 import kr.weit.odya.service.dto.KakaoRegisterRequest
-import kr.weit.odya.service.dto.KakaoRegistrationResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -41,8 +41,8 @@ class AuthController(
         return try {
             val tokenResponse = authenticationService.kakaoLoginProcess(kakaoUserInfo)
             ResponseEntity.ok(tokenResponse)
-        } catch (e: LoginFailedException) {
-            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(KakaoRegistrationResponse(kakaoUserInfo))
+        } catch (e: UnRegisteredUserException) {
+            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(KakaoRegisterErrorResponse(kakaoUserInfo))
         }
     }
 
