@@ -1,0 +1,38 @@
+name: issueTransition
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+    types: [ opened, reopened ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: JiraLogin
+        uses: atlassian/gajira-login@master
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+      - name: Find in head ref
+        uses: atlassian/gajira-find-issue-key@master
+        id: jira-ticket
+        with:
+          string: ${{ github.head_ref }}
+      - name: Transition issue to review
+        if: ${{ github.event_name == 'pull_request' && steps.jira-ticket.outputs.issue != '' }}
+        uses: atlassian/gajira-transition@master
+        with:
+          issue: ${{ steps.jira-ticket.outputs.issue }}
+          transition: "리뷰 대기"
+      - name: Transition issue to complete
+        if: ${{ github.event_name == 'push' && steps.jira-ticket.outputs.issue != '' }}
+        uses: atlassian/gajira-transition@master
+        with:
+          issue: ${{ steps.jira-ticket.outputs.issue }}
+          transition: "완료"

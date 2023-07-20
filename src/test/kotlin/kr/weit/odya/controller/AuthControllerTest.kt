@@ -461,7 +461,6 @@ class AuthControllerTest(
             val targetUri = "/api/v1/auth/register/kakao"
             context("유효한 회원가입 정보가 전달되면") {
                 val request = createKakaoRegisterRequest()
-                every { authenticationService.createFirebaseUser(request.username) } just runs
                 every { authenticationService.register(request) } just runs
                 it("201 응답한다.") {
                     restDocMockMvc.post(targetUri) {
@@ -487,7 +486,7 @@ class AuthControllerTest(
 
             context("FIREBASE에 이미 존재하는 USERNAME이 전달되면") {
                 val request = createKakaoRegisterRequest()
-                every { authenticationService.createFirebaseUser(request.username) } throws CreateFirebaseUserException(
+                every { authenticationService.register(request) } throws CreateFirebaseUserException(
                     ALREADY_REGISTER_USER_ERROR_MESSAGE,
                 )
                 it("409 응답한다.") {
@@ -517,7 +516,6 @@ class AuthControllerTest(
 
             context("유효한 토큰이지만, 이미 존재하는 사용자면") {
                 val request = createKakaoRegisterRequest()
-                every { authenticationService.createFirebaseUser(request.username) } just runs
                 every { authenticationService.register(request) } throws ExistResourceException(
                     EXIST_USER_ERROR_MESSAGE,
                 )
@@ -548,7 +546,6 @@ class AuthControllerTest(
 
             context("유효한 토큰이지만, 이미 존재하는 이메일이면") {
                 val request = createKakaoRegisterRequest()
-                every { authenticationService.createFirebaseUser(request.username) } just runs
                 every { authenticationService.register(request) } throws ExistResourceException(
                     EXIST_EMAIL_ERROR_MESSAGE,
                 )
@@ -579,7 +576,6 @@ class AuthControllerTest(
 
             context("유효한 토큰이지만, 이미 존재하는 전화번호이면") {
                 val request = createKakaoRegisterRequest()
-                every { authenticationService.createFirebaseUser(request.username) } just runs
                 every { authenticationService.register(request) } throws ExistResourceException(
                     EXIST_PHONE_NUMBER_ERROR_MESSAGE,
                 )
@@ -610,7 +606,6 @@ class AuthControllerTest(
 
             context("유효한 토큰이지만, 이미 존재하는 닉네임이면") {
                 val request = createKakaoRegisterRequest()
-                every { authenticationService.createFirebaseUser(request.username) } just runs
                 every { authenticationService.register(request) } throws ExistResourceException(
                     EXIST_NICKNAME_ERROR_MESSAGE,
                 )
