@@ -39,3 +39,7 @@ const val SOMETHING_ERROR_MESSAGE = "something error message"
 const val INVALID_DELETE_DEFAULT_PROFILE_ERROR_MESSAGE = "기본 프로필은 삭제할 수 없습니다"
 
 const val DELETE_NOT_EXIST_PROFILE_ERROR_MESSAGE = "$TEST_PROFILE_PNG: Object Storage에 존재하지 않는 파일입니다"
+
+const val NOT_FOUND_INTEREST_PLACE_ERROR_MESSAGE = "해당 장소는 관심 장소 등록되어있지 않습니다."
+
+const val EXIST_INTEREST_PLACE_ERROR_MESSAGE = "$TEST_PLACE_ID: 해당 장소는 이미 관심 장소입니다"

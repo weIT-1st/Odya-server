@@ -45,7 +45,7 @@ operation::place-review-controller-test/placeReview-update-success[snippets='htt
 
 === *2-2 실패 - 유효한 토큰이지만 양수가 아닌 장소리뷰ID*
 
-operation::place-review-controller-test/placeReview-update-fail-negative-rating[snippets='http-request,request-headers,request-body,request-fields,response-body,http-response']
+operation::place-review-controller-test/placeReview-update-fail-negative-id[snippets='http-request,request-headers,request-body,request-fields,response-body,http-response']
 
 === *2-3 실패 - 유효한 토큰이지만 최소보다 미만인 별점*
 
@@ -69,7 +69,7 @@ operation::place-review-controller-test/placeReview-update-fail-not-registered-u
 
 === *2-8 실패 - 유효한 토큰이지만 존재하지 않는 장소리뷰ID*
 
-operation::place-review-controller-test/placeReview-update-fail-not-found-review[snippets='http-request,request-headers,request-body,request-fields,response-body,http-response']
+operation::place-review-controller-test/placeReview-update-fail-not-found-id[snippets='http-request,request-headers,request-body,request-fields,response-body,http-response']
 
 === *2-9 실패 - 유효한 토큰이지만 수정할 권한의 유저*
 
