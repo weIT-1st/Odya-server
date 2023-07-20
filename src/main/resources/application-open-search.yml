@@ -1,0 +1,13 @@
+---
+spring.config.activate.on-profile: sandbox
+
+open-search:
+  indices:
+    place-search-history: sandbox-place-search-history
+
+---
+spring.config.activate.on-profile: stable
+
+open-search:
+  indices:
+    place-search-history: stable-place-search-history
