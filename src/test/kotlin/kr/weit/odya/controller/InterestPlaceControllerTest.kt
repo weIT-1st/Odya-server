@@ -133,7 +133,7 @@ class InterestPlaceControllerTest(
                         status { isConflict() }
                     }.andDo {
                         createDocument(
-                            "interest-place-create-failed-not-exist-user-id",
+                            "interest-place-create-failed-already-exist-interest-place",
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
