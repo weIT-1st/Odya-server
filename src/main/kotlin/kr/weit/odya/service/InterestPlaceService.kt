@@ -23,7 +23,7 @@ class InterestPlaceService(private val interestPlaceRepository: InterestPlaceRep
         interestPlaceRepository.delete(interestPlaceRepository.getByInterestPlaceId(interestPlaceId))
     }
 
-    fun getInterestPlace(userId: Long, request: InterestPlaceRequest): Boolean {
-        return interestPlaceRepository.existsByUserIdAndPlaceId(userId, request.placeId)
+    fun getInterestPlace(userId: Long, placeId: String): Boolean {
+        return interestPlaceRepository.existsByUserIdAndPlaceId(userId, placeId)
     }
 }

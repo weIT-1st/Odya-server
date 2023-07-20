@@ -5,7 +5,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 
 fun InterestPlaceRepository.getByInterestPlaceId(interestPlaceId: Long): InterestPlace =
-    findByIdOrNull(interestPlaceId) ?: throw NoSuchElementException("해당 장소는 관심 장소가 아닙니다")
+    findByIdOrNull(interestPlaceId) ?: throw NoSuchElementException("해당 장소는 관심 장소 등록되어있지 않습니다.")
 
 @Repository
 interface InterestPlaceRepository : JpaRepository<InterestPlace, Long> {

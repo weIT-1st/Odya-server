@@ -66,5 +66,14 @@ class InterestPlaceServiceTest : DescribeSpec(
                 }
             }
         }
+
+        describe("getInterestPlace 메소드") {
+            context("유효한 데이터가 전달되면") {
+                every { interestPlaceRepository.existsByUserIdAndPlaceId(TEST_USER_ID, TEST_PLACE_ID) } returns true
+                it("관심 장소 여부를 확인한다.") {
+                    shouldNotThrowAny { sut.getInterestPlace(TEST_USER_ID, TEST_PLACE_ID) }
+                }
+            }
+        }
     },
 )

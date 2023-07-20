@@ -46,14 +46,14 @@ class InterestPlaceController(private val interestPlaceService: InterestPlaceSer
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
     }
 
-    @GetMapping
+    @GetMapping("/{placeId}")
     fun getInterestPlace(
         @LoginUserId
         userId: Long,
-        @Valid
-        @RequestBody
-        interestPlace: InterestPlaceRequest,
+        @NotNull(message = "관심 장소 ID는 필수 입력값입니다.")
+        @PathVariable("placeId")
+        placeId: String,
     ): ResponseEntity<Boolean> {
-        return ResponseEntity.ok(interestPlaceService.getInterestPlace(userId, interestPlace))
+        return ResponseEntity.ok(interestPlaceService.getInterestPlace(userId, placeId))
     }
 }
