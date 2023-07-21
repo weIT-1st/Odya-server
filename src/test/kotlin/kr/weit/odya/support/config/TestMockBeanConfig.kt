@@ -12,6 +12,7 @@ import org.testcontainers.containers.OracleContainer
 import org.testcontainers.containers.wait.strategy.Wait
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.utility.DockerImageName
+import java.time.Duration
 
 @TestConfiguration
 class TestMockBeanConfig {
@@ -25,7 +26,8 @@ class TestMockBeanConfig {
         @Container
         var opensearch: OpensearchContainer =
             OpensearchContainer(DockerImageName.parse("opensearchproject/opensearch:2.8.0"))
-                .waitingFor(Wait.forListeningPort())
+                .withStartupAttempts(5)
+                .withStartupTimeout(Duration.ofMinutes(2))
                 .apply { start() }
 
         @Container
