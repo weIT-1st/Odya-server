@@ -11,14 +11,10 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.restdocs.RestDocumentationExtension
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestConstructor
-import org.testcontainers.junit.jupiter.Testcontainers
 
 class BaseTests {
     @ActiveProfiles("test")
-    @Testcontainers
-    @ContextConfiguration(initializers = [TestMockBeanConfig.Initializer::class])
     @Target(AnnotationTarget.CLASS)
     @Retention(AnnotationRetention.RUNTIME)
     @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
