@@ -5,7 +5,7 @@ WORKDIR /app
 ARG AWS_ACCESS_KEY_ID
 ARG AWS_SECRET_ACCESS_KEY
 
-RUN ./gradlew assemble -x test
+RUN ./gradlew assemble
 
 FROM eclipse-temurin:17.0.7_7-jdk AS run
 
