@@ -1,6 +1,6 @@
 package kr.weit.odya.service
 
-import io.kotest.assertions.throwables.shouldNotThrow
+import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
@@ -13,8 +13,8 @@ import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.existsByEmail
 import kr.weit.odya.domain.user.existsByNickname
 import kr.weit.odya.domain.user.existsByPhoneNumber
+import kr.weit.odya.security.CreateFirebaseCustomTokenException
 import kr.weit.odya.security.CreateFirebaseUserException
-import kr.weit.odya.security.CreateTokenException
 import kr.weit.odya.security.FirebaseTokenHelper
 import kr.weit.odya.security.InvalidTokenException
 import kr.weit.odya.support.NOT_EXIST_PROFILE_COLOR_ERROR_MESSAGE
@@ -46,14 +46,14 @@ class AuthenticationServiceTest : DescribeSpec(
             context("유효한 USERNAME이 주어지는 경우") {
                 every { userRepository.existsByUsername(TEST_USERNAME) } returns true
                 it("정상적으로 종료한다") {
-                    shouldNotThrow<Exception> { authenticationService.appleLoginProcess(TEST_USERNAME) }
+                    shouldNotThrowAny { authenticationService.appleLoginProcess(TEST_USERNAME) }
                 }
             }
 
             context("가입되어 있지 않은 USERNAME이 주어지는 경우") {
                 every { userRepository.existsByUsername(TEST_USERNAME) } returns false
                 it("[LoginFailedException] 예외가 발생한다") {
-                    shouldThrow<LoginFailedException> { authenticationService.appleLoginProcess(TEST_USERNAME) }
+                    shouldThrow<UnRegisteredUserException> { authenticationService.appleLoginProcess(TEST_USERNAME) }
                 }
             }
         }
@@ -71,15 +71,19 @@ class AuthenticationServiceTest : DescribeSpec(
             context("가입되어 있지 않은 USERNAME이 주어지는 경우") {
                 every { userRepository.existsByUsername(kakaoUserInfo.username) } returns false
                 it("[LoginFailedException] 예외가 발생한다") {
-                    shouldThrow<LoginFailedException> { authenticationService.kakaoLoginProcess(kakaoUserInfo) }
+                    shouldThrow<UnRegisteredUserException> { authenticationService.kakaoLoginProcess(kakaoUserInfo) }
                 }
             }
 
             context("FIREBASE CUSTOM TOKEN 생성에 실패하는 경우") {
                 every { userRepository.existsByUsername(kakaoUserInfo.username) } returns true
-                every { firebaseTokenHelper.createFirebaseCustomToken(kakaoUserInfo.username) } throws CreateTokenException()
+                every { firebaseTokenHelper.createFirebaseCustomToken(kakaoUserInfo.username) } throws CreateFirebaseCustomTokenException()
                 it("[CreateTokenException] 예외가 발생한다") {
-                    shouldThrow<CreateTokenException> { authenticationService.kakaoLoginProcess(kakaoUserInfo) }
+                    shouldThrow<CreateFirebaseCustomTokenException> {
+                        authenticationService.kakaoLoginProcess(
+                            kakaoUserInfo,
+                        )
+                    }
                 }
             }
         }
@@ -94,7 +98,7 @@ class AuthenticationServiceTest : DescribeSpec(
                 every { profileColorService.getRandomProfileColor() } returns createProfileColor()
                 every { userRepository.save(any()) } returns createUser()
                 it("정상적으로 종료한다") {
-                    shouldNotThrow<Exception> { authenticationService.register(request) }
+                    shouldNotThrowAny { authenticationService.register(request) }
                 }
             }
 
@@ -144,13 +148,27 @@ class AuthenticationServiceTest : DescribeSpec(
                     shouldThrow<NotFoundDefaultResourceException> { authenticationService.register(request) }
                 }
             }
+
+            context("유효한 USERNAME이 주어지는 경우") {
+                every { firebaseTokenHelper.createFirebaseUser(TEST_USERNAME) } just runs
+                it("정상적으로 종료한다") {
+                    shouldNotThrowAny { firebaseTokenHelper.createFirebaseUser(TEST_USERNAME) }
+                }
+            }
+
+            context("USER 생성 중 에러가 발생하는 경우") {
+                every { firebaseTokenHelper.createFirebaseUser(TEST_USERNAME) } throws CreateFirebaseUserException()
+                it("[CreateFirebaseUserException] 예외가 발생한다") {
+                    shouldThrow<CreateFirebaseUserException> { firebaseTokenHelper.createFirebaseUser(TEST_USERNAME) }
+                }
+            }
         }
 
         describe("getUsernameByIdToken") {
             context("유효한 ID TOKEN이 주어지는 경우") {
                 every { firebaseTokenHelper.getUid(TEST_ID_TOKEN) } returns TEST_USERNAME
                 it("정상적으로 종료한다") {
-                    shouldNotThrow<Exception> { authenticationService.getUsernameByIdToken(TEST_ID_TOKEN) }
+                    shouldNotThrowAny { authenticationService.getUsernameByIdToken(TEST_ID_TOKEN) }
                 }
             }
 
@@ -158,22 +176,6 @@ class AuthenticationServiceTest : DescribeSpec(
                 every { firebaseTokenHelper.getUid(TEST_ID_TOKEN) } throws InvalidTokenException()
                 it("[InvalidTokenException] 예외가 발생한다") {
                     shouldThrow<InvalidTokenException> { authenticationService.getUsernameByIdToken(TEST_ID_TOKEN) }
-                }
-            }
-        }
-
-        describe("createFirebaseUser") {
-            context("유효한 USERNAME이 주어지는 경우") {
-                every { firebaseTokenHelper.createFirebaseUser(TEST_USERNAME) } just runs
-                it("정상적으로 종료한다") {
-                    shouldNotThrow<Exception> { authenticationService.createFirebaseUser(TEST_USERNAME) }
-                }
-            }
-
-            context("USER 생성 중 에러가 발생하는 경우") {
-                every { firebaseTokenHelper.createFirebaseUser(TEST_USERNAME) } throws CreateFirebaseUserException()
-                it("[CreateFirebaseUserException] 예외가 발생한다") {
-                    shouldThrow<CreateFirebaseUserException> { authenticationService.createFirebaseUser(TEST_USERNAME) }
                 }
             }
         }
@@ -201,7 +203,7 @@ class AuthenticationServiceTest : DescribeSpec(
             context("중복이 없는 닉네임이 주어지는 경우") {
                 every { userRepository.existsByNickname(TEST_NICKNAME) } returns false
                 it("정상적으로 종료한다") {
-                    shouldNotThrow<Exception> { authenticationService.validateNickname(TEST_NICKNAME) }
+                    shouldNotThrowAny { authenticationService.validateNickname(TEST_NICKNAME) }
                 }
             }
 
@@ -217,7 +219,7 @@ class AuthenticationServiceTest : DescribeSpec(
             context("중복이 없는 이메일이 주어지는 경우") {
                 every { userRepository.existsByEmail(TEST_EMAIL) } returns false
                 it("정상적으로 종료한다") {
-                    shouldNotThrow<Exception> { authenticationService.validateEmail(TEST_EMAIL) }
+                    shouldNotThrowAny { authenticationService.validateEmail(TEST_EMAIL) }
                 }
             }
 
@@ -233,7 +235,7 @@ class AuthenticationServiceTest : DescribeSpec(
             context("중복이 없는 이메일이 주어지는 경우") {
                 every { userRepository.existsByPhoneNumber(TEST_PHONE_NUMBER) } returns false
                 it("정상적으로 종료한다") {
-                    shouldNotThrow<Exception> { authenticationService.validatePhoneNumber(TEST_PHONE_NUMBER) }
+                    shouldNotThrowAny { authenticationService.validatePhoneNumber(TEST_PHONE_NUMBER) }
                 }
             }
 

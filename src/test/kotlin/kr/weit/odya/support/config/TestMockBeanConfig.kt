@@ -1,5 +1,6 @@
 package kr.weit.odya.support.config
 
+import kr.weit.odya.domain.placeSearchHistory.PlaceSearchHistoryRepository
 import kr.weit.odya.service.ObjectStorageService
 import org.opensearch.testcontainers.OpensearchContainer
 import org.springframework.boot.test.context.TestConfiguration
@@ -18,6 +19,9 @@ import java.time.temporal.ChronoUnit
 class TestMockBeanConfig {
     @MockBean
     lateinit var objectStorageService: ObjectStorageService
+
+    @MockBean
+    lateinit var placeSearchHistoryRepository: PlaceSearchHistoryRepository
     companion object {
 
         @Container

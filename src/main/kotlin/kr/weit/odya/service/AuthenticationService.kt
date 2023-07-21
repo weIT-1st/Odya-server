@@ -1,9 +1,11 @@
 package kr.weit.odya.service
 
+import kr.weit.odya.client.KakaoClientException
 import kr.weit.odya.client.kakao.KakaoClient
 import kr.weit.odya.client.kakao.KakaoUserInfo
 import kr.weit.odya.domain.profilecolor.ProfileColor
 import kr.weit.odya.domain.user.Profile
+import kr.weit.odya.domain.user.SocialType
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.existsByEmail
@@ -13,6 +15,7 @@ import kr.weit.odya.security.FirebaseTokenHelper
 import kr.weit.odya.service.dto.KakaoLoginRequest
 import kr.weit.odya.service.dto.RegisterRequest
 import kr.weit.odya.service.dto.TokenResponse
+import kr.weit.odya.util.getOrThrow
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -27,13 +30,13 @@ class AuthenticationService(
 ) {
     fun appleLoginProcess(appleUsername: String) {
         if (!userRepository.existsByUsername(appleUsername)) {
-            throw LoginFailedException("$appleUsername: 존재하지 않는 회원입니다")
+            throw UnRegisteredUserException("$appleUsername: 존재하지 않는 회원입니다")
         }
     }
 
     fun kakaoLoginProcess(kakaoUserInfo: KakaoUserInfo): TokenResponse {
         if (!userRepository.existsByUsername(kakaoUserInfo.username)) {
-            throw LoginFailedException("${kakaoUserInfo.username}: 존재하지 않는 회원입니다")
+            throw UnRegisteredUserException("${kakaoUserInfo.username}: 존재하지 않는 회원입니다")
         }
         return TokenResponse(firebaseTokenHelper.createFirebaseCustomToken(kakaoUserInfo.username))
     }
@@ -43,6 +46,9 @@ class AuthenticationService(
         validateRegisterInformation(registerRequest)
         val randomProfileColor = profileColorService.getRandomProfileColor()
         userRepository.save(createUser(registerRequest, randomProfileColor))
+        if (registerRequest.socialType == SocialType.KAKAO) {
+            firebaseTokenHelper.createFirebaseUser(registerRequest.username)
+        }
     }
 
     fun validateNickname(nickname: String) {
@@ -63,15 +69,11 @@ class AuthenticationService(
         }
     }
 
-    fun getUsernameByIdToken(idToken: String): String =
-        firebaseTokenHelper.getUid(idToken)
+    fun getUsernameByIdToken(idToken: String): String = firebaseTokenHelper.getUid(idToken)
 
-    fun createFirebaseUser(username: String) {
-        firebaseTokenHelper.createFirebaseUser(username)
-    }
-
-    fun getKakaoUserInfo(kakaoLoginRequest: KakaoLoginRequest): KakaoUserInfo =
+    fun getKakaoUserInfo(kakaoLoginRequest: KakaoLoginRequest): KakaoUserInfo = runCatching {
         kakaoClient.getKakaoUserInfo(getBearerToken(kakaoLoginRequest.accessToken))
+    }.getOrThrow { ex -> KakaoClientException(ex.message) }
 
     private fun getBearerToken(oAuthAccessToken: String) = "$OAUTH_ACCESS_TOKEN_TYPE $oAuthAccessToken"
 

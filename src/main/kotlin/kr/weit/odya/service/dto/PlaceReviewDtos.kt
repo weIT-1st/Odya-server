@@ -47,15 +47,40 @@ data class PlaceReviewUpdateRequest(
 )
 
 data class PlaceReviewListResponse(
+    val id: Long,
     val placeId: String,
+    val userId: Long,
     val writerNickname: String,
     val starRating: Int,
     val review: String,
 ) {
     constructor(placeReview: PlaceReview) : this(
+        placeReview.id,
         placeReview.placeId,
+        placeReview.writerId,
         placeReview.writerNickname,
         placeReview.starRating,
         placeReview.review,
     )
+}
+
+data class SlicePlaceReviewResponse private constructor(
+    override var hasNext: Boolean,
+    val averageRating: Double,
+    override val content: List<PlaceReviewListResponse>,
+) : SliceResponse<PlaceReviewListResponse>(hasNext, content) {
+    companion object {
+        fun of(size: Int, content: List<PlaceReview>, averageRating: Double): SlicePlaceReviewResponse {
+            val contents: List<PlaceReview>
+            val hasNext: Boolean
+            if (content.size > size) {
+                hasNext = true
+                contents = content.dropLast(1)
+            } else {
+                hasNext = false
+                contents = content
+            }
+            return SlicePlaceReviewResponse(hasNext, averageRating, contents.map { PlaceReviewListResponse(it) })
+        }
+    }
 }

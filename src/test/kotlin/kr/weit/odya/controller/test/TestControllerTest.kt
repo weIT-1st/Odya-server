@@ -64,7 +64,6 @@ class TestControllerTest(
                         createDocument(
                             "test-fail-empty-name",
                             requestBody("name" type JsonFieldType.STRING description "빈 값" example request.name),
-                            responseBody("errorMessage" type JsonFieldType.STRING description "에러 메시지"),
                         )
                     }
                 }
@@ -81,7 +80,6 @@ class TestControllerTest(
                         createDocument(
                             "test-fail-error-name",
                             requestBody("name" type JsonFieldType.STRING description "에러 발생 이름" example request.name),
-                            responseBody("errorMessage" type JsonFieldType.STRING description "에러 메시지"),
                         )
                     }
                 }

@@ -8,13 +8,13 @@
 
 operation::auth-controller-test/apple-login-success[snippets='http-request,request-body,request-fields,http-response']
 
-=== *1-2 실패 - 유효하지만 가입되지 않은 토큰*
+=== *1-2 실패 - 유효하지만 서버에 가입되지 않은 파이어베이스 아이디 토큰이면*
 
-operation::auth-controller-test/apple-login-fail-not-registered-token[snippets='http-request,request-body,request-fields,http-response,response-fields']
+operation::auth-controller-test/apple-login-fail-not-registered-token[snippets='http-request,request-body,request-fields,http-response']
 
-=== *1-3 실패 - 유효하지만 가입되지 않은 토큰이 전달되면*
+=== *1-3 실패 - 유효하지 않은 파이어베이스 아이디 토큰이면*
 
-operation::auth-controller-test/apple-login-fail-invalid-token[snippets='http-request,request-body,request-fields,http-response,response-fields']
+operation::auth-controller-test/apple-login-fail-invalid-token[snippets='http-request,request-body,request-fields,http-response']
 
 [[카카오-로그인-API]]
 == *2. 카카오 로그인 API*
@@ -23,17 +23,17 @@ operation::auth-controller-test/apple-login-fail-invalid-token[snippets='http-re
 
 operation::auth-controller-test/kakao-login-success[snippets='http-request,request-body,request-fields,http-response,response-fields']
 
-=== *2-2 실패 - 유효하지만 가입되지 않은 토큰이 전달되면*
+=== *2-2 실패 - 유효하지만 서버에 가입되지 않은 파이어베이스 아이디 토큰이면*
 
 operation::auth-controller-test/kakao-login-fail-not-registered-token[snippets='http-request,request-body,request-fields,http-response,response-fields']
 
-=== *2-3 실패 - 회원 정보 요청 통신에 예외가 발생하면*
+=== *2-3 실패 - 카카오 회원 정보 요청 중, 예외가 발생하면*
 
-operation::auth-controller-test/kakao-login-fail-webclient-error[snippets='http-request,request-body,request-fields,http-response,response-fields']
+operation::auth-controller-test/kakao-login-fail-webclient-error[snippets='http-request,request-body,request-fields,http-response']
 
-=== *2-3 실패 - 토큰 생성에 실패하면*
+=== *2-3 실패 - 커스텀 토큰 생성에 실패하면*
 
-operation::auth-controller-test/kakao-login-fail-create-token-error[snippets='http-request,request-body,request-fields,http-response,response-fields']
+operation::auth-controller-test/kakao-login-fail-create-token-error[snippets='http-request,request-body,request-fields,http-response']
 
 [[애플-회원가입-API]]
 == *3. 애플-회원가입 API*
@@ -44,31 +44,31 @@ operation::auth-controller-test/apple-register-success[snippets='http-request,re
 
 === *3-2 실패 - FIREBASE에 등록되지 않은 ID TOKEN이 주어지면*
 
-operation::auth-controller-test/apple-register-fail-not-register-token[snippets='http-request,request-body,request-fields,http-response,response-fields']
+operation::auth-controller-test/apple-register-fail-not-register-token[snippets='http-request,request-body,request-fields,http-response']
 
 === *3-3 실패 - 유효한 토큰이지만, 이미 존재하는 사용자면*
 
-operation::auth-controller-test/apple-register-fail-exist-user[snippets='http-request,request-body,request-fields,http-response,response-fields']
+operation::auth-controller-test/apple-register-fail-exist-user[snippets='http-request,request-body,request-fields,http-response']
 
 === *3-4 실패 - 유효한 토큰이지만, 이미 존재하는 이메일이면*
 
-operation::auth-controller-test/apple-register-fail-exist-email[snippets='http-request,request-body,request-fields,http-response,response-fields']
+operation::auth-controller-test/apple-register-fail-exist-email[snippets='http-request,request-body,request-fields,http-response']
 
 === *3-5 실패 - 유효한 토큰이지만, 이미 존재하는 전화번호이면*
 
-operation::auth-controller-test/apple-register-fail-exist-phone-number[snippets='http-request,request-body,request-fields,http-response,response-fields']
+operation::auth-controller-test/apple-register-fail-exist-phone-number[snippets='http-request,request-body,request-fields,http-response']
 
 === *3-6 실패 - 유효한 토큰이지만, 이미 존재하는 닉네임이면*
 
-operation::auth-controller-test/apple-register-fail-exist-nickname[snippets='http-request,request-body,request-fields,http-response,response-fields']
+operation::auth-controller-test/apple-register-fail-exist-nickname[snippets='http-request,request-body,request-fields,http-response']
 
 === *3-7 실패 - 유효한 토큰이지만, 유효하지 않은 형식의 이메일이면*
 
-operation::auth-controller-test/apple-register-fail-invalid-email[snippets='http-request,request-body,request-fields,http-response,response-fields']
+operation::auth-controller-test/apple-register-fail-invalid-email[snippets='http-request,request-body,request-fields,http-response']
 
 === *3-8 실패 - 유효한 토큰이지만, 유효하지 않은 형식의 전화번호이면*
 
-operation::auth-controller-test/apple-register-fail-invalid-phone-number[snippets='http-request,request-body,request-fields,http-response,response-fields']
+operation::auth-controller-test/apple-register-fail-invalid-phone-number[snippets='http-request,request-body,request-fields,http-response']
 
 [[카카오-회원가입-API]]
 == *4. 카카오-회원가입 API*
@@ -79,31 +79,31 @@ operation::auth-controller-test/kakao-register-success[snippets='http-request,re
 
 === *4-2 실패 - FIREBASE에 이미 존재하는 USERNAME이 전달되면*
 
-operation::auth-controller-test/kakao-register-fail-exist-username-in-firebase[snippets='http-request,request-body,request-fields,http-response,response-fields']
+operation::auth-controller-test/kakao-register-fail-exist-username-in-firebase[snippets='http-request,request-body,request-fields,http-response']
 
 === *4-3 실패 - 유효한 토큰이지만, 이미 존재하는 사용자면*
 
-operation::auth-controller-test/kakao-register-fail-exist-user[snippets='http-request,request-body,request-fields,http-response,response-fields']
+operation::auth-controller-test/kakao-register-fail-exist-user[snippets='http-request,request-body,request-fields,http-response']
 
 === *4-4 실패 - 유효한 토큰이지만, 이미 존재하는 이메일이면*
 
-operation::auth-controller-test/kakao-register-fail-exist-email[snippets='http-request,request-body,request-fields,http-response,response-fields']
+operation::auth-controller-test/kakao-register-fail-exist-email[snippets='http-request,request-body,request-fields,http-response']
 
 === *4-5 실패 - 유효한 토큰이지만, 이미 존재하는 전화번호이면*
 
-operation::auth-controller-test/kakao-register-fail-exist-phone-number[snippets='http-request,request-body,request-fields,http-response,response-fields']
+operation::auth-controller-test/kakao-register-fail-exist-phone-number[snippets='http-request,request-body,request-fields,http-response']
 
 === *4-6 실패 - 유효한 토큰이지만, 이미 존재하는 닉네임이면*
 
-operation::auth-controller-test/kakao-register-fail-exist-nickname[snippets='http-request,request-body,request-fields,http-response,response-fields']
+operation::auth-controller-test/kakao-register-fail-exist-nickname[snippets='http-request,request-body,request-fields,http-response']
 
 === *4-7 실패 - 유효한 토큰이지만, 유효하지 않은 형식의 이메일이면*
 
-operation::auth-controller-test/kakao-register-fail-invalid-email[snippets='http-request,request-body,request-fields,http-response,response-fields']
+operation::auth-controller-test/kakao-register-fail-invalid-email[snippets='http-request,request-body,request-fields,http-response']
 
 === *4-8 실패 - 유효한 토큰이지만, 유효하지 않은 형식의 전화번호이면*
 
-operation::auth-controller-test/kakao-register-fail-invalid-phone-number[snippets='http-request,request-body,request-fields,http-response,response-fields']
+operation::auth-controller-test/kakao-register-fail-invalid-phone-number[snippets='http-request,request-body,request-fields,http-response']
 
 [[닉네임-중복-검사-API]]
 == *5. 닉네임 중복 검사 API*

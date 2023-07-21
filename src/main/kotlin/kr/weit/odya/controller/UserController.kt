@@ -51,7 +51,8 @@ class UserController(
 
     @PatchMapping("/information")
     fun updateInformation(
-        @RequestBody @Valid
+        @RequestBody
+        @Valid
         informationRequest: InformationRequest,
         @LoginUserId userId: Long,
     ): ResponseEntity<Void> {
