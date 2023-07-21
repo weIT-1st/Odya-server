@@ -1,17 +1,17 @@
 CREATE TABLE users
 (
-    id            NUMBER(19, 0) NOT NULL,
-    username      VARCHAR2(50)  NOT NULL,
-    email         VARCHAR2(255) NULL,
-    nickname      VARCHAR2(24)  NOT NULL,
-    phone_number  VARCHAR2(13)  NULL,
-    gender        VARCHAR2(1)   NOT NULL,
-    birthday      DATE          NOT NULL,
-    user_role     VARCHAR2(255) NOT NULL,
-    social_type   VARCHAR2(10)  NOT NULL,
-    profile_id    NUMBER(19, 0) NULL,
-    withdraw_date DATE          NULL,
-    created_date  DATE          NOT NULL,
+    id            NUMERIC(19, 0) NOT NULL,
+    username      VARCHAR2(50)   NOT NULL,
+    email         VARCHAR2(255)  NULL,
+    nickname      VARCHAR2(24)   NOT NULL,
+    phone_number  VARCHAR2(13)   NULL,
+    gender        VARCHAR2(1)    NOT NULL,
+    birthday      DATE           NOT NULL,
+    user_role     VARCHAR2(255)  NOT NULL,
+    social_type   VARCHAR2(10)   NOT NULL,
+    profile_id    NUMERIC(19, 0) NULL,
+    withdraw_date DATE           NULL,
+    created_date  DATE           NOT NULL,
     PRIMARY KEY (id)
 );
 
@@ -50,20 +50,20 @@ ALTER TABLE place_review
 
 CREATE TABLE follow
 (
-    follower_id  NUMBER(19, 0) NOT NULL,
-    following_id NUMBER(19, 0) NOT NULL,
-    created_date DATE          NOT NULL,
+    follower_id  NUMERIC(19, 0) NOT NULL,
+    following_id NUMERIC(19, 0) NOT NULL,
+    created_date DATE           NOT NULL,
     CONSTRAINT pk_follow PRIMARY KEY (follower_id, following_id)
 );
 
 CREATE TABLE profile
 (
-    id               NUMBER(19, 0) NOT NULL,
-    profile_name     VARCHAR2(30)  NOT NULL,
-    origin_file_name VARCHAR2(255) NULL,
-    profile_color_id NUMBER(19, 0) NOT NULL,
-    created_date     DATE          NOT NULL,
-    updated_date     DATE          NOT NULL,
+    id               NUMERIC(19, 0) NOT NULL,
+    profile_name     VARCHAR2(30)   NOT NULL,
+    origin_file_name VARCHAR2(255)  NULL,
+    profile_color_id NUMERIC(19, 0) NOT NULL,
+    created_date     DATE           NOT NULL,
+    updated_date     DATE           NOT NULL,
     CONSTRAINT pk_profile PRIMARY KEY (id)
 );
 
@@ -71,12 +71,12 @@ create sequence profile_seq start with 1 increment by 1;
 
 CREATE TABLE profile_color
 (
-    id           NUMBER(19, 0) NOT NULL,
-    color_hex    VARCHAR2(7)   NOT NULL,
-    red          INTEGER       NULL,
-    green        INTEGER       NOT NULL,
-    blue         INTEGER       NOT NULL,
-    created_date DATE          NOT NULL,
+    id           NUMERIC(19, 0) NOT NULL,
+    color_hex    VARCHAR2(7)    NOT NULL,
+    red          INTEGER        NULL,
+    green        INTEGER        NOT NULL,
+    blue         INTEGER        NOT NULL,
+    created_date DATE           NOT NULL,
     CONSTRAINT pk_profile_color PRIMARY KEY (id)
 );
 

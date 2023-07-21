@@ -1,10 +1,4 @@
 ---
-spring.config.activate.on-profile: test
-
-open-search:
-  indices:
-    place-search-history: test-place-search-history
----
 spring.config.activate.on-profile: sandbox
 
 open-search:
