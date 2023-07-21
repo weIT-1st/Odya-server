@@ -12,10 +12,8 @@ import org.opensearch.client.RestHighLevelClient
 import org.opensearch.data.client.orhlc.AbstractOpenSearchConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Profile
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories
 
-@Profile("!test")
 @Configuration(proxyBeanMethods = false)
 @EnableElasticsearchRepositories
 class OpenSearchConfig(private val properties: OpenSearchProperties) : AbstractOpenSearchConfiguration() {
@@ -30,8 +28,8 @@ class OpenSearchConfig(private val properties: OpenSearchProperties) : AbstractO
         val builder: RestClientBuilder = RestClient.builder(
             HttpHost(
                 properties.serverUrl,
-                443,
-                "https",
+                properties.port,
+                properties.scheme,
             ),
         ).setHttpClientConfigCallback { httpClientBuilder ->
             httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider)

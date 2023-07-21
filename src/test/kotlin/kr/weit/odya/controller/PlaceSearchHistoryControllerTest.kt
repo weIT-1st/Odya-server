@@ -16,6 +16,7 @@ import kr.weit.odya.support.TEST_PLACE_SEARCH_TERM
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createListSearchTerm
 import kr.weit.odya.support.createPlaceSearchRequest
+import kr.weit.odya.support.exception.ErrorCode
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
 import kr.weit.odya.support.test.ControllerTestHelper.Companion.jsonContent
 import kr.weit.odya.support.test.RestDocsHelper
@@ -97,6 +98,7 @@ class PlaceSearchHistoryControllerTest(
                                 "searchTerm" type JsonFieldType.STRING description "검색어" example TEST_PLACE_SEARCH_TERM,
                             ),
                             responseBody(
+                                "code" type JsonFieldType.NUMBER description "에러 코드" example ErrorCode.INVALID_FIREBASE_ID_TOKEN.code,
                                 "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                             ),
                         )
@@ -122,6 +124,7 @@ class PlaceSearchHistoryControllerTest(
                                 "searchTerm" type JsonFieldType.STRING description "검색어" example TEST_PLACE_SEARCH_TERM,
                             ),
                             responseBody(
+                                "code" type JsonFieldType.NUMBER description "에러 코드" example ErrorCode.INVALID_FIREBASE_ID_TOKEN.code,
                                 "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                             ),
                         )
@@ -167,6 +170,7 @@ class PlaceSearchHistoryControllerTest(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
                             responseBody(
+                                "code" type JsonFieldType.NUMBER description "에러 코드" example ErrorCode.INVALID_FIREBASE_ID_TOKEN.code,
                                 "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                             ),
                         )
@@ -187,6 +191,7 @@ class PlaceSearchHistoryControllerTest(
                                 HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
                             ),
                             responseBody(
+                                "code" type JsonFieldType.NUMBER description "에러 코드" example ErrorCode.INVALID_FIREBASE_ID_TOKEN.code,
                                 "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                             ),
                         )
@@ -240,6 +245,7 @@ class PlaceSearchHistoryControllerTest(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                                 ),
                                 responseBody(
+                                    "code" type JsonFieldType.NUMBER description "에러 코드" example ErrorCode.INVALID_REQUEST.code,
                                     "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                                 ),
                             ),
@@ -264,6 +270,7 @@ class PlaceSearchHistoryControllerTest(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                                 ),
                                 responseBody(
+                                    "code" type JsonFieldType.NUMBER description "에러 코드" example ErrorCode.INVALID_FIREBASE_ID_TOKEN.code,
                                     "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                                 ),
                             ),
@@ -288,6 +295,7 @@ class PlaceSearchHistoryControllerTest(
                                     HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
                                 ),
                                 responseBody(
+                                    "code" type JsonFieldType.NUMBER description "에러 코드" example ErrorCode.INVALID_FIREBASE_ID_TOKEN.code,
                                     "errorMessage" type JsonFieldType.STRING description "에러 메시지" example SOMETHING_ERROR_MESSAGE,
                                 ),
                             ),
