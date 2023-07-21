@@ -15,6 +15,7 @@ import kr.weit.odya.support.TEST_PLACE_SEARCH_TERM
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createListSearchTerm
 import kr.weit.odya.support.createPlaceSearchRequest
+import kr.weit.odya.support.exception.ErrorCode
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
 import kr.weit.odya.support.test.ControllerTestHelper.Companion.jsonContent
 import kr.weit.odya.support.test.RestDocsHelper

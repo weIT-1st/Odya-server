@@ -55,7 +55,6 @@ dependencies {
     implementation("com.google.firebase:firebase-admin:9.1.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("com.h2database:h2:2.1.214")
     testImplementation("io.mockk:mockk:1.13.5")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
     testImplementation("io.kotest:kotest-runner-junit5:5.6.2")
@@ -86,7 +85,6 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers:1.18.3")
     testImplementation("org.testcontainers:junit-jupiter:1.18.3")
     testImplementation("org.opensearch:opensearch-testcontainers:2.0.0")
-    testImplementation("org.testcontainers:oracle-xe:1.18.3")
 }
 
 tasks {

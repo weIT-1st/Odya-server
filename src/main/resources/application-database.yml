@@ -1,17 +1,13 @@
 spring:
-  jpa:
-    open-in-view: false
-    properties:
-      hibernate:
-        default_batch_fetch_size: 100 # 나중에 부족하시면 늘려주세요!
----
-spring:
-  config.activate.on-profile: sandbox, stable
   datasource:
     driver-class-name: oracle.jdbc.OracleDriver
     hikari:
       maximum-pool-size: 8 # DB 최대 세션수가 30개인데 서버배포시 rolling update를 할때 디폴트 값인 10개씩 먹으면 아슬아슬해서 줄였습니다!
   jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        default_batch_fetch_size: 100 # 나중에 부족하시면 늘려주세요!
     hibernate:
       ddl-auto: validate
     database: oracle
@@ -38,27 +34,17 @@ spring:
 spring:
   config.activate.on-profile: test
 
-  h2:
-    console:
-      enabled: true
   jpa:
     show-sql: true
-    hibernate:
-      ddl-auto: validate
     properties:
       hibernate:
         format_sql: true
-    database: h2
     generate-ddl: off
-  datasource:
-    url: jdbc:h2:mem:test;MODE=Oracle;
-    username: SA
-    password: password
   sql:
     init:
       mode: always
-      schema-locations: classpath:sql/schema-h2.sql
-      data-locations: classpath:sql/data-h2.sql
+      schema-locations: classpath:sql/schema.sql
+      data-locations: classpath:sql/data.sql
 
 logging:
   level:
