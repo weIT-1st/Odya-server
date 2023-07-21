@@ -6,5 +6,5 @@ WORKDIR /app
 ARG AWS_ACCESS_KEY_ID
 ARG AWS_SECRET_ACCESS_KEY
 
-RUN ./gradlew assemble && \
+RUN ./gradlew assemble -x test && \
     rm -rf /app
