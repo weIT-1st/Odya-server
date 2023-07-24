@@ -1,4 +1,4 @@
-package kr.weit.odya.domain.interestPlace
+package kr.weit.odya.domain.favoritePlace
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -17,25 +17,25 @@ import kr.weit.odya.support.domain.BaseTimeEntity
 @Table(
     uniqueConstraints = [
         UniqueConstraint(
-            name = "interest_place_id_user_id_unique",
+            name = "favorite_place_id_user_id_unique",
             columnNames = ["place_id", "user_id"],
         ),
     ],
     indexes = [
-        Index(name = "interest_place_id_index", columnList = "place_id"),
+        Index(name = "favorite_place_id_index", columnList = "place_id"),
     ],
 )
 @SequenceGenerator(
-    name = "INTEREST_PLACE_SEQ_GENERATOR",
-    sequenceName = "INTEREST_PLACE_SEQ",
+    name = "FAVORITE_PLACE_SEQ_GENERATOR",
+    sequenceName = "FAVORITE_PLACE_SEQ",
     initialValue = 1,
     allocationSize = 1,
 )
 @Entity
-class InterestPlace(
+class FavoritePlace(
     @Id
     @Column(columnDefinition = "NUMERIC(19, 0)")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "INTEREST_PLACE_SEQ_GENERATOR")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "FAVORITE_PLACE_SEQ_GENERATOR")
     val id: Long,
 
     @Column(name = "place_id", length = 400, nullable = false, updatable = false)
