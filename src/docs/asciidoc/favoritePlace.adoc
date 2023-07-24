@@ -1,0 +1,59 @@
+[[FavoritePlace-API]]
+= *Favorite Place API*
+
+[[관심장소등록-API]]
+== *1. 관심 장소 등록 API*
+
+=== *1-1 성공*
+
+operation::favorite-place-controller-test/favorite-place-create-success[snippets='http-request,request-headers,request-body,request-fields,http-response']
+
+=== *1-2 실패 - 공백인 장소 ID*
+
+operation::favorite-place-controller-test/favorite-place-create-failed-empty-place-id[snippets='http-request,request-headers,request-body,request-fields,http-response']
+
+=== *1-3 실패 - 이미 등록된 관심 장소*
+
+operation::favorite-place-controller-test/favorite-place-create-failed-already-exist-favorite-place[snippets='http-request,request-headers,request-body,request-fields,http-response']
+
+=== *1-4 실패 - 가입되지 않은 유저*
+
+operation::favorite-place-controller-test/favorite-place-create-failed-not-exist-user-id[snippets='http-request,request-headers,request-body,request-fields,http-response']
+
+=== *1-5 실패 - 유효하지 않은 토큰*
+
+operation::favorite-place-controller-test/favorite-place-create-failed-invalid-token[snippets='http-request,request-headers,request-body,request-fields,http-response']
+
+[[관심장소삭제-API]]
+== *2. 관심 장소 삭제 API*
+
+=== *2-1 성공*
+
+operation::favorite-place-controller-test/favorite-place-delete-success[snippets='http-request,request-headers,path-parameters,http-response']
+
+=== *2-2 실패 - 양수가 아닌 관심 장소 ID*
+
+operation::favorite-place-controller-test/favorite-place-delete-failed-invalid-favorite-place-id[snippets='http-request,request-headers,path-parameters,http-response']
+
+=== *2-3 실패 - 존재하지 않는 관심 장소 ID*
+
+operation::favorite-place-controller-test/favorite-place-delete-failed-not-exist-favorite-place-id[snippets='http-request,request-headers,path-parameters,http-response']
+
+=== *2-4 실패 - 가입되지 않은 유저*
+
+operation::favorite-place-controller-test/favorite-place-delete-failed-not-exist-user-id[snippets='http-request,request-headers,path-parameters,http-response']
+
+=== *2-5 실패 - 유효하지 않은 토큰*
+
+operation::favorite-place-controller-test/favorite-place-delete-failed-invalid-token[snippets='http-request,request-headers,path-parameters,http-response']
+
+[[관심장소확인-API]]
+== *3. 관심 장소 확인 API*
+
+=== *3-1 성공*
+
+operation::favorite-place-controller-test/favorite-place-check-success[snippets='http-request,request-headers,path-parameters,http-response']
+
+=== *3-2 실패 - 유효하지 않은 토큰*
+
+operation::favorite-place-controller-test/favorite-place-check-failed-invalid-token[snippets='http-request,request-headers,path-parameters,http-response']
