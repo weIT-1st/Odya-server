@@ -19,11 +19,8 @@ class FavoritePlaceRepositoryTest(
 ) : ExpectSpec(
     {
         extensions(SpringTestExtension(SpringTestLifecycleMode.Root))
-        lateinit var user: User
-        beforeEach {
-            user = userRepository.save(createUser())
-            favoritePlaceRepository.save(createFavoritePlace(user))
-        }
+        val user: User = userRepository.save(createUser())
+        favoritePlaceRepository.save(createFavoritePlace(user))
 
         context("관심 장소 조회") {
 

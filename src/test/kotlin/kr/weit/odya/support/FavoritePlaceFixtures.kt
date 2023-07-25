@@ -7,6 +7,10 @@ import kr.weit.odya.service.dto.FavoritePlaceRequest
 const val TEST_FAVORITE_PLACE_ID = 1L
 const val TEST_INVALID_FAVORITE_PLACE_ID = -1L
 const val TEST_EXIST_FAVORITE_PLACE_ID = 10L
-fun createFavoritePlace(user: User = createUser()) = FavoritePlace(TEST_FAVORITE_PLACE_ID, TEST_PLACE_ID, user)
+fun createFavoritePlace(user: User = createUser()): FavoritePlace {
+    return FavoritePlace(TEST_FAVORITE_PLACE_ID, TEST_PLACE_ID, user)
+}
 
-fun createFavoritePlaceRequest() = FavoritePlaceRequest(TEST_PLACE_ID)
+fun createFavoritePlaceRequest(): FavoritePlaceRequest {
+    return FavoritePlaceRequest(TEST_PLACE_ID)
+}
