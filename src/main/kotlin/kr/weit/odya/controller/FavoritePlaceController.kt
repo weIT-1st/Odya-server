@@ -60,7 +60,7 @@ class FavoritePlaceController(private val favoritePlaceService: FavoritePlaceSer
         return ResponseEntity.ok(favoritePlaceService.getFavoritePlace(userId, placeId))
     }
 
-    @GetMapping("/count")
+    @GetMapping("/counts")
     fun getFavoritePlaceCount(
         @LoginUserId
         userId: Long,
@@ -77,6 +77,7 @@ class FavoritePlaceController(private val favoritePlaceService: FavoritePlaceSer
         size: Int,
         @RequestParam("sortType", defaultValue = "LATEST", required = false)
         sortType: FavoritePlaceSortType,
+        @Positive(message = "마지막 ID는 양수여야 합니다.")
         @RequestParam("lastId", required = false)
         lastId: Long?,
     ): ResponseEntity<SliceFavoritePlaceResponse> {
