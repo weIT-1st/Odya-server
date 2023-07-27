@@ -88,7 +88,7 @@ operation::favorite-place-controller-test/favorite-place-list-failed-invalid-siz
 
 operation::favorite-place-controller-test/favorite-place-list-failed-invalid-sort-type[snippets='http-request,request-headers,query-parameters,http-response']
 
-=== *5-5 실패 - 정의되지않은 정렬기준*
+=== *5-5 실패 - 양수가 아닌 마지막 ID*
 
 operation::favorite-place-controller-test/favorite-place-list-failed-invalid-last-id[snippets='http-request,request-headers,query-parameters,http-response']
 
