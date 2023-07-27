@@ -88,6 +88,10 @@ operation::favorite-place-controller-test/favorite-place-list-failed-invalid-siz
 
 operation::favorite-place-controller-test/favorite-place-list-failed-invalid-sort-type[snippets='http-request,request-headers,query-parameters,http-response']
 
-=== *5-5 실패 - 유효하지 않은 토큰*
+=== *5-5 실패 - 정의되지않은 정렬기준*
+
+operation::favorite-place-controller-test/favorite-place-list-failed-invalid-last-id[snippets='http-request,request-headers,query-parameters,http-response']
+
+=== *5-6 실패 - 유효하지 않은 토큰*
 
 operation::favorite-place-controller-test/favorite-place-list-failed-invalid-token[snippets='http-request,request-headers,query-parameters,http-response']
