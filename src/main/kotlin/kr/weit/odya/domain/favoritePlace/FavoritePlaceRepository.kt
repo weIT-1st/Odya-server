@@ -45,20 +45,12 @@ class FavoritePlaceRepositoryImpl(private val queryFactory: QueryFactory) : Cust
         sortType: FavoritePlaceSortType,
         lastId: Long?,
     ): List<FavoritePlace> = queryFactory.listQuery {
-        baseSearchQuery(size, sortType, lastId)
-        where(col(FavoritePlace::user).equal(user))
-    }
-
-    private fun CriteriaQueryDsl<FavoritePlace>.baseSearchQuery(
-        size: Int,
-        sortType: FavoritePlaceSortType,
-        lastId: Long?,
-    ) {
         select(entity(FavoritePlace::class))
         from(entity(FavoritePlace::class))
         where(dynamicPredicateFavoritePlaceSortType(sortType, lastId))
         orderBy(dynamicOrderingByFavoritePlaceSortType(sortType))
         limit(size + 1)
+        where(col(FavoritePlace::user).equal(user))
     }
 
     private fun <T> CriteriaQueryDsl<T>.dynamicPredicateFavoritePlaceSortType(
