@@ -47,10 +47,14 @@ class FavoritePlaceRepositoryImpl(private val queryFactory: QueryFactory) : Cust
     ): List<FavoritePlace> = queryFactory.listQuery {
         select(entity(FavoritePlace::class))
         from(entity(FavoritePlace::class))
-        where(dynamicPredicateFavoritePlaceSortType(sortType, lastId))
+        where(
+            and(
+                dynamicPredicateFavoritePlaceSortType(sortType, lastId),
+                col(FavoritePlace::user).equal(user),
+            ),
+        )
         orderBy(dynamicOrderingByFavoritePlaceSortType(sortType))
         limit(size + 1)
-        where(col(FavoritePlace::user).equal(user))
     }
 
     private fun <T> CriteriaQueryDsl<T>.dynamicPredicateFavoritePlaceSortType(
