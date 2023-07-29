@@ -57,3 +57,41 @@ operation::favorite-place-controller-test/favorite-place-check-success[snippets=
 === *3-2 실패 - 유효하지 않은 토큰*
 
 operation::favorite-place-controller-test/favorite-place-check-failed-invalid-token[snippets='http-request,request-headers,path-parameters,http-response']
+
+[[관심장소수조회-API]]
+== *4. 관심 장소 수 조회 API*
+
+=== *4-1 성공*
+
+operation::favorite-place-controller-test/favorite-place-count-success[snippets='http-request,request-headers,http-response']
+
+=== *4-2 실패 - 유효하지 않은 토큰*
+
+operation::favorite-place-controller-test/favorite-place-count-failed-invalid-token[snippets='http-request,request-headers,http-response']
+
+[[관심장소리스트조회-API]]
+== *5. 관심 장소 리스트 조회 API*
+
+=== *5-1 성공*
+
+operation::favorite-place-controller-test/favorite-place-list-success[snippets='http-request,request-headers,query-parameters,http-response']
+
+=== *5-2 성공*
+
+operation::favorite-place-controller-test/favorite-place-list-request-param-null-success[snippets='http-request,request-headers,query-parameters,http-response']
+
+=== *5-3 실패 - 양수가 아닌 사이즈*
+
+operation::favorite-place-controller-test/favorite-place-list-failed-invalid-size[snippets='http-request,request-headers,query-parameters,http-response']
+
+=== *5-4 실패 - 정의되지않은 정렬기준*
+
+operation::favorite-place-controller-test/favorite-place-list-failed-invalid-sort-type[snippets='http-request,request-headers,query-parameters,http-response']
+
+=== *5-5 실패 - 양수가 아닌 마지막 ID*
+
+operation::favorite-place-controller-test/favorite-place-list-failed-invalid-last-id[snippets='http-request,request-headers,query-parameters,http-response']
+
+=== *5-6 실패 - 유효하지 않은 토큰*
+
+operation::favorite-place-controller-test/favorite-place-list-failed-invalid-token[snippets='http-request,request-headers,query-parameters,http-response']

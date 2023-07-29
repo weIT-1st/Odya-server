@@ -8,24 +8,38 @@ import io.mockk.just
 import kr.weit.odya.service.ExistResourceException
 import kr.weit.odya.service.FavoritePlaceService
 import kr.weit.odya.support.EXIST_FAVORITE_PLACE_ERROR_MESSAGE
+import kr.weit.odya.support.LAST_ID_PARAM
 import kr.weit.odya.support.NOT_FOUND_FAVORITE_PLACE_ERROR_MESSAGE
+import kr.weit.odya.support.SIZE_PARAM
+import kr.weit.odya.support.SORT_TYPE_PARAM
 import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_NOT_EXIST_USER_ID_TOKEN
+import kr.weit.odya.support.TEST_DEFAULT_SIZE
 import kr.weit.odya.support.TEST_EXIST_FAVORITE_PLACE_ID
+import kr.weit.odya.support.TEST_FAVORITE_PLACE_COUNT
 import kr.weit.odya.support.TEST_FAVORITE_PLACE_ID
+import kr.weit.odya.support.TEST_FAVORITE_PLACE_INVALID_SORT_TYPE
+import kr.weit.odya.support.TEST_FAVORITE_PLACE_SORT_TYPE
 import kr.weit.odya.support.TEST_INVALID_FAVORITE_PLACE_ID
+import kr.weit.odya.support.TEST_INVALID_LAST_ID
+import kr.weit.odya.support.TEST_INVALID_SIZE
+import kr.weit.odya.support.TEST_LAST_ID
 import kr.weit.odya.support.TEST_PLACE_ID
+import kr.weit.odya.support.TEST_SIZE
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createFavoritePlaceRequest
+import kr.weit.odya.support.createSliceFavoritePlaceResponse
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
 import kr.weit.odya.support.test.ControllerTestHelper.Companion.jsonContent
 import kr.weit.odya.support.test.RestDocsHelper
 import kr.weit.odya.support.test.RestDocsHelper.Companion.createDocument
 import kr.weit.odya.support.test.RestDocsHelper.Companion.createPathDocument
 import kr.weit.odya.support.test.RestDocsHelper.Companion.requestBody
+import kr.weit.odya.support.test.RestDocsHelper.Companion.responseBody
 import kr.weit.odya.support.test.example
 import kr.weit.odya.support.test.headerDescription
+import kr.weit.odya.support.test.isOptional
 import kr.weit.odya.support.test.pathDescription
 import kr.weit.odya.support.test.type
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -35,6 +49,8 @@ import org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.request.RequestDocumentation.pathParameters
+import org.springframework.restdocs.request.RequestDocumentation.queryParameters
+import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.web.context.WebApplicationContext
@@ -323,6 +339,219 @@ class FavoritePlaceControllerTest(
                 }
             }
         }
+
+        describe("GET /api/v1/favorite-places/counts") {
+            val targetUri = "/api/v1/favorite-places/counts"
+            context("유효한 USERID가 전달되면") {
+                every { favoritePlaceService.getFavoritePlaceCount(TEST_USER_ID) } returns TEST_FAVORITE_PLACE_COUNT
+                it("관심장소 수를 출력한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                    }.andExpect {
+                        status { isOk() }
+                    }.andDo {
+                        createDocument(
+                            "favorite-place-count-success",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효하지않은 토큰이 전달되면") {
+                it("401을 출력한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                    }.andExpect {
+                        status { isUnauthorized() }
+                    }.andDo {
+                        createDocument(
+                            "favorite-place-count-failed-invalid-token",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                            ),
+                        )
+                    }
+                }
+            }
+        }
+
+        describe("GET /api/v1/favorite-places/list") {
+            val targetUri = "/api/v1/favorite-places/list"
+            context("유효한 USERID와 size,sortType,lastId가 전달되면") {
+                val response = createSliceFavoritePlaceResponse()
+                val content = response.content[0]
+                every { favoritePlaceService.getFavoritePlaceList(TEST_USER_ID, TEST_SIZE, TEST_FAVORITE_PLACE_SORT_TYPE, TEST_LAST_ID) } returns createSliceFavoritePlaceResponse()
+                it("관심장소 수를 출력한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_SIZE.toString())
+                            .param(SORT_TYPE_PARAM, TEST_FAVORITE_PLACE_SORT_TYPE.name)
+                            .param(LAST_ID_PARAM, TEST_LAST_ID.toString()),
+                    ).andExpect(status().isOk)
+                        .andDo(
+                            createPathDocument(
+                                "favorite-place-list-success",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM pathDescription "츨력할 리스트 사이즈(default=10)" example TEST_SIZE isOptional true,
+                                    SORT_TYPE_PARAM pathDescription "리스트 정렬기준(default=최신순)" example TEST_FAVORITE_PLACE_SORT_TYPE isOptional true,
+                                    LAST_ID_PARAM pathDescription "마지막 리스트 ID" example TEST_LAST_ID isOptional true,
+                                ),
+                                responseBody(
+                                    "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
+                                    "content[].id" type JsonFieldType.NUMBER description "관심 장소 ID" example content.id,
+                                    "content[].placeId" type JsonFieldType.STRING description "장소 ID" example content.placeId,
+                                    "content[].userId" type JsonFieldType.NUMBER description "유저 ID" example content.userId,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효한 USERID만 전달되면") {
+                val response = createSliceFavoritePlaceResponse()
+                val content = response.content[0]
+                every { favoritePlaceService.getFavoritePlaceList(TEST_USER_ID, TEST_DEFAULT_SIZE, TEST_FAVORITE_PLACE_SORT_TYPE, null) } returns createSliceFavoritePlaceResponse()
+                it("관심장소 수를 출력한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    ).andExpect(status().isOk)
+                        .andDo(
+                            createPathDocument(
+                                "favorite-place-list-request-param-null-success",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM pathDescription "츨력할 리스트 사이즈(default=10)" example "null" isOptional true,
+                                    SORT_TYPE_PARAM pathDescription "리스트 정렬기준(default=최신순)" example "null" isOptional true,
+                                    LAST_ID_PARAM pathDescription "마지막 리스트 ID" example "null" isOptional true,
+                                ),
+                                responseBody(
+                                    "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
+                                    "content[].id" type JsonFieldType.NUMBER description "관심 장소 ID" example content.id,
+                                    "content[].placeId" type JsonFieldType.STRING description "장소 ID" example content.placeId,
+                                    "content[].userId" type JsonFieldType.NUMBER description "유저 ID" example content.userId,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효한 USERID와 양수가 아닌 size가 전달되면") {
+                it("400을 반환한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_INVALID_SIZE.toString())
+                            .param(SORT_TYPE_PARAM, TEST_FAVORITE_PLACE_SORT_TYPE.name)
+                            .param(LAST_ID_PARAM, TEST_LAST_ID.toString()),
+                    ).andExpect(status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "favorite-place-list-failed-invalid-size",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM pathDescription "양수가 아닌 츨력할 리스트 사이즈(default=10)" example TEST_INVALID_SIZE isOptional true,
+                                    SORT_TYPE_PARAM pathDescription "리스트 정렬기준(default=최신순)" example TEST_FAVORITE_PLACE_SORT_TYPE isOptional true,
+                                    LAST_ID_PARAM pathDescription "마지막 리스트 ID" example TEST_LAST_ID isOptional true,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효한 USERID와 정의하지 않은 정렬 기준이 전달되면") {
+                it("400을 반환한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_SIZE.toString())
+                            .param(SORT_TYPE_PARAM, TEST_FAVORITE_PLACE_INVALID_SORT_TYPE)
+                            .param(LAST_ID_PARAM, TEST_LAST_ID.toString()),
+                    ).andExpect(status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "favorite-place-list-failed-invalid-sort-type",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM pathDescription "츨력할 리스트 사이즈(default=10)" example TEST_INVALID_SIZE isOptional true,
+                                    SORT_TYPE_PARAM pathDescription "정의되지 않은 정렬기준(default=최신순)" example TEST_FAVORITE_PLACE_INVALID_SORT_TYPE isOptional true,
+                                    LAST_ID_PARAM pathDescription "마지막 리스트 ID" example TEST_LAST_ID isOptional true,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효한 USERID와 양수가 아닌 마지막 ID가 전달되면") {
+                it("400을 반환한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_SIZE.toString())
+                            .param(SORT_TYPE_PARAM, TEST_FAVORITE_PLACE_SORT_TYPE.name)
+                            .param(LAST_ID_PARAM, TEST_INVALID_LAST_ID.toString()),
+                    ).andExpect(status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "favorite-place-list-failed-invalid-last-id",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM pathDescription "츨력할 리스트 사이즈(default=10)" example TEST_SIZE isOptional true,
+                                    SORT_TYPE_PARAM pathDescription "리스트 정렬기준(default=최신순)" example TEST_FAVORITE_PLACE_SORT_TYPE isOptional true,
+                                    LAST_ID_PARAM pathDescription "양수가 아닌 마지막 리스트 ID" example TEST_INVALID_LAST_ID isOptional true,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효하지 않은 토큰이 전달되면") {
+                it("401을 반환한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_SIZE.toString())
+                            .param(SORT_TYPE_PARAM, TEST_FAVORITE_PLACE_SORT_TYPE.name)
+                            .param(LAST_ID_PARAM, TEST_LAST_ID.toString()),
+                    ).andExpect(status().isUnauthorized)
+                        .andDo(
+                            createPathDocument(
+                                "favorite-place-list-failed-invalid-token",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM pathDescription "츨력할 리스트 사이즈(default=10)" example TEST_SIZE isOptional true,
+                                    SORT_TYPE_PARAM pathDescription "리스트 정렬기준(default=최신순)" example TEST_FAVORITE_PLACE_SORT_TYPE isOptional true,
+                                    LAST_ID_PARAM pathDescription "마지막 리스트 ID" example TEST_LAST_ID isOptional true,
+                                ),
+                            ),
+                        )
+                }
+            }
+        }
+
         afterEach {
             restDocumentation.afterTest()
         }
