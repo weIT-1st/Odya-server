@@ -1,0 +1,11 @@
+CREATE SEQUENCE topic_seq START WITH 1 INCREMENT BY 1;
+
+CREATE TABLE topic
+(
+    id   NUMBER(19, 0) NOT NULL,
+    word VARCHAR2(90)  NOT NULL,
+    CONSTRAINT pk_topic PRIMARY KEY (id)
+);
+
+ALTER TABLE topic
+    ADD CONSTRAINT topic_unique UNIQUE (word);
