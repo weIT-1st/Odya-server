@@ -3,9 +3,11 @@ package kr.weit.odya.controller
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Positive
+import kr.weit.odya.domain.favoritePlace.FavoritePlaceSortType
 import kr.weit.odya.security.LoginUserId
 import kr.weit.odya.service.FavoritePlaceService
 import kr.weit.odya.service.dto.FavoritePlaceRequest
+import kr.weit.odya.service.dto.SliceFavoritePlaceResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @Validated
@@ -55,5 +58,29 @@ class FavoritePlaceController(private val favoritePlaceService: FavoritePlaceSer
         placeId: String,
     ): ResponseEntity<Boolean> {
         return ResponseEntity.ok(favoritePlaceService.getFavoritePlace(userId, placeId))
+    }
+
+    @GetMapping("/counts")
+    fun getFavoritePlaceCount(
+        @LoginUserId
+        userId: Long,
+    ): ResponseEntity<Int> {
+        return ResponseEntity.ok(favoritePlaceService.getFavoritePlaceCount(userId))
+    }
+
+    @GetMapping("/list")
+    fun getFavoritePlaceList(
+        @LoginUserId
+        userId: Long,
+        @Positive(message = "조회할 개수는 양수여야 합니다.")
+        @RequestParam("size", defaultValue = "10", required = false)
+        size: Int,
+        @RequestParam("sortType", defaultValue = "LATEST", required = false)
+        sortType: FavoritePlaceSortType,
+        @Positive(message = "마지막 ID는 양수여야 합니다.")
+        @RequestParam("lastId", required = false)
+        lastId: Long?,
+    ): ResponseEntity<SliceFavoritePlaceResponse> {
+        return ResponseEntity.ok(favoritePlaceService.getFavoritePlaceList(userId, size, sortType, lastId))
     }
 }
