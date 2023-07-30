@@ -17,14 +17,14 @@ class TopicRepositoryTest(
             topicRepository.save(createOtherTopic())
         }
 
-        context("lastId 이후의 토픽 조회") {
+        context("토픽 조회") {
             expect("토픽을 조회한다.") {
-                val result = topicRepository.getTopic(TEST_DEFAULT_SIZE, null)
+                val result = topicRepository.getTopicList(TEST_DEFAULT_SIZE, null)
                 result.size shouldBe 2
             }
 
-            expect("토픽을 조회한다.") {
-                val result = topicRepository.getTopic(TEST_DEFAULT_SIZE, 1L)
+            expect("lastId 이후의 토픽을 조회한다.") {
+                val result = topicRepository.getTopicList(TEST_DEFAULT_SIZE, 1L)
                 result.size shouldBe 1
             }
         }

@@ -7,7 +7,7 @@ import com.linecorp.kotlinjdsl.querydsl.CriteriaQueryDsl
 import com.linecorp.kotlinjdsl.querydsl.expression.col
 import org.springframework.data.jpa.repository.JpaRepository
 
-fun TopicRepository.getTopic(size: Int, lastId: Long?): List<Topic> {
+fun TopicRepository.getTopicList(size: Int, lastId: Long?): List<Topic> {
     return sliceByLastId(size, lastId)
 }
 

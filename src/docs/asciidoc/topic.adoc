@@ -1,0 +1,21 @@
+[[Topic-API]]
+= *Topic API*
+
+[[토픽조회-API]]
+== *1. 토픽조회 API*
+
+=== *1-1 성공*
+
+operation::topic-controller-test/topic-get-list-success[snippets='http-request,request-headers,query-parameters,http-response']
+
+=== *1-2 실패 - 유효한 토큰이지만 양수가 아닌 size*
+
+operation::topic-controller-test/topic-get-list-fail-invalid-size[snippets='http-request,request-headers,query-parameters,http-response']
+
+=== *1-3 실패 - 유효한 토큰이지만 양수가 아닌 lastId*
+
+operation::topic-controller-test/topic-get-list-fail-invalid-last-id[snippets='http-request,request-headers,query-parameters,http-response']
+
+=== *1-4 실패 - 유효하지 않은 토큰*
+
+operation::topic-controller-test/topic-get-list-fail-invalid-token[snippets='http-request,request-headers,query-parameters,http-response']
