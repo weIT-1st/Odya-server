@@ -1,6 +1,7 @@
 package kr.weit.odya.service
 
 import jakarta.transaction.Transactional
+import jakarta.ws.rs.ForbiddenException
 import kr.weit.odya.domain.favoritePlace.FavoritePlaceRepository
 import kr.weit.odya.domain.favoritePlace.FavoritePlaceSortType
 import kr.weit.odya.domain.favoritePlace.getByFavoritePlaceId
@@ -24,7 +25,11 @@ class FavoritePlaceService(private val favoritePlaceRepository: FavoritePlaceRep
 
     @Transactional
     fun deleteFavoritePlace(userId: Long, favoritePlaceId: Long) {
-        favoritePlaceRepository.delete(favoritePlaceRepository.getByFavoritePlaceId(favoritePlaceId))
+        favoritePlaceRepository.delete(
+            favoritePlaceRepository.getByFavoritePlaceId(favoritePlaceId).also { favoritePlace ->
+                require(favoritePlace.registrantsId == userId) { throw ForbiddenException("관심 장소를 삭제할 권한이 없습니다.") }
+            },
+        )
     }
 
     fun getFavoritePlace(userId: Long, placeId: String): Boolean {

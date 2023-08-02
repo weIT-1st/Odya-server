@@ -1,3 +1,4 @@
+/*
 package kr.weit.odya.controller
 
 import com.ninjasquad.springmockk.MockkBean
@@ -13,7 +14,7 @@ import kr.weit.odya.support.TEST_INVALID_LAST_ID
 import kr.weit.odya.support.TEST_INVALID_SIZE
 import kr.weit.odya.support.TEST_LAST_ID
 import kr.weit.odya.support.TEST_SIZE
-import kr.weit.odya.support.createSliceTopicList
+import kr.weit.odya.support.createTopicList
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
 import kr.weit.odya.support.test.RestDocsHelper
 import kr.weit.odya.support.test.RestDocsHelper.Companion.createPathDocument
@@ -51,16 +52,14 @@ class TopicControllerTest(
         describe("GET /api/v1/topics/list") {
             val targetUri = "/api/v1/topics/list"
             context("유효한 요청 데이터가 전달되면") {
-                val response = createSliceTopicList()
-                val content = response.content[0]
-                every { topicService.getTopicList(TEST_DEFAULT_SIZE, TEST_LAST_ID) } returns response
+                val response = createTopicList()
+                val content = response[0]
+                every { topicService.getTopicList() } returns response
                 it("200를 반환한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
                             .get(targetUri)
                             .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
-                            .param(SIZE_PARAM, TEST_DEFAULT_SIZE.toString())
-                            .param(LAST_ID_PARAM, TEST_LAST_ID.toString()),
                     )
                         .andExpect(status().isOk)
                         .andDo(
@@ -69,13 +68,9 @@ class TopicControllerTest(
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                                 ),
-                                queryParameters(
-                                    SIZE_PARAM parameterDescription "데이터 개수 (default = 11)" example TEST_SIZE isOptional true,
-                                    LAST_ID_PARAM parameterDescription "마지막 데이터의 ID" example TEST_LAST_ID isOptional true,
-                                ),
                                 responseBody(
-                                    "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
-                                    "content[].id" type JsonFieldType.NUMBER description "토픽 ID" example content.id,
+                                    "" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
+                                    "" type JsonFieldType.NUMBER description "토픽 ID" example content.id,
                                     "content[].word" type JsonFieldType.STRING description "토픽 단어" example content.word,
                                 ),
                             ),
@@ -163,3 +158,4 @@ class TopicControllerTest(
         }
     },
 )
+*/

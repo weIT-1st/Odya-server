@@ -30,6 +30,6 @@ class Topic(
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "TOPIC_SEQ_GENERATOR")
     val id: Long,
 
-    @Column(length = 90, nullable = false)
+    @Column(length = 30, nullable = false)
     val word: String,
 )
