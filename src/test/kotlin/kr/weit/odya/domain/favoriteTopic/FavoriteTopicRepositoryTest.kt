@@ -28,7 +28,7 @@ class FavoriteTopicRepositoryTest(
 
             expect("userId와 일치하는 관심 장소를 조회한다") {
                 val result = favoriteTopicRepository.getByUserId(user.id)
-                result.first().user shouldBe user
+                result.first().registrantsId shouldBe user.id
             }
         }
 

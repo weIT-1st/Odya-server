@@ -12,6 +12,7 @@ import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
 import kr.weit.odya.domain.topic.Topic
 import kr.weit.odya.domain.user.User
+import kr.weit.odya.support.domain.BaseTimeEntity
 
 @Table(
     uniqueConstraints = [
@@ -41,7 +42,7 @@ class FavoriteTopic(
     @ManyToOne
     @JoinColumn(name = "topic_id", columnDefinition = "NUMERIC(19, 0)", updatable = false, nullable = false)
     val topic: Topic,
-) {
+) : BaseTimeEntity() {
     val registrantsId: Long
         get() = user.id
 }
