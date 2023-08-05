@@ -6,6 +6,7 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.mockk.every
 import io.mockk.mockk
 import jakarta.ws.rs.ForbiddenException
+import kr.weit.odya.domain.favoriteTopic.FavoriteTopic
 import kr.weit.odya.domain.favoriteTopic.FavoriteTopicRepository
 import kr.weit.odya.domain.favoriteTopic.getByFavoriteTopicId
 import kr.weit.odya.domain.favoriteTopic.getByUserId
@@ -18,11 +19,11 @@ import kr.weit.odya.support.TEST_INVALID_TOPIC_ID
 import kr.weit.odya.support.TEST_NOT_EXIST_FAVORITE_TOPIC_ID
 import kr.weit.odya.support.TEST_NOT_EXIST_USER_ID
 import kr.weit.odya.support.TEST_USER_ID
+import kr.weit.odya.support.createAddFavoriteTopicRequest
 import kr.weit.odya.support.createFavoriteTopic
 import kr.weit.odya.support.createFavoriteTopicList
-import kr.weit.odya.support.createInvalidTopicIdList
+import kr.weit.odya.support.createInvalidAddFavoriteTopicRequest
 import kr.weit.odya.support.createTopic
-import kr.weit.odya.support.createTopicIdList
 import kr.weit.odya.support.createTopicList
 import kr.weit.odya.support.createUser
 
@@ -46,26 +47,28 @@ class TopicServiceTest : DescribeSpec(
         describe("addFavoriteTopic 메소드") {
             context("유효한 userId와 topicId 리스트가 주어졌을 경우") {
                 every { userRepository.getByUserId(TEST_USER_ID) } returns user
-                every { favoriteTopicRepository.existsByUserAndTopicId(user, any()) } returns false
-                every { favoriteTopicRepository.save(any()) } returns createFavoriteTopic()
+                every { favoriteTopicRepository.existsByUserAndTopicId(any(), any()) } returns false
                 every { topicRepository.getByTopicId(any()) } returns createTopic()
+                every { topicRepository.findAll() } returns createTopicList()
+                every { favoriteTopicRepository.saveAll(any<List<FavoriteTopic>>()) } returns createFavoriteTopicList()
                 it("관심 토픽으로 등록한다") {
-                    shouldNotThrowAny { topicService.addFavoriteTopic(TEST_USER_ID, createTopicIdList()) }
+                    shouldNotThrowAny { topicService.addFavoriteTopic(TEST_USER_ID, createAddFavoriteTopicRequest()) }
                 }
             }
 
             context("존재하지않는 userId가 주어졌을 경우") {
                 every { userRepository.getByUserId(TEST_NOT_EXIST_USER_ID) } throws NoSuchElementException()
                 it("NoSuchElementException 예외가 발생한다") {
-                    shouldThrow<NoSuchElementException> { topicService.addFavoriteTopic(TEST_NOT_EXIST_USER_ID, createTopicIdList()) }
+                    shouldThrow<NoSuchElementException> { topicService.addFavoriteTopic(TEST_NOT_EXIST_USER_ID, createAddFavoriteTopicRequest()) }
                 }
             }
 
             context("유효한 userId와 존재하지 않는 topicId가 주어졌을 경우") {
                 every { userRepository.getByUserId(TEST_USER_ID) } returns user
+                every { favoriteTopicRepository.existsByUserAndTopicId(user, TEST_INVALID_TOPIC_ID) } returns false
                 every { topicRepository.getByTopicId(TEST_INVALID_TOPIC_ID) } throws NoSuchElementException()
                 it("NoSuchElementException 예외가 발생한다") {
-                    shouldThrow<NoSuchElementException> { topicService.addFavoriteTopic(TEST_USER_ID, createInvalidTopicIdList()) }
+                    shouldThrow<NoSuchElementException> { topicService.addFavoriteTopic(TEST_USER_ID, createInvalidAddFavoriteTopicRequest()) }
                 }
             }
         }
