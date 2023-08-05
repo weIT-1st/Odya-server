@@ -135,7 +135,7 @@ class TopicControllerTest(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
                             requestBody(
-                                "topicIdList".type(JsonFieldType.ARRAY) description "빈 토픽 ID 리스트" example request,
+                                "[]".type(JsonFieldType.ARRAY) description "빈 토픽 ID 리스트" example request,
                             ),
                         )
                     }
@@ -158,7 +158,7 @@ class TopicControllerTest(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
                             requestBody(
-                                "[]".type(JsonFieldType.ARRAY) description "존재하지않는 토픽 ID가 포함된 리스트" example request,
+                                "topicIdList".type(JsonFieldType.ARRAY) description "존재하지않는 토픽 ID가 포함된 리스트" example request,
                             ),
                         )
                     }

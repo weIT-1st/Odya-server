@@ -14,12 +14,10 @@ import kr.weit.odya.domain.topic.TopicRepository
 import kr.weit.odya.domain.topic.getByTopicId
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
-import kr.weit.odya.service.dto.AddFavoriteTopicRequest
 import kr.weit.odya.support.TEST_FAVORITE_TOPIC_ID
 import kr.weit.odya.support.TEST_INVALID_TOPIC_ID
 import kr.weit.odya.support.TEST_NOT_EXIST_FAVORITE_TOPIC_ID
 import kr.weit.odya.support.TEST_NOT_EXIST_USER_ID
-import kr.weit.odya.support.TEST_TOPIC_ID
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createAddFavoriteTopicRequest
 import kr.weit.odya.support.createFavoriteTopic
@@ -49,11 +47,12 @@ class TopicServiceTest : DescribeSpec(
         describe("addFavoriteTopic 메소드") {
             context("유효한 userId와 topicId 리스트가 주어졌을 경우") {
                 every { userRepository.getByUserId(TEST_USER_ID) } returns user
-                every { favoriteTopicRepository.existsByUserAndTopicId(user, TEST_TOPIC_ID) } returns false
-                every { topicRepository.getByTopicId(TEST_TOPIC_ID) } returns createTopic()
-                every { favoriteTopicRepository.saveAll(listOf(FavoriteTopic(any(), any(), any()))) } returns createFavoriteTopicList()
+                every { favoriteTopicRepository.existsByUserAndTopicId(any(), any()) } returns false
+                every { topicRepository.getByTopicId(any()) } returns createTopic()
+                every { topicRepository.findAll() } returns createTopicList()
+                every { favoriteTopicRepository.saveAll(any<List<FavoriteTopic>>()) } returns createFavoriteTopicList()
                 it("관심 토픽으로 등록한다") {
-                    shouldNotThrowAny { topicService.addFavoriteTopic(TEST_USER_ID, AddFavoriteTopicRequest(listOf(TEST_TOPIC_ID))) }
+                    shouldNotThrowAny { topicService.addFavoriteTopic(TEST_USER_ID, createAddFavoriteTopicRequest()) }
                 }
             }
 

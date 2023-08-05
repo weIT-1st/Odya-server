@@ -28,14 +28,13 @@ class TopicService(
     @Transactional
     fun addFavoriteTopic(userId: Long, request: AddFavoriteTopicRequest) {
         val user = userRepository.getByUserId(userId)
-        val topicList =
-            request.topicIdList.mapNotNull {
-                if (!favoriteTopicRepository.existsByUserAndTopicId(user, it)) {
-                    FavoriteTopic(0L, user, topicRepository.getByTopicId(it))
-                } else {
-                    null
-                }
+        val topicList = request.topicIdList.mapNotNull {
+            if (!favoriteTopicRepository.existsByUserAndTopicId(user, it)) {
+                FavoriteTopic(0L, user, topicRepository.getByTopicId(it))
+            } else {
+                null
             }
+        }
         favoriteTopicRepository.saveAll(topicList)
     }
 
