@@ -159,3 +159,14 @@ operation::place-review-controller-test/placeReview-userId-get-fail-lookup-not-r
 === *5-7 실패 - 유효하지 않은 토큰*
 
 operation::place-review-controller-test/placeReview-userId-get-fail-invalid-token[snippets='http-request,path-Parameters,request-headers,query-parameters,http-response']
+
+[[리뷰작성여부-API]]
+== *6. 리뷰 작성 여부 API*
+
+=== *6-1 성공*
+
+operation::place-review-controller-test/placeReview-exist-get-success[snippets='http-request,path-Parameters,request-Headers,response-fields,http-response']
+
+=== *6-1 성공*
+
+operation::place-review-controller-test/placeReview-exist-get-fail-invalid-token[snippets='http-request,path-Parameters,request-Headers,http-response']

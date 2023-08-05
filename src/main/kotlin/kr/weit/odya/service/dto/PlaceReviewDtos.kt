@@ -84,3 +84,7 @@ data class SlicePlaceReviewResponse private constructor(
         }
     }
 }
+
+data class ExistReviewResponse(
+    val exist: Boolean,
+)
