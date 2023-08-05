@@ -10,6 +10,7 @@ import kr.weit.odya.domain.topic.TopicRepository
 import kr.weit.odya.domain.topic.getByTopicId
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
+import kr.weit.odya.service.dto.AddFavoriteTopicRequest
 import kr.weit.odya.service.dto.FavoriteTopicListResponse
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -25,23 +26,26 @@ class TopicService(
     }
 
     @Transactional
-    fun addFavoriteTopic(userId: Long, topicIdList: List<Long>) {
+    fun addFavoriteTopic(userId: Long, request: AddFavoriteTopicRequest) {
         val user = userRepository.getByUserId(userId)
-        topicIdList.forEach {
-            if (!favoriteTopicRepository.existsByUserAndTopicId(user, it)) {
-                favoriteTopicRepository.save(
-                    FavoriteTopic(0L, user, topicRepository.getByTopicId(it)),
-                )
+        val topicList =
+            request.topicIdList.mapNotNull {
+                if (!favoriteTopicRepository.existsByUserAndTopicId(user, it)) {
+                    FavoriteTopic(0L, user, topicRepository.getByTopicId(it))
+                } else {
+                    null
+                }
             }
-        }
+        favoriteTopicRepository.saveAll(topicList)
     }
 
     @Transactional
     fun deleteFavoriteTopic(userId: Long, favoriteTopicId: Long) {
-        val favoriteTopic = favoriteTopicRepository.getByFavoriteTopicId(favoriteTopicId).also {
-            require(it.registrantsId == userId) { throw ForbiddenException("관심 토픽을 삭제할 권한이 없습니다.") }
-        }
-        favoriteTopicRepository.delete(favoriteTopic)
+        favoriteTopicRepository.delete(
+            favoriteTopicRepository.getByFavoriteTopicId(favoriteTopicId).also {
+                require(it.registrantsId == userId) { throw ForbiddenException("관심 토픽을 삭제할 권한이 없습니다.") }
+            },
+        )
     }
 
     fun getFavoriteTopicList(userId: Long): List<FavoriteTopicListResponse> {

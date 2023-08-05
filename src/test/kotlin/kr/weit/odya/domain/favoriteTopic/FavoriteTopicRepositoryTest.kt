@@ -5,6 +5,8 @@ import io.kotest.matchers.shouldBe
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.support.TEST_FAVORITE_PLACE_ID
+import kr.weit.odya.support.TEST_FAVORITE_TOPIC_ID
+import kr.weit.odya.support.TEST_NOT_EXIST_FAVORITE_TOPIC_ID
 import kr.weit.odya.support.createFavoriteTopic
 import kr.weit.odya.support.createUser
 import kr.weit.odya.support.test.BaseTests.RepositoryTest
@@ -34,8 +36,13 @@ class FavoriteTopicRepositoryTest(
 
         context("관심 토픽 존재 여부") {
             expect("user와 topicId가 일치하는 관심 토픽 존재 여부를 확인한다") {
-                val result = favoriteTopicRepository.existsByUserAndTopicId(user, TEST_FAVORITE_PLACE_ID)
+                val result = favoriteTopicRepository.existsByUserAndTopicId(user, TEST_FAVORITE_TOPIC_ID)
                 result shouldBe true
+            }
+
+            expect("user와 topicId가 일치하는 관심 토픽 존재 여부를 확인한다") {
+                val result = favoriteTopicRepository.existsByUserAndTopicId(user, TEST_NOT_EXIST_FAVORITE_TOPIC_ID)
+                result shouldBe false
             }
         }
     },

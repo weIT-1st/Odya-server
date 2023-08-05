@@ -1,11 +1,12 @@
 package kr.weit.odya.controller
 
-import jakarta.validation.constraints.NotEmpty
+import jakarta.validation.Valid
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Positive
 import kr.weit.odya.domain.topic.Topic
 import kr.weit.odya.security.LoginUserId
 import kr.weit.odya.service.TopicService
+import kr.weit.odya.service.dto.AddFavoriteTopicRequest
 import kr.weit.odya.service.dto.FavoriteTopicListResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -31,11 +32,11 @@ class TopicController(private val topicService: TopicService) {
     fun createFavoritePlace(
         @LoginUserId
         userId: Long,
-        @NotEmpty(message = "관심 토픽 ID는 필수 입력값입니다.")
+        @Valid
         @RequestBody
-        topicIdList: List<Long>,
+        request: AddFavoriteTopicRequest,
     ): ResponseEntity<Void> {
-        topicService.addFavoriteTopic(userId, topicIdList)
+        topicService.addFavoriteTopic(userId, request)
         return ResponseEntity.status(HttpStatus.CREATED).build()
     }
 

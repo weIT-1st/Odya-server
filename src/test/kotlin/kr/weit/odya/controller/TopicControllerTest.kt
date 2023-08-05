@@ -11,9 +11,9 @@ import kr.weit.odya.support.TEST_FAVORITE_TOPIC_ID
 import kr.weit.odya.support.TEST_INVALID_FAVORITE_TOPIC_ID
 import kr.weit.odya.support.TEST_NOT_EXIST_FAVORITE_TOPIC_ID
 import kr.weit.odya.support.TEST_USER_ID
+import kr.weit.odya.support.createAddFavoriteTopicRequest
 import kr.weit.odya.support.createFavoriteTopicListResponse
-import kr.weit.odya.support.createInvalidTopicIdList
-import kr.weit.odya.support.createTopicIdList
+import kr.weit.odya.support.createInvalidAddFavoriteTopicRequest
 import kr.weit.odya.support.createTopicList
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
 import kr.weit.odya.support.test.ControllerTestHelper.Companion.jsonContent
@@ -98,7 +98,7 @@ class TopicControllerTest(
         describe("POST /api/v1/topics") {
             val targetUri = "/api/v1/topics"
             context("유효한 요청 데이터가 전달되면") {
-                val request = createTopicIdList()
+                val request = createAddFavoriteTopicRequest()
                 every { topicService.addFavoriteTopic(TEST_USER_ID, request) } returns Unit
                 it("201를 반환한다.") {
                     restDocMockMvc.post(targetUri) {
@@ -113,7 +113,7 @@ class TopicControllerTest(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
                             requestBody(
-                                "[]".type(JsonFieldType.ARRAY) description "토픽 ID 리스트" example request,
+                                "topicIdList".type(JsonFieldType.ARRAY) description "토픽 ID 리스트" example request,
                             ),
                         )
                     }
@@ -135,7 +135,7 @@ class TopicControllerTest(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
                             requestBody(
-                                "[]".type(JsonFieldType.ARRAY) description "빈 토픽 ID 리스트" example request,
+                                "topicIdList".type(JsonFieldType.ARRAY) description "빈 토픽 ID 리스트" example request,
                             ),
                         )
                     }
@@ -143,7 +143,7 @@ class TopicControllerTest(
             }
 
             context("유효한 토큰이지만 존재하지않는 토픽 ID가 포함된 리스트를 전달하면") {
-                val request = createInvalidTopicIdList()
+                val request = createInvalidAddFavoriteTopicRequest()
                 every { topicService.addFavoriteTopic(TEST_USER_ID, request) } throws NoSuchElementException()
                 it("404를 반환한다.") {
                     restDocMockMvc.post(targetUri) {
@@ -166,7 +166,7 @@ class TopicControllerTest(
             }
 
             context("유효하지 않은 토큰이 전달되면") {
-                val request = createTopicIdList()
+                val request = createAddFavoriteTopicRequest()
                 it("401 응답한다.") {
                     restDocMockMvc.post(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
