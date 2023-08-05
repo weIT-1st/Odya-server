@@ -1,6 +1,10 @@
 package kr.weit.odya.service
 
+import kr.weit.odya.domain.favoritePlace.FavoritePlaceRepository
+import kr.weit.odya.domain.follow.FollowRepository
+import kr.weit.odya.domain.placeReview.PlaceReviewRepository
 import kr.weit.odya.domain.user.DEFAULT_PROFILE_PNG
+import kr.weit.odya.domain.user.ProfileRepository
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.existsByEmail
 import kr.weit.odya.domain.user.existsByNickname
@@ -9,6 +13,7 @@ import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.domain.user.getByUserIdWithProfile
 import kr.weit.odya.security.FirebaseTokenHelper
 import kr.weit.odya.service.dto.InformationRequest
+import kr.weit.odya.service.dto.KakaoWithdrawRequest
 import kr.weit.odya.service.dto.UserResponse
 import kr.weit.odya.service.generator.FileNameGenerator
 import org.springframework.stereotype.Service
@@ -21,6 +26,10 @@ val ALLOW_FILE_FORMAT_LIST: List<String> = listOf("png", "jpg", "jpeg", "webp")
 @Service
 class UserService(
     private val userRepository: UserRepository,
+    private val favoritePlaceRepository: FavoritePlaceRepository,
+    private val followRepository: FollowRepository,
+    private val placeReviewRepository: PlaceReviewRepository,
+    private val profileRepository: ProfileRepository,
     private val objectStorageService: ObjectStorageService,
     private val firebaseTokenHelper: FirebaseTokenHelper,
     private val fileNameGenerator: FileNameGenerator,
@@ -89,13 +98,28 @@ class UserService(
         }
     }
 
+    @Transactional
+    fun withdraw(kakaoWithdrawRequest: KakaoWithdrawRequest, userId: Long) {
+        runCatching {
+            favoritePlaceRepository.deleteAll(favoritePlaceRepository.findAllByUserId(userId))
+            followRepository.deleteAll(followRepository.findAllByFollowerId(userId))
+            followRepository.deleteAll(followRepository.findAllByFollowingId(userId))
+            placeReviewRepository.deleteAll(placeReviewRepository.findAllByUserId(userId))
+            profileRepository.deleteById(userId)
+            userRepository.deleteById(userId)
+        }.onFailure {
+            throw RuntimeException("회원 탈퇴 중 오류가 발생했습니다")
+        }
+        firebaseTokenHelper.withdrawUser(kakaoWithdrawRequest.accessToken)
+    }
+
     private fun validateInformationRequest(informationRequest: InformationRequest) {
         if (userRepository.existsByNickname(informationRequest.nickname)) {
             throw ExistResourceException("${informationRequest.nickname}: 이미 존재하는 닉네임입니다")
         }
     }
 
-    private fun getFileFormat(originFileName: String?): String? {
+    private fun getFileFormat(originFileName: String?): String {
         require(originFileName != null) { "원본 파일 이름이 존재하지 않습니다" }
         return originFileName.let {
             it.substring(it.lastIndexOf(".") + 1).lowercase(Locale.getDefault()).apply {

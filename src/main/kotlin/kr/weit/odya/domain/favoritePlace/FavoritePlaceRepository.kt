@@ -27,6 +27,8 @@ interface FavoritePlaceRepository : JpaRepository<FavoritePlace, Long>, CustomFa
     fun existsByUserIdAndPlaceId(userId: Long, placeId: String): Boolean
 
     fun countByUserId(userId: Long): Int
+
+    fun findAllByUserId(userId: Long): List<FavoritePlace>
 }
 
 interface CustomFavoritePlaceRepository {

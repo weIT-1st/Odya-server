@@ -4,9 +4,11 @@ import jakarta.validation.Valid
 import kr.weit.odya.security.LoginUserId
 import kr.weit.odya.service.UserService
 import kr.weit.odya.service.dto.InformationRequest
+import kr.weit.odya.service.dto.KakaoWithdrawRequest
 import kr.weit.odya.service.dto.UserResponse
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -72,6 +74,16 @@ class UserController(
             null
         }
         userService.updateProfile(userId, profileName, multipartFile?.originalFilename)
+        return ResponseEntity.noContent().build()
+    }
+
+    @DeleteMapping("/kakao")
+    fun kakaoWithdraw(
+        @RequestBody @Valid
+        kakaoWithdrawRequest: KakaoWithdrawRequest,
+        @LoginUserId userId: Long,
+    ): ResponseEntity<Void> {
+        userService.withdraw(kakaoWithdrawRequest, userId)
         return ResponseEntity.noContent().build()
     }
 }

@@ -40,6 +40,8 @@ interface PlaceReviewRepository : JpaRepository<PlaceReview, Long>, CustomPlaceR
 
     @Query("select avg(pr.starRating) from PlaceReview pr where pr.user = :user")
     fun getAverageRatingByUser(user: User): Double?
+
+    fun findAllByUserId(userId: Long): List<PlaceReview>
 }
 
 interface CustomPlaceReviewRepository {

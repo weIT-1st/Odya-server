@@ -16,7 +16,6 @@ import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
 import kr.weit.odya.domain.profilecolor.ProfileColor
 import kr.weit.odya.support.domain.BaseTimeEntity
-import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -24,7 +23,6 @@ import java.time.LocalDateTime
 @Entity
 @Table(name = "users")
 @Where(clause = "withdraw_date is null")
-@SQLDelete(sql = "update users set withdraw_date = sysdate where id = ?")
 @SequenceGenerator(name = "USERS_SEQ_GENERATOR", sequenceName = "USERS_SEQ", initialValue = 1, allocationSize = 1)
 class User(
     @Id

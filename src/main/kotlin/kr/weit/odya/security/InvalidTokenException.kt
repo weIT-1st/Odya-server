@@ -12,3 +12,6 @@ class CreateFirebaseUserException(message: String? = null) :
 
 class CreateFirebaseCustomTokenException(message: String? = null) :
     FirebaseAuthException(ErrorCode.FIREBASE_CUSTOM_TOKEN_CREATION_FAIL, message)
+
+class WithdrawFirebaseUserException(message: String? = null) :
+    FirebaseAuthException(ErrorCode.FIREBASE_USER_WITHDRAW_FAIL, message)
