@@ -35,12 +35,12 @@ class FavoriteTopicRepositoryTest(
         }
 
         context("관심 토픽 존재 여부") {
-            expect("user와 topicId가 일치하는 관심 토픽 존재 여부를 확인한다") {
+            expect("user와 topicId가 일치하는 관심 토픽 존재 여부를 확인한다(등록되어있음)") {
                 val result = favoriteTopicRepository.existsByUserAndTopicId(user, TEST_FAVORITE_TOPIC_ID)
                 result shouldBe true
             }
 
-            expect("user와 topicId가 일치하는 관심 토픽 존재 여부를 확인한다") {
+            expect("user와 topicId가 일치하는 관심 토픽 존재 여부를 확인한다(등록되어있지 않음)") {
                 val result = favoriteTopicRepository.existsByUserAndTopicId(user, TEST_NOT_EXIST_FAVORITE_TOPIC_ID)
                 result shouldBe false
             }
