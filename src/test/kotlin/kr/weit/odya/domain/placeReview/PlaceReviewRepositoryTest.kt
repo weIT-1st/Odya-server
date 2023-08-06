@@ -83,6 +83,13 @@ class PlaceReviewRepositoryTest(
             }
         }
 
+        context("최신순") {
+            expect("최신순 정렬") {
+                val result = placeReviewRepository.getPlaceReviewListByPlaceId(TEST_OTHER_PLACE_ID, TEST_DEFAULT_SIZE, TEST_PLACE_SORT_TYPE, null)
+                result shouldBe listOf(placeReview3)
+            }
+        }
+
         context("높은 순") {
             expect("평점 높은 순 정렬") {
                 val result = placeReviewRepository.getPlaceReviewListByPlaceId(TEST_PLACE_ID, TEST_DEFAULT_SIZE, PlaceReviewSortType.HIGHEST, null)
@@ -94,13 +101,6 @@ class PlaceReviewRepositoryTest(
             expect("평점 낮은 순 정렬") {
                 val result = placeReviewRepository.getPlaceReviewListByPlaceId(TEST_PLACE_ID, TEST_DEFAULT_SIZE, PlaceReviewSortType.LOWEST, null)
                 result shouldBe listOf(placeReview2, placeReview1)
-            }
-        }
-
-        context("최신순") {
-            expect("최신순 정렬") {
-                val result = placeReviewRepository.getPlaceReviewListByPlaceId(TEST_OTHER_PLACE_ID, TEST_DEFAULT_SIZE, TEST_PLACE_SORT_TYPE, null)
-                result shouldBe listOf(placeReview3)
             }
         }
 

@@ -36,16 +36,16 @@ operation::place-search-history-controller-test/place-search-overall-ranking-fai
 
 === *3-1 성공*
 
-operation::place-search-history-controller-test/place-search-age-rang-ranking-success[snippets='http-request,path-Parameters,request-headers,response-fields,http-response']
+operation::place-search-history-controller-test/place-search-age-rang-ranking-success[snippets='http-request,path-parameters,request-headers,response-fields,http-response']
 
 === *3-2 실패 - 양수가 아닌 연령대*
 
-operation::place-search-history-controller-test/place-search-age-rang-ranking-fail-invalid-age-range[snippets='http-request,path-Parameters,request-headers,http-response']
+operation::place-search-history-controller-test/place-search-age-rang-ranking-fail-invalid-age-range[snippets='http-request,path-parameters,request-headers,http-response']
 
 === *3-3 실패 - 가입되지 않은 유저*
 
-operation::place-search-history-controller-test/place-search-age-rang-ranking-fail-not-registered-user[snippets='http-request,path-Parameters,request-headers,http-response']
+operation::place-search-history-controller-test/place-search-age-rang-ranking-fail-not-registered-user[snippets='http-request,path-parameters,request-headers,http-response']
 
 === *3-4 실패 - 유효하지 않은 토큰*
 
-operation::place-search-history-controller-test/place-search-age-rang-ranking-fail-invalid-token[snippets='http-request,path-Parameters,request-headers,http-response']
+operation::place-search-history-controller-test/place-search-age-rang-ranking-fail-invalid-token[snippets='http-request,path-parameters,request-headers,http-response']
