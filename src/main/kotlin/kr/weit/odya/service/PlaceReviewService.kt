@@ -10,6 +10,7 @@ import kr.weit.odya.domain.placeReview.getPlaceReviewListByUser
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
+import kr.weit.odya.service.dto.ExistReviewResponse
 import kr.weit.odya.service.dto.PlaceReviewCreateRequest
 import kr.weit.odya.service.dto.PlaceReviewUpdateRequest
 import kr.weit.odya.service.dto.SlicePlaceReviewResponse
@@ -64,6 +65,10 @@ class PlaceReviewService(
     fun getByUserReviewList(userId: Long, size: Int, sortType: PlaceReviewSortType, lastId: Long?): SlicePlaceReviewResponse {
         val user: User = userRepository.getByUserId(userId)
         return SlicePlaceReviewResponse.of(size, placeReviewRepository.getPlaceReviewListByUser(user, size, sortType, lastId), getAverage(placeReviewRepository.getAverageRatingByUser(user)))
+    }
+
+    fun getExistReview(userId: Long, placeId: String): ExistReviewResponse {
+        return ExistReviewResponse(placeReviewRepository.existsByUserIdAndPlaceId(userId, placeId))
     }
 
     private fun getAverage(averageRating: Double?): Double {
