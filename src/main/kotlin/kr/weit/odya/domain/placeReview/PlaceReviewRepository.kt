@@ -100,7 +100,7 @@ class PlaceReviewRepositoryImpl(private val queryFactory: QueryFactory) : Custom
             when (sortType) {
                 PlaceReviewSortType.LATEST -> col(PlaceReview::id).lessThan(lastId)
                 PlaceReviewSortType.LOWEST -> {
-                    val starRating = getStartingByLastId(lastId)
+                    val starRating = getStarRatingByLastId(lastId)
                     or(
                         and(col(PlaceReview::starRating).equal(starRating), col(PlaceReview::id).lessThan(lastId)),
                         col(PlaceReview::starRating).greaterThan(starRating),
@@ -108,7 +108,7 @@ class PlaceReviewRepositoryImpl(private val queryFactory: QueryFactory) : Custom
                 }
 
                 PlaceReviewSortType.HIGHEST -> {
-                    val starRating = getStartingByLastId(lastId)
+                    val starRating = getStarRatingByLastId(lastId)
                     or(
                         and(col(PlaceReview::starRating).equal(starRating), col(PlaceReview::id).lessThan(lastId)),
                         col(PlaceReview::starRating).lessThan(starRating),
@@ -129,7 +129,7 @@ class PlaceReviewRepositoryImpl(private val queryFactory: QueryFactory) : Custom
             PlaceReviewSortType.HIGHEST -> listOf(col(PlaceReview::starRating).desc(), col(PlaceReview::id).desc())
         }
 
-    private fun getStartingByLastId(lastId: Long): Int = queryFactory.selectQuery {
+    private fun getStarRatingByLastId(lastId: Long): Int = queryFactory.selectQuery {
         select(col(PlaceReview::starRating))
         from(entity(PlaceReview::class))
         where(col(PlaceReview::id).equal(lastId))
