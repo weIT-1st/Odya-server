@@ -27,6 +27,7 @@ import kr.weit.odya.support.TEST_INVALID_SIZE
 import kr.weit.odya.support.TEST_INVALID_USER_ID
 import kr.weit.odya.support.TEST_LAST_ID
 import kr.weit.odya.support.TEST_NOT_EXIST_USER_ID
+import kr.weit.odya.support.TEST_OTHER_PLACE_ID
 import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_PLACE_SORT_TYPE
@@ -1068,9 +1069,9 @@ class PlaceReviewControllerTest(
 
         describe("GET /api/v1/place-reviews/{id}") {
             val targetUri = "/api/v1/place-reviews/{id}"
-            context("유효한 데이터가 전달되면") {
+            context("이미 한줄 리뷰를 작성한 장소의 유효한 데이터가 전달되면") {
                 every { placeReviewService.getExistReview(TEST_USER_ID, TEST_PLACE_ID) } returns createExistReviewResponse()
-                it("200 및 Boolean를 반환") {
+                it("200 및 true 반환") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
                             .get(targetUri, TEST_PLACE_ID)
@@ -1079,7 +1080,7 @@ class PlaceReviewControllerTest(
                         .andExpect(status().isOk)
                         .andDo(
                             createPathDocument(
-                                "placeReview-exist-get-success",
+                                "placeReview-exist-get-true-success",
                                 pathParameters(
                                     "id" pathDescription "장소 ID" example TEST_PLACE_ID,
                                 ),
@@ -1088,6 +1089,32 @@ class PlaceReviewControllerTest(
                                 ),
                                 responseBody(
                                     "exist" type JsonFieldType.BOOLEAN description "이미 작성한 리뷰가 있는지 여부" example true,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("한줄 리뷰를 작성하지 않은 장소의 유효한 데이터가 전달되면") {
+                every { placeReviewService.getExistReview(TEST_USER_ID, TEST_OTHER_PLACE_ID) } returns createExistReviewResponse(false)
+                it("200 및 false 반환") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_OTHER_PLACE_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    )
+                        .andExpect(status().isOk)
+                        .andDo(
+                            createPathDocument(
+                                "placeReview-exist-get-false-success",
+                                pathParameters(
+                                    "id" pathDescription "장소 ID" example TEST_OTHER_PLACE_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                responseBody(
+                                    "exist" type JsonFieldType.BOOLEAN description "이미 작성한 리뷰가 있는지 여부" example false,
                                 ),
                             ),
                         )

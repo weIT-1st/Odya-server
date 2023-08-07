@@ -163,10 +163,14 @@ operation::place-review-controller-test/placeReview-userId-get-fail-invalid-toke
 [[리뷰작성여부-API]]
 == *6. 리뷰 작성 여부 API*
 
-=== *6-1 성공*
+=== *6-1 성공 - 이미 한 줄 리뷰 존재*
 
-operation::place-review-controller-test/placeReview-exist-get-success[snippets='http-request,path-parameters,request-headers,response-fields,http-response']
+operation::place-review-controller-test/placeReview-exist-get-true-success[snippets='http-request,path-parameters,request-headers,http-response']
 
-=== *6-2 실패 - 유효하지 않은 토큰*
+=== *6-2 성공 - 한 줄 리뷰 존재하지 않음*
+
+operation::place-review-controller-test/placeReview-exist-get-false-success[snippets='http-request,path-parameters,request-headers,http-response']
+
+=== *6-3 실패 - 유효하지 않은 토큰*
 
 operation::place-review-controller-test/placeReview-exist-get-fail-invalid-token[snippets='http-request,path-parameters,request-headers,http-response']
