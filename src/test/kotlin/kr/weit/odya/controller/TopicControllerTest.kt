@@ -320,8 +320,8 @@ class TopicControllerTest(
                             responseBody(
                                 "[].id" type JsonFieldType.NUMBER description "관심 토픽 ID" example response[0].id,
                                 "[].userId" type JsonFieldType.NUMBER description "유저 ID" example response[0].userId,
-                                "[].topic.id" type JsonFieldType.NUMBER description "토픽 ID" example response[0].topic.id,
-                                "[].topic.word" type JsonFieldType.STRING description "토픽 단어" example response[0].topic.word,
+                                "[].topicId" type JsonFieldType.NUMBER description "토픽 ID" example response[0].topicId,
+                                "[].topicWord" type JsonFieldType.STRING description "토픽 단어" example response[0].topicWord,
                             ),
                         )
                     }
