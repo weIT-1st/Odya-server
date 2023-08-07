@@ -22,6 +22,7 @@ import kr.weit.odya.support.TEST_PLACE_SORT_TYPE
 import kr.weit.odya.support.TEST_SIZE
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.creatSlicePlaceReviewResponse
+import kr.weit.odya.support.createExistReviewResponse
 import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createPlaceReview
 import kr.weit.odya.support.createPlaceReviewRequest
@@ -142,6 +143,22 @@ class PlaceReviewServiceTest : DescribeSpec(
                 every { userRepository.getByUserId(TEST_USER_ID) } throws NoSuchElementException()
                 it("[NoSuchElementException] 예외가 발생한다") {
                     shouldThrow<NoSuchElementException> { sut.getByUserReviewList(TEST_USER_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) }
+                }
+            }
+        }
+
+        describe("getExistReview 메소드") {
+            context("이미 리뷰를 쓴 userId와 placeId가 전달되면") {
+                every { placeReviewRepository.existsByUserIdAndPlaceId(TEST_USER_ID, TEST_PLACE_ID) } returns true
+                it("true를 반환한다.") {
+                    sut.getExistReview(TEST_USER_ID, TEST_PLACE_ID) shouldBe createExistReviewResponse()
+                }
+            }
+
+            context("리뷰를 쓰지 않은 userId와 placeId가 전달되면") {
+                every { placeReviewRepository.existsByUserIdAndPlaceId(TEST_USER_ID, TEST_PLACE_ID) } returns false
+                it("false를 반환한다.") {
+                    sut.getExistReview(TEST_USER_ID, TEST_PLACE_ID) shouldBe createExistReviewResponse(false)
                 }
             }
         }

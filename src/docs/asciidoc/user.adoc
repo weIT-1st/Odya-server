@@ -10,15 +10,15 @@ operation::user-controller-test/get-my-information-success[snippets='http-reques
 
 === *1-2 실패 - 유효한 토큰이면서, 가입되지 않은 사용자*
 
-operation::user-controller-test/get-my-information-fail-not-registered-user[snippets='http-request,request-headers,http-response,response-fields']
+operation::user-controller-test/get-my-information-fail-not-registered-user[snippets='http-request,request-headers,http-response']
 
 === *1-3 실패 - 유효한 토큰이면서, 프로필 PreAuthentication Access Url 생성에 실패한 경우*
 
-operation::user-controller-test/get-my-information-fail-create-pre-authentication-access-url[snippets='http-request,request-headers,http-response,response-fields']
+operation::user-controller-test/get-my-information-fail-create-pre-authentication-access-url[snippets='http-request,request-headers,http-response']
 
 === *1-4 실패 - 유효하지 않은 토큰*
 
-operation::user-controller-test/get-my-information-fail-invalid-token[snippets='http-request,request-headers,http-response,response-fields']
+operation::user-controller-test/get-my-information-fail-invalid-token[snippets='http-request,request-headers,http-response']
 
 [[이메일-변경-API]]
 == *2. 이메일 변경 API*
@@ -29,15 +29,15 @@ operation::user-controller-test/update-email-success[snippets='http-request,requ
 
 === *2-2 실패 - 유효한 토큰이면서, 인증된 이메일이 토큰에 없는 경우*
 
-operation::user-controller-test/update-email-fail-not-exist-email-in-token[snippets='http-request,request-headers,http-response,response-fields']
+operation::user-controller-test/update-email-fail-not-exist-email-in-token[snippets='http-request,request-headers,http-response']
 
 === *2-3 실패 - 유효한 토큰이면서, 가입되어 있는 이메일인 경우*
 
-operation::user-controller-test/update-email-fail-exist-email[snippets='http-request,request-headers,http-response,response-fields']
+operation::user-controller-test/update-email-fail-exist-email[snippets='http-request,request-headers,http-response']
 
 === *2-4 실패 - 유효하지 않은 토큰*
 
-operation::user-controller-test/update-email-fail-invalid-token[snippets='http-request,request-headers,http-response,response-fields']
+operation::user-controller-test/update-email-fail-invalid-token[snippets='http-request,request-headers,http-response']
 
 [[전화번호-변경-API]]
 == *3. 전화번호 변경 API*
@@ -48,7 +48,7 @@ operation::user-controller-test/update-phone-number-success[snippets='http-reque
 
 === *3-2 실패 - 유효한 토큰이면서, 인증된 전화번호가 토큰에 없는 경우*
 
-operation::user-controller-test/update-phone-number-fail-not-exist-phone-number-in-token[snippets='http-request,request-headers,http-response,response-fields']
+operation::user-controller-test/update-phone-number-fail-not-exist-phone-number-in-token[snippets='http-request,request-headers,http-response']
 
 === *3-3 실패 - 유효한 토큰이면서, 가입되어 있는 전화번호인 경우*
 
@@ -86,32 +86,32 @@ operation::user-controller-test/update-profile-image-success-without-profile-ima
 
 === *5-3 실패 - 유효한 토큰이면서, 프로필 사진의 형식이 잘못된 경우*
 
-operation::user-controller-test/update-profile-image-fail-invalid-format[snippets='http-request,request-headers,request-parts,http-response,response-fields']
+operation::user-controller-test/update-profile-image-fail-invalid-format[snippets='http-request,request-headers,request-parts,http-response']
 
 === *5-4 실패 - 유효한 토큰이면서, 프로필 사진의 원본 파일 이름이 존재하지 않는 경우*
 
-operation::user-controller-test/update-profile-image-fail-not-exist-origin-file-name[snippets='http-request,request-headers,request-parts,http-response,response-fields']
+operation::user-controller-test/update-profile-image-fail-not-exist-origin-file-name[snippets='http-request,request-headers,request-parts,http-response']
 
 === *5-5 실패 - 유효한 토큰이면서, Object Storage에 저장하는데 실패한 경우*
 
-operation::user-controller-test/update-profile-image-fail-object-storage-error[snippets='http-request,request-headers,request-parts,http-response,response-fields']
+operation::user-controller-test/update-profile-image-fail-object-storage-error[snippets='http-request,request-headers,request-parts,http-response']
 
 === *5-6 실패 - 유효한 토큰이면서, 프로필 사진을 첨부하지 않고 이미 기본 프로필인 경우*
 
-operation::user-controller-test/update-profile-image-fail-invalid-delete-default-profile[snippets='http-request,request-headers,http-response,response-fields']
+operation::user-controller-test/update-profile-image-fail-invalid-delete-default-profile[snippets='http-request,request-headers,http-response']
 
 === *5-7 실패 - 유효한 토큰이면서, Object Storage에 프로필이 없어 삭제에 실패한 경우*
 
-operation::user-controller-test/update-profile-image-fail-delete-not-exist-profile[snippets='http-request,request-headers,http-response,response-fields']
+operation::user-controller-test/update-profile-image-fail-delete-not-exist-profile[snippets='http-request,request-headers,http-response']
 
 === *5-8 실패 - 유효한 토큰이면서, 프로필 삭제에 실패한 경우*
 
-operation::user-controller-test/update-profile-image-fail-delete-profile-error[snippets='http-request,request-headers,http-response,response-fields']
+operation::user-controller-test/update-profile-image-fail-delete-profile-error[snippets='http-request,request-headers,http-response']
 
 === *5-9 실패 - 유효한 토큰이면서, DB에 프로필 색상이 없는 경우*
 
-operation::user-controller-test/update-profile-image-fail-object-storage-error[snippets='http-request,request-headers,request-parts,http-response,response-fields']
+operation::user-controller-test/update-profile-image-fail-object-storage-error[snippets='http-request,request-headers,request-parts,http-response']
 
 === *5-10 실패 - 유효하지 않은 토큰이면*
 
-operation::user-controller-test/update-profile-image-fail-unauthorized[snippets='http-request,request-headers,request-parts,http-response,response-fields']
+operation::user-controller-test/update-profile-image-fail-unauthorized[snippets='http-request,request-headers,request-parts,http-response']

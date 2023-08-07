@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Positive
 import kr.weit.odya.domain.placeReview.PlaceReviewSortType
 import kr.weit.odya.security.LoginUserId
 import kr.weit.odya.service.PlaceReviewService
+import kr.weit.odya.service.dto.ExistReviewResponse
 import kr.weit.odya.service.dto.PlaceReviewCreateRequest
 import kr.weit.odya.service.dto.PlaceReviewUpdateRequest
 import kr.weit.odya.service.dto.SlicePlaceReviewResponse
@@ -92,5 +93,15 @@ class PlaceReviewController(private val placeReviewService: PlaceReviewService) 
         lastId: Long?,
     ): ResponseEntity<SlicePlaceReviewResponse> {
         return ResponseEntity.ok(placeReviewService.getByUserReviewList(userId, size, sortType, lastId))
+    }
+
+    @GetMapping("/{id}")
+    fun getExistReview(
+        @NotNull(message = "장소 ID는 필수 입력값입니다.")
+        @PathVariable("id")
+        placeId: String,
+        @LoginUserId userId: Long,
+    ): ResponseEntity<ExistReviewResponse> {
+        return ResponseEntity.ok(placeReviewService.getExistReview(userId, placeId))
     }
 }

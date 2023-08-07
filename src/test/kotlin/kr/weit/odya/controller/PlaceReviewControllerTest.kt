@@ -20,16 +20,17 @@ import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_NOT_EXIST_USER_ID_TOKEN
 import kr.weit.odya.support.TEST_EXIST_PLACE_REVIEW_ID
+import kr.weit.odya.support.TEST_HIGHEST_RATING
 import kr.weit.odya.support.TEST_INVALID_LAST_ID
 import kr.weit.odya.support.TEST_INVALID_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_INVALID_SIZE
 import kr.weit.odya.support.TEST_INVALID_USER_ID
 import kr.weit.odya.support.TEST_LAST_ID
 import kr.weit.odya.support.TEST_NOT_EXIST_USER_ID
+import kr.weit.odya.support.TEST_OTHER_PLACE_ID
 import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_PLACE_SORT_TYPE
-import kr.weit.odya.support.TEST_RATING
 import kr.weit.odya.support.TEST_REVIEW
 import kr.weit.odya.support.TEST_SIZE
 import kr.weit.odya.support.TEST_TOO_HIGH_RATING
@@ -37,6 +38,7 @@ import kr.weit.odya.support.TEST_TOO_LONG_REVIEW
 import kr.weit.odya.support.TEST_TOO_LOW_RATING
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.creatSlicePlaceReviewResponse
+import kr.weit.odya.support.createExistReviewResponse
 import kr.weit.odya.support.createPlaceReviewRequest
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
 import kr.weit.odya.support.test.ControllerTestHelper.Companion.jsonContent
@@ -98,7 +100,7 @@ class PlaceReviewControllerTest(
                             ),
                             requestBody(
                                 "placeId" type JsonFieldType.STRING description "장소 ID" example TEST_PLACE_ID,
-                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING,
+                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_HIGHEST_RATING,
                                 "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW,
                             ),
                         )
@@ -170,7 +172,7 @@ class PlaceReviewControllerTest(
                             ),
                             requestBody(
                                 "placeId" type JsonFieldType.STRING description "장소 ID" example TEST_PLACE_ID,
-                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING,
+                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_HIGHEST_RATING,
                                 "review" type JsonFieldType.STRING description "공백인 리뷰" example " ",
                             ),
                         )
@@ -194,7 +196,7 @@ class PlaceReviewControllerTest(
                             ),
                             requestBody(
                                 "placeId" type JsonFieldType.STRING description "장소 ID" example TEST_PLACE_ID,
-                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING,
+                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_HIGHEST_RATING,
                                 "review" type JsonFieldType.STRING description "최대 길이를 초과한 리뷰" example TEST_TOO_LONG_REVIEW,
                             ),
                         )
@@ -218,7 +220,7 @@ class PlaceReviewControllerTest(
                             ),
                             requestBody(
                                 "placeId" type JsonFieldType.STRING description "장소 ID" example TEST_PLACE_ID,
-                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING,
+                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_HIGHEST_RATING,
                                 "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW,
                             ),
                         )
@@ -245,7 +247,7 @@ class PlaceReviewControllerTest(
                             ),
                             requestBody(
                                 "placeId" type JsonFieldType.STRING description "이미 리뷰한 장소 ID" example TEST_PLACE_ID,
-                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING,
+                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_HIGHEST_RATING,
                                 "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW,
                             ),
                         )
@@ -269,7 +271,7 @@ class PlaceReviewControllerTest(
                             ),
                             requestBody(
                                 "placeId" type JsonFieldType.STRING description "장소 ID" example TEST_PLACE_ID,
-                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING,
+                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_HIGHEST_RATING,
                                 "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW,
                             ),
                         )
@@ -297,7 +299,7 @@ class PlaceReviewControllerTest(
                             ),
                             requestBody(
                                 "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID,
-                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING isOptional true,
+                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_HIGHEST_RATING isOptional true,
                                 "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true,
                             ),
                         )
@@ -321,7 +323,7 @@ class PlaceReviewControllerTest(
                             ),
                             requestBody(
                                 "id" type JsonFieldType.NUMBER description "양수가 아닌 장소 리뷰 ID" example TEST_INVALID_PLACE_REVIEW_ID,
-                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING isOptional true,
+                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_HIGHEST_RATING isOptional true,
                                 "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true,
                             ),
                         )
@@ -393,7 +395,7 @@ class PlaceReviewControllerTest(
                             ),
                             requestBody(
                                 "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID,
-                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING isOptional true,
+                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_HIGHEST_RATING isOptional true,
                                 "review" type JsonFieldType.STRING description "공백인 리뷰" example " " isOptional true,
                             ),
                         )
@@ -417,7 +419,7 @@ class PlaceReviewControllerTest(
                             ),
                             requestBody(
                                 "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID,
-                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING isOptional true,
+                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_HIGHEST_RATING isOptional true,
                                 "review" type JsonFieldType.STRING description "최대 길이를 초과한 리뷰" example TEST_TOO_LONG_REVIEW isOptional true,
                             ),
                         )
@@ -466,7 +468,7 @@ class PlaceReviewControllerTest(
                             ),
                             requestBody(
                                 "id" type JsonFieldType.NUMBER description "잘못된 장소 리뷰 ID" example TEST_EXIST_PLACE_REVIEW_ID,
-                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING isOptional true,
+                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_HIGHEST_RATING isOptional true,
                                 "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true,
                             ),
                         )
@@ -491,7 +493,7 @@ class PlaceReviewControllerTest(
                             ),
                             requestBody(
                                 "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID,
-                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING isOptional true,
+                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_HIGHEST_RATING isOptional true,
                                 "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true,
                             ),
                         )
@@ -515,7 +517,7 @@ class PlaceReviewControllerTest(
                             ),
                             requestBody(
                                 "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID,
-                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_RATING isOptional true,
+                                "rating" type JsonFieldType.NUMBER description "별점" example TEST_HIGHEST_RATING isOptional true,
                                 "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true,
                             ),
                         )
@@ -1058,6 +1060,83 @@ class PlaceReviewControllerTest(
                                     SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example PlaceReviewSortType.values()
                                         .joinToString() isOptional true,
                                     LAST_ID_PARAM parameterDescription "마지막 데이터의 ID" example TEST_LAST_ID isOptional true,
+                                ),
+                            ),
+                        )
+                }
+            }
+        }
+
+        describe("GET /api/v1/place-reviews/{id}") {
+            val targetUri = "/api/v1/place-reviews/{id}"
+            context("이미 한줄 리뷰를 작성한 장소의 유효한 데이터가 전달되면") {
+                every { placeReviewService.getExistReview(TEST_USER_ID, TEST_PLACE_ID) } returns createExistReviewResponse()
+                it("200 및 true 반환") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_PLACE_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    )
+                        .andExpect(status().isOk)
+                        .andDo(
+                            createPathDocument(
+                                "placeReview-exist-get-true-success",
+                                pathParameters(
+                                    "id" pathDescription "장소 ID" example TEST_PLACE_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                responseBody(
+                                    "exist" type JsonFieldType.BOOLEAN description "이미 작성한 리뷰가 있는지 여부" example true,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("한줄 리뷰를 작성하지 않은 장소의 유효한 데이터가 전달되면") {
+                every { placeReviewService.getExistReview(TEST_USER_ID, TEST_OTHER_PLACE_ID) } returns createExistReviewResponse(false)
+                it("200 및 false 반환") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_OTHER_PLACE_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    )
+                        .andExpect(status().isOk)
+                        .andDo(
+                            createPathDocument(
+                                "placeReview-exist-get-false-success",
+                                pathParameters(
+                                    "id" pathDescription "장소 ID" example TEST_OTHER_PLACE_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                responseBody(
+                                    "exist" type JsonFieldType.BOOLEAN description "이미 작성한 리뷰가 있는지 여부" example false,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효하지 않은 토큰이 전달되면") {
+                it("401 반환") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_PLACE_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN),
+                    )
+                        .andExpect(status().isUnauthorized)
+                        .andDo(
+                            createPathDocument(
+                                "placeReview-exist-get-fail-invalid-token",
+                                pathParameters(
+                                    "id" pathDescription "장소 ID" example TEST_PLACE_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
                                 ),
                             ),
                         )
