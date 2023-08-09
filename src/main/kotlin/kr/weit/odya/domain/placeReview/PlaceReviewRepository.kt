@@ -6,6 +6,7 @@ import com.linecorp.kotlinjdsl.query.spec.OrderSpec
 import com.linecorp.kotlinjdsl.query.spec.predicate.PredicateSpec
 import com.linecorp.kotlinjdsl.querydsl.CriteriaQueryDsl
 import com.linecorp.kotlinjdsl.querydsl.expression.col
+import com.linecorp.kotlinjdsl.selectQuery
 import kr.weit.odya.domain.user.User
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
@@ -100,7 +101,21 @@ class PlaceReviewRepositoryImpl(private val queryFactory: QueryFactory) : Custom
         return if (lastId != null) {
             when (sortType) {
                 PlaceReviewSortType.LATEST -> col(PlaceReview::id).lessThan(lastId)
-                PlaceReviewSortType.OLDEST -> col(PlaceReview::id).greaterThan(lastId)
+                PlaceReviewSortType.LOWEST -> {
+                    val starRating = getStarRatingByLastId(lastId)
+                    or(
+                        and(col(PlaceReview::starRating).equal(starRating), col(PlaceReview::id).lessThan(lastId)),
+                        col(PlaceReview::starRating).greaterThan(starRating),
+                    )
+                }
+
+                PlaceReviewSortType.HIGHEST -> {
+                    val starRating = getStarRatingByLastId(lastId)
+                    or(
+                        and(col(PlaceReview::starRating).equal(starRating), col(PlaceReview::id).lessThan(lastId)),
+                        col(PlaceReview::starRating).lessThan(starRating),
+                    )
+                }
             }
         } else {
             PredicateSpec.empty
@@ -112,10 +127,16 @@ class PlaceReviewRepositoryImpl(private val queryFactory: QueryFactory) : Custom
     ): List<OrderSpec> =
         when (sortType) {
             PlaceReviewSortType.LATEST -> listOf(col(PlaceReview::id).desc())
-            PlaceReviewSortType.OLDEST -> listOf(col(PlaceReview::id).asc())
+            PlaceReviewSortType.LOWEST -> listOf(col(PlaceReview::starRating).asc(), col(PlaceReview::id).desc())
+            PlaceReviewSortType.HIGHEST -> listOf(col(PlaceReview::starRating).desc(), col(PlaceReview::id).desc())
         }
-}
 
+    private fun getStarRatingByLastId(lastId: Long): Int = queryFactory.selectQuery {
+        select(col(PlaceReview::starRating))
+        from(entity(PlaceReview::class))
+        where(col(PlaceReview::id).equal(lastId))
+    }.singleResult
+}
 enum class PlaceReviewSortType(val description: String) {
-    LATEST("최신순"), OLDEST("오래된순")
+    LATEST("최신순"), HIGHEST("별점 높은 순"), LOWEST("별점 낮은 순")
 }

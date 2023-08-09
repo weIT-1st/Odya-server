@@ -1,0 +1,66 @@
+[[Topic-API]]
+= *Topic API*
+
+[[토픽리스트조회-API]]
+== *1. 토픽 리스트 조회 API*
+
+=== *1-1 성공*
+
+operation::topic-controller-test/topic-get-list-success[snippets='http-request,request-headers,http-response']
+
+=== *1-2 실패 - 유효하지 않은 토큰*
+
+operation::topic-controller-test/topic-get-list-fail-invalid-token[snippets='http-request,request-headers,http-response']
+
+[[관심토픽등록-API]]
+== *2. 관심 토픽 등록 API*
+
+=== *2-1 성공*
+
+operation::topic-controller-test/favorite-topic-add-success[snippets='http-request,request-headers,request-fields,http-response']
+
+=== *2-2 실패 - 빈 토픽 ID 리스트*
+
+operation::topic-controller-test/favorite-topic-add-fail-empty-list[snippets='http-request,request-headers,request-fields,http-response']
+
+=== *2-3 실패 - 존재하지 않는 토픽 ID가 포함된 리스트*
+
+operation::topic-controller-test/favorite-topic-add-fail-not-found-topic[snippets='http-request,request-headers,request-fields,http-response']
+
+=== *2-4 실패 - 유효하지 않은 토큰*
+
+operation::topic-controller-test/favorite-topic-add-fail-invalid-token[snippets='http-request,request-headers,http-response']
+
+[[관심토픽등록해체-API]]
+== *3. 관심 토픽 등록 해체 API*
+
+=== *3-1 성공*
+
+operation::topic-controller-test/favorite-topic-delete-success[snippets='http-request,request-headers,path-parameters,http-response']
+
+=== *3-2 실패 - 양수가 아닌 관심 토픽 ID*
+
+operation::topic-controller-test/favorite-topic-delete-fail-invalid-topic-id[snippets='http-request,request-headers,path-parameters,http-response']
+
+=== *3-3 실패 - 존재하지 않는 관심 토픽 ID*
+
+operation::topic-controller-test/favorite-topic-delete-fail-not-found-id[snippets='http-request,request-headers,path-parameters,http-response']
+
+=== *3-4 실패 - 삭제할 권한이 없는 유저*
+
+operation::topic-controller-test/favorite-topic-delete-fail-no-permissions[snippets='http-request,request-headers,path-parameters,http-response']
+
+=== *3-5 실패 - 유효하지 않은 토큰*
+
+operation::topic-controller-test/favorite-topic-delete-fail-invalid-token[snippets='http-request,request-headers,path-parameters,http-response']
+
+[[관심토픽리스트조회-API]]
+== *4. 관심 토픽 리스트 조회 API*
+
+=== *4-1 성공*
+
+operation::topic-controller-test/favorite-topic-list-success[snippets='http-request,request-headers,http-response']
+
+=== *4-2 실패 - 유효하지 않은 토큰*
+
+operation::topic-controller-test/favorite-topic-list-fail-invalid-token[snippets='http-request,request-headers,http-response']
