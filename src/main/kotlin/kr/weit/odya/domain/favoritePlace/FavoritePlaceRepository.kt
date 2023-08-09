@@ -28,7 +28,7 @@ interface FavoritePlaceRepository : JpaRepository<FavoritePlace, Long>, CustomFa
 
     fun countByUserId(userId: Long): Int
 
-    fun findAllByUserId(userId: Long): List<FavoritePlace>
+    fun deleteByUserId(userId: Long)
 }
 
 interface CustomFavoritePlaceRepository {

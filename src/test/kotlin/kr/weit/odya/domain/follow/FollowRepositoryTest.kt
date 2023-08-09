@@ -71,5 +71,19 @@ class FollowRepositoryTest(
                 followRepository.existsByFollowerIdAndFollowingId(follower.id, following.id) shouldBe false
             }
         }
+
+        context("FOLLOWER가 팔로잉하는 사용자 목록을 전체 삭제한다") {
+            expect("userId와 일치하는 팔로잉 목록을 전체 삭제한다") {
+                followRepository.deleteByFollowerId(follower.id)
+                followRepository.countByFollowerId(follower.id) shouldBe 0
+            }
+        }
+
+        context("FOLLOWING이 팔로워하는 사용자 목록을 전체 삭제한다") {
+            expect("userId와 일치하는 팔로우 목록을 전체 삭제한다") {
+                followRepository.deleteByFollowingId(following.id)
+                followRepository.countByFollowingId(following.id) shouldBe 0
+            }
+        }
     },
 )

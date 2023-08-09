@@ -1,6 +1,7 @@
 package kr.weit.odya.service
 
 import kr.weit.odya.domain.favoritePlace.FavoritePlaceRepository
+import kr.weit.odya.domain.favoriteTopic.FavoriteTopicRepository
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.placeReview.PlaceReviewRepository
 import kr.weit.odya.domain.user.DEFAULT_PROFILE_PNG
@@ -13,7 +14,6 @@ import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.domain.user.getByUserIdWithProfile
 import kr.weit.odya.security.FirebaseTokenHelper
 import kr.weit.odya.service.dto.InformationRequest
-import kr.weit.odya.service.dto.KakaoWithdrawRequest
 import kr.weit.odya.service.dto.UserResponse
 import kr.weit.odya.service.generator.FileNameGenerator
 import org.springframework.stereotype.Service
@@ -30,6 +30,7 @@ class UserService(
     private val followRepository: FollowRepository,
     private val placeReviewRepository: PlaceReviewRepository,
     private val profileRepository: ProfileRepository,
+    private val favoriteTopicRepository: FavoriteTopicRepository,
     private val objectStorageService: ObjectStorageService,
     private val firebaseTokenHelper: FirebaseTokenHelper,
     private val fileNameGenerator: FileNameGenerator,
@@ -99,18 +100,19 @@ class UserService(
     }
 
     @Transactional
-    fun withdraw(kakaoWithdrawRequest: KakaoWithdrawRequest, userId: Long) {
+    fun withdrawUser(idToken: String, userId: Long) {
         runCatching {
-            favoritePlaceRepository.deleteAll(favoritePlaceRepository.findAllByUserId(userId))
-            followRepository.deleteAll(followRepository.findAllByFollowerId(userId))
-            followRepository.deleteAll(followRepository.findAllByFollowingId(userId))
-            placeReviewRepository.deleteAll(placeReviewRepository.findAllByUserId(userId))
+            favoritePlaceRepository.deleteByUserId(userId)
+            followRepository.deleteByFollowingId(userId)
+            followRepository.deleteByFollowerId(userId)
+            placeReviewRepository.deleteByUserId(userId)
+            favoriteTopicRepository.deleteByUserId(userId)
             profileRepository.deleteById(userId)
             userRepository.deleteById(userId)
         }.onFailure {
             throw RuntimeException("회원 탈퇴 중 오류가 발생했습니다")
         }
-        firebaseTokenHelper.withdrawUser(kakaoWithdrawRequest.accessToken)
+        firebaseTokenHelper.withdrawUser(idToken)
     }
 
     private fun validateInformationRequest(informationRequest: InformationRequest) {

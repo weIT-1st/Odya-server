@@ -1,6 +1,5 @@
 package kr.weit.odya.service.dto
 
-import jakarta.validation.constraints.NotBlank
 import kr.weit.odya.domain.profilecolor.NONE_PROFILE_COLOR_HEX
 import kr.weit.odya.domain.profilecolor.ProfileColor
 import kr.weit.odya.domain.user.Gender
@@ -61,8 +60,3 @@ data class UserProfileResponse(
         )
     }
 }
-
-data class KakaoWithdrawRequest(
-    @field:NotBlank
-    val accessToken: String,
-)

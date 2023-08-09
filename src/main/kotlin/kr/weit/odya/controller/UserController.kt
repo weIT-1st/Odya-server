@@ -4,7 +4,6 @@ import jakarta.validation.Valid
 import kr.weit.odya.security.LoginUserId
 import kr.weit.odya.service.UserService
 import kr.weit.odya.service.dto.InformationRequest
-import kr.weit.odya.service.dto.KakaoWithdrawRequest
 import kr.weit.odya.service.dto.UserResponse
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
@@ -77,13 +76,15 @@ class UserController(
         return ResponseEntity.noContent().build()
     }
 
-    @DeleteMapping("/kakao")
-    fun kakaoWithdraw(
-        @RequestBody @Valid
-        kakaoWithdrawRequest: KakaoWithdrawRequest,
-        @LoginUserId userId: Long,
+    @DeleteMapping
+    fun withdrawUser(
+        @RequestHeader(HttpHeaders.AUTHORIZATION)
+        bearerToken: String,
+        @LoginUserId
+        userId: Long,
     ): ResponseEntity<Void> {
-        userService.withdraw(kakaoWithdrawRequest, userId)
+        val idToken = bearerToken.split(" ")[1]
+        userService.withdrawUser(idToken, userId)
         return ResponseEntity.noContent().build()
     }
 }

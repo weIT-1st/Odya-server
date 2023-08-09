@@ -16,13 +16,10 @@ import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
 import kr.weit.odya.domain.profilecolor.ProfileColor
 import kr.weit.odya.support.domain.BaseTimeEntity
-import org.hibernate.annotations.Where
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 @Entity
 @Table(name = "users")
-@Where(clause = "withdraw_date is null")
 @SequenceGenerator(name = "USERS_SEQ_GENERATOR", sequenceName = "USERS_SEQ", initialValue = 1, allocationSize = 1)
 class User(
     @Id
@@ -40,9 +37,6 @@ class User(
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     val userRole: UserRole,
-
-    @Column
-    val withdrawDate: LocalDateTime? = null,
 
     @JoinColumn(name = "profile_id", nullable = false)
     @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE])
@@ -69,7 +63,6 @@ class User(
         id = id,
         username = username,
         socialType = socialType,
-        withdrawDate = null,
         userRole = userRole,
         userInformation = UserInformation(email, nickname, phoneNumber, gender, birthday),
         profile = profile,
