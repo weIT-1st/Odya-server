@@ -75,5 +75,12 @@ class FavoritePlaceRepositoryTest(
                 favoritePlaceRepository.existsByUserIdAndPlaceId(TEST_USER_ID, TEST_PLACE_ID) shouldBe false
             }
         }
+
+        context("유저의 관심 장소 전체 삭제") {
+            expect("userId와 일치하는 관심 장소 전체를 삭제한다") {
+                favoritePlaceRepository.deleteByUserId(user.id)
+                favoritePlaceRepository.countByUserId(user.id) shouldBe 0
+            }
+        }
     },
 )

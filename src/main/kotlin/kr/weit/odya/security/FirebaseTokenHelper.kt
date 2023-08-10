@@ -42,6 +42,12 @@ class FirebaseTokenHelper(
         }
             .getOrThrow { ex -> throw InvalidTokenException(ex.message) }
 
+    fun withdrawUser(idToken: String) =
+        runCatching {
+            val uid = firebaseAuth.verifyIdToken(idToken).uid
+            firebaseAuth.deleteUser(uid)
+        }.getOrThrow { ex -> throw WithdrawFirebaseUserException(ex.message) }
+
     private fun createUserRequest(username: String): UserRecord.CreateRequest? =
         UserRecord.CreateRequest().setUid(username)
 }

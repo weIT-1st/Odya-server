@@ -45,5 +45,13 @@ class FavoriteTopicRepositoryTest(
                 result shouldBe false
             }
         }
+
+        context("유저의 관심 토픽 전체 삭제") {
+            expect("userId와 일치하는 관심 토픽 전체를 삭제한다") {
+                favoriteTopicRepository.deleteByUserId(user.id)
+                val result = favoriteTopicRepository.getByUserId(user.id)
+                result.size shouldBe 0
+            }
+        }
     },
 )

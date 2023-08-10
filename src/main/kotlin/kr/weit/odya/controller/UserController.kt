@@ -7,6 +7,7 @@ import kr.weit.odya.service.dto.InformationRequest
 import kr.weit.odya.service.dto.UserResponse
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -72,6 +73,18 @@ class UserController(
             null
         }
         userService.updateProfile(userId, profileName, multipartFile?.originalFilename)
+        return ResponseEntity.noContent().build()
+    }
+
+    @DeleteMapping
+    fun withdrawUser(
+        @RequestHeader(HttpHeaders.AUTHORIZATION)
+        bearerToken: String,
+        @LoginUserId
+        userId: Long,
+    ): ResponseEntity<Void> {
+        val idToken = bearerToken.split(" ")[1]
+        userService.withdrawUser(idToken, userId)
         return ResponseEntity.noContent().build()
     }
 }

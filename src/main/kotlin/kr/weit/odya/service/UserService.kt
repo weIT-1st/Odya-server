@@ -1,6 +1,11 @@
 package kr.weit.odya.service
 
+import kr.weit.odya.domain.favoritePlace.FavoritePlaceRepository
+import kr.weit.odya.domain.favoriteTopic.FavoriteTopicRepository
+import kr.weit.odya.domain.follow.FollowRepository
+import kr.weit.odya.domain.placeReview.PlaceReviewRepository
 import kr.weit.odya.domain.user.DEFAULT_PROFILE_PNG
+import kr.weit.odya.domain.user.ProfileRepository
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.existsByEmail
 import kr.weit.odya.domain.user.existsByNickname
@@ -21,6 +26,11 @@ val ALLOW_FILE_FORMAT_LIST: List<String> = listOf("png", "jpg", "jpeg", "webp")
 @Service
 class UserService(
     private val userRepository: UserRepository,
+    private val favoritePlaceRepository: FavoritePlaceRepository,
+    private val followRepository: FollowRepository,
+    private val placeReviewRepository: PlaceReviewRepository,
+    private val profileRepository: ProfileRepository,
+    private val favoriteTopicRepository: FavoriteTopicRepository,
     private val objectStorageService: ObjectStorageService,
     private val firebaseTokenHelper: FirebaseTokenHelper,
     private val fileNameGenerator: FileNameGenerator,
@@ -89,13 +99,29 @@ class UserService(
         }
     }
 
+    @Transactional
+    fun withdrawUser(idToken: String, userId: Long) {
+        runCatching {
+            favoritePlaceRepository.deleteByUserId(userId)
+            followRepository.deleteByFollowingId(userId)
+            followRepository.deleteByFollowerId(userId)
+            placeReviewRepository.deleteByUserId(userId)
+            favoriteTopicRepository.deleteByUserId(userId)
+            profileRepository.deleteById(userId)
+            userRepository.deleteById(userId)
+        }.onFailure {
+            throw RuntimeException("회원 탈퇴 중 오류가 발생했습니다")
+        }
+        firebaseTokenHelper.withdrawUser(idToken)
+    }
+
     private fun validateInformationRequest(informationRequest: InformationRequest) {
         if (userRepository.existsByNickname(informationRequest.nickname)) {
             throw ExistResourceException("${informationRequest.nickname}: 이미 존재하는 닉네임입니다")
         }
     }
 
-    private fun getFileFormat(originFileName: String?): String? {
+    private fun getFileFormat(originFileName: String?): String {
         require(originFileName != null) { "원본 파일 이름이 존재하지 않습니다" }
         return originFileName.let {
             it.substring(it.lastIndexOf(".") + 1).lowercase(Locale.getDefault()).apply {
