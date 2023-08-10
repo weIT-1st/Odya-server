@@ -10,7 +10,6 @@ CREATE TABLE users
     user_role     VARCHAR2(255)  NOT NULL,
     social_type   VARCHAR2(10)   NOT NULL,
     profile_id    NUMERIC(19, 0) NULL,
-    withdraw_date DATE           NULL,
     created_date  DATE           NOT NULL,
     PRIMARY KEY (id)
 );
