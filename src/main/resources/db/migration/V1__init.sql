@@ -9,6 +9,7 @@ CREATE TABLE users
     birthday      DATE           NOT NULL,
     profile_name  VARCHAR2(255)  NOT NULL,
     social_type   VARCHAR2(10)   NOT NULL,
+    withdraw_date DATE           NULL,
     created_date  DATE           NOT NULL,
     PRIMARY KEY (id)
 );
