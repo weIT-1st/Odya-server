@@ -13,6 +13,7 @@ import kr.weit.odya.support.TEST_LAST_ID
 import kr.weit.odya.support.TEST_OTHER_PLACE_ID
 import kr.weit.odya.support.TEST_OTHER_USER_ID
 import kr.weit.odya.support.TEST_PLACE_ID
+import kr.weit.odya.support.TEST_PLACE_REVIEW_COUNT
 import kr.weit.odya.support.TEST_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_PLACE_SORT_TYPE
 import kr.weit.odya.support.TEST_SIZE
@@ -115,6 +116,13 @@ class PlaceReviewRepositoryTest(
             expect("USER_ID와 PLACE_ID이 일치하는 장소 리뷰 여부 확인") {
                 val result = placeReviewRepository.existsByUserIdAndPlaceId(TEST_OTHER_USER_ID, TEST_OTHER_PLACE_ID)
                 result shouldBe false
+            }
+        }
+
+        context("해당 장소 한줄 리뷰 수 조회") {
+            expect("PLACE_ID이 일치하는 장소 수 조회") {
+                val result = placeReviewRepository.countByPlaceId(TEST_PLACE_ID)
+                result shouldBe TEST_PLACE_REVIEW_COUNT
             }
         }
     },
