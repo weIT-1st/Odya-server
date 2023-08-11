@@ -60,9 +60,9 @@ import org.springframework.web.context.WebApplicationContext
 @UnitControllerTestEnvironment
 @WebMvcTest(UserController::class)
 class UserControllerTest(
-        private val context: WebApplicationContext,
-        @MockkBean private val userService: UserService,
-        @MockkBean private val withdrawService: WithdrawService,
+    private val context: WebApplicationContext,
+    @MockkBean private val userService: UserService,
+    @MockkBean private val withdrawService: WithdrawService,
 ) : DescribeSpec(
     {
         val restDocumentation = ManualRestDocumentation()
