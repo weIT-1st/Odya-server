@@ -95,7 +95,7 @@ class UserService(
         }
     }
 
-    private fun getFileFormat(originFileName: String?): String? {
+    private fun getFileFormat(originFileName: String?): String {
         require(originFileName != null) { "원본 파일 이름이 존재하지 않습니다" }
         return originFileName.let {
             it.substring(it.lastIndexOf(".") + 1).lowercase(Locale.getDefault()).apply {

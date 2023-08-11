@@ -2,6 +2,7 @@ package kr.weit.odya.controller
 
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.DescribeSpec
+import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.runs
@@ -9,6 +10,7 @@ import kr.weit.odya.service.ExistResourceException
 import kr.weit.odya.service.NotFoundDefaultResourceException
 import kr.weit.odya.service.ObjectStorageException
 import kr.weit.odya.service.UserService
+import kr.weit.odya.service.WithdrawService
 import kr.weit.odya.support.DELETE_NOT_EXIST_PROFILE_ERROR_MESSAGE
 import kr.weit.odya.support.EXIST_EMAIL_ERROR_MESSAGE
 import kr.weit.odya.support.EXIST_NICKNAME_ERROR_MESSAGE
@@ -49,6 +51,7 @@ import org.springframework.restdocs.ManualRestDocumentation
 import org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.request.RequestDocumentation.requestParts
+import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.multipart
 import org.springframework.test.web.servlet.patch
@@ -57,8 +60,9 @@ import org.springframework.web.context.WebApplicationContext
 @UnitControllerTestEnvironment
 @WebMvcTest(UserController::class)
 class UserControllerTest(
-    private val context: WebApplicationContext,
-    @MockkBean private val userService: UserService,
+        private val context: WebApplicationContext,
+        @MockkBean private val userService: UserService,
+        @MockkBean private val withdrawService: WithdrawService,
 ) : DescribeSpec(
     {
         val restDocumentation = ManualRestDocumentation()
@@ -635,6 +639,44 @@ class UserControllerTest(
                             ),
                             requestParts(
                                 "profile" requestPartDescription "프로필 사진" isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+        }
+
+        describe("DELETE /api/v1/users") {
+            val targetUri = "/api/v1/users"
+            context("유효한 토큰과 요청이 들어오면,") {
+                every { withdrawService.withdrawUser(TEST_USER_ID) } just Runs
+                it("204 응답한다.") {
+                    restDocMockMvc.delete(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                    }.andExpect {
+                        status { isNoContent() }
+                    }.andDo {
+                        createDocument(
+                            "withdraw-user-success",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효하지 않은 토큰이면,") {
+                it("401 응답한다.") {
+                    restDocMockMvc.delete(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                    }.andExpect {
+                        status { isUnauthorized() }
+                    }.andDo {
+                        createDocument(
+                            "withdraw-user-fail-unauthorized",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
                             ),
                         )
                     }

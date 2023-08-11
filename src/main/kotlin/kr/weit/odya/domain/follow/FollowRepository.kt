@@ -31,6 +31,10 @@ interface FollowRepository : JpaRepository<Follow, Long>, CustomFollowRepository
     fun countByFollowerId(followerId: Long): Int
 
     fun countByFollowingId(followingId: Long): Int
+
+    fun deleteByFollowingId(followingId: Long)
+
+    fun deleteByFollowerId(follower: Long)
 }
 
 interface CustomFollowRepository {

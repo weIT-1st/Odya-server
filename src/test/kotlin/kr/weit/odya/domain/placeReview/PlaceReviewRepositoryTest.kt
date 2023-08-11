@@ -119,6 +119,13 @@ class PlaceReviewRepositoryTest(
             }
         }
 
+        context("유저가 작성한 한줄 리뷰 전체 삭제") {
+            expect("userId와 일치하는 한줄 리뷰 전체를 삭제한다") {
+                placeReviewRepository.deleteByUserId(user1.id)
+                placeReviewRepository.count() shouldBe 1
+            }
+        }
+
         context("해당 장소 한줄 리뷰 수 조회") {
             expect("PLACE_ID이 일치하는 장소 수 조회") {
                 val result = placeReviewRepository.countByPlaceId(TEST_PLACE_ID)

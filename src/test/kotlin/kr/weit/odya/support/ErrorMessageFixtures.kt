@@ -43,3 +43,5 @@ const val DELETE_NOT_EXIST_PROFILE_ERROR_MESSAGE = "$TEST_PROFILE_PNG: Object St
 const val NOT_FOUND_FAVORITE_PLACE_ERROR_MESSAGE = "해당 장소는 관심 장소 등록되어있지 않습니다."
 
 const val EXIST_FAVORITE_PLACE_ERROR_MESSAGE = "$TEST_PLACE_ID: 해당 장소는 이미 관심 장소입니다"
+
+const val WITHDRAW_FIREBASE_USER_ERROR_MESSAGE = "Firebase user withdraw fail(USER_NOT_FOUND)"
