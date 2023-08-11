@@ -115,3 +115,14 @@ operation::user-controller-test/update-profile-image-fail-object-storage-error[s
 === *5-10 실패 - 유효하지 않은 토큰이면*
 
 operation::user-controller-test/update-profile-image-fail-unauthorized[snippets='http-request,request-headers,request-parts,http-response']
+
+[[회원탈퇴-API]]
+== *6. 회원 탈퇴 API*
+
+=== *6-1 성공*
+
+operation::user-controller-test/withdraw-user-success[snippets='http-request,request-headers,http-response']
+
+=== *6-2 실패 - 유효하지 않은 토큰*
+
+operation::user-controller-test/withdraw-user-fail-unauthorized[snippets='http-request,request-headers,http-response']

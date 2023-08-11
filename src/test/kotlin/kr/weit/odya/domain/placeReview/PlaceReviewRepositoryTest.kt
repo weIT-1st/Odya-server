@@ -117,5 +117,12 @@ class PlaceReviewRepositoryTest(
                 result shouldBe false
             }
         }
+
+        context("유저가 작성한 한줄 리뷰 전체 삭제") {
+            expect("userId와 일치하는 한줄 리뷰 전체를 삭제한다") {
+                placeReviewRepository.deleteByUserId(user1.id)
+                placeReviewRepository.count() shouldBe 1
+            }
+        }
     },
 )
