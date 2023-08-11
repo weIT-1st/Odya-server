@@ -8,11 +8,6 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
-import kr.weit.odya.domain.favoritePlace.FavoritePlaceRepository
-import kr.weit.odya.domain.favoriteTopic.FavoriteTopicRepository
-import kr.weit.odya.domain.follow.FollowRepository
-import kr.weit.odya.domain.placeReview.PlaceReviewRepository
-import kr.weit.odya.domain.user.ProfileRepository
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.existsByEmail
 import kr.weit.odya.domain.user.existsByNickname
@@ -44,11 +39,6 @@ import kr.weit.odya.support.createUserResponse
 class UserServiceTest : DescribeSpec(
     {
         val userRepository = mockk<UserRepository>()
-        val favoritePlaceRepository = mockk<FavoritePlaceRepository>()
-        val followRepository = mockk<FollowRepository>()
-        val placeReviewRepository = mockk<PlaceReviewRepository>()
-        val profileRepository = mockk<ProfileRepository>()
-        val favoriteTopicRepository = mockk<FavoriteTopicRepository>()
         val objectStorageService = mockk<ObjectStorageService>()
         val firebaseTokenHelper = mockk<FirebaseTokenHelper>()
         val fileNameGenerator = mockk<FileNameGenerator>()
@@ -56,11 +46,6 @@ class UserServiceTest : DescribeSpec(
         val userService =
             UserService(
                 userRepository,
-                favoritePlaceRepository,
-                followRepository,
-                placeReviewRepository,
-                profileRepository,
-                favoriteTopicRepository,
                 objectStorageService,
                 firebaseTokenHelper,
                 fileNameGenerator,
@@ -334,22 +319,6 @@ class UserServiceTest : DescribeSpec(
                     shouldThrow<NoSuchElementException> {
                         userService.updateProfile(TEST_USER_ID, TEST_PROFILE_PNG, TEST_PROFILE_PNG)
                     }
-                }
-            }
-        }
-
-        describe("withdrawUser") {
-            context("유효한 토큰이 주어지는 경우") {
-                every { favoritePlaceRepository.deleteByUserId(any()) } just runs
-                every { followRepository.deleteByFollowerId(any()) } just runs
-                every { followRepository.deleteByFollowingId(any()) } just runs
-                every { placeReviewRepository.deleteByUserId(any()) } just runs
-                every { favoriteTopicRepository.deleteByUserId(any()) } just runs
-                every { profileRepository.deleteById(TEST_USER_ID) } just runs
-                every { userRepository.deleteById(TEST_USER_ID) } just runs
-                every { firebaseTokenHelper.withdrawUser(TEST_ID_TOKEN) } just runs
-                it("정상적으로 종료한다") {
-                    shouldNotThrowAny { userService.withdrawUser(TEST_ID_TOKEN, TEST_USER_ID) }
                 }
             }
         }
