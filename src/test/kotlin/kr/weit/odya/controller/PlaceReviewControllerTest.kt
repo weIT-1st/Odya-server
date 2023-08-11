@@ -29,6 +29,7 @@ import kr.weit.odya.support.TEST_LAST_ID
 import kr.weit.odya.support.TEST_NOT_EXIST_USER_ID
 import kr.weit.odya.support.TEST_OTHER_PLACE_ID
 import kr.weit.odya.support.TEST_PLACE_ID
+import kr.weit.odya.support.TEST_PLACE_REVIEW_COUNT
 import kr.weit.odya.support.TEST_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_PLACE_SORT_TYPE
 import kr.weit.odya.support.TEST_REVIEW
@@ -38,6 +39,7 @@ import kr.weit.odya.support.TEST_TOO_LONG_REVIEW
 import kr.weit.odya.support.TEST_TOO_LOW_RATING
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.creatSlicePlaceReviewResponse
+import kr.weit.odya.support.createCountPlaceReviewResponse
 import kr.weit.odya.support.createExistReviewResponse
 import kr.weit.odya.support.createPlaceReviewRequest
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
@@ -1132,6 +1134,57 @@ class PlaceReviewControllerTest(
                         .andDo(
                             createPathDocument(
                                 "placeReview-exist-get-fail-invalid-token",
+                                pathParameters(
+                                    "id" pathDescription "장소 ID" example TEST_PLACE_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                                ),
+                            ),
+                        )
+                }
+            }
+        }
+
+        describe("GET /api/v1/place-reviews/count/{id}") {
+            val targetUri = "/api/v1/place-reviews/count/{id}"
+            context("유효한 토큰과 placeId가 전달되면") {
+                every { placeReviewService.getReviewCount(TEST_PLACE_ID) } returns createCountPlaceReviewResponse()
+                it("200 및 해당 장소의 한줄 리뷰 수 반환") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_PLACE_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    )
+                        .andExpect(status().isOk)
+                        .andDo(
+                            createPathDocument(
+                                "placeReview-count-get-success",
+                                pathParameters(
+                                    "id" pathDescription "장소 ID" example TEST_PLACE_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                responseBody(
+                                    "count" type JsonFieldType.NUMBER description "해당 장소의 리뷰 수" example TEST_PLACE_REVIEW_COUNT,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효하지 않은 토큰이 전달되면") {
+                it("401 반환") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_PLACE_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN),
+                    )
+                        .andExpect(status().isUnauthorized)
+                        .andDo(
+                            createPathDocument(
+                                "placeReview-count-get-fail-invalid-token",
                                 pathParameters(
                                     "id" pathDescription "장소 ID" example TEST_PLACE_ID,
                                 ),

@@ -17,11 +17,13 @@ import kr.weit.odya.support.TEST_AVERAGE_RATING
 import kr.weit.odya.support.TEST_EXIST_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_LAST_ID
 import kr.weit.odya.support.TEST_PLACE_ID
+import kr.weit.odya.support.TEST_PLACE_REVIEW_COUNT
 import kr.weit.odya.support.TEST_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_PLACE_SORT_TYPE
 import kr.weit.odya.support.TEST_SIZE
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.creatSlicePlaceReviewResponse
+import kr.weit.odya.support.createCountPlaceReviewResponse
 import kr.weit.odya.support.createExistReviewResponse
 import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createPlaceReview
@@ -159,6 +161,15 @@ class PlaceReviewServiceTest : DescribeSpec(
                 every { placeReviewRepository.existsByUserIdAndPlaceId(TEST_USER_ID, TEST_PLACE_ID) } returns false
                 it("false를 반환한다.") {
                     sut.getExistReview(TEST_USER_ID, TEST_PLACE_ID) shouldBe createExistReviewResponse(false)
+                }
+            }
+        }
+
+        describe("getReviewCount 메소드") {
+            context("placeId가 전달되면") {
+                every { placeReviewRepository.countByPlaceId(TEST_PLACE_ID) } returns TEST_PLACE_REVIEW_COUNT
+                it("해당 장소의 한줄 리뷰 수를 반환") {
+                    sut.getReviewCount(TEST_PLACE_ID) shouldBe createCountPlaceReviewResponse()
                 }
             }
         }

@@ -88,3 +88,7 @@ data class SlicePlaceReviewResponse private constructor(
 data class ExistReviewResponse(
     val exist: Boolean,
 )
+
+data class ReviewCountResponse(
+    val count: Int,
+)
