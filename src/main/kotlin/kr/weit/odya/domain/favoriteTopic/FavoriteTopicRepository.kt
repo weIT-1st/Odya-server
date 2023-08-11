@@ -13,11 +13,11 @@ fun FavoriteTopicRepository.getByUserId(userId: Long): List<FavoriteTopic> =
     findByUserId(userId)
 
 @Repository
-@Transactional
 interface FavoriteTopicRepository : JpaRepository<FavoriteTopic, Long> {
     fun existsByUserAndTopicId(user: User, topicId: Long): Boolean
 
     fun findByUserId(userId: Long): List<FavoriteTopic>
 
+    @Transactional
     fun deleteByUserId(userId: Long)
 }

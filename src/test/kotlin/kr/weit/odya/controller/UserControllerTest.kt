@@ -10,6 +10,7 @@ import kr.weit.odya.service.ExistResourceException
 import kr.weit.odya.service.NotFoundDefaultResourceException
 import kr.weit.odya.service.ObjectStorageException
 import kr.weit.odya.service.UserService
+import kr.weit.odya.service.WithdrawService
 import kr.weit.odya.support.DELETE_NOT_EXIST_PROFILE_ERROR_MESSAGE
 import kr.weit.odya.support.EXIST_EMAIL_ERROR_MESSAGE
 import kr.weit.odya.support.EXIST_NICKNAME_ERROR_MESSAGE
@@ -59,8 +60,9 @@ import org.springframework.web.context.WebApplicationContext
 @UnitControllerTestEnvironment
 @WebMvcTest(UserController::class)
 class UserControllerTest(
-    private val context: WebApplicationContext,
-    @MockkBean private val userService: UserService,
+        private val context: WebApplicationContext,
+        @MockkBean private val userService: UserService,
+        @MockkBean private val withdrawService: WithdrawService,
 ) : DescribeSpec(
     {
         val restDocumentation = ManualRestDocumentation()
@@ -647,7 +649,7 @@ class UserControllerTest(
         describe("DELETE /api/v1/users") {
             val targetUri = "/api/v1/users"
             context("유효한 토큰과 요청이 들어오면,") {
-                every { userService.withdrawUser(TEST_ID_TOKEN, TEST_USER_ID) } just Runs
+                every { withdrawService.withdrawUser(TEST_USER_ID) } just Runs
                 it("204 응답한다.") {
                     restDocMockMvc.delete(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
