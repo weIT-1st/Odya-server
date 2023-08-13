@@ -2,6 +2,7 @@ package kr.weit.odya.controller
 
 import jakarta.validation.Valid
 import kr.weit.odya.service.AuthenticationService
+import kr.weit.odya.service.TermsService
 import kr.weit.odya.service.UnRegisteredUserException
 import kr.weit.odya.service.dto.AppleLoginRequest
 import kr.weit.odya.service.dto.AppleRegisterRequest
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/auth")
 class AuthController(
     private val authenticationService: AuthenticationService,
+    private val termsService: TermsService,
 ) {
     @PostMapping("/login/apple")
     fun appleLogin(
@@ -54,7 +56,10 @@ class AuthController(
         authenticationService.getUsernameByIdToken(appleRegisterRequest.idToken).apply {
             appleRegisterRequest.updateUsername(this)
         }
-        authenticationService.register(appleRegisterRequest)
+        val termsIdList = appleRegisterRequest.termsIdList
+        termsService.checkRequiredTerms(termsIdList)
+        val user = authenticationService.register(appleRegisterRequest)
+        termsService.saveAllAgreedTerms(user, termsIdList)
         return ResponseEntity.status(HttpStatus.CREATED).build()
     }
 
@@ -63,7 +68,10 @@ class AuthController(
         @RequestBody @Valid
         kakaoRegisterRequest: KakaoRegisterRequest,
     ): ResponseEntity<Void> {
-        authenticationService.register(kakaoRegisterRequest)
+        val termsIdList = kakaoRegisterRequest.termsIdList
+        termsService.checkRequiredTerms(termsIdList)
+        val user = authenticationService.register(kakaoRegisterRequest)
+        termsService.saveAllAgreedTerms(user, termsIdList)
         return ResponseEntity.status(HttpStatus.CREATED).build()
     }
 

@@ -33,6 +33,7 @@ import kr.weit.odya.support.createKakaoRegisterErrorResponse
 import kr.weit.odya.support.createKakaoRegisterRequest
 import kr.weit.odya.support.createKakaoUserInfo
 import kr.weit.odya.support.createTokenResponse
+import kr.weit.odya.support.createUser
 import kr.weit.odya.support.exception.ErrorCode
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
 import kr.weit.odya.support.test.ControllerTestHelper.Companion.jsonContent
@@ -225,7 +226,7 @@ class AuthControllerTest(
             context("유효한 회원가입 정보가 전달되면") {
                 val request = createAppleRegisterRequest()
                 every { authenticationService.getUsernameByIdToken(request.idToken) } returns TEST_USERNAME
-                every { authenticationService.register(request) } just runs
+                every { authenticationService.register(request) } returns createUser()
                 it("201 응답한다.") {
                     restDocMockMvc.post(targetUri) {
                         jsonContent(request)
@@ -440,7 +441,7 @@ class AuthControllerTest(
             val targetUri = "/api/v1/auth/register/kakao"
             context("유효한 회원가입 정보가 전달되면") {
                 val request = createKakaoRegisterRequest()
-                every { authenticationService.register(request) } just runs
+                every { authenticationService.register(request) } returns createUser()
                 it("201 응답한다.") {
                     restDocMockMvc.post(targetUri) {
                         jsonContent(request)

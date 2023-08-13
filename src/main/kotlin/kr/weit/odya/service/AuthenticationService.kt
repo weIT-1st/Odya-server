@@ -42,13 +42,14 @@ class AuthenticationService(
     }
 
     @Transactional
-    fun register(registerRequest: RegisterRequest) {
+    fun register(registerRequest: RegisterRequest): User {
         validateRegisterInformation(registerRequest)
         val randomProfileColor = profileColorService.getRandomProfileColor()
-        userRepository.save(createUser(registerRequest, randomProfileColor))
+        val user = userRepository.save(createUser(registerRequest, randomProfileColor))
         if (registerRequest.socialType == SocialType.KAKAO) {
             firebaseTokenHelper.createFirebaseUser(registerRequest.username)
         }
+        return user
     }
 
     fun validateNickname(nickname: String) {

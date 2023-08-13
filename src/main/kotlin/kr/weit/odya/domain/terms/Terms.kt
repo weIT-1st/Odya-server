@@ -7,10 +7,8 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Lob
 import jakarta.persistence.SequenceGenerator
-import jakarta.persistence.Table
 import kr.weit.odya.support.domain.BaseModifiableEntity
 
-@Table()
 @SequenceGenerator(
     name = "TERMS_SEQ_GENERATOR",
     sequenceName = "TERMS_TOPIC_SEQ",
@@ -27,11 +25,10 @@ class Terms(
     @Column(nullable = false, length = 60)
     val title: String,
 
-    @Column(nullable = false, columnDefinition = "CLOB NOT NULL")
+    @Column(columnDefinition = "CLOB NOT NULL")
     @Lob
     val content: String,
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "NUMERIC(1) NOT NULL DEFAULT 0")
     val required: Boolean,
-
 ) : BaseModifiableEntity()
