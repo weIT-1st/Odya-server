@@ -2,6 +2,7 @@ package kr.weit.odya.controller
 
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.DescribeSpec
+import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.runs
@@ -12,6 +13,7 @@ import kr.weit.odya.security.CreateFirebaseUserException
 import kr.weit.odya.security.InvalidTokenException
 import kr.weit.odya.service.AuthenticationService
 import kr.weit.odya.service.ExistResourceException
+import kr.weit.odya.service.TermsService
 import kr.weit.odya.service.UnRegisteredUserException
 import kr.weit.odya.support.ALREADY_REGISTER_USER_ERROR_MESSAGE
 import kr.weit.odya.support.EXIST_EMAIL_ERROR_MESSAGE
@@ -19,12 +21,18 @@ import kr.weit.odya.support.EXIST_NICKNAME_ERROR_MESSAGE
 import kr.weit.odya.support.EXIST_PHONE_NUMBER_ERROR_MESSAGE
 import kr.weit.odya.support.EXIST_USER_ERROR_MESSAGE
 import kr.weit.odya.support.NOT_EXIST_USER_ERROR_MESSAGE
+import kr.weit.odya.support.NOT_FOUND_REQUIRED_TERMS_ERROR_MESSAGE
+import kr.weit.odya.support.NOT_FOUND_TERMS_ERROR_MESSAGE
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_EMAIL
 import kr.weit.odya.support.TEST_INVALID_EMAIL
 import kr.weit.odya.support.TEST_INVALID_PHONE_NUMBER
 import kr.weit.odya.support.TEST_NICKNAME
+import kr.weit.odya.support.TEST_NOT_EXIST_TERMS_ID
+import kr.weit.odya.support.TEST_OTHER_TERMS_ID
+import kr.weit.odya.support.TEST_OTHER_TERMS_ID_2
 import kr.weit.odya.support.TEST_PHONE_NUMBER
+import kr.weit.odya.support.TEST_TERMS_ID
 import kr.weit.odya.support.TEST_USERNAME
 import kr.weit.odya.support.createAppleLoginRequest
 import kr.weit.odya.support.createAppleRegisterRequest
@@ -57,6 +65,7 @@ import org.springframework.web.context.WebApplicationContext
 class AuthControllerTest(
     private val context: WebApplicationContext,
     @MockkBean private val authenticationService: AuthenticationService,
+    @MockkBean private val termsService: TermsService,
 ) : DescribeSpec(
     {
         val restDocumentation = ManualRestDocumentation()
@@ -223,10 +232,13 @@ class AuthControllerTest(
 
         describe("POST /api/v1/auth/register/apple") {
             val targetUri = "/api/v1/auth/register/apple"
+            val user = createUser()
             context("유효한 회원가입 정보가 전달되면") {
                 val request = createAppleRegisterRequest()
                 every { authenticationService.getUsernameByIdToken(request.idToken) } returns TEST_USERNAME
-                every { authenticationService.register(request) } returns createUser()
+                every { authenticationService.register(request) } returns user
+                every { termsService.checkRequiredTerms(request.termsIdList) } just Runs
+                every { termsService.saveAllAgreedTerms(user, request.termsIdList) } just Runs
                 it("201 응답한다.") {
                     restDocMockMvc.post(targetUri) {
                         jsonContent(request)
@@ -243,6 +255,7 @@ class AuthControllerTest(
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
                                     .joinToString(),
                                 "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday,
+                                "termsIdList" type JsonFieldType.ARRAY description "동의한 약관 ID 리스트" example request.termsIdList,
                             ),
                         )
                     }
@@ -270,6 +283,36 @@ class AuthControllerTest(
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
                                     .joinToString(),
                                 "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday,
+                                "termsIdList" type JsonFieldType.ARRAY description "동의한 약관 ID 리스트" example request.termsIdList,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이지만 필수 약관이 모두 포함되지 않은 리스트가 전달되면") {
+                val request = createAppleRegisterRequest().copy(termsIdList = listOf(TEST_OTHER_TERMS_ID, TEST_OTHER_TERMS_ID_2))
+                every { authenticationService.getUsernameByIdToken(request.idToken) } returns TEST_USERNAME
+                every { termsService.checkRequiredTerms(request.termsIdList) } throws NoSuchElementException(
+                    NOT_FOUND_REQUIRED_TERMS_ERROR_MESSAGE,
+                )
+                it("404 응답한다.") {
+                    restDocMockMvc.post(targetUri) {
+                        jsonContent(request)
+                    }.andExpect {
+                        status { isNotFound() }
+                    }.andDo {
+                        createDocument(
+                            "apple-register-fail-not-found-required-terms",
+                            requestBody(
+                                "idToken" type JsonFieldType.STRING description "유효한 ID TOKEN" example request.idToken,
+                                "email" type JsonFieldType.STRING description "사용자 이메일" example request.email isOptional true,
+                                "nickname" type JsonFieldType.STRING description "사용자 닉네임" example request.nickname,
+                                "phoneNumber" type JsonFieldType.STRING description "사용자 전화번호" example request.phoneNumber isOptional true,
+                                "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
+                                    .joinToString(),
+                                "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday,
+                                "termsIdList" type JsonFieldType.ARRAY description "필수 약관이 모두 포함되지 않은 약관 ID 리스트" example request.termsIdList,
                             ),
                         )
                     }
@@ -282,6 +325,7 @@ class AuthControllerTest(
                 every { authenticationService.register(request) } throws ExistResourceException(
                     EXIST_USER_ERROR_MESSAGE,
                 )
+                every { termsService.checkRequiredTerms(request.termsIdList) } just Runs
                 it("409 응답한다.") {
                     restDocMockMvc.post(targetUri) {
                         jsonContent(request)
@@ -298,6 +342,7 @@ class AuthControllerTest(
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
                                     .joinToString(),
                                 "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday,
+                                "termsIdList" type JsonFieldType.ARRAY description "동의한 약관 ID 리스트" example request.termsIdList,
                             ),
                         )
                     }
@@ -310,6 +355,7 @@ class AuthControllerTest(
                 every { authenticationService.register(request) } throws ExistResourceException(
                     EXIST_EMAIL_ERROR_MESSAGE,
                 )
+                every { termsService.checkRequiredTerms(request.termsIdList) } just Runs
                 it("409 응답한다.") {
                     restDocMockMvc.post(targetUri) {
                         jsonContent(request)
@@ -326,6 +372,7 @@ class AuthControllerTest(
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
                                     .joinToString(),
                                 "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday,
+                                "termsIdList" type JsonFieldType.ARRAY description "동의한 약관 ID 리스트" example request.termsIdList,
                             ),
                         )
                     }
@@ -338,6 +385,7 @@ class AuthControllerTest(
                 every { authenticationService.register(request) } throws ExistResourceException(
                     EXIST_PHONE_NUMBER_ERROR_MESSAGE,
                 )
+                every { termsService.checkRequiredTerms(request.termsIdList) } just Runs
                 it("409 응답한다.") {
                     restDocMockMvc.post(targetUri) {
                         jsonContent(request)
@@ -354,6 +402,7 @@ class AuthControllerTest(
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
                                     .joinToString(),
                                 "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday,
+                                "termsIdList" type JsonFieldType.ARRAY description "동의한 약관 ID 리스트" example request.termsIdList,
                             ),
                         )
                     }
@@ -366,6 +415,7 @@ class AuthControllerTest(
                 every { authenticationService.register(request) } throws ExistResourceException(
                     EXIST_NICKNAME_ERROR_MESSAGE,
                 )
+                every { termsService.checkRequiredTerms(request.termsIdList) } just Runs
                 it("409 응답한다.") {
                     restDocMockMvc.post(targetUri) {
                         jsonContent(request)
@@ -382,6 +432,38 @@ class AuthControllerTest(
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
                                     .joinToString(),
                                 "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday,
+                                "termsIdList" type JsonFieldType.ARRAY description "동의한 약관 ID 리스트" example request.termsIdList,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이지만 존재하지 않는 약관 ID가 포함되어 있으면") {
+                val request = createAppleRegisterRequest().copy(termsIdList = listOf(TEST_TERMS_ID, TEST_OTHER_TERMS_ID_2, TEST_NOT_EXIST_TERMS_ID))
+                every { authenticationService.getUsernameByIdToken(request.idToken) } returns TEST_USERNAME
+                every { authenticationService.register(request) } returns user
+                every { termsService.checkRequiredTerms(request.termsIdList) } just Runs
+                every { termsService.saveAllAgreedTerms(user, request.termsIdList) } throws NoSuchElementException(
+                    NOT_FOUND_TERMS_ERROR_MESSAGE,
+                )
+                it("404 응답한다.") {
+                    restDocMockMvc.post(targetUri) {
+                        jsonContent(request)
+                    }.andExpect {
+                        status { isNotFound() }
+                    }.andDo {
+                        createDocument(
+                            "apple-register-fail-not-found-terms",
+                            requestBody(
+                                "idToken" type JsonFieldType.STRING description "유효한 ID TOKEN" example request.idToken,
+                                "email" type JsonFieldType.STRING description "사용자 이메일" example request.email isOptional true,
+                                "nickname" type JsonFieldType.STRING description "사용자 닉네임" example request.nickname,
+                                "phoneNumber" type JsonFieldType.STRING description "사용자 전화번호" example request.phoneNumber isOptional true,
+                                "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
+                                    .joinToString(),
+                                "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday,
+                                "termsIdList" type JsonFieldType.ARRAY description "존재하지 않는 약관 ID가 포함 리스트" example request.termsIdList,
                             ),
                         )
                     }
@@ -406,6 +488,7 @@ class AuthControllerTest(
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
                                     .joinToString(),
                                 "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday,
+                                "termsIdList" type JsonFieldType.ARRAY description "동의한 약관 ID 리스트" example request.termsIdList,
                             ),
                         )
                     }
@@ -430,6 +513,32 @@ class AuthControllerTest(
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
                                     .joinToString(),
                                 "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday,
+                                "termsIdList" type JsonFieldType.ARRAY description "동의한 약관 ID 리스트" example request.termsIdList,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이지만, 빈 약관 ID 리스트가 전달되면") {
+                val request = createAppleRegisterRequest().copy(termsIdList = emptyList())
+                it("400 응답한다.") {
+                    restDocMockMvc.post(targetUri) {
+                        jsonContent(request)
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "apple-register-fail-empty-terms-id-list",
+                            requestBody(
+                                "idToken" type JsonFieldType.STRING description "유효한 ID TOKEN" example request.idToken,
+                                "email" type JsonFieldType.STRING description "사용자 이메일" example request.email isOptional true,
+                                "nickname" type JsonFieldType.STRING description "사용자 닉네임" example request.nickname,
+                                "phoneNumber" type JsonFieldType.STRING description "올바르지 않은 형식의 사용자 전화번호" example request.phoneNumber isOptional true,
+                                "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
+                                    .joinToString(),
+                                "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday,
+                                "termsIdList" type JsonFieldType.ARRAY description "빈 약관 ID 리스트" example request.termsIdList,
                             ),
                         )
                     }
@@ -439,9 +548,12 @@ class AuthControllerTest(
 
         describe("POST /api/v1/auth/register/kakao") {
             val targetUri = "/api/v1/auth/register/kakao"
+            val user = createUser()
             context("유효한 회원가입 정보가 전달되면") {
                 val request = createKakaoRegisterRequest()
-                every { authenticationService.register(request) } returns createUser()
+                every { authenticationService.register(request) } returns user
+                every { termsService.checkRequiredTerms(request.termsIdList) } just Runs
+                every { termsService.saveAllAgreedTerms(user, request.termsIdList) } just Runs
                 it("201 응답한다.") {
                     restDocMockMvc.post(targetUri) {
                         jsonContent(request)
@@ -458,6 +570,7 @@ class AuthControllerTest(
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
                                     .joinToString(),
                                 "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday,
+                                "termsIdList" type JsonFieldType.ARRAY description "동의한 약관 ID 리스트" example request.termsIdList,
                             ),
                         )
                     }
@@ -485,6 +598,34 @@ class AuthControllerTest(
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
                                     .joinToString(),
                                 "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday,
+                                "termsIdList" type JsonFieldType.ARRAY description "동의한 약관 ID 리스트" example request.termsIdList,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이지만 필수 약관이 모두 포함되지 않은 리스트가 전달되면") {
+                val request = createKakaoRegisterRequest().copy(termsIdList = listOf(TEST_OTHER_TERMS_ID, TEST_OTHER_TERMS_ID_2))
+                every { authenticationService.register(request) } returns user
+                every { termsService.checkRequiredTerms(request.termsIdList) } throws NoSuchElementException(NOT_FOUND_REQUIRED_TERMS_ERROR_MESSAGE)
+                it("404 응답한다.") {
+                    restDocMockMvc.post(targetUri) {
+                        jsonContent(request)
+                    }.andExpect {
+                        status { isNotFound() }
+                    }.andDo {
+                        createDocument(
+                            "kakao-register-fail-not-found-required-terms",
+                            requestBody(
+                                "username" type JsonFieldType.STRING description "USERNAME" example request.username,
+                                "email" type JsonFieldType.STRING description "사용자 이메일" example request.email isOptional true,
+                                "nickname" type JsonFieldType.STRING description "사용자 닉네임" example request.nickname,
+                                "phoneNumber" type JsonFieldType.STRING description "사용자 전화번호" example request.phoneNumber isOptional true,
+                                "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
+                                    .joinToString(),
+                                "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday,
+                                "termsIdList" type JsonFieldType.ARRAY description "필수 약관이 모두 포함되지 않은 약관 ID 리스트" example request.termsIdList,
                             ),
                         )
                     }
@@ -512,6 +653,7 @@ class AuthControllerTest(
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
                                     .joinToString(),
                                 "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday,
+                                "termsIdList" type JsonFieldType.ARRAY description "동의한 약관 ID 리스트" example request.termsIdList,
                             ),
                         )
                     }
@@ -539,6 +681,7 @@ class AuthControllerTest(
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
                                     .joinToString(),
                                 "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday,
+                                "termsIdList" type JsonFieldType.ARRAY description "동의한 약관 ID 리스트" example request.termsIdList,
                             ),
                         )
                     }
@@ -566,6 +709,7 @@ class AuthControllerTest(
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
                                     .joinToString(),
                                 "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday,
+                                "termsIdList" type JsonFieldType.ARRAY description "동의한 약관 ID 리스트" example request.termsIdList,
                             ),
                         )
                     }
@@ -593,6 +737,35 @@ class AuthControllerTest(
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
                                     .joinToString(),
                                 "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday,
+                                "termsIdList" type JsonFieldType.ARRAY description "동의한 약관 ID 리스트" example request.termsIdList,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이지만 존재하지 않는 약관 ID가 리스트 포함되어 있으면") {
+                val request = createKakaoRegisterRequest().copy(termsIdList = listOf(TEST_TERMS_ID, TEST_OTHER_TERMS_ID_2, TEST_NOT_EXIST_TERMS_ID))
+                every { authenticationService.register(request) } returns user
+                every { termsService.checkRequiredTerms(request.termsIdList) } just Runs
+                every { termsService.saveAllAgreedTerms(user, request.termsIdList) } throws NoSuchElementException(NOT_FOUND_TERMS_ERROR_MESSAGE)
+                it("404 응답한다.") {
+                    restDocMockMvc.post(targetUri) {
+                        jsonContent(request)
+                    }.andExpect {
+                        status { isNotFound() }
+                    }.andDo {
+                        createDocument(
+                            "kakao-register-fail-not-found-terms",
+                            requestBody(
+                                "username" type JsonFieldType.STRING description "USERNAME" example request.username,
+                                "email" type JsonFieldType.STRING description "사용자 이메일" example request.email isOptional true,
+                                "nickname" type JsonFieldType.STRING description "사용자 닉네임" example request.nickname,
+                                "phoneNumber" type JsonFieldType.STRING description "사용자 전화번호" example request.phoneNumber isOptional true,
+                                "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
+                                    .joinToString(),
+                                "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday,
+                                "termsIdList" type JsonFieldType.ARRAY description "존재하지 않는 약관 ID가 포함된 리스트" example request.termsIdList,
                             ),
                         )
                     }
@@ -617,6 +790,7 @@ class AuthControllerTest(
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
                                     .joinToString(),
                                 "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday,
+                                "termsIdList" type JsonFieldType.ARRAY description "동의한 약관 ID 리스트" example request.termsIdList,
                             ),
                         )
                     }
@@ -641,6 +815,32 @@ class AuthControllerTest(
                                 "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
                                     .joinToString(),
                                 "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday,
+                                "termsIdList" type JsonFieldType.ARRAY description "동의한 약관 ID 리스트" example request.termsIdList,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이지만 빈 약관 ID 리스트이면") {
+                val request = createKakaoRegisterRequest().copy(termsIdList = emptyList())
+                it("400 응답한다.") {
+                    restDocMockMvc.post(targetUri) {
+                        jsonContent(request)
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "kakao-register-fail-empty-terms-id-list",
+                            requestBody(
+                                "username" type JsonFieldType.STRING description "USERNAME" example request.username,
+                                "email" type JsonFieldType.STRING description "사용자 이메일" example request.email isOptional true,
+                                "nickname" type JsonFieldType.STRING description "사용자 닉네임" example request.nickname,
+                                "phoneNumber" type JsonFieldType.STRING description "사용자 전화번호" example request.phoneNumber isOptional true,
+                                "gender" type JsonFieldType.STRING description "사용자 성별" example Gender.values()
+                                    .joinToString(),
+                                "birthday" type JsonFieldType.ARRAY description "사용자 생일" example request.birthday,
+                                "termsIdList" type JsonFieldType.ARRAY description "빈 약관 ID 리스트" example request.termsIdList,
                             ),
                         )
                     }

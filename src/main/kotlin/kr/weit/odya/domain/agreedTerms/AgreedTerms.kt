@@ -8,17 +8,27 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.SequenceGenerator
+import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
 import kr.weit.odya.domain.terms.Terms
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.support.domain.BaseTimeEntity
 
-@Entity
+@Table(
+    uniqueConstraints = [
+        UniqueConstraint(
+            name = "agreedTerms_unique",
+            columnNames = ["user_id", "terms_id"],
+        ),
+    ],
+)
 @SequenceGenerator(
     name = "AGREED_TERMS_SEQ_GENERATOR",
     sequenceName = "AGREED_TERMS_TOPIC_SEQ",
     initialValue = 1,
     allocationSize = 1,
 )
+@Entity
 class AgreedTerms(
     @Id
     @Column(columnDefinition = "NUMERIC(19, 0)")

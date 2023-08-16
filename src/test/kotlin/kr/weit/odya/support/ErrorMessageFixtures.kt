@@ -44,4 +44,6 @@ const val NOT_FOUND_FAVORITE_PLACE_ERROR_MESSAGE = "해당 장소는 관심 장�
 
 const val EXIST_FAVORITE_PLACE_ERROR_MESSAGE = "$TEST_PLACE_ID: 해당 장소는 이미 관심 장소입니다"
 
-const val WITHDRAW_FIREBASE_USER_ERROR_MESSAGE = "Firebase user withdraw fail(USER_NOT_FOUND)"
+const val NOT_FOUND_REQUIRED_TERMS_ERROR_MESSAGE = "$TEST_TERMS_ID : 필수 약관에 동의하지 않았습니다."
+
+const val NOT_FOUND_TERMS_ERROR_MESSAGE = "$TEST_NOT_EXIST_TERMS_ID : 해당 약관이 존재하지 않습니다."

@@ -8,11 +8,11 @@ fun TermsRepository.getByTermsId(termsId: Long): Terms {
     return findByIdOrNull(termsId) ?: throw NoSuchElementException("$termsId : 해당 약관이 존재하지 않습니다.")
 }
 
-fun TermsRepository.getRequiredTerms(required: Boolean = true): List<Terms> {
-    return findByRequired(required)
+fun TermsRepository.getRequiredTerms(required: Int = 1): List<Terms> {
+    return findAllByRequired(required)
 }
 
 @Repository
 interface TermsRepository : JpaRepository<Terms, Long> {
-    fun findByRequired(required: Boolean): List<Terms>
+    fun findAllByRequired(required: Int): List<Terms>
 }

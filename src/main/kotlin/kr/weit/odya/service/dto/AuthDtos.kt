@@ -3,6 +3,7 @@ package kr.weit.odya.service.dto
 import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Past
 import kr.weit.odya.client.kakao.KakaoUserInfo
@@ -64,7 +65,7 @@ data class AppleRegisterRequest(
     @field:Past
     override var birthday: LocalDate,
 
-    @field:NotBlank
+    @field:NotEmpty
     val termsIdList: List<Long>,
 ) : RegisterRequest() {
     @JsonIgnore
@@ -96,8 +97,8 @@ data class KakaoRegisterRequest(
     @field:Past
     override var birthday: LocalDate,
 
-    @field:NotBlank
-    val termsIdList: List<Long>,
+    @field:NotEmpty
+    val termsIdList: Set<Long>,
 ) : RegisterRequest() {
     @JsonIgnore
     override var socialType: SocialType = SocialType.KAKAO
