@@ -43,6 +43,8 @@ interface PlaceReviewRepository : JpaRepository<PlaceReview, Long>, CustomPlaceR
     fun getAverageRatingByUser(user: User): Double?
 
     fun deleteByUserId(userId: Long)
+
+    fun countByPlaceId(placeId: String): Int
 }
 
 interface CustomPlaceReviewRepository {

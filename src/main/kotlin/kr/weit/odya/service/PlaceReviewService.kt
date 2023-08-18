@@ -13,6 +13,7 @@ import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.service.dto.ExistReviewResponse
 import kr.weit.odya.service.dto.PlaceReviewCreateRequest
 import kr.weit.odya.service.dto.PlaceReviewUpdateRequest
+import kr.weit.odya.service.dto.ReviewCountResponse
 import kr.weit.odya.service.dto.SlicePlaceReviewResponse
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -69,6 +70,10 @@ class PlaceReviewService(
 
     fun getExistReview(userId: Long, placeId: String): ExistReviewResponse {
         return ExistReviewResponse(placeReviewRepository.existsByUserIdAndPlaceId(userId, placeId))
+    }
+
+    fun getReviewCount(placeId: String): ReviewCountResponse {
+        return ReviewCountResponse(placeReviewRepository.countByPlaceId(placeId))
     }
 
     private fun getAverage(averageRating: Double?): Double {

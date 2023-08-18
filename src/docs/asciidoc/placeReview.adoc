@@ -174,3 +174,14 @@ operation::place-review-controller-test/placeReview-exist-get-false-success[snip
 === *6-3 실패 - 유효하지 않은 토큰*
 
 operation::place-review-controller-test/placeReview-exist-get-fail-invalid-token[snippets='http-request,path-parameters,request-headers,http-response']
+
+[[리뷰수조회-API]]
+== *7. 리뷰 수 조회 API*
+
+=== *7-1 성공*
+
+operation::place-review-controller-test/placeReview-count-get-success[snippets='http-request,path-parameters,request-headers,http-response']
+
+=== *7-2 실패 - 유효하지 않은 토큰*
+
+operation::place-review-controller-test/placeReview-count-get-fail-invalid-token[snippets='http-request,path-parameters,request-headers,http-response']

@@ -8,11 +8,6 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
-import kr.weit.odya.domain.favoritePlace.FavoritePlaceRepository
-import kr.weit.odya.domain.favoriteTopic.FavoriteTopicRepository
-import kr.weit.odya.domain.follow.FollowRepository
-import kr.weit.odya.domain.placeReview.PlaceReviewRepository
-import kr.weit.odya.domain.user.ProfileRepository
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.existsByEmail
 import kr.weit.odya.domain.user.existsByNickname
@@ -21,7 +16,6 @@ import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.domain.user.getByUserIdWithProfile
 import kr.weit.odya.security.FirebaseTokenHelper
 import kr.weit.odya.security.InvalidTokenException
-import kr.weit.odya.service.generator.FileNameGenerator
 import kr.weit.odya.support.DELETE_NOT_EXIST_PROFILE_ERROR_MESSAGE
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_DEFAULT_PROFILE_NAME
@@ -31,11 +25,11 @@ import kr.weit.odya.support.TEST_ID_TOKEN
 import kr.weit.odya.support.TEST_INVALID_PROFILE_ORIGINAL_NAME
 import kr.weit.odya.support.TEST_NICKNAME
 import kr.weit.odya.support.TEST_PHONE_NUMBER
-import kr.weit.odya.support.TEST_PROFILE_CONTENT_BYTE_ARRAY
 import kr.weit.odya.support.TEST_PROFILE_PNG
 import kr.weit.odya.support.TEST_PROFILE_URL
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createInformationRequest
+import kr.weit.odya.support.createMockProfile
 import kr.weit.odya.support.createNoneProfileColor
 import kr.weit.odya.support.createProfileColor
 import kr.weit.odya.support.createUser
@@ -44,33 +38,15 @@ import kr.weit.odya.support.createUserResponse
 class UserServiceTest : DescribeSpec(
     {
         val userRepository = mockk<UserRepository>()
-        val favoritePlaceRepository = mockk<FavoritePlaceRepository>()
-        val followRepository = mockk<FollowRepository>()
-        val placeReviewRepository = mockk<PlaceReviewRepository>()
-        val profileRepository = mockk<ProfileRepository>()
-        val favoriteTopicRepository = mockk<FavoriteTopicRepository>()
-        val objectStorageService = mockk<ObjectStorageService>()
         val firebaseTokenHelper = mockk<FirebaseTokenHelper>()
-        val fileNameGenerator = mockk<FileNameGenerator>()
+        val fileService = mockk<FileService>()
         val profileColorService = mockk<ProfileColorService>()
-        val userService =
-            UserService(
-                userRepository,
-                favoritePlaceRepository,
-                followRepository,
-                placeReviewRepository,
-                profileRepository,
-                favoriteTopicRepository,
-                objectStorageService,
-                firebaseTokenHelper,
-                fileNameGenerator,
-                profileColorService,
-            )
+        val userService = UserService(userRepository, firebaseTokenHelper, fileService, profileColorService)
 
         describe("getInformation") {
             context("가입되어 있는 USER ID가 주어지는 경우") {
                 every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser()
-                every { objectStorageService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
+                every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
                 it("UserResponse를 반환한다") {
                     val userResponse = userService.getInformation(TEST_USER_ID)
                     userResponse shouldBe createUserResponse()
@@ -79,7 +55,7 @@ class UserServiceTest : DescribeSpec(
 
             context("preAuthentication Access Url 생성에 실패한 경우") {
                 every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser()
-                every { objectStorageService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } throws ObjectStorageException(
+                every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } throws ObjectStorageException(
                     SOMETHING_ERROR_MESSAGE,
                 )
                 it("[ObjectStorageException] 반환한다") {
@@ -229,44 +205,41 @@ class UserServiceTest : DescribeSpec(
 
         describe("uploadProfile") {
             context("유효한 프로필 INPUT STREAM과 ORIGINAL FILE NAME이 주어지는 경우") {
-                every { objectStorageService.save(any(), TEST_DEFAULT_PROFILE_PNG) } just runs
-                every { fileNameGenerator.generate() } returns TEST_DEFAULT_PROFILE_NAME
+                val mockFile = createMockProfile()
+                every { fileService.saveFile(mockFile) } returns TEST_DEFAULT_PROFILE_NAME
                 it("정상적으로 종료한다") {
-                    shouldNotThrowAny {
-                        userService.uploadProfile(TEST_PROFILE_CONTENT_BYTE_ARRAY, TEST_DEFAULT_PROFILE_PNG)
-                    }
+                    shouldNotThrowAny { userService.uploadProfile(mockFile) }
                 }
             }
 
             context("올바르지 않은 형식의 ORIGINAL FILE NAME이 주어지는 경우") {
+                val mockFile = createMockProfile(originalFileName = TEST_INVALID_PROFILE_ORIGINAL_NAME)
+                every { fileService.saveFile(mockFile) } throws IllegalArgumentException("프로필 사진은 ${ALLOW_FILE_FORMAT_LIST.joinToString()} 형식만 가능합니다")
                 it("[IllegalArgumentException] 반환한다") {
                     shouldThrow<IllegalArgumentException> {
-                        userService.uploadProfile(TEST_PROFILE_CONTENT_BYTE_ARRAY, TEST_INVALID_PROFILE_ORIGINAL_NAME)
+                        userService.uploadProfile(mockFile)
                     }
                 }
             }
 
             context("ORIGINAL FILE NAME이 주어지지 않는 경우") {
+                val mockFile = createMockProfile(originalFileName = null)
+                every { fileService.saveFile(mockFile) } throws IllegalArgumentException("원본 파일 이름이 존재하지 않습니다")
                 it("[IllegalArgumentException] 반환한다") {
                     shouldThrow<IllegalArgumentException> {
-                        userService.uploadProfile(TEST_PROFILE_CONTENT_BYTE_ARRAY, null)
+                        userService.uploadProfile(mockFile)
                     }
                 }
             }
 
             context("프로필 업로드에 실패하는 경우") {
-                every { fileNameGenerator.generate() } returns TEST_DEFAULT_PROFILE_NAME
-                every {
-                    objectStorageService.save(TEST_PROFILE_CONTENT_BYTE_ARRAY, TEST_DEFAULT_PROFILE_PNG)
-                } throws ObjectStorageException(
+                val mockFile = createMockProfile()
+                every { fileService.saveFile(mockFile) } throws ObjectStorageException(
                     SOMETHING_ERROR_MESSAGE,
                 )
                 it("[ObjectStorageException] 반환한다") {
                     shouldThrow<ObjectStorageException> {
-                        userService.uploadProfile(
-                            TEST_PROFILE_CONTENT_BYTE_ARRAY,
-                            TEST_DEFAULT_PROFILE_PNG,
-                        )
+                        userService.uploadProfile(mockFile)
                     }
                 }
             }
@@ -275,7 +248,7 @@ class UserServiceTest : DescribeSpec(
         describe("deleteProfile") {
             context("유효한 USER ID가 주어지는 경우") {
                 every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser(TEST_PROFILE_PNG)
-                every { objectStorageService.delete(TEST_PROFILE_PNG) } just runs
+                every { fileService.deleteFile(TEST_PROFILE_PNG) } just runs
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny { userService.deleteProfile(TEST_USER_ID) }
                 }
@@ -292,7 +265,7 @@ class UserServiceTest : DescribeSpec(
 
             context("OBJECT STORAGE에 프로필이 없어 프로필 삭제에 실패하는 경우") {
                 every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser(TEST_PROFILE_PNG)
-                every { objectStorageService.delete(TEST_PROFILE_PNG) } throws IllegalArgumentException(
+                every { fileService.deleteFile(TEST_PROFILE_PNG) } throws IllegalArgumentException(
                     DELETE_NOT_EXIST_PROFILE_ERROR_MESSAGE,
                 )
                 it("[IllegalArgumentException] 반환한다") {
@@ -302,7 +275,7 @@ class UserServiceTest : DescribeSpec(
 
             context("프로필 업로드에 실패하는 경우") {
                 every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser(TEST_PROFILE_PNG)
-                every { objectStorageService.delete(TEST_PROFILE_PNG) } throws ObjectStorageException(
+                every { fileService.deleteFile(TEST_PROFILE_PNG) } throws ObjectStorageException(
                     SOMETHING_ERROR_MESSAGE,
                 )
                 it("[ObjectStorageException] 반환한다") {
@@ -334,22 +307,6 @@ class UserServiceTest : DescribeSpec(
                     shouldThrow<NoSuchElementException> {
                         userService.updateProfile(TEST_USER_ID, TEST_PROFILE_PNG, TEST_PROFILE_PNG)
                     }
-                }
-            }
-        }
-
-        describe("withdrawUser") {
-            context("유효한 토큰이 주어지는 경우") {
-                every { favoritePlaceRepository.deleteByUserId(any()) } just runs
-                every { followRepository.deleteByFollowerId(any()) } just runs
-                every { followRepository.deleteByFollowingId(any()) } just runs
-                every { placeReviewRepository.deleteByUserId(any()) } just runs
-                every { favoriteTopicRepository.deleteByUserId(any()) } just runs
-                every { profileRepository.deleteById(TEST_USER_ID) } just runs
-                every { userRepository.deleteById(TEST_USER_ID) } just runs
-                every { firebaseTokenHelper.withdrawUser(TEST_ID_TOKEN) } just runs
-                it("정상적으로 종료한다") {
-                    shouldNotThrowAny { userService.withdrawUser(TEST_ID_TOKEN, TEST_USER_ID) }
                 }
             }
         }

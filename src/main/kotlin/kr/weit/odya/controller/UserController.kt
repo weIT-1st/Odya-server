@@ -3,6 +3,7 @@ package kr.weit.odya.controller
 import jakarta.validation.Valid
 import kr.weit.odya.security.LoginUserId
 import kr.weit.odya.service.UserService
+import kr.weit.odya.service.WithdrawService
 import kr.weit.odya.service.dto.InformationRequest
 import kr.weit.odya.service.dto.UserResponse
 import org.springframework.http.HttpHeaders
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile
 @RequestMapping("/api/v1/users")
 class UserController(
     private val userService: UserService,
+    private val withdrawService: WithdrawService,
 ) {
     @GetMapping("/me")
     fun getMyInfo(@LoginUserId userId: Long): ResponseEntity<UserResponse> {
@@ -67,7 +69,7 @@ class UserController(
         @LoginUserId userId: Long,
     ): ResponseEntity<Void> {
         val profileName: String? = if (multipartFile != null) {
-            userService.uploadProfile(multipartFile.inputStream, multipartFile.originalFilename)
+            userService.uploadProfile(multipartFile)
         } else {
             userService.deleteProfile(userId)
             null
@@ -78,13 +80,10 @@ class UserController(
 
     @DeleteMapping
     fun withdrawUser(
-        @RequestHeader(HttpHeaders.AUTHORIZATION)
-        bearerToken: String,
         @LoginUserId
         userId: Long,
     ): ResponseEntity<Void> {
-        val idToken = bearerToken.split(" ")[1]
-        userService.withdrawUser(idToken, userId)
+        withdrawService.withdrawUser(userId)
         return ResponseEntity.noContent().build()
     }
 }

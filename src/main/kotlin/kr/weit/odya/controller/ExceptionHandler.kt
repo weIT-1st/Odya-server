@@ -1,5 +1,6 @@
 package kr.weit.odya.controller
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import jakarta.validation.ConstraintViolationException
 import jakarta.ws.rs.ForbiddenException
@@ -40,7 +41,10 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
     ): ResponseEntity<Any>? {
         logger.error("[HttpMessageNotReadableException] ${ex.message}")
         val errorMessage = when (val cause = ex.cause) {
-            is MismatchedInputException -> "${cause.path.joinToString { it.fieldName }}: ${ex.message}"
+            is InvalidFormatException -> "${cause.path.joinToString(separator = ".") { it?.fieldName.orEmpty() }}: ${ex.message}"
+            is MismatchedInputException -> {
+                "${cause.path.joinToString(separator = ".") { it?.fieldName.orEmpty() }}: ${ex.message}"
+            }
             else -> "유효하지 않은 요청입니다"
         }
         return getInvalidRequestResponse(errorMessage)

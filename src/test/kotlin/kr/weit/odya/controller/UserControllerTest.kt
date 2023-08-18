@@ -10,6 +10,7 @@ import kr.weit.odya.service.ExistResourceException
 import kr.weit.odya.service.NotFoundDefaultResourceException
 import kr.weit.odya.service.ObjectStorageException
 import kr.weit.odya.service.UserService
+import kr.weit.odya.service.WithdrawService
 import kr.weit.odya.support.DELETE_NOT_EXIST_PROFILE_ERROR_MESSAGE
 import kr.weit.odya.support.EXIST_EMAIL_ERROR_MESSAGE
 import kr.weit.odya.support.EXIST_NICKNAME_ERROR_MESSAGE
@@ -61,6 +62,7 @@ import org.springframework.web.context.WebApplicationContext
 class UserControllerTest(
     private val context: WebApplicationContext,
     @MockkBean private val userService: UserService,
+    @MockkBean private val withdrawService: WithdrawService,
 ) : DescribeSpec(
     {
         val restDocumentation = ManualRestDocumentation()
@@ -391,10 +393,7 @@ class UserControllerTest(
             context("유효한 토큰이면서, 프로필 사진을 전송한 경우") {
                 val mockProfile = createMockProfile()
                 every {
-                    userService.uploadProfile(
-                        any(),
-                        mockProfile.originalFilename,
-                    )
+                    userService.uploadProfile(mockProfile)
                 } returns TEST_MOCK_PROFILE_NAME
                 every {
                     userService.updateProfile(
@@ -445,10 +444,7 @@ class UserControllerTest(
             context("유효한 토큰이면서, 프로필 사진의 형식이 잘못된 경우") {
                 val mockProfile = createMockProfile()
                 every {
-                    userService.uploadProfile(
-                        any(),
-                        mockProfile.originalFilename,
-                    )
+                    userService.uploadProfile(mockProfile)
                 } throws IllegalArgumentException(
                     NOT_ALLOW_FILE_FORMAT_ERROR_MESSAGE,
                 )
@@ -475,10 +471,7 @@ class UserControllerTest(
             context("유효한 토큰이면서, 프로필 사진의 원본 파일 이름이 존재하지 않는 경우") {
                 val mockProfile = createMockProfile()
                 every {
-                    userService.uploadProfile(
-                        any(),
-                        mockProfile.originalFilename,
-                    )
+                    userService.uploadProfile(mockProfile)
                 } throws IllegalArgumentException(
                     NOT_EXIST_ORIGIN_FILE_NAME_ERROR_MESSAGE,
                 )
@@ -505,10 +498,7 @@ class UserControllerTest(
             context("유효한 토큰이면서, Object Storage에 저장하는데 실패한 경우") {
                 val mockProfile = createMockProfile()
                 every {
-                    userService.uploadProfile(
-                        any(),
-                        mockProfile.originalFilename,
-                    )
+                    userService.uploadProfile(mockProfile)
                 } throws ObjectStorageException(
                     SOMETHING_ERROR_MESSAGE,
                 )
@@ -647,7 +637,7 @@ class UserControllerTest(
         describe("DELETE /api/v1/users") {
             val targetUri = "/api/v1/users"
             context("유효한 토큰과 요청이 들어오면,") {
-                every { userService.withdrawUser(TEST_ID_TOKEN, TEST_USER_ID) } just Runs
+                every { withdrawService.withdrawUser(TEST_USER_ID) } just Runs
                 it("204 응답한다.") {
                     restDocMockMvc.delete(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)

@@ -1,11 +1,7 @@
 package kr.weit.odya.service
 
-import kr.weit.odya.domain.favoritePlace.FavoritePlaceRepository
-import kr.weit.odya.domain.favoriteTopic.FavoriteTopicRepository
-import kr.weit.odya.domain.follow.FollowRepository
-import kr.weit.odya.domain.placeReview.PlaceReviewRepository
 import kr.weit.odya.domain.user.DEFAULT_PROFILE_PNG
-import kr.weit.odya.domain.user.ProfileRepository
+import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.existsByEmail
 import kr.weit.odya.domain.user.existsByNickname
@@ -15,25 +11,17 @@ import kr.weit.odya.domain.user.getByUserIdWithProfile
 import kr.weit.odya.security.FirebaseTokenHelper
 import kr.weit.odya.service.dto.InformationRequest
 import kr.weit.odya.service.dto.UserResponse
-import kr.weit.odya.service.generator.FileNameGenerator
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.io.InputStream
-import java.util.Locale
+import org.springframework.web.multipart.MultipartFile
 
 val ALLOW_FILE_FORMAT_LIST: List<String> = listOf("png", "jpg", "jpeg", "webp")
 
 @Service
 class UserService(
     private val userRepository: UserRepository,
-    private val favoritePlaceRepository: FavoritePlaceRepository,
-    private val followRepository: FollowRepository,
-    private val placeReviewRepository: PlaceReviewRepository,
-    private val profileRepository: ProfileRepository,
-    private val favoriteTopicRepository: FavoriteTopicRepository,
-    private val objectStorageService: ObjectStorageService,
     private val firebaseTokenHelper: FirebaseTokenHelper,
-    private val fileNameGenerator: FileNameGenerator,
+    private val fileService: FileService,
     private val profileColorService: ProfileColorService,
 ) {
     fun getEmailByIdToken(idToken: String) = firebaseTokenHelper.getEmail(idToken)
@@ -43,8 +31,7 @@ class UserService(
     @Transactional(readOnly = true)
     fun getInformation(userId: Long): UserResponse {
         val findUser = userRepository.getByUserIdWithProfile(userId)
-        val profileUrl = objectStorageService.getPreAuthenticatedObjectUrl(findUser.profile.profileName)
-        return UserResponse(findUser, profileUrl)
+        return getUserResponse(findUser)
     }
 
     @Transactional
@@ -74,18 +61,13 @@ class UserService(
         findUser.changeInformation(informationRequest.nickname)
     }
 
-    fun uploadProfile(inputStream: InputStream, originalFilename: String?): String {
-        val fileFormat = getFileFormat(originalFilename)
-        val profileName = "${fileNameGenerator.generate()}.$fileFormat"
-        objectStorageService.save(inputStream, profileName)
-        return profileName
-    }
+    fun uploadProfile(profile: MultipartFile): String = fileService.saveFile(profile)
 
     fun deleteProfile(userId: Long) {
         val profileName = userRepository.getByUserIdWithProfile(userId).profile.profileName.also {
             require(it != DEFAULT_PROFILE_PNG) { "기본 프로필은 삭제할 수 없습니다" }
         }
-        objectStorageService.delete(profileName)
+        fileService.deleteFile(profileName)
     }
 
     @Transactional
@@ -99,20 +81,10 @@ class UserService(
         }
     }
 
-    @Transactional
-    fun withdrawUser(idToken: String, userId: Long) {
-        runCatching {
-            favoritePlaceRepository.deleteByUserId(userId)
-            followRepository.deleteByFollowingId(userId)
-            followRepository.deleteByFollowerId(userId)
-            placeReviewRepository.deleteByUserId(userId)
-            favoriteTopicRepository.deleteByUserId(userId)
-            profileRepository.deleteById(userId)
-            userRepository.deleteById(userId)
-        }.onFailure {
-            throw RuntimeException("회원 탈퇴 중 오류가 발생했습니다")
-        }
-        firebaseTokenHelper.withdrawUser(idToken)
+    private fun getProfileColor(profileName: String?) = if (profileName == null) {
+        profileColorService.getRandomProfileColor()
+    } else {
+        profileColorService.getNoneProfileColor()
     }
 
     private fun validateInformationRequest(informationRequest: InformationRequest) {
@@ -121,20 +93,8 @@ class UserService(
         }
     }
 
-    private fun getFileFormat(originFileName: String?): String {
-        require(originFileName != null) { "원본 파일 이름이 존재하지 않습니다" }
-        return originFileName.let {
-            it.substring(it.lastIndexOf(".") + 1).lowercase(Locale.getDefault()).apply {
-                require(ALLOW_FILE_FORMAT_LIST.contains(this)) {
-                    "프로필 사진은 ${ALLOW_FILE_FORMAT_LIST.joinToString()} 형식만 가능합니다"
-                }
-            }
-        }
-    }
-
-    private fun getProfileColor(profileName: String?) = if (profileName == null) {
-        profileColorService.getRandomProfileColor()
-    } else {
-        profileColorService.getNoneProfileColor()
+    private fun getUserResponse(findUser: User): UserResponse {
+        val profileUrl = fileService.getPreAuthenticatedObjectUrl(findUser.profile.profileName)
+        return UserResponse(findUser, profileUrl)
     }
 }
