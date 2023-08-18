@@ -21,8 +21,8 @@ import org.springframework.web.multipart.MultipartFile
 @RestController
 @RequestMapping("/api/v1/users")
 class UserController(
-        private val userService: UserService,
-        private val withdrawService: WithdrawService,
+    private val userService: UserService,
+    private val withdrawService: WithdrawService,
 ) {
     @GetMapping("/me")
     fun getMyInfo(@LoginUserId userId: Long): ResponseEntity<UserResponse> {
@@ -69,7 +69,7 @@ class UserController(
         @LoginUserId userId: Long,
     ): ResponseEntity<Void> {
         val profileName: String? = if (multipartFile != null) {
-            userService.uploadProfile(multipartFile.inputStream, multipartFile.originalFilename)
+            userService.uploadProfile(multipartFile)
         } else {
             userService.deleteProfile(userId)
             null
