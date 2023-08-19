@@ -19,6 +19,7 @@ import kr.weit.odya.support.TEST_REQUIRED_TERMS_TITLE_2
 import kr.weit.odya.support.TEST_TERMS_ID
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createAgreedTermsList
+import kr.weit.odya.support.createModifyAgreedTermsRequest
 import kr.weit.odya.support.createOptionalAgreedTermsList
 import kr.weit.odya.support.createOptionalTerms
 import kr.weit.odya.support.createOptionalTermsList
@@ -26,7 +27,6 @@ import kr.weit.odya.support.createRequiredTerms
 import kr.weit.odya.support.createRequiredTermsList
 import kr.weit.odya.support.createTermsIdList
 import kr.weit.odya.support.createTermsList
-import kr.weit.odya.support.createTermsUpdateRequest
 import kr.weit.odya.support.createUser
 
 class TermsServiceTest : DescribeSpec(
@@ -116,14 +116,14 @@ class TermsServiceTest : DescribeSpec(
                 every { agreedTermsRepository.saveAll(any<List<AgreedTerms>>()) } returns createAgreedTermsList()
                 every { agreedTermsRepository.deleteAllByUserIdAndTermsIdIn(TEST_USER_ID, any()) } returns Unit
                 it("전부 저장 및 삭제한다") {
-                    shouldNotThrowAny { termsService.modifyAgreedTerms(createTermsUpdateRequest(), TEST_USER_ID) }
+                    shouldNotThrowAny { termsService.modifyAgreedTerms(createModifyAgreedTermsRequest(), TEST_USER_ID) }
                 }
             }
 
             context("유효하지 않은 유저 ID가 들어올 경우") {
                 every { userRepository.getByUserId(TEST_NOT_EXIST_USER_ID) } throws NoSuchElementException()
                 it("[NoSuchElementException]을 반환한다") {
-                    shouldThrow<NoSuchElementException> { termsService.modifyAgreedTerms(createTermsUpdateRequest(), TEST_NOT_EXIST_USER_ID) }
+                    shouldThrow<NoSuchElementException> { termsService.modifyAgreedTerms(createModifyAgreedTermsRequest(), TEST_NOT_EXIST_USER_ID) }
                 }
             }
 
@@ -132,7 +132,7 @@ class TermsServiceTest : DescribeSpec(
                 every { agreedTermsRepository.existsByUserIdAndTermsId(TEST_USER_ID, any()) } returns false
                 every { termsRepository.getByTermsId(any()) } throws NoSuchElementException()
                 it("[NoSuchElementException]을 반환한다") {
-                    shouldThrow<NoSuchElementException> { termsService.modifyAgreedTerms(createTermsUpdateRequest(), TEST_USER_ID) }
+                    shouldThrow<NoSuchElementException> { termsService.modifyAgreedTerms(createModifyAgreedTermsRequest(), TEST_USER_ID) }
                 }
             }
 
@@ -141,7 +141,7 @@ class TermsServiceTest : DescribeSpec(
                 every { agreedTermsRepository.existsByUserIdAndTermsId(TEST_USER_ID, any()) } returns true
                 every { termsRepository.getRequiredTerms() } returns createRequiredTermsList()
                 it("[IllegalArgumentException]을 반환한다") {
-                    shouldThrow<IllegalArgumentException> { termsService.modifyAgreedTerms(createTermsUpdateRequest().copy(disagreeTermsIdList = setOf(TEST_TERMS_ID)), TEST_USER_ID) }
+                    shouldThrow<IllegalArgumentException> { termsService.modifyAgreedTerms(createModifyAgreedTermsRequest().copy(disagreeTermsIdList = setOf(TEST_TERMS_ID)), TEST_USER_ID) }
                 }
             }
         }

@@ -15,8 +15,8 @@ import kr.weit.odya.support.TEST_NOT_EXIST_TERMS_ID
 import kr.weit.odya.support.TEST_OTHER_TERMS_ID
 import kr.weit.odya.support.TEST_TERMS_ID
 import kr.weit.odya.support.TEST_USER_ID
-import kr.weit.odya.support.createTermsUpdateRequest
-import kr.weit.odya.support.createTermsUpdateResponse
+import kr.weit.odya.support.createModifyAgreedTermsRequest
+import kr.weit.odya.support.createModifyAgreedTermsResponse
 import kr.weit.odya.support.createUser
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
 import kr.weit.odya.support.test.ControllerTestHelper.Companion.jsonContent
@@ -54,7 +54,7 @@ class TermsControllerTest(
             val targetUri = "/api/v1/terms"
             val user = createUser()
             context("유효한 요청이 전달되면") {
-                val response = createTermsUpdateResponse(user)
+                val response = createModifyAgreedTermsResponse(user)
                 val optionalAgreedTerms = response.optionalAgreedTermsList[0]
                 val userOptionalAgreedTerms = response.userOptionalAgreedTermsList[0]
                 every { termsService.getOptionalTermsListAndOptionalAgreedTerms(TEST_USER_ID) } returns response
@@ -106,7 +106,7 @@ class TermsControllerTest(
         describe("PATCH /api/v1/terms") {
             val targetUri = "/api/v1/terms"
             context("동의 약관 ID 리스트(미동의->동의)와 미동의 약관 ID 리스트(동의->미동의)와 유저 ID가 전달되면") {
-                val request = createTermsUpdateRequest()
+                val request = createModifyAgreedTermsRequest()
                 every { termsService.modifyAgreedTerms(request, TEST_USER_ID) } just Runs
                 it("204를 반환한다.") {
                     restDocMockMvc.patch(targetUri) {
@@ -130,7 +130,7 @@ class TermsControllerTest(
             }
 
             context("존재하지 않는 약관 ID가 동의 약관 ID 리스트(미동의->동의)로 전달되면") {
-                val request = createTermsUpdateRequest().copy(agreedTermsIdList = setOf(TEST_OTHER_TERMS_ID, TEST_NOT_EXIST_TERMS_ID))
+                val request = createModifyAgreedTermsRequest().copy(agreedTermsIdList = setOf(TEST_OTHER_TERMS_ID, TEST_NOT_EXIST_TERMS_ID))
                 every { termsService.modifyAgreedTerms(request, TEST_USER_ID) } throws NoSuchElementException(NOT_FOUND_TERMS_ERROR_MESSAGE)
                 it("404를 반환한다.") {
                     restDocMockMvc.patch(targetUri) {
@@ -154,7 +154,7 @@ class TermsControllerTest(
             }
 
             context("필수 약관 ID가 미동의 약관 ID 리스트(미동의->동의)로 전달되면") {
-                val request = createTermsUpdateRequest().copy(disagreeTermsIdList = setOf(TEST_TERMS_ID, TEST_OTHER_TERMS_ID))
+                val request = createModifyAgreedTermsRequest().copy(disagreeTermsIdList = setOf(TEST_TERMS_ID, TEST_OTHER_TERMS_ID))
                 every { termsService.modifyAgreedTerms(request, TEST_USER_ID) } throws IllegalArgumentException(INVALID_DELETE_REQUIRED_TERMS_ERROR_MESSAGE)
                 it("400을 반환한다.") {
                     restDocMockMvc.patch(targetUri) {
@@ -178,7 +178,7 @@ class TermsControllerTest(
             }
 
             context("유효하지 않은 토큰이 전달되면") {
-                val request = createTermsUpdateRequest()
+                val request = createModifyAgreedTermsRequest()
                 it("401를 반환한다.") {
                     restDocMockMvc.patch(targetUri) {
                         header(AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
