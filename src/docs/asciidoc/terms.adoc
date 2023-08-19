@@ -1,0 +1,32 @@
+[[Terms-API]]
+= *Terms API*
+
+[[선택약관리스트사용자가동의한선택약관리스트출력API]]
+== *1. 선택 약관 리스트&사용자가 동의한 선택 약관 리스트 출력 API*
+
+=== *1-1 성공*
+
+operation::terms-controller-test/optional-terms-and-user-agreed-terms-list-get-success[snippets='http-request,request-headers,response-fields,http-response']
+
+=== *1-2 실패 - 유효하지 않은 토큰*
+
+operation::terms-controller-test/optional-terms-and-user-agreed-terms-list-get-fail-invalid-token[snippets='http-request,request-headers,http-response']
+
+[[선택약관동의여부수정API]]
+== *2. 선택 약관 동의 여부 수정 API*
+
+=== *2-1 성공*
+
+operation::terms-controller-test/modify-agreed-terms-success[snippets='http-request,request-headers,request-fields,http-response']
+
+=== *2-2 실패 - 존재하지 않는 약관 ID가 동의 약관 ID 리스트(미동의->동의)로 전달*
+
+operation::terms-controller-test/modify-agreed-terms-fail-not-found-terms[snippets='http-request,request-headers,request-fields,http-response']
+
+=== *2-3 실패 - 필수 약관 ID가 미동의 약관 ID 리스트(미동의->동의)로 전달*
+
+operation::terms-controller-test/modify-agreed-terms-fail-invalid-delete-required-terms[snippets='http-request,request-headers,request-fields,http-response']
+
+=== *2-4 실패 - 유효하지 않은 토큰*
+
+operation::terms-controller-test/modify-agreed-terms-fail-invalid-token[snippets='http-request,request-headers,request-fields,http-response']

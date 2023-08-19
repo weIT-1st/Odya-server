@@ -19,6 +19,7 @@ import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
 import kr.weit.odya.support.test.ControllerTestHelper.Companion.jsonContent
 import kr.weit.odya.support.test.RestDocsHelper
 import kr.weit.odya.support.test.RestDocsHelper.Companion.createDocument
+import kr.weit.odya.support.test.RestDocsHelper.Companion.createPathDocument
 import kr.weit.odya.support.test.RestDocsHelper.Companion.requestBody
 import kr.weit.odya.support.test.RestDocsHelper.Companion.responseBody
 import kr.weit.odya.support.test.example
@@ -197,7 +198,7 @@ class TopicControllerTest(
                     )
                         .andExpect(status().isNoContent)
                         .andDo(
-                            RestDocsHelper.createPathDocument(
+                            createPathDocument(
                                 "favorite-topic-delete-success",
                                 RequestDocumentation.pathParameters(
                                     "id" pathDescription "관심 토픽 ID" example TEST_FAVORITE_TOPIC_ID,
@@ -219,7 +220,7 @@ class TopicControllerTest(
                     )
                         .andExpect(status().isBadRequest)
                         .andDo(
-                            RestDocsHelper.createPathDocument(
+                            createPathDocument(
                                 "favorite-topic-delete-fail-invalid-topic-id",
                                 RequestDocumentation.pathParameters(
                                     "id" pathDescription "양수가 아닌 관심 토픽 ID" example TEST_INVALID_FAVORITE_TOPIC_ID,
@@ -242,7 +243,7 @@ class TopicControllerTest(
                     )
                         .andExpect(status().isNotFound)
                         .andDo(
-                            RestDocsHelper.createPathDocument(
+                            createPathDocument(
                                 "favorite-topic-delete-fail-not-found-id",
                                 RequestDocumentation.pathParameters(
                                     "id" pathDescription "존재하지 않는 관심 토픽 ID" example TEST_NOT_EXIST_FAVORITE_TOPIC_ID,
@@ -265,7 +266,7 @@ class TopicControllerTest(
                     )
                         .andExpect(status().isForbidden)
                         .andDo(
-                            RestDocsHelper.createPathDocument(
+                            createPathDocument(
                                 "favorite-topic-delete-fail-no-permissions",
                                 RequestDocumentation.pathParameters(
                                     "id" pathDescription "관심 토픽 ID" example TEST_FAVORITE_TOPIC_ID,
@@ -287,7 +288,7 @@ class TopicControllerTest(
                     )
                         .andExpect(status().isUnauthorized)
                         .andDo(
-                            RestDocsHelper.createPathDocument(
+                            createPathDocument(
                                 "favorite-topic-delete-fail-invalid-token",
                                 RequestDocumentation.pathParameters(
                                     "id" pathDescription "관심 토픽 ID" example TEST_FAVORITE_TOPIC_ID,
