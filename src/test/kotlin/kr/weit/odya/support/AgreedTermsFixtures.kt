@@ -13,7 +13,7 @@ fun createAgreedTerms(user: User = createUser(), id: Long = TEST_AGREED_TERMS_ID
 
 fun createAgreedTermsList(user: User = createUser()) = listOf(
     createAgreedTerms(),
-    createAgreedTerms(user, TEST_OTHER_AGREED_TERMS_ID, createRequiredTerms(TEST_OTHER_TERMS_ID, TEST_OPTIONAL_TERMS_TITLE)),
+    createAgreedTerms(user, TEST_OTHER_AGREED_TERMS_ID, createOptionalTerms()),
     createAgreedTerms(user, TEST_OTHER_AGREED_TERMS_ID_2, createRequiredTerms(TEST_OTHER_TERMS_ID_2, TEST_REQUIRED_TERMS_TITLE_2)),
 )
 

@@ -17,14 +17,14 @@ import kr.weit.odya.support.domain.BaseTimeEntity
 @Table(
     uniqueConstraints = [
         UniqueConstraint(
-            name = "agreedTerms_unique",
+            name = "agreed_terms_unique",
             columnNames = ["user_id", "terms_id"],
         ),
     ],
 )
 @SequenceGenerator(
     name = "AGREED_TERMS_SEQ_GENERATOR",
-    sequenceName = "AGREED_TERMS_TOPIC_SEQ",
+    sequenceName = "AGREED_TERMS_SEQ",
     initialValue = 1,
     allocationSize = 1,
 )

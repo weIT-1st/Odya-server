@@ -66,7 +66,7 @@ data class AppleRegisterRequest(
     override var birthday: LocalDate,
 
     @field:NotEmpty
-    val termsIdList: List<Long>,
+    val termsIdList: Set<Long>,
 ) : RegisterRequest() {
     @JsonIgnore
     override var username: String = ""

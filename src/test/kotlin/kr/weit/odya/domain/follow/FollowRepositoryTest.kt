@@ -1,8 +1,6 @@
 package kr.weit.odya.domain.follow
 
 import io.kotest.core.spec.style.ExpectSpec
-import io.kotest.extensions.spring.SpringTestExtension
-import io.kotest.extensions.spring.SpringTestLifecycleMode
 import io.kotest.matchers.shouldBe
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
@@ -19,7 +17,6 @@ class FollowRepositoryTest(
     private val userRepository: UserRepository,
 ) : ExpectSpec(
     {
-        extensions(SpringTestExtension(SpringTestLifecycleMode.Root))
         val follower: User = userRepository.save(createUser())
         val following: User = userRepository.save(createOtherUser())
         beforeEach {

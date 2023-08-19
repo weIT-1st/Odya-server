@@ -12,6 +12,7 @@ import kr.weit.odya.domain.terms.getByTermsId
 import kr.weit.odya.domain.terms.getRequiredTerms
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
+import kr.weit.odya.support.TEST_NOT_EXIST_USER_ID
 import kr.weit.odya.support.TEST_OTHER_TERMS_ID
 import kr.weit.odya.support.TEST_OTHER_TERMS_ID_2
 import kr.weit.odya.support.TEST_REQUIRED_TERMS_TITLE_2
@@ -72,7 +73,7 @@ class TermsServiceTest : DescribeSpec(
             context("필수 약관이 모두 포함되지 않은 약관 ID 리스트가 들어올 경우") {
                 every { termsRepository.getRequiredTerms() } returns createRequiredTermsList()
                 it("[NoSuchElementException]을 반환된다") {
-                    shouldThrow<NoSuchElementException> { termsService.checkRequiredTerms(listOf(TEST_TERMS_ID)) }
+                    shouldThrow<NoSuchElementException> { termsService.checkRequiredTerms(setOf(TEST_TERMS_ID)) }
                 }
             }
         }
@@ -106,14 +107,41 @@ class TermsServiceTest : DescribeSpec(
             }
         }
 
-        describe("updateAgreedTerms 메소드") {
-            context("동의한 약관 ID 리스트가 들어올 경우") {
+        describe("modifyAgreedTerms 메소드") {
+            context("유효한 동의로 변경한 약관 ID 리스트와 미동의로 변경한 약관 ID 리스트와 유저 ID가 들어올 경우") {
                 every { userRepository.getByUserId(TEST_USER_ID) } returns user
                 every { termsRepository.getRequiredTerms() } returns createRequiredTermsList()
+                every { termsRepository.getByTermsId(any()) } returns createRequiredTerms()
                 every { agreedTermsRepository.existsByUserIdAndTermsId(TEST_USER_ID, any()) } returns false
-                // every { agreedTermsRepository.getByTermsIdAndUserId(any(), TEST_USER_ID) } returns createOptionalTermsList()
-                it("전부 저장한다") {
-                    shouldNotThrowAny { termsService.updateAgreedTerms(createTermsUpdateRequest(), TEST_USER_ID) }
+                every { agreedTermsRepository.saveAll(any<List<AgreedTerms>>()) } returns createAgreedTermsList()
+                every { agreedTermsRepository.deleteAllByUserIdAndTermsIdIn(TEST_USER_ID, any()) } returns Unit
+                it("전부 저장 및 삭제한다") {
+                    shouldNotThrowAny { termsService.modifyAgreedTerms(createTermsUpdateRequest(), TEST_USER_ID) }
+                }
+            }
+
+            context("유효하지 않은 유저 ID가 들어올 경우") {
+                every { userRepository.getByUserId(TEST_NOT_EXIST_USER_ID) } throws NoSuchElementException()
+                it("[NoSuchElementException]을 반환한다") {
+                    shouldThrow<NoSuchElementException> { termsService.modifyAgreedTerms(createTermsUpdateRequest(), TEST_NOT_EXIST_USER_ID) }
+                }
+            }
+
+            context("존재하지 않는 약관 ID가 동의 약관 리스트로 들어올 경우") {
+                every { userRepository.getByUserId(TEST_USER_ID) } returns user
+                every { agreedTermsRepository.existsByUserIdAndTermsId(TEST_USER_ID, any()) } returns false
+                every { termsRepository.getByTermsId(any()) } throws NoSuchElementException()
+                it("[NoSuchElementException]을 반환한다") {
+                    shouldThrow<NoSuchElementException> { termsService.modifyAgreedTerms(createTermsUpdateRequest(), TEST_USER_ID) }
+                }
+            }
+
+            context("필수 약관 ID가 포함된 미동의 약관 리스트와 유저 ID가 들어올 경우") {
+                every { userRepository.getByUserId(TEST_USER_ID) } returns user
+                every { agreedTermsRepository.existsByUserIdAndTermsId(TEST_USER_ID, any()) } returns true
+                every { termsRepository.getRequiredTerms() } returns createRequiredTermsList()
+                it("[IllegalArgumentException]을 반환한다") {
+                    shouldThrow<IllegalArgumentException> { termsService.modifyAgreedTerms(createTermsUpdateRequest().copy(disagreeTermsIdList = setOf(TEST_TERMS_ID)), TEST_USER_ID) }
                 }
             }
         }

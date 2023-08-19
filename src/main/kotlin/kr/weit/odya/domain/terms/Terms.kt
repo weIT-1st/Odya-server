@@ -21,7 +21,7 @@ import kr.weit.odya.support.domain.BaseModifiableEntity
 )
 @SequenceGenerator(
     name = "TERMS_SEQ_GENERATOR",
-    sequenceName = "TERMS_TOPIC_SEQ",
+    sequenceName = "TERMS_SEQ",
     initialValue = 1,
     allocationSize = 1,
 )

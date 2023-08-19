@@ -27,9 +27,13 @@ data class TermsContentResponse(
 
 data class OptionalAgreedTermsResponse(
     val id: Long,
+    val userId: Long,
+    val termsId: Long,
     val required: Int,
 ) {
     constructor(agreedTerms: AgreedTerms) : this(
+        agreedTerms.id,
+        agreedTerms.user.id,
         agreedTerms.terms.id,
         agreedTerms.terms.required,
     )
@@ -40,7 +44,7 @@ data class TermsUpdateResponse(
     val userOptionalAgreedTermsList: List<OptionalAgreedTermsResponse>,
 )
 
-data class TermsUpdateRequest(
+data class ModifyAgreedTermsRequest(
     val agreedTermsIdList: Set<Long>?,
     val disagreeTermsIdList: Set<Long>?,
 )
