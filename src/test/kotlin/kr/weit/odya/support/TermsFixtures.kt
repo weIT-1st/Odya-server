@@ -51,6 +51,6 @@ fun createRequiredTermsList() = listOf(
 
 fun createOptionalTermsList() = listOf(createOptionalTerms(), createOptionalTerms(4L, "선택 테스트 약관2"))
 
-fun createTermsUpdateResponse(user: User) = TermsUpdateResponse(createOptionalTermsList().map { TermsTitleListResponse(it) }, listOf(createAgreedTerms(user, TEST_OTHER_AGREED_TERMS_ID, createOptionalTerms())).map { OptionalAgreedTermsResponse(it) })
+fun createModifyAgreedTermsResponse(user: User) = TermsUpdateResponse(createOptionalTermsList().map { TermsTitleListResponse(it) }, listOf(createAgreedTerms(user, TEST_OTHER_AGREED_TERMS_ID, createOptionalTerms())).map { OptionalAgreedTermsResponse(it) })
 
-fun createTermsUpdateRequest() = ModifyAgreedTermsRequest(setOf(TEST_TERMS_ID, TEST_OTHER_TERMS_ID_2), setOf(TEST_OTHER_TERMS_ID))
+fun createModifyAgreedTermsRequest() = ModifyAgreedTermsRequest(setOf(TEST_TERMS_ID, TEST_OTHER_TERMS_ID_2), setOf(TEST_OTHER_TERMS_ID))

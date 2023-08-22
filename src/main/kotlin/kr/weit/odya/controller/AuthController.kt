@@ -63,10 +63,7 @@ class AuthController(
         authenticationService.getUsernameByIdToken(appleRegisterRequest.idToken).apply {
             appleRegisterRequest.updateUsername(this)
         }
-        val termsIdList = appleRegisterRequest.termsIdList
-        termsService.checkRequiredTerms(termsIdList)
-        val user = authenticationService.register(appleRegisterRequest)
-        termsService.saveAllAgreedTerms(user, termsIdList)
+        authenticationService.register(appleRegisterRequest)
         return ResponseEntity.status(HttpStatus.CREATED).build()
     }
 
@@ -75,10 +72,7 @@ class AuthController(
         @RequestBody @Valid
         kakaoRegisterRequest: KakaoRegisterRequest,
     ): ResponseEntity<Void> {
-        val termsIdList = kakaoRegisterRequest.termsIdList
-        termsService.checkRequiredTerms(termsIdList)
-        val user = authenticationService.register(kakaoRegisterRequest)
-        termsService.saveAllAgreedTerms(user, termsIdList)
+        authenticationService.register(kakaoRegisterRequest)
         return ResponseEntity.status(HttpStatus.CREATED).build()
     }
 

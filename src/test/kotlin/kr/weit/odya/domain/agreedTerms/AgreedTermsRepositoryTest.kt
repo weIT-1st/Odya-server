@@ -22,8 +22,9 @@ class AgreedTermsRepositoryTest(private val agreedTermsRepository: AgreedTermsRe
         lateinit var requiredAgreedTerms: AgreedTerms
         lateinit var requiredAgreedTerms2: AgreedTerms
         lateinit var optionalAgreedTerms: AgreedTerms
-        val user: User = userRepository.save(createUser())
+        lateinit var user: User
         beforeTest {
+            user = userRepository.save(createUser())
             requiredAgreedTerms = agreedTermsRepository.save(createAgreedTerms(user))
             optionalAgreedTerms = agreedTermsRepository.save(createAgreedTerms(user, TEST_OTHER_AGREED_TERMS_ID, createOptionalTerms()))
             requiredAgreedTerms2 = agreedTermsRepository.save(createAgreedTerms(user, TEST_OTHER_AGREED_TERMS_ID_2, createRequiredTerms(TEST_OTHER_TERMS_ID_2, TEST_REQUIRED_TERMS_TITLE_2)))

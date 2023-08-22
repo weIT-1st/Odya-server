@@ -39,7 +39,7 @@ class TermsService(
             if (!contain) {
                 requiredTermsList.forEach { termsId ->
                     if (!termsIdList.contains(termsId)) {
-                        throw NoSuchElementException("$termsId : 필수 약관에 동의하지 않았습니다.")
+                        throw IllegalArgumentException("$termsId : 필수 약관에 동의하지 않았습니다.")
                     }
                 }
             }
