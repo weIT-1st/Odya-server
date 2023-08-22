@@ -27,9 +27,11 @@ import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_NOT_EXIST_USER_ID_TOKEN
 import kr.weit.odya.support.TEST_DEFAULT_PROFILE_PNG
 import kr.weit.odya.support.TEST_EMAIL
+import kr.weit.odya.support.TEST_GENERATED_FILE_NAME
 import kr.weit.odya.support.TEST_ID_TOKEN
 import kr.weit.odya.support.TEST_MOCK_PROFILE_NAME
 import kr.weit.odya.support.TEST_PHONE_NUMBER
+import kr.weit.odya.support.TEST_PROFILE_WEBP
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createInformationRequest
 import kr.weit.odya.support.createMockProfile
@@ -394,12 +396,12 @@ class UserControllerTest(
                 val mockProfile = createMockProfile()
                 every {
                     userService.uploadProfile(mockProfile)
-                } returns TEST_MOCK_PROFILE_NAME
+                } returns TEST_GENERATED_FILE_NAME
                 every {
                     userService.updateProfile(
                         TEST_USER_ID,
-                        TEST_MOCK_PROFILE_NAME,
-                        TEST_DEFAULT_PROFILE_PNG,
+                        TEST_GENERATED_FILE_NAME,
+                        TEST_PROFILE_WEBP,
                     )
                 } just runs
                 it("204 응답한다.") {

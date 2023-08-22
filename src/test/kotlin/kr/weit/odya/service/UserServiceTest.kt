@@ -25,8 +25,8 @@ import kr.weit.odya.support.TEST_ID_TOKEN
 import kr.weit.odya.support.TEST_INVALID_PROFILE_ORIGINAL_NAME
 import kr.weit.odya.support.TEST_NICKNAME
 import kr.weit.odya.support.TEST_PHONE_NUMBER
-import kr.weit.odya.support.TEST_PROFILE_PNG
 import kr.weit.odya.support.TEST_PROFILE_URL
+import kr.weit.odya.support.TEST_PROFILE_WEBP
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createInformationRequest
 import kr.weit.odya.support.createMockProfile
@@ -247,8 +247,8 @@ class UserServiceTest : DescribeSpec(
 
         describe("deleteProfile") {
             context("유효한 USER ID가 주어지는 경우") {
-                every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser(TEST_PROFILE_PNG)
-                every { fileService.deleteFile(TEST_PROFILE_PNG) } just runs
+                every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser(TEST_PROFILE_WEBP)
+                every { fileService.deleteFile(TEST_PROFILE_WEBP) } just runs
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny { userService.deleteProfile(TEST_USER_ID) }
                 }
@@ -264,8 +264,8 @@ class UserServiceTest : DescribeSpec(
             }
 
             context("OBJECT STORAGE에 프로필이 없어 프로필 삭제에 실패하는 경우") {
-                every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser(TEST_PROFILE_PNG)
-                every { fileService.deleteFile(TEST_PROFILE_PNG) } throws IllegalArgumentException(
+                every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser(TEST_PROFILE_WEBP)
+                every { fileService.deleteFile(TEST_PROFILE_WEBP) } throws IllegalArgumentException(
                     DELETE_NOT_EXIST_PROFILE_ERROR_MESSAGE,
                 )
                 it("[IllegalArgumentException] 반환한다") {
@@ -274,8 +274,8 @@ class UserServiceTest : DescribeSpec(
             }
 
             context("프로필 업로드에 실패하는 경우") {
-                every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser(TEST_PROFILE_PNG)
-                every { fileService.deleteFile(TEST_PROFILE_PNG) } throws ObjectStorageException(
+                every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser(TEST_PROFILE_WEBP)
+                every { fileService.deleteFile(TEST_PROFILE_WEBP) } throws ObjectStorageException(
                     SOMETHING_ERROR_MESSAGE,
                 )
                 it("[ObjectStorageException] 반환한다") {
@@ -289,7 +289,7 @@ class UserServiceTest : DescribeSpec(
                 every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser()
                 every { profileColorService.getNoneProfileColor() } returns createNoneProfileColor()
                 it("정상적으로 종료한다") {
-                    shouldNotThrowAny { userService.updateProfile(TEST_USER_ID, TEST_PROFILE_PNG, TEST_PROFILE_PNG) }
+                    shouldNotThrowAny { userService.updateProfile(TEST_USER_ID, TEST_PROFILE_WEBP, TEST_PROFILE_WEBP) }
                 }
             }
 
@@ -305,7 +305,7 @@ class UserServiceTest : DescribeSpec(
                 every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } throws NoSuchElementException()
                 it("[NoSuchElementException] 반환한다") {
                     shouldThrow<NoSuchElementException> {
-                        userService.updateProfile(TEST_USER_ID, TEST_PROFILE_PNG, TEST_PROFILE_PNG)
+                        userService.updateProfile(TEST_USER_ID, TEST_PROFILE_WEBP, TEST_PROFILE_WEBP)
                     }
                 }
             }

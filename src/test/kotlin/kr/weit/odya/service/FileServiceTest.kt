@@ -12,7 +12,7 @@ import kr.weit.odya.support.DELETE_NOT_EXIST_PROFILE_ERROR_MESSAGE
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_FILE_AUTHENTICATED_URL
 import kr.weit.odya.support.TEST_FILE_NAME
-import kr.weit.odya.support.TEST_IMAGE_FILE_PNG
+import kr.weit.odya.support.TEST_IMAGE_FILE_WEBP
 import kr.weit.odya.support.TEST_INVALID_IMAGE_FILE_ORIGINAL_NAME
 import kr.weit.odya.support.createMockProfile
 
@@ -26,7 +26,7 @@ class FileServiceTest : DescribeSpec(
             context("유효한 파일이 주어지는 경우") {
                 val mockFile = createMockProfile()
                 every { fileNameGenerator.generate() } returns TEST_FILE_NAME
-                every { objectStorageService.save(any(), TEST_IMAGE_FILE_PNG) } just runs
+                every { objectStorageService.save(any(), TEST_IMAGE_FILE_WEBP) } just runs
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny { fileService.saveFile(mockFile) }
                 }
@@ -51,7 +51,7 @@ class FileServiceTest : DescribeSpec(
             context("프로필 업로드에 실패하는 경우") {
                 val mockFile = createMockProfile()
                 every { fileNameGenerator.generate() } returns TEST_FILE_NAME
-                every { objectStorageService.save(any(), TEST_IMAGE_FILE_PNG) } throws ObjectStorageException(
+                every { objectStorageService.save(any(), TEST_IMAGE_FILE_WEBP) } throws ObjectStorageException(
                     SOMETHING_ERROR_MESSAGE,
                 )
                 it("[ObjectStorageException] 반환한다") {
@@ -62,20 +62,20 @@ class FileServiceTest : DescribeSpec(
 
         describe("getPreAuthenticatedObjectUrl") {
             context("유효한 파일 이름이 주어지는 경우") {
-                every { objectStorageService.getPreAuthenticatedObjectUrl(TEST_IMAGE_FILE_PNG) } returns TEST_FILE_AUTHENTICATED_URL
+                every { objectStorageService.getPreAuthenticatedObjectUrl(TEST_IMAGE_FILE_WEBP) } returns TEST_FILE_AUTHENTICATED_URL
                 it("정상적으로 종료한다") {
-                    shouldNotThrowAny { fileService.getPreAuthenticatedObjectUrl(TEST_IMAGE_FILE_PNG) }
+                    shouldNotThrowAny { fileService.getPreAuthenticatedObjectUrl(TEST_IMAGE_FILE_WEBP) }
                 }
             }
 
             context("프로필 조회에 실패하는 경우") {
-                every { objectStorageService.getPreAuthenticatedObjectUrl(TEST_IMAGE_FILE_PNG) } throws ObjectStorageException(
+                every { objectStorageService.getPreAuthenticatedObjectUrl(TEST_IMAGE_FILE_WEBP) } throws ObjectStorageException(
                     SOMETHING_ERROR_MESSAGE,
                 )
                 it("[ObjectStorageException] 반환한다") {
                     shouldThrow<ObjectStorageException> {
                         fileService.getPreAuthenticatedObjectUrl(
-                            TEST_IMAGE_FILE_PNG,
+                            TEST_IMAGE_FILE_WEBP,
                         )
                     }
                 }
@@ -84,27 +84,27 @@ class FileServiceTest : DescribeSpec(
 
         describe("deleteFile") {
             context("유효한 파일 이름이 주어지는 경우") {
-                every { objectStorageService.delete(TEST_IMAGE_FILE_PNG) } just runs
+                every { objectStorageService.delete(TEST_IMAGE_FILE_WEBP) } just runs
                 it("정상적으로 종료한다") {
-                    shouldNotThrowAny { fileService.deleteFile(TEST_IMAGE_FILE_PNG) }
+                    shouldNotThrowAny { fileService.deleteFile(TEST_IMAGE_FILE_WEBP) }
                 }
             }
 
             context("OBJECT STORAGE에 프로필이 없어 파일 삭제에 실패하는 경우") {
-                every { objectStorageService.delete(TEST_IMAGE_FILE_PNG) } throws IllegalArgumentException(
+                every { objectStorageService.delete(TEST_IMAGE_FILE_WEBP) } throws IllegalArgumentException(
                     DELETE_NOT_EXIST_PROFILE_ERROR_MESSAGE,
                 )
                 it("[IllegalArgumentException] 반환한다") {
-                    shouldThrow<IllegalArgumentException> { fileService.deleteFile(TEST_IMAGE_FILE_PNG) }
+                    shouldThrow<IllegalArgumentException> { fileService.deleteFile(TEST_IMAGE_FILE_WEBP) }
                 }
             }
 
             context("프로필 삭제에 실패하는 경우") {
-                every { objectStorageService.delete(TEST_IMAGE_FILE_PNG) } throws ObjectStorageException(
+                every { objectStorageService.delete(TEST_IMAGE_FILE_WEBP) } throws ObjectStorageException(
                     SOMETHING_ERROR_MESSAGE,
                 )
                 it("[ObjectStorageException] 반환한다") {
-                    shouldThrow<ObjectStorageException> { fileService.deleteFile(TEST_IMAGE_FILE_PNG) }
+                    shouldThrow<ObjectStorageException> { fileService.deleteFile(TEST_IMAGE_FILE_WEBP) }
                 }
             }
         }

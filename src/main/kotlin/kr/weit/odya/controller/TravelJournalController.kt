@@ -23,7 +23,7 @@ class TravelJournalController(private val travelJournalService: TravelJournalSer
     fun createTravelJournal(
         @LoginUserId userId: Long,
         @Valid @RequestPart("travel-journal") travelJournalRequest: TravelJournalRequest,
-        @Size(max = 255, message = "이미지는 최대 255개까지 업로드할 수 있습니다.")
+        @Size(max = 225, message = "이미지는 최대 225개까지 업로드할 수 있습니다.")
         @RequestPart("travel-journal-content-image", required = false) images: List<MultipartFile>?,
     ): ResponseEntity<Void> {
         val imageMap = travelJournalService.getImageMap(images)

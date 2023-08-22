@@ -10,7 +10,7 @@ val TEST_CONTENT_IMAGES = listOf(
 
 fun createContentImage(
     name: String = TEST_GENERATED_FILE_NAME,
-    originName: String = TEST_IMAGE_FILE_PNG,
+    originName: String = TEST_IMAGE_FILE_WEBP,
     user: User = createUser(),
 ) = ContentImage(
     name = name,
@@ -20,7 +20,7 @@ fun createContentImage(
 
 fun createOtherContentImage(
     name: String = TEST_OTHER_GENERATED_FILE_NAME,
-    originName: String = TEST_OTHER_IMAGE_FILE_PNG,
+    originName: String = TEST_OTHER_IMAGE_FILE_WEBP,
     user: User = createUser(),
 ) = ContentImage(
     name = name,

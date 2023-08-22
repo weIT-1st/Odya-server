@@ -12,7 +12,7 @@ import kr.weit.odya.support.NOT_EXIST_USER_ERROR_MESSAGE
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
-import kr.weit.odya.support.TEST_IMAGE_FILE_PNG
+import kr.weit.odya.support.TEST_IMAGE_FILE_WEBP
 import kr.weit.odya.support.TEST_TRAVEL_CONTENT_IMAGE_MAP
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createImageNamePairs
@@ -278,7 +278,9 @@ class TravelJournalControllerTest(
                     ControllerTestHelper.jsonContent(travelJournalRequest).byteInputStream()
                 val travelJournalRequestFile =
                     createTravelJournalRequestFile(contentStream = travelJournalRequestByteInputStream)
-                every { travelJournalService.getImageMap(any<List<MultipartFile>>()) } returns mapOf(TEST_IMAGE_FILE_PNG to createMockImageFile())
+                every { travelJournalService.getImageMap(any<List<MultipartFile>>()) } returns mapOf(
+                    TEST_IMAGE_FILE_WEBP to createMockImageFile(),
+                )
                 every {
                     travelJournalService.validateTravelJournalRequest(
                         any<TravelJournalRequest>(),

@@ -104,9 +104,7 @@ class TravelJournalService(
 
     fun getImageMap(images: List<MultipartFile>?): Map<String, MultipartFile>? =
         images?.associateBy {
-            require(!it.originalFilename.isNullOrEmpty()) {
-                throw IllegalArgumentException("파일 원본 이름은 필수 값입니다.")
-            }
+            require(!it.originalFilename.isNullOrEmpty()) { IllegalArgumentException("파일 원본 이름은 필수 값입니다.") }
             it.originalFilename!!
         }
 
