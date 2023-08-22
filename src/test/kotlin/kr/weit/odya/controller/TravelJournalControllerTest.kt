@@ -208,7 +208,7 @@ class TravelJournalControllerTest(
                 }
             }
 
-            context("여행 이미지가 255개를 초과하는 경우") {
+            context("여행 이미지가 225개를 초과하는 경우") {
                 val travelJournalRequest = createTravelJournalRequest()
                 val travelJournalRequestByteInputStream =
                     ControllerTestHelper.jsonContent(travelJournalRequest).byteInputStream()
@@ -218,12 +218,12 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        files(256, createMockImageFile())
+                        files(226, createMockImageFile())
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
                         createDocument(
-                            "travel-journals-fail-image-size-over-255",
+                            "travel-journals-fail-image-size-over-225",
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),

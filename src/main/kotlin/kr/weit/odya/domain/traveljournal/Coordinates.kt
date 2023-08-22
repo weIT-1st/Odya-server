@@ -12,7 +12,7 @@ import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
 import jakarta.persistence.Lob
 
-private class PasswordDeserializer : JsonDeserializer<Coordinates>() {
+private class CoordinatesDeserializer : JsonDeserializer<Coordinates>() {
     override fun deserialize(p: JsonParser, ctxt: DeserializationContext): Coordinates {
         val latitudes = mutableListOf<Double>()
         val longitudes = mutableListOf<Double>()
@@ -25,15 +25,15 @@ private class PasswordDeserializer : JsonDeserializer<Coordinates>() {
     }
 }
 
-private class PasswordSerializer : JsonSerializer<Coordinates>() {
+private class CoordinatesSerializer : JsonSerializer<Coordinates>() {
     override fun serialize(coordinates: Coordinates, gen: JsonGenerator, serializers: SerializerProvider) {
         gen.writeString(coordinates.value)
     }
 }
 
 @Embeddable
-@JsonSerialize(using = PasswordSerializer::class)
-@JsonDeserialize(using = PasswordDeserializer::class)
+@JsonSerialize(using = CoordinatesSerializer::class)
+@JsonDeserialize(using = CoordinatesDeserializer::class)
 class Coordinates(
     latitudes: List<Double>,
     longitudes: List<Double>,
