@@ -72,8 +72,8 @@ class TermsServiceTest : DescribeSpec(
 
             context("필수 약관이 모두 포함되지 않은 약관 ID 리스트가 들어올 경우") {
                 every { termsRepository.getRequiredTerms() } returns createRequiredTermsList()
-                it("[NoSuchElementException]을 반환된다") {
-                    shouldThrow<NoSuchElementException> { termsService.checkRequiredTerms(setOf(TEST_TERMS_ID)) }
+                it("[IllegalArgumentException]을 반환된다") {
+                    shouldThrow<IllegalArgumentException> { termsService.checkRequiredTerms(setOf(TEST_TERMS_ID)) }
                 }
             }
         }

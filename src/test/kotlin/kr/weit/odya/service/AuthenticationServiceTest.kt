@@ -38,9 +38,10 @@ class AuthenticationServiceTest : DescribeSpec(
         val firebaseTokenHelper = mockk<FirebaseTokenHelper>()
         val profileColorService = mockk<ProfileColorService>()
         val kakaoClient = mockk<KakaoClient>()
+        val termsService = mockk<TermsService>()
 
         val authenticationService =
-            AuthenticationService(userRepository, profileColorService, firebaseTokenHelper, kakaoClient)
+            AuthenticationService(termsService, userRepository, profileColorService, firebaseTokenHelper, kakaoClient)
 
         describe("appleLoginProcess") {
             context("유효한 USERNAME이 주어지는 경우") {
@@ -97,6 +98,8 @@ class AuthenticationServiceTest : DescribeSpec(
                 every { userRepository.existsByNickname(request.nickname) } returns false
                 every { profileColorService.getRandomProfileColor() } returns createProfileColor()
                 every { userRepository.save(any()) } returns createUser()
+                every { termsService.checkRequiredTerms(request.termsIdList) } just runs
+                every { termsService.saveAllAgreedTerms(any(), request.termsIdList) } just runs
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny { authenticationService.register(request) }
                 }
@@ -104,6 +107,7 @@ class AuthenticationServiceTest : DescribeSpec(
 
             context("이미 가입한 USERNAME이 주어지는 경우") {
                 every { userRepository.existsByUsername(request.username) } returns true
+                every { termsService.checkRequiredTerms(request.termsIdList) } just runs
                 it("[ExistResourceException] 예외가 발생한다") {
                     shouldThrow<ExistResourceException> { authenticationService.register(request) }
                 }
@@ -112,6 +116,7 @@ class AuthenticationServiceTest : DescribeSpec(
             context("이미 가입한 이메일이 주어지는 경우") {
                 every { userRepository.existsByUsername(request.username) } returns false
                 every { userRepository.existsByEmail(request.email!!) } returns true
+                every { termsService.checkRequiredTerms(request.termsIdList) } just runs
                 it("[ExistResourceException] 예외가 발생한다") {
                     shouldThrow<ExistResourceException> { authenticationService.register(request) }
                 }
@@ -121,6 +126,7 @@ class AuthenticationServiceTest : DescribeSpec(
                 every { userRepository.existsByUsername(request.username) } returns false
                 every { userRepository.existsByEmail(request.email!!) } returns false
                 every { userRepository.existsByPhoneNumber(request.phoneNumber!!) } returns true
+                every { termsService.checkRequiredTerms(request.termsIdList) } just runs
                 it("[ExistResourceException] 예외가 발생한다") {
                     shouldThrow<ExistResourceException> { authenticationService.register(request) }
                 }
@@ -131,6 +137,7 @@ class AuthenticationServiceTest : DescribeSpec(
                 every { userRepository.existsByEmail(request.email!!) } returns false
                 every { userRepository.existsByPhoneNumber(request.phoneNumber!!) } returns false
                 every { userRepository.existsByNickname(request.nickname) } returns true
+                every { termsService.checkRequiredTerms(request.termsIdList) } just runs
                 it("[ExistResourceException] 예외가 발생한다") {
                     shouldThrow<ExistResourceException> { authenticationService.register(request) }
                 }
@@ -144,6 +151,7 @@ class AuthenticationServiceTest : DescribeSpec(
                 every { profileColorService.getRandomProfileColor() } throws NotFoundDefaultResourceException(
                     NOT_EXIST_PROFILE_COLOR_ERROR_MESSAGE,
                 )
+                every { termsService.checkRequiredTerms(request.termsIdList) } just runs
                 it("[NotFoundDefaultResourceException] 예외가 발생한다") {
                     shouldThrow<NotFoundDefaultResourceException> { authenticationService.register(request) }
                 }

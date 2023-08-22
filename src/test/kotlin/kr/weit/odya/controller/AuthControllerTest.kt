@@ -44,7 +44,6 @@ import kr.weit.odya.support.createKakaoUserInfo
 import kr.weit.odya.support.createTermsContentResponse
 import kr.weit.odya.support.createTermsListResponse
 import kr.weit.odya.support.createTokenResponse
-import kr.weit.odya.support.createUser
 import kr.weit.odya.support.exception.ErrorCode
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
 import kr.weit.odya.support.test.ControllerTestHelper.Companion.jsonContent
@@ -240,13 +239,10 @@ class AuthControllerTest(
 
         describe("POST /api/v1/auth/register/apple") {
             val targetUri = "/api/v1/auth/register/apple"
-            val user = createUser()
             context("유효한 회원가입 정보가 전달되면") {
                 val request = createAppleRegisterRequest()
                 every { authenticationService.getUsernameByIdToken(request.idToken) } returns TEST_USERNAME
-                every { authenticationService.register(request) } returns user
-                every { termsService.checkRequiredTerms(request.termsIdList) } just Runs
-                every { termsService.saveAllAgreedTerms(user, request.termsIdList) } just Runs
+                every { authenticationService.register(request) } just Runs
                 it("201 응답한다.") {
                     restDocMockMvc.post(targetUri) {
                         jsonContent(request)
@@ -301,14 +297,14 @@ class AuthControllerTest(
             context("유효한 토큰이지만 필수 약관이 모두 포함되지 않은 리스트가 전달되면") {
                 val request = createAppleRegisterRequest().copy(termsIdList = setOf(TEST_OTHER_TERMS_ID, TEST_OTHER_TERMS_ID_2))
                 every { authenticationService.getUsernameByIdToken(request.idToken) } returns TEST_USERNAME
-                every { termsService.checkRequiredTerms(request.termsIdList) } throws NoSuchElementException(
+                every { authenticationService.register(request) } throws IllegalArgumentException(
                     NOT_FOUND_REQUIRED_TERMS_ERROR_MESSAGE,
                 )
-                it("404 응답한다.") {
+                it("400 응답한다.") {
                     restDocMockMvc.post(targetUri) {
                         jsonContent(request)
                     }.andExpect {
-                        status { isNotFound() }
+                        status { isBadRequest() }
                     }.andDo {
                         createDocument(
                             "apple-register-fail-not-found-required-terms",
@@ -450,11 +446,7 @@ class AuthControllerTest(
             context("유효한 토큰이지만 존재하지 않는 약관 ID가 포함되어 있으면") {
                 val request = createAppleRegisterRequest().copy(termsIdList = setOf(TEST_TERMS_ID, TEST_OTHER_TERMS_ID_2, TEST_NOT_EXIST_TERMS_ID))
                 every { authenticationService.getUsernameByIdToken(request.idToken) } returns TEST_USERNAME
-                every { authenticationService.register(request) } returns user
-                every { termsService.checkRequiredTerms(request.termsIdList) } just Runs
-                every { termsService.saveAllAgreedTerms(user, request.termsIdList) } throws NoSuchElementException(
-                    NOT_FOUND_TERMS_ERROR_MESSAGE,
-                )
+                every { authenticationService.register(request) } throws NoSuchElementException(NOT_FOUND_TERMS_ERROR_MESSAGE)
                 it("404 응답한다.") {
                     restDocMockMvc.post(targetUri) {
                         jsonContent(request)
@@ -556,12 +548,9 @@ class AuthControllerTest(
 
         describe("POST /api/v1/auth/register/kakao") {
             val targetUri = "/api/v1/auth/register/kakao"
-            val user = createUser()
             context("유효한 회원가입 정보가 전달되면") {
                 val request = createKakaoRegisterRequest()
-                every { authenticationService.register(request) } returns user
-                every { termsService.checkRequiredTerms(request.termsIdList) } just Runs
-                every { termsService.saveAllAgreedTerms(user, request.termsIdList) } just Runs
+                every { authenticationService.register(request) } just Runs
                 it("201 응답한다.") {
                     restDocMockMvc.post(targetUri) {
                         jsonContent(request)
@@ -616,13 +605,12 @@ class AuthControllerTest(
 
             context("유효한 토큰이지만 필수 약관이 모두 포함되지 않은 리스트가 전달되면") {
                 val request = createKakaoRegisterRequest().copy(termsIdList = setOf(TEST_OTHER_TERMS_ID, TEST_OTHER_TERMS_ID_2))
-                every { authenticationService.register(request) } returns user
-                every { termsService.checkRequiredTerms(request.termsIdList) } throws NoSuchElementException(NOT_FOUND_REQUIRED_TERMS_ERROR_MESSAGE)
-                it("404 응답한다.") {
+                every { authenticationService.register(request) } throws IllegalArgumentException(NOT_FOUND_REQUIRED_TERMS_ERROR_MESSAGE)
+                it("400 응답한다.") {
                     restDocMockMvc.post(targetUri) {
                         jsonContent(request)
                     }.andExpect {
-                        status { isNotFound() }
+                        status { isBadRequest() }
                     }.andDo {
                         createDocument(
                             "kakao-register-fail-not-found-required-terms",
@@ -759,9 +747,7 @@ class AuthControllerTest(
 
             context("유효한 토큰이지만 존재하지 않는 약관 ID가 리스트 포함되어 있으면") {
                 val request = createKakaoRegisterRequest().copy(termsIdList = setOf(TEST_TERMS_ID, TEST_OTHER_TERMS_ID_2, TEST_NOT_EXIST_TERMS_ID))
-                every { authenticationService.register(request) } returns user
-                every { termsService.checkRequiredTerms(request.termsIdList) } just Runs
-                every { termsService.saveAllAgreedTerms(user, request.termsIdList) } throws NoSuchElementException(NOT_FOUND_TERMS_ERROR_MESSAGE)
+                every { authenticationService.register(request) } throws NoSuchElementException(NOT_FOUND_TERMS_ERROR_MESSAGE)
                 it("404 응답한다.") {
                     restDocMockMvc.post(targetUri) {
                         jsonContent(request)

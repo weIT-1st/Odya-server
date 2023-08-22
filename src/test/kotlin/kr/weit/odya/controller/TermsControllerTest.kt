@@ -1,6 +1,5 @@
 package kr.weit.odya.controller
 
-import com.google.auth.http.AuthHttpConstants.AUTHORIZATION
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.DescribeSpec
 import io.mockk.Runs
@@ -22,12 +21,12 @@ import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
 import kr.weit.odya.support.test.ControllerTestHelper.Companion.jsonContent
 import kr.weit.odya.support.test.RestDocsHelper
 import kr.weit.odya.support.test.RestDocsHelper.Companion.createDocument
-import kr.weit.odya.support.test.RestDocsHelper.Companion.createPathDocument
 import kr.weit.odya.support.test.RestDocsHelper.Companion.requestBody
 import kr.weit.odya.support.test.RestDocsHelper.Companion.responseBody
 import kr.weit.odya.support.test.headerDescription
 import kr.weit.odya.support.test.type
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.http.HttpHeaders
 import org.springframework.restdocs.ManualRestDocumentation
 import org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders
 import org.springframework.restdocs.payload.JsonFieldType
@@ -60,14 +59,14 @@ class TermsControllerTest(
                 every { termsService.getOptionalTermsListAndOptionalAgreedTerms(TEST_USER_ID) } returns response
                 it("선택 약관 리스트와 유저가 동의한 선택 약관 리스트 및 200을 반환한다.") {
                     restDocMockMvc.get(targetUri) {
-                        header(AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                     }.andExpect {
                         status { isOk() }
                     }.andDo {
                         createDocument(
                             "optional-terms-and-user-agreed-terms-list-get-success",
                             requestHeaders(
-                                AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
                             responseBody(
                                 "optionalAgreedTermsList[]" type JsonFieldType.ARRAY description "선택 약관 리스트",
@@ -88,14 +87,14 @@ class TermsControllerTest(
             context("유효하지 않은 토큰 전달되면") {
                 it("401를 반환한다.") {
                     restDocMockMvc.get(targetUri) {
-                        header(AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
                     }.andExpect {
                         status { isUnauthorized() }
                     }.andDo {
                         createDocument(
                             "optional-terms-and-user-agreed-terms-list-get-fail-invalid-token",
                             requestHeaders(
-                                AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                                HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
                             ),
                         )
                     }
@@ -110,19 +109,19 @@ class TermsControllerTest(
                 every { termsService.modifyAgreedTerms(request, TEST_USER_ID) } just Runs
                 it("204를 반환한다.") {
                     restDocMockMvc.patch(targetUri) {
-                        header(AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         jsonContent(request)
                     }.andExpect {
                         status { isNoContent() }
                     }.andDo {
-                        createPathDocument(
+                        createDocument(
                             "modify-agreed-terms-success",
                             requestHeaders(
-                                AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
                             requestBody(
                                 "agreedTermsIdList" type JsonFieldType.ARRAY description "동의로 변경하는 약관 ID 리스트" example request.agreedTermsIdList isOptional true,
-                                "disagreedTermsIdList" type JsonFieldType.ARRAY description "미동의로 변경하는 약관 ID 리스트" example request.disagreeTermsIdList isOptional true,
+                                "disagreeTermsIdList" type JsonFieldType.ARRAY description "미동의로 변경하는 약관 ID 리스트" example request.disagreeTermsIdList isOptional true,
                             ),
                         )
                     }
@@ -134,19 +133,19 @@ class TermsControllerTest(
                 every { termsService.modifyAgreedTerms(request, TEST_USER_ID) } throws NoSuchElementException(NOT_FOUND_TERMS_ERROR_MESSAGE)
                 it("404를 반환한다.") {
                     restDocMockMvc.patch(targetUri) {
-                        header(AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         jsonContent(request)
                     }.andExpect {
                         status { isNotFound() }
                     }.andDo {
-                        createPathDocument(
+                        createDocument(
                             "modify-agreed-terms-fail-not-found-terms",
                             requestHeaders(
-                                AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
                             requestBody(
                                 "agreedTermsIdList" type JsonFieldType.ARRAY description "존재하지 않는 약관 ID가 포함된 동의로 변경하는 약관 ID 리스트" example request.agreedTermsIdList isOptional true,
-                                "disagreedTermsIdList" type JsonFieldType.ARRAY description "미동의로 변경하는 약관 ID 리스트" example request.disagreeTermsIdList isOptional true,
+                                "disagreeTermsIdList" type JsonFieldType.ARRAY description "미동의로 변경하는 약관 ID 리스트" example request.disagreeTermsIdList isOptional true,
                             ),
                         )
                     }
@@ -158,19 +157,19 @@ class TermsControllerTest(
                 every { termsService.modifyAgreedTerms(request, TEST_USER_ID) } throws IllegalArgumentException(INVALID_DELETE_REQUIRED_TERMS_ERROR_MESSAGE)
                 it("400을 반환한다.") {
                     restDocMockMvc.patch(targetUri) {
-                        header(AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         jsonContent(request)
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
-                        createPathDocument(
+                        createDocument(
                             "modify-agreed-terms-fail-invalid-delete-required-terms",
                             requestHeaders(
-                                AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
                             requestBody(
                                 "agreedTermsIdList" type JsonFieldType.ARRAY description "동의로 변경하는 약관 ID 리스트" example request.agreedTermsIdList isOptional true,
-                                "disagreedTermsIdList" type JsonFieldType.ARRAY description "필수 약관 ID가 포함된 미동의로 변경하는 약관 ID 리스트" example request.disagreeTermsIdList isOptional true,
+                                "disagreeTermsIdList" type JsonFieldType.ARRAY description "필수 약관 ID가 포함된 미동의로 변경하는 약관 ID 리스트" example request.disagreeTermsIdList isOptional true,
                             ),
                         )
                     }
@@ -181,19 +180,19 @@ class TermsControllerTest(
                 val request = createModifyAgreedTermsRequest()
                 it("401를 반환한다.") {
                     restDocMockMvc.patch(targetUri) {
-                        header(AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
                         jsonContent(request)
                     }.andExpect {
                         status { isUnauthorized() }
                     }.andDo {
-                        createPathDocument(
+                        createDocument(
                             "modify-agreed-terms-fail-invalid-token",
                             requestHeaders(
-                                AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                                HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
                             ),
                             requestBody(
                                 "agreedTermsIdList" type JsonFieldType.ARRAY description "동의로 변경하는 약관 ID 리스트" example request.agreedTermsIdList isOptional true,
-                                "disagreedTermsIdList" type JsonFieldType.ARRAY description "미동의로 변경하는 약관 ID 리스트" example request.disagreeTermsIdList isOptional true,
+                                "disagreeTermsIdList" type JsonFieldType.ARRAY description "미동의로 변경하는 약관 ID 리스트" example request.disagreeTermsIdList isOptional true,
                             ),
                         )
                     }

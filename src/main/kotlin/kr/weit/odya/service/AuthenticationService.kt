@@ -23,6 +23,7 @@ private const val OAUTH_ACCESS_TOKEN_TYPE = "BEARER"
 
 @Service
 class AuthenticationService(
+    private val termsService: TermsService,
     private val userRepository: UserRepository,
     private val profileColorService: ProfileColorService,
     private val firebaseTokenHelper: FirebaseTokenHelper,
@@ -42,14 +43,16 @@ class AuthenticationService(
     }
 
     @Transactional
-    fun register(registerRequest: RegisterRequest): User {
+    fun register(registerRequest: RegisterRequest) {
+        val termsIdList = registerRequest.termsIdList
+        termsService.checkRequiredTerms(termsIdList)
         validateRegisterInformation(registerRequest)
         val randomProfileColor = profileColorService.getRandomProfileColor()
         val user = userRepository.save(createUser(registerRequest, randomProfileColor))
         if (registerRequest.socialType == SocialType.KAKAO) {
             firebaseTokenHelper.createFirebaseUser(registerRequest.username)
         }
-        return user
+        termsService.saveAllAgreedTerms(user, termsIdList)
     }
 
     fun validateNickname(nickname: String) {

@@ -21,10 +21,11 @@ class FavoritePlaceRepositoryTest(
     private val userRepository: UserRepository,
 ) : ExpectSpec(
     {
-        val user: User = userRepository.save(createUser())
+        lateinit var user: User
         lateinit var favoritePlace: FavoritePlace
         lateinit var otherFavoritePlace: FavoritePlace
         beforeEach {
+            user = userRepository.save(createUser())
             favoritePlace = favoritePlaceRepository.save(createFavoritePlace(user))
             otherFavoritePlace = favoritePlaceRepository.save(createOtherFavoritePlace(user))
         }
