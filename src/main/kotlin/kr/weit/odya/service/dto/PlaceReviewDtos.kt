@@ -11,7 +11,7 @@ import kr.weit.odya.support.validator.NullOrNotBlank
 import org.hibernate.validator.constraints.Length
 
 data class PlaceReviewCreateRequest(
-    @field:NotNull(message = "장소는 필수 입력값입니다.")
+    @field:NotBlank(message = "장소는 필수 입력값입니다.")
     val placeId: String,
 
     @field:NotNull(message = "별점은 필수 입력값입니다.")
