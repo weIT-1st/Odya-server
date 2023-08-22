@@ -66,7 +66,7 @@ data class AppleRegisterRequest(
     override var birthday: LocalDate,
 
     @field:NotEmpty
-    val termsIdList: Set<Long>,
+    override var termsIdList: Set<Long>,
 ) : RegisterRequest() {
     @JsonIgnore
     override var username: String = ""
@@ -98,7 +98,7 @@ data class KakaoRegisterRequest(
     override var birthday: LocalDate,
 
     @field:NotEmpty
-    val termsIdList: Set<Long>,
+    override var termsIdList: Set<Long>,
 ) : RegisterRequest() {
     @JsonIgnore
     override var socialType: SocialType = SocialType.KAKAO
@@ -116,6 +116,8 @@ open class RegisterRequest {
     open lateinit var birthday: LocalDate
         protected set
     open lateinit var socialType: SocialType
+        protected set
+    open lateinit var termsIdList: Set<Long>
         protected set
 }
 
