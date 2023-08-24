@@ -986,7 +986,7 @@ class AuthControllerTest(
                                     "[]" type JsonFieldType.ARRAY description "약관 목록" example response,
                                     "[].id" type JsonFieldType.NUMBER description "약관 ID" example response[0].id,
                                     "[].title" type JsonFieldType.STRING description "약관 제목" example response[0].title,
-                                    "[].required" type JsonFieldType.NUMBER description "필수 여부" example response[0].required,
+                                    "[].required" type JsonFieldType.BOOLEAN description "필수 여부" example response[0].required,
                                 ),
                             )
                         }

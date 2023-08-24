@@ -31,13 +31,25 @@ class TermsRepositoryTest(private val termsRepository: TermsRepository) : Expect
 
         context("필수/선택 약관 모두 조회") {
             expect("필수 약관을 모두 조회한다") {
-                val result = termsRepository.getRequiredTerms()
+                val result = termsRepository.getByRequired(true)
                 result.map { it.title } shouldBe listOf(TEST_REQUIRED_TERMS_TITLE, TEST_REQUIRED_TERMS_TITLE_2)
             }
 
             expect("선택 약관을 모두 조회한다") {
-                val result = termsRepository.getRequiredTerms(0)
+                val result = termsRepository.getByRequired(false)
                 result[0].title shouldBe TEST_OPTIONAL_TERMS_TITLE
+            }
+        }
+
+        context("필수/선택 약관 id 조회") {
+            expect("필수 약관 id 모두 조회한다") {
+                val result = termsRepository.getIdByRequire()
+                result shouldBe listOf(requiredTerms.id, requiredTerms2.id)
+            }
+
+            expect("선택 약관 id 모두 조회한다") {
+                val result = termsRepository.getIdByRequire(false)
+                result shouldBe listOf(optionalTerms.id, 4L)
             }
         }
     },

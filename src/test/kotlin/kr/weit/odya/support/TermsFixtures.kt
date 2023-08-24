@@ -23,14 +23,14 @@ fun createRequiredTerms(id: Long = TEST_TERMS_ID, title: String = TEST_REQUIRED_
     id,
     title,
     content = TEST_REQUIRED_TERMS_CONTENT,
-    1,
+    true,
 )
 
 fun createOptionalTerms(id: Long = TEST_OTHER_TERMS_ID, title: String = TEST_OPTIONAL_TERMS_TITLE) = Terms(
     id,
     title,
     content = TEST_OPTIONAL_TERMS_CONTENT,
-    0,
+    false,
 )
 
 fun createTermsList() = listOf(createRequiredTerms(), createOptionalTerms(), createRequiredTerms(TEST_OTHER_TERMS_ID_2, TEST_REQUIRED_TERMS_TITLE_2))
@@ -44,9 +44,9 @@ fun createTermsContentResponse(terms: Terms = createRequiredTerms()) = TermsCont
 
 fun createTermsIdList() = setOf(TEST_TERMS_ID, TEST_OTHER_TERMS_ID, TEST_OTHER_TERMS_ID_2)
 
-fun createRequiredTermsList() = listOf(
-    createRequiredTerms(),
-    createRequiredTerms(TEST_OTHER_TERMS_ID_2, TEST_REQUIRED_TERMS_TITLE_2),
+fun createRequiredTermsIdList() = listOf(
+    TEST_TERMS_ID,
+    TEST_OTHER_TERMS_ID_2,
 )
 
 fun createOptionalTermsList() = listOf(createOptionalTerms(), createOptionalTerms(4L, "선택 테스트 약관2"))

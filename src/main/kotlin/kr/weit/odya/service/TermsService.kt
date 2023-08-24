@@ -4,8 +4,9 @@ import jakarta.transaction.Transactional
 import kr.weit.odya.domain.agreedTerms.AgreedTerms
 import kr.weit.odya.domain.agreedTerms.AgreedTermsRepository
 import kr.weit.odya.domain.terms.TermsRepository
+import kr.weit.odya.domain.terms.getByRequired
 import kr.weit.odya.domain.terms.getByTermsId
-import kr.weit.odya.domain.terms.getRequiredTerms
+import kr.weit.odya.domain.terms.getIdByRequire
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
@@ -34,10 +35,10 @@ class TermsService(
 
     @Transactional
     fun checkRequiredTerms(termsIdList: Set<Long>) {
-        val requiredTermsList = termsRepository.getRequiredTerms().map { it.id }
-        termsIdList.containsAll(requiredTermsList).also { contain ->
+        val requiredTermsIdList = termsRepository.getIdByRequire()
+        termsIdList.containsAll(requiredTermsIdList).also { contain ->
             if (!contain) {
-                requiredTermsList.forEach { termsId ->
+                requiredTermsIdList.forEach { termsId ->
                     if (!termsIdList.contains(termsId)) {
                         throw IllegalArgumentException("$termsId : 필수 약관에 동의하지 않았습니다.")
                     }
@@ -48,15 +49,15 @@ class TermsService(
 
     @Transactional
     fun saveAllAgreedTerms(user: User, termsIdList: Set<Long>) {
-        val agreedTermsList: List<AgreedTerms> = termsIdList.map { AgreedTerms(0L, user, termsRepository.getByTermsId(it)) }
+        val agreedTermsList = termsIdList.map { AgreedTerms(0L, user, termsRepository.getByTermsId(it)) }
         agreedTermsRepository.saveAll(agreedTermsList)
     }
 
     @Transactional
     fun getOptionalTermsListAndOptionalAgreedTerms(userId: Long): TermsUpdateResponse {
         return TermsUpdateResponse(
-            termsRepository.findAllByRequired(0).map { TermsTitleListResponse(it) },
-            agreedTermsRepository.getAgreedTermsByUserIdAndRequired(userId, 0).map { OptionalAgreedTermsResponse(it) },
+            termsRepository.getByRequired().map { TermsTitleListResponse(it) },
+            agreedTermsRepository.getAgreedTermsByUserIdAndRequired(userId, false).map { OptionalAgreedTermsResponse(it) },
         )
     }
 
@@ -73,10 +74,10 @@ class TermsService(
             }
             agreedTermsRepository.saveAll(agreedTermsList)
         }
-        val requiredTermsList = termsRepository.getRequiredTerms().map { it.id }
-        modifyAgreedTermsRequest.disagreeTermsIdList?.forEach { termsId ->
-            if (requiredTermsList.contains(termsId)) {
-                throw IllegalArgumentException("$termsId : 필수 약관은 삭제할 수 없습니다.")
+        val requiredTermsIdList = termsRepository.getIdByRequire()
+        modifyAgreedTermsRequest.disagreeTermsIdList?.forEach { disagreeTermsId ->
+            if (requiredTermsIdList.contains(disagreeTermsId)) {
+                throw IllegalArgumentException("$disagreeTermsId : 필수 약관은 비동의할 수 없습니다.")
             }
         }
         agreedTermsRepository.deleteAllByUserIdAndTermsIdIn(userId, modifyAgreedTermsRequest.disagreeTermsIdList)

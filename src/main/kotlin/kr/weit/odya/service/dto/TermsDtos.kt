@@ -6,7 +6,7 @@ import kr.weit.odya.domain.terms.Terms
 data class TermsTitleListResponse(
     val id: Long,
     val title: String,
-    val required: Int,
+    val required: Boolean,
 ) {
     constructor(terms: Terms) : this(
         terms.id,
@@ -29,7 +29,7 @@ data class OptionalAgreedTermsResponse(
     val id: Long,
     val userId: Long,
     val termsId: Long,
-    val required: Int,
+    val required: Boolean,
 ) {
     constructor(agreedTerms: AgreedTerms) : this(
         agreedTerms.id,
