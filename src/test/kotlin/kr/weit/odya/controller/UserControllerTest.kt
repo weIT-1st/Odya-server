@@ -27,9 +27,11 @@ import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_NOT_EXIST_USER_ID_TOKEN
 import kr.weit.odya.support.TEST_DEFAULT_PROFILE_PNG
 import kr.weit.odya.support.TEST_EMAIL
+import kr.weit.odya.support.TEST_GENERATED_FILE_NAME
 import kr.weit.odya.support.TEST_ID_TOKEN
 import kr.weit.odya.support.TEST_MOCK_PROFILE_NAME
 import kr.weit.odya.support.TEST_PHONE_NUMBER
+import kr.weit.odya.support.TEST_PROFILE_WEBP
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createInformationRequest
 import kr.weit.odya.support.createMockProfile
@@ -393,16 +395,13 @@ class UserControllerTest(
             context("유효한 토큰이면서, 프로필 사진을 전송한 경우") {
                 val mockProfile = createMockProfile()
                 every {
-                    userService.uploadProfile(
-                        any(),
-                        mockProfile.originalFilename,
-                    )
-                } returns TEST_MOCK_PROFILE_NAME
+                    userService.uploadProfile(mockProfile)
+                } returns TEST_GENERATED_FILE_NAME
                 every {
                     userService.updateProfile(
                         TEST_USER_ID,
-                        TEST_MOCK_PROFILE_NAME,
-                        TEST_DEFAULT_PROFILE_PNG,
+                        TEST_GENERATED_FILE_NAME,
+                        TEST_PROFILE_WEBP,
                     )
                 } just runs
                 it("204 응답한다.") {
@@ -447,10 +446,7 @@ class UserControllerTest(
             context("유효한 토큰이면서, 프로필 사진의 형식이 잘못된 경우") {
                 val mockProfile = createMockProfile()
                 every {
-                    userService.uploadProfile(
-                        any(),
-                        mockProfile.originalFilename,
-                    )
+                    userService.uploadProfile(mockProfile)
                 } throws IllegalArgumentException(
                     NOT_ALLOW_FILE_FORMAT_ERROR_MESSAGE,
                 )
@@ -477,10 +473,7 @@ class UserControllerTest(
             context("유효한 토큰이면서, 프로필 사진의 원본 파일 이름이 존재하지 않는 경우") {
                 val mockProfile = createMockProfile()
                 every {
-                    userService.uploadProfile(
-                        any(),
-                        mockProfile.originalFilename,
-                    )
+                    userService.uploadProfile(mockProfile)
                 } throws IllegalArgumentException(
                     NOT_EXIST_ORIGIN_FILE_NAME_ERROR_MESSAGE,
                 )
@@ -507,10 +500,7 @@ class UserControllerTest(
             context("유효한 토큰이면서, Object Storage에 저장하는데 실패한 경우") {
                 val mockProfile = createMockProfile()
                 every {
-                    userService.uploadProfile(
-                        any(),
-                        mockProfile.originalFilename,
-                    )
+                    userService.uploadProfile(mockProfile)
                 } throws ObjectStorageException(
                     SOMETHING_ERROR_MESSAGE,
                 )

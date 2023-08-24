@@ -135,9 +135,10 @@ CREATE TABLE travel_journal_content
 CREATE TABLE travel_companion
 (
     id                NUMERIC(19, 0) NOT NULL,
+    username          VARCHAR(255)   NULL,
     created_date      TIMESTAMP      NOT NULL,
     travel_journal_id NUMERIC(19, 0) NOT NULL,
-    user_id           NUMERIC(19, 0) NOT NULL,
+    user_id           NUMERIC(19, 0) NULL,
     CONSTRAINT pk_travel_companion PRIMARY KEY (id)
 );
 

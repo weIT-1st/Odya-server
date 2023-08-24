@@ -21,7 +21,8 @@ class PlaceSearchHistoryService(
     }
 
     fun getAgeRangeRanking(userId: Long, ageRange: Int?): List<String> {
-        val ageRange = ageRange ?: userRepository.getByUserId(userId).getAgeRange()
-        return placeSearchHistoryRepository.getRecentTop10Keywords(ageRange)
+        return placeSearchHistoryRepository.getRecentTop10Keywords(
+            ageRange ?: userRepository.getByUserId(userId).getAgeRange(),
+        )
     }
 }
