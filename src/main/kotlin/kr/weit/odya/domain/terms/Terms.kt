@@ -39,6 +39,6 @@ class Terms(
     @Lob
     val content: String,
 
-    @Column(columnDefinition = "NUMERIC(1) NOT NULL DEFAULT 0")
-    val required: Int,
+    @Column(nullable = false)
+    val required: Boolean,
 ) : BaseModifiableEntity()

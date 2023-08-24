@@ -8,8 +8,9 @@ import io.mockk.mockk
 import kr.weit.odya.domain.agreedTerms.AgreedTerms
 import kr.weit.odya.domain.agreedTerms.AgreedTermsRepository
 import kr.weit.odya.domain.terms.TermsRepository
+import kr.weit.odya.domain.terms.getByRequired
 import kr.weit.odya.domain.terms.getByTermsId
-import kr.weit.odya.domain.terms.getRequiredTerms
+import kr.weit.odya.domain.terms.getIdByRequire
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.support.TEST_NOT_EXIST_USER_ID
@@ -24,7 +25,7 @@ import kr.weit.odya.support.createOptionalAgreedTermsList
 import kr.weit.odya.support.createOptionalTerms
 import kr.weit.odya.support.createOptionalTermsList
 import kr.weit.odya.support.createRequiredTerms
-import kr.weit.odya.support.createRequiredTermsList
+import kr.weit.odya.support.createRequiredTermsIdList
 import kr.weit.odya.support.createTermsIdList
 import kr.weit.odya.support.createTermsList
 import kr.weit.odya.support.createUser
@@ -64,14 +65,14 @@ class TermsServiceTest : DescribeSpec(
 
         describe("checkRequiredTerms 메소드") {
             context("필수 약관이 모두 포함된 약관 ID 리스트가 들어올 경우") {
-                every { termsRepository.getRequiredTerms() } returns createRequiredTermsList()
+                every { termsRepository.getIdByRequire() } returns createRequiredTermsIdList()
                 it("등록된 약관의 id와 제목이 반환된다") {
                     shouldNotThrowAny { termsService.checkRequiredTerms(createTermsIdList()) }
                 }
             }
 
             context("필수 약관이 모두 포함되지 않은 약관 ID 리스트가 들어올 경우") {
-                every { termsRepository.getRequiredTerms() } returns createRequiredTermsList()
+                every { termsRepository.getIdByRequire() } returns createRequiredTermsIdList()
                 it("[IllegalArgumentException]을 반환된다") {
                     shouldThrow<IllegalArgumentException> { termsService.checkRequiredTerms(setOf(TEST_TERMS_ID)) }
                 }
@@ -99,8 +100,8 @@ class TermsServiceTest : DescribeSpec(
 
         describe("getOptionalTermsListAndOptionalAgreedTerms 메소드") {
             context("유효한 유저 ID가 들어올 경우") {
-                every { termsRepository.findAllByRequired(0) } returns createOptionalTermsList()
-                every { agreedTermsRepository.getAgreedTermsByUserIdAndRequired(TEST_USER_ID, 0) } returns createOptionalAgreedTermsList()
+                every { termsRepository.getByRequired() } returns createOptionalTermsList()
+                every { agreedTermsRepository.getAgreedTermsByUserIdAndRequired(TEST_USER_ID, false) } returns createOptionalAgreedTermsList()
                 it("선택 약관 리스트와 유저가 동의한 선택 약관 리스트를 반환한다") {
                     shouldNotThrowAny { termsService.getOptionalTermsListAndOptionalAgreedTerms(TEST_USER_ID) }
                 }
@@ -110,7 +111,7 @@ class TermsServiceTest : DescribeSpec(
         describe("modifyAgreedTerms 메소드") {
             context("유효한 동의로 변경한 약관 ID 리스트와 미동의로 변경한 약관 ID 리스트와 유저 ID가 들어올 경우") {
                 every { userRepository.getByUserId(TEST_USER_ID) } returns user
-                every { termsRepository.getRequiredTerms() } returns createRequiredTermsList()
+                every { termsRepository.getIdByRequire() } returns createRequiredTermsIdList()
                 every { termsRepository.getByTermsId(any()) } returns createRequiredTerms()
                 every { agreedTermsRepository.existsByUserIdAndTermsId(TEST_USER_ID, any()) } returns false
                 every { agreedTermsRepository.saveAll(any<List<AgreedTerms>>()) } returns createAgreedTermsList()
@@ -139,7 +140,7 @@ class TermsServiceTest : DescribeSpec(
             context("필수 약관 ID가 포함된 미동의 약관 리스트와 유저 ID가 들어올 경우") {
                 every { userRepository.getByUserId(TEST_USER_ID) } returns user
                 every { agreedTermsRepository.existsByUserIdAndTermsId(TEST_USER_ID, any()) } returns true
-                every { termsRepository.getRequiredTerms() } returns createRequiredTermsList()
+                every { termsRepository.getIdByRequire() } returns createRequiredTermsIdList()
                 it("[IllegalArgumentException]을 반환한다") {
                     shouldThrow<IllegalArgumentException> { termsService.modifyAgreedTerms(createModifyAgreedTermsRequest().copy(disagreeTermsIdList = setOf(TEST_TERMS_ID)), TEST_USER_ID) }
                 }

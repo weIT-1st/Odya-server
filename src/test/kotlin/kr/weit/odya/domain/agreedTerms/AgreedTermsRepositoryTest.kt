@@ -34,13 +34,13 @@ class AgreedTermsRepositoryTest(private val agreedTermsRepository: AgreedTermsRe
             expect("user와 일치하는 선택 약관 전체를 조회한다") {
                 val result = agreedTermsRepository.getAgreedTermsByUserIdAndRequired(user.id)
                 result.size shouldBe 1
-                result[0].terms.required shouldBe 0
+                result[0].terms.required shouldBe false
             }
 
             expect("user와 일치하는 필수 약관 전체를 조회한다") {
-                val result = agreedTermsRepository.getAgreedTermsByUserIdAndRequired(user.id, 1)
+                val result = agreedTermsRepository.getAgreedTermsByUserIdAndRequired(user.id, true)
                 result.size shouldBe 2
-                result[0].terms.required shouldBe 1
+                result[0].terms.required shouldBe true
             }
         }
 

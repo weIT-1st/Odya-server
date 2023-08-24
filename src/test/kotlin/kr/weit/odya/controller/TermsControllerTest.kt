@@ -6,7 +6,7 @@ import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import kr.weit.odya.service.TermsService
-import kr.weit.odya.support.INVALID_DELETE_REQUIRED_TERMS_ERROR_MESSAGE
+import kr.weit.odya.support.DISAGREE_REQUIRED_TERMS_ERROR_MESSAGE
 import kr.weit.odya.support.NOT_FOUND_TERMS_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
@@ -72,12 +72,12 @@ class TermsControllerTest(
                                 "optionalAgreedTermsList[]" type JsonFieldType.ARRAY description "선택 약관 리스트",
                                 "optionalAgreedTermsList[].id" type JsonFieldType.NUMBER description "약관 id" example optionalAgreedTerms.id,
                                 "optionalAgreedTermsList[].title" type JsonFieldType.STRING description "약관 제목" example optionalAgreedTerms.title,
-                                "optionalAgreedTermsList[].required" type JsonFieldType.NUMBER description "필수 약관 여부(false:0)" example optionalAgreedTerms.required,
+                                "optionalAgreedTermsList[].required" type JsonFieldType.BOOLEAN description "필수 약관 여부" example optionalAgreedTerms.required,
                                 "optionalAgreedTermsList[]" type JsonFieldType.ARRAY description "유저가 동의한 약관 리스트" example optionalAgreedTerms,
                                 "userOptionalAgreedTermsList[].id" type JsonFieldType.NUMBER description "동의한 약관 ID" example userOptionalAgreedTerms.id,
                                 "userOptionalAgreedTermsList[].userId" type JsonFieldType.NUMBER description "유저 Id" example userOptionalAgreedTerms.userId,
                                 "userOptionalAgreedTermsList[].termsId" type JsonFieldType.NUMBER description "약관 id" example userOptionalAgreedTerms.termsId,
-                                "userOptionalAgreedTermsList[].required" type JsonFieldType.NUMBER description "필수 약관의 필수 여부(false:0)" example userOptionalAgreedTerms.required,
+                                "userOptionalAgreedTermsList[].required" type JsonFieldType.BOOLEAN description "필수 약관의 필수 여부" example userOptionalAgreedTerms.required,
                             ),
                         )
                     }
@@ -154,7 +154,7 @@ class TermsControllerTest(
 
             context("필수 약관 ID가 미동의 약관 ID 리스트(미동의->동의)로 전달되면") {
                 val request = createModifyAgreedTermsRequest().copy(disagreeTermsIdList = setOf(TEST_TERMS_ID, TEST_OTHER_TERMS_ID))
-                every { termsService.modifyAgreedTerms(request, TEST_USER_ID) } throws IllegalArgumentException(INVALID_DELETE_REQUIRED_TERMS_ERROR_MESSAGE)
+                every { termsService.modifyAgreedTerms(request, TEST_USER_ID) } throws IllegalArgumentException(DISAGREE_REQUIRED_TERMS_ERROR_MESSAGE)
                 it("400을 반환한다.") {
                     restDocMockMvc.patch(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
