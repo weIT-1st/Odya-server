@@ -15,7 +15,7 @@ import kr.weit.odya.domain.user.getByUserIds
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_CONTENT_IMAGES
 import kr.weit.odya.support.TEST_GENERATED_FILE_NAME
-import kr.weit.odya.support.TEST_IMAGE_FILE_PNG
+import kr.weit.odya.support.TEST_IMAGE_FILE_WEBP
 import kr.weit.odya.support.TEST_TRAVEL_COMPANION_IDS
 import kr.weit.odya.support.TEST_TRAVEL_COMPANION_USERS
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL
@@ -148,7 +148,7 @@ class TravelJournalServiceTest : DescribeSpec(
             context("여행 일지 콘텐츠의 이미지 이름의 개수와 실제 이미지의 개수가 다른 경우") {
                 val travelJournalRequest = createTravelJournalRequest(
                     travelJournalContentRequests = listOf(
-                        createTravelJournalContentRequest(contentImageNames = listOf(TEST_IMAGE_FILE_PNG)),
+                        createTravelJournalContentRequest(contentImageNames = listOf(TEST_IMAGE_FILE_WEBP)),
                     ),
                 )
                 val imageMap = createImageMap()

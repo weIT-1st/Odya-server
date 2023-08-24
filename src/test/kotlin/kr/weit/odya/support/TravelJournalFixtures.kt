@@ -62,7 +62,7 @@ fun createTravelJournalContentRequest(
     longitudes: List<Double> = TEST_TRAVEL_JOURNAL_LONGITUDES,
     placeId: String = TEST_PLACE_ID,
     travelDate: LocalDate = TEST_TRAVEL_DATE,
-    contentImageNames: List<String>? = listOf(TEST_IMAGE_FILE_PNG),
+    contentImageNames: List<String>? = listOf(TEST_IMAGE_FILE_WEBP),
 ) = TravelJournalContentRequest(
     content = content,
     latitudes = latitudes,
@@ -73,23 +73,23 @@ fun createTravelJournalContentRequest(
 )
 
 fun createTravelJournalContentRequestByImageNameSize(size: Int) = createTravelJournalContentRequest(
-    contentImageNames = List(size) { "$it$TEST_IMAGE_FILE_PNG" },
+    contentImageNames = List(size) { "$it$TEST_IMAGE_FILE_WEBP" },
 )
 
 fun createOtherTravelJournalContentRequest() = createTravelJournalContentRequest(
     content = TEST_OTHER_TRAVEL_JOURNAL_CONTENT,
     travelDate = TEST_OTHER_TRAVEL_DATE,
-    contentImageNames = listOf(TEST_OTHER_IMAGE_FILE_PNG),
+    contentImageNames = listOf(TEST_OTHER_IMAGE_FILE_WEBP),
 )
 
-fun createImageMap(fileName: String = TEST_IMAGE_FILE_PNG, otherFileName: String = TEST_OTHER_IMAGE_FILE_PNG) = mapOf(
+fun createImageMap(fileName: String = TEST_IMAGE_FILE_WEBP, otherFileName: String = TEST_OTHER_IMAGE_FILE_WEBP) = mapOf(
     fileName to createMockImageFile(),
     otherFileName to createMockOtherImageFile(),
 )
 
 fun createImageNamePairs() = listOf(
-    TEST_GENERATED_FILE_NAME to TEST_IMAGE_FILE_PNG,
-    TEST_GENERATED_FILE_NAME to TEST_OTHER_IMAGE_FILE_PNG,
+    TEST_GENERATED_FILE_NAME to TEST_IMAGE_FILE_WEBP,
+    TEST_GENERATED_FILE_NAME to TEST_OTHER_IMAGE_FILE_WEBP,
 )
 
 fun createTravelCompanionById(user: User = createOtherUser()) = TravelCompanion(
@@ -107,7 +107,7 @@ fun createTravelJournal(
     travelStartDate: LocalDate = TEST_TRAVEL_JOURNAL_START_DATE,
     travelEndDate: LocalDate = TEST_TRAVEL_JOURNAL_END_DATE,
     visibility: TravelJournalVisibility = TravelJournalVisibility.PUBLIC,
-    register: User = createUser(),
+    user: User = createUser(),
     travelCompanions: List<TravelCompanion> = TEST_TRAVEL_COMPANIONS,
     travelJournalContents: List<TravelJournalContent> = listOf(
         createTravelJournalContent(),
@@ -120,7 +120,7 @@ fun createTravelJournal(
     travelStartDate = travelStartDate,
     travelEndDate = travelEndDate,
     visibility = visibility,
-    register = register,
+    user = user,
     travelCompanions = travelCompanions,
     travelJournalContents = travelJournalContents,
 )

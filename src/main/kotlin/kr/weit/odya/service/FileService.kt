@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.util.Locale
 
+val ALLOW_FILE_FORMAT_LIST: List<String> = listOf("webp")
+
 @Service
 class FileService(
     private val fileNameGenerator: FileNameGenerator,

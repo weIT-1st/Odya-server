@@ -12,7 +12,7 @@ import kr.weit.odya.support.NOT_EXIST_USER_ERROR_MESSAGE
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
-import kr.weit.odya.support.TEST_IMAGE_FILE_PNG
+import kr.weit.odya.support.TEST_IMAGE_FILE_WEBP
 import kr.weit.odya.support.TEST_TRAVEL_CONTENT_IMAGE_MAP
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createImageNamePairs
@@ -208,7 +208,7 @@ class TravelJournalControllerTest(
                 }
             }
 
-            context("여행 이미지가 255개를 초과하는 경우") {
+            context("여행 이미지가 225개를 초과하는 경우") {
                 val travelJournalRequest = createTravelJournalRequest()
                 val travelJournalRequestByteInputStream =
                     ControllerTestHelper.jsonContent(travelJournalRequest).byteInputStream()
@@ -218,12 +218,12 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        files(256, createMockImageFile())
+                        files(226, createMockImageFile())
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
                         createDocument(
-                            "travel-journals-fail-image-size-over-255",
+                            "travel-journals-fail-image-size-over-225",
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
@@ -278,7 +278,9 @@ class TravelJournalControllerTest(
                     ControllerTestHelper.jsonContent(travelJournalRequest).byteInputStream()
                 val travelJournalRequestFile =
                     createTravelJournalRequestFile(contentStream = travelJournalRequestByteInputStream)
-                every { travelJournalService.getImageMap(any<List<MultipartFile>>()) } returns mapOf(TEST_IMAGE_FILE_PNG to createMockImageFile())
+                every { travelJournalService.getImageMap(any<List<MultipartFile>>()) } returns mapOf(
+                    TEST_IMAGE_FILE_WEBP to createMockImageFile(),
+                )
                 every {
                     travelJournalService.validateTravelJournalRequest(
                         any<TravelJournalRequest>(),
