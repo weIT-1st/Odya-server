@@ -44,10 +44,10 @@ fun createKakaoRegisterErrorResponse(kakaoUserInfo: KakaoUserInfo) = KakaoRegist
 fun createTokenResponse() = TokenResponse(TEST_CUSTOM_TOKEN)
 
 fun createAppleRegisterRequest() =
-    AppleRegisterRequest(TEST_ID_TOKEN, TEST_EMAIL, TEST_PHONE_NUMBER, TEST_NICKNAME, TEST_GENDER, TEST_BIRTHDAY)
+    AppleRegisterRequest(TEST_ID_TOKEN, TEST_EMAIL, TEST_PHONE_NUMBER, TEST_NICKNAME, TEST_GENDER, TEST_BIRTHDAY, createTermsIdList())
 
 fun createKakaoRegisterRequest() =
-    KakaoRegisterRequest(TEST_KAKAO_UID, TEST_EMAIL, TEST_PHONE_NUMBER, TEST_NICKNAME, TEST_GENDER, TEST_BIRTHDAY)
+    KakaoRegisterRequest(TEST_KAKAO_UID, TEST_EMAIL, TEST_PHONE_NUMBER, TEST_NICKNAME, TEST_GENDER, TEST_BIRTHDAY, createTermsIdList())
 
 fun userAuthentication() =
     UsernamePasswordAuthenticationToken(TEST_USER_ID, null, listOf(SimpleGrantedAuthority(TEST_USER_ROLE.name)))

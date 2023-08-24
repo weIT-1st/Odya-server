@@ -1,8 +1,6 @@
 package kr.weit.odya.domain.favoritePlace
 
 import io.kotest.core.spec.style.ExpectSpec
-import io.kotest.extensions.spring.SpringTestExtension
-import io.kotest.extensions.spring.SpringTestLifecycleMode
 import io.kotest.matchers.shouldBe
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
@@ -23,11 +21,11 @@ class FavoritePlaceRepositoryTest(
     private val userRepository: UserRepository,
 ) : ExpectSpec(
     {
-        extensions(SpringTestExtension(SpringTestLifecycleMode.Root))
-        val user: User = userRepository.save(createUser())
+        lateinit var user: User
         lateinit var favoritePlace: FavoritePlace
         lateinit var otherFavoritePlace: FavoritePlace
         beforeEach {
+            user = userRepository.save(createUser())
             favoritePlace = favoritePlaceRepository.save(createFavoritePlace(user))
             otherFavoritePlace = favoritePlaceRepository.save(createOtherFavoritePlace(user))
         }

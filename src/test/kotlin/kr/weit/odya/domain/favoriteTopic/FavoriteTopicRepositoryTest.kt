@@ -17,8 +17,9 @@ class FavoriteTopicRepositoryTest(
     private val userRepository: UserRepository,
 ) : ExpectSpec(
     {
-        val user: User = userRepository.save(createUser())
+        lateinit var user: User
         beforeEach {
+            user = userRepository.save(createUser())
             favoriteTopicRepository.save(createFavoriteTopic(user))
         }
 
