@@ -12,12 +12,12 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class WithdrawService(
-        private val userRepository: UserRepository,
-        private val favoritePlaceRepository: FavoritePlaceRepository,
-        private val followRepository: FollowRepository,
-        private val placeReviewRepository: PlaceReviewRepository,
-        private val favoriteTopicRepository: FavoriteTopicRepository,
-        private val firebaseTokenHelper: FirebaseTokenHelper,
+    private val userRepository: UserRepository,
+    private val favoritePlaceRepository: FavoritePlaceRepository,
+    private val followRepository: FollowRepository,
+    private val placeReviewRepository: PlaceReviewRepository,
+    private val favoriteTopicRepository: FavoriteTopicRepository,
+    private val firebaseTokenHelper: FirebaseTokenHelper,
 ) {
     @Transactional
     fun withdrawUser(userId: Long) {
