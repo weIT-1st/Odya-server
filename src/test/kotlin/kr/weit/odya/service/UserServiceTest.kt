@@ -9,6 +9,8 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import kr.weit.odya.domain.user.UserRepository
+import kr.weit.odya.domain.user.UsersDocument
+import kr.weit.odya.domain.user.UsersDocumentRepository
 import kr.weit.odya.domain.user.existsByEmail
 import kr.weit.odya.domain.user.existsByNickname
 import kr.weit.odya.domain.user.existsByPhoneNumber
@@ -41,7 +43,9 @@ class UserServiceTest : DescribeSpec(
         val firebaseTokenHelper = mockk<FirebaseTokenHelper>()
         val fileService = mockk<FileService>()
         val profileColorService = mockk<ProfileColorService>()
-        val userService = UserService(userRepository, firebaseTokenHelper, fileService, profileColorService)
+        val usersDocumentRepository = mockk<UsersDocumentRepository>()
+        val userService =
+            UserService(userRepository, firebaseTokenHelper, fileService, profileColorService, usersDocumentRepository)
 
         describe("getInformation") {
             context("가입되어 있는 USER ID가 주어지는 경우") {
@@ -178,6 +182,7 @@ class UserServiceTest : DescribeSpec(
             context("가입되어 있는 USER ID와 유효한 정보 요청이 주어지는 경우") {
                 every { userRepository.existsByNickname(TEST_NICKNAME) } returns false
                 every { userRepository.getByUserId(TEST_USER_ID) } returns createUser()
+                every { usersDocumentRepository.save(any()) } returns UsersDocument(TEST_USER_ID, TEST_NICKNAME)
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny { userService.updateInformation(TEST_USER_ID, informationRequest) }
                 }

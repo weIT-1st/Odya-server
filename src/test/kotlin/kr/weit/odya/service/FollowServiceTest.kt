@@ -12,6 +12,7 @@ import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowerListBySearchCond
 import kr.weit.odya.domain.follow.getFollowingListBySearchCond
 import kr.weit.odya.domain.user.UserRepository
+import kr.weit.odya.domain.user.UsersDocumentRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_DEFAULT_PAGEABLE
@@ -34,7 +35,9 @@ class FollowServiceTest : DescribeSpec(
         val userRepository = mockk<UserRepository>()
         val followRepository = mockk<FollowRepository>()
         val objectStorageService = mockk<ObjectStorageService>()
-        val followService = FollowService(followRepository, userRepository, objectStorageService)
+        val usersDocumentRepository = mockk<UsersDocumentRepository>()
+        val followService =
+            FollowService(followRepository, userRepository, objectStorageService, usersDocumentRepository)
 
         describe("createFollow") {
             context("이미 존재하지 않는 팔로우를 생성하는 경우") {

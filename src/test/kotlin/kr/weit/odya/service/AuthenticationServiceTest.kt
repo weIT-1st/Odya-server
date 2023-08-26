@@ -10,6 +10,8 @@ import io.mockk.mockk
 import io.mockk.runs
 import kr.weit.odya.client.kakao.KakaoClient
 import kr.weit.odya.domain.user.UserRepository
+import kr.weit.odya.domain.user.UsersDocument
+import kr.weit.odya.domain.user.UsersDocumentRepository
 import kr.weit.odya.domain.user.existsByEmail
 import kr.weit.odya.domain.user.existsByNickname
 import kr.weit.odya.domain.user.existsByPhoneNumber
@@ -26,6 +28,7 @@ import kr.weit.odya.support.TEST_KAKAO_UID
 import kr.weit.odya.support.TEST_NICKNAME
 import kr.weit.odya.support.TEST_PHONE_NUMBER
 import kr.weit.odya.support.TEST_USERNAME
+import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createAppleRegisterRequest
 import kr.weit.odya.support.createKakaoLoginRequest
 import kr.weit.odya.support.createKakaoUserInfo
@@ -39,9 +42,17 @@ class AuthenticationServiceTest : DescribeSpec(
         val profileColorService = mockk<ProfileColorService>()
         val kakaoClient = mockk<KakaoClient>()
         val termsService = mockk<TermsService>()
+        val usersDocumentRepository = mockk<UsersDocumentRepository>()
 
         val authenticationService =
-            AuthenticationService(termsService, userRepository, profileColorService, firebaseTokenHelper, kakaoClient)
+            AuthenticationService(
+                termsService,
+                userRepository,
+                profileColorService,
+                firebaseTokenHelper,
+                kakaoClient,
+                usersDocumentRepository,
+            )
 
         describe("appleLoginProcess") {
             context("유효한 USERNAME이 주어지는 경우") {
@@ -100,6 +111,7 @@ class AuthenticationServiceTest : DescribeSpec(
                 every { userRepository.save(any()) } returns createUser()
                 every { termsService.checkRequiredTerms(request.termsIdList) } just runs
                 every { termsService.saveAllAgreedTerms(any(), request.termsIdList) } just runs
+                every { usersDocumentRepository.save(any()) } returns UsersDocument(TEST_USER_ID, request.nickname)
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny { authenticationService.register(request) }
                 }

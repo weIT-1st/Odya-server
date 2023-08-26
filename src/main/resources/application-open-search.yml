@@ -4,6 +4,7 @@ spring.config.activate.on-profile: sandbox
 open-search:
   indices:
     place-search-history: sandbox-place-search-history
+    users: sandbox-users
 
 ---
 spring.config.activate.on-profile: stable
@@ -11,3 +12,4 @@ spring.config.activate.on-profile: stable
 open-search:
   indices:
     place-search-history: stable-place-search-history
+    users: stable-users
