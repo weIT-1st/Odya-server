@@ -27,15 +27,15 @@ class TravelJournalContent(
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "TRAVEL_JOURNAL_CONTENT_SEQ_GENERATOR")
     val id: Long = 0L,
 
-    @Column(nullable = false, length = 600)
-    val content: String,
+    @Column(length = 600)
+    val content: String?,
 
-    @Column(nullable = false, length = 400)
-    val placeId: String,
+    @Column(length = 400)
+    val placeId: String?,
 
     @Embedded
     @AttributeOverride(name = "value", column = Column(name = "coordinates", nullable = false))
-    val coordinates: Coordinates,
+    val coordinates: Coordinates?,
 
     @Column(nullable = false)
     val travelDate: LocalDate,

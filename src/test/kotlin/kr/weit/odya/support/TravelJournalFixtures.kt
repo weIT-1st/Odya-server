@@ -57,12 +57,12 @@ fun createTravelJournalRequestByContentSize(size: Int) = createTravelJournalRequ
 )
 
 fun createTravelJournalContentRequest(
-    content: String = TEST_TRAVEL_JOURNAL_CONTENT,
-    latitudes: List<Double> = TEST_TRAVEL_JOURNAL_LATITUDES,
-    longitudes: List<Double> = TEST_TRAVEL_JOURNAL_LONGITUDES,
-    placeId: String = TEST_PLACE_ID,
+    content: String? = TEST_TRAVEL_JOURNAL_CONTENT,
+    latitudes: List<Double>? = TEST_TRAVEL_JOURNAL_LATITUDES,
+    longitudes: List<Double>? = TEST_TRAVEL_JOURNAL_LONGITUDES,
+    placeId: String? = TEST_PLACE_ID,
     travelDate: LocalDate = TEST_TRAVEL_DATE,
-    contentImageNames: List<String>? = listOf(TEST_IMAGE_FILE_WEBP),
+    contentImageNames: List<String> = listOf(TEST_IMAGE_FILE_WEBP),
 ) = TravelJournalContentRequest(
     content = content,
     latitudes = latitudes,

@@ -24,66 +24,82 @@
 
 operation::travel-journal-controller-test/travel-journals-success[snippets='http-request,request-headers,request-parts,http-response']
 
-=== *1-2 실패 - 제목이 20자가 넘는 경우*
+=== *1-2 성공 - nullable 필드들이 전부 null*
+
+operation::travel-journal-controller-test/travel-journals-nullable-success[snippets='http-request,request-headers,request-parts,http-response']
+
+=== *1-3 실패 - 제목이 20자가 넘는 경우*
 
 operation::travel-journal-controller-test/travel-journals-failure-title[snippets='http-request,request-headers,request-parts,http-response']
 
-=== *1-3 실패 - 여행 일지 콘텐츠가 15개 초과인 경우*
+=== *1-4 실패 - 여행 일지 콘텐츠가 15개 초과인 경우*
 
 operation::travel-journal-controller-test/travel-journals-failure-content-size[snippets='http-request,request-headers,request-parts,http-response']
 
-=== *1-4 실패 - 여행 일지 콘텐츠의 이미지 제목 개수가 15개를 초과하는 경우*
+=== *1-5 실패 - 여행 일지 콘텐츠의 이미지 제목이 비어있는 경우*
+
+operation::travel-journal-controller-test/travel-journals-failure-image-name-empty[snippets='http-request,request-headers,request-parts,http-response']
+
+=== *1-6 실패 - 여행 일지 콘텐츠의 이미지 제목 개수가 15개를 초과하는 경우*
 
 operation::travel-journal-controller-test/travel-journals-failure-image-name-size[snippets='http-request,request-headers,request-parts,http-response']
 
-=== *1-5 실패 - 여행 이미지가 225개를 초과하는 경우*
+=== *1-7 실패 - 여행 이미지가 비어있는 경우*
+
+operation::travel-journal-controller-test/travel-journals-fail-image-size-empty[snippets='http-request,request-headers,request-parts,http-response']
+
+=== *1-8 실패 - 여행 이미지가 225개를 초과하는 경우*
 
 operation::travel-journal-controller-test/travel-journals-fail-image-size-over-225[snippets='http-request,request-headers,request-parts,http-response']
 
-=== *1-6 실패 - 여행 일지의 시작일이 여행 일지의 종료일보다 늦을 경우*
+=== *1-9 실패 - 여행 일지의 시작일이 여행 일지의 종료일보다 늦을 경우*
 
 operation::travel-journal-controller-test/travel-journals-fail-travel-start-date-after-travel-end-date[snippets='http-request,request-headers,request-parts,http-response']
 
-=== *1-7 실패 - 여행 일지 콘텐츠의 이미지 이름 개수와 실제 이미지 개수가 다를 경우*
+=== *1-10 실패 - 여행 일지 콘텐츠의 이미지 이름 개수와 실제 이미지 개수가 다를 경우*
 
 operation::travel-journal-controller-test/travel-journals-fail-image-name-size-not-equal-to-image-size[snippets='http-request,request-headers,request-parts,http-response']
 
-=== *1-8 실패 - 여행 일자보다 콘텐츠의 개수가 많을 경우*
+=== *1-11 실패 - 여행 일자보다 콘텐츠의 개수가 많을 경우*
 
 operation::travel-journal-controller-test/travel-journals-fail-travel-journal-content-size-more-than-travel-date-size[snippets='http-request,request-headers,request-parts,http-response']
 
-=== *1-9 실패 - 여행 콘텐츠 일자가 여행 시작일보다 이전이거나 여행 종료일보다 이후일 경우*
+=== *1-12 실패 - 여행 콘텐츠 일자가 여행 시작일보다 이전이거나 여행 종료일보다 이후일 경우*
 
 operation::travel-journal-controller-test/travel-journals-fail-travel-journal-content-travel-date-not-in-travel-date-range[snippets='http-request,request-headers,request-parts,http-response']
 
-=== *1-10 실패 - 여행 일자가 15일 초과인 경우*
+=== *1-13 실패 - 여행 일자가 15일 초과인 경우*
 
 operation::travel-journal-controller-test/travel-journals-fail-travel-end-date-over-15-days[snippets='http-request,request-headers,request-parts,http-response']
 
-=== *1-11 실패 - 여행 친구 아이디가 등록되지 않은 사용자인 경우*
+=== *1-14 실패 - 여행 친구 아이디가 등록되지 않은 사용자인 경우*
 
 operation::travel-journal-controller-test/travel-journals-fail-travel-friend-not-found[snippets='http-request,request-headers,request-parts,http-response']
 
-=== *1-12 실패 - 여행 친구가 10명 초과인 경우*
+=== *1-15 실패 - 여행 친구가 10명 초과인 경우*
 
 operation::travel-journal-controller-test/travel-journals-fail-travel-friend-over-10[snippets='http-request,request-headers,request-parts,http-response']
 
-=== *1-13 실패 - 여행 일지 콘텐츠의 이름이 실제 이미지 파일 이름과 일치하지 않는 경우*
+=== *1-16 실패 - 여행 일지 콘텐츠의 이름이 실제 이미지 파일 이름과 일치하지 않는 경우*
 
 operation::travel-journal-controller-test/travel-journals-fail-travel-journal-content-image-name-not-equal-to-image-name[snippets='http-request,request-headers,request-parts,http-response']
 
-=== *1-14 실패 - 위도와 경도의 개수가 다를 경우*
+=== *1-17 실패 - 위도와 경도 중에 하나만 null인 경우*
+
+operation::travel-journal-controller-test/travel-journals-fail-latitude-longitude-only-one-null[snippets='http-request,request-headers,request-parts,http-response']
+
+=== *1-18 실패 - 위도와 경도의 개수가 다를 경우*
 
 operation::travel-journal-controller-test/travel-journals-fail-latitude-longitude-size-not-equal[snippets='http-request,request-headers,request-parts,http-response']
 
-=== *1-15 실패 - 여행 일지 콘텐츠 이미지 저장에 실패하는 경우*
+=== *1-19 실패 - 여행 일지 콘텐츠 이미지 저장에 실패하는 경우*
 
 operation::travel-journal-controller-test/travel-journals-fail-travel-journal-content-image-upload-fail[snippets='http-request,request-headers,request-parts,http-response']
 
-=== *1-16 실패 - 여행 일지를 등록하려는 사용자가 없는 경우*
+=== *1-20 실패 - 여행 일지를 등록하려는 사용자가 없는 경우*
 
 operation::travel-journal-controller-test/travel-journals-fail-user-not-found[snippets='http-request,request-headers,request-parts,http-response']
 
-=== *1-17 실패 - 유효하지 않은 토큰일 경우*
+=== *1-21 실패 - 유효하지 않은 토큰일 경우*
 
 operation::travel-journal-controller-test/travel-journals-fail-invalid-token[snippets='http-request,request-headers,request-parts,http-response']
