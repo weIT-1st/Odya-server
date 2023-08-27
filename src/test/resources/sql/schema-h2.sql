@@ -122,9 +122,9 @@ CREATE TABLE travel_journal
 CREATE TABLE travel_journal_content
 (
     id                NUMERIC(19, 0) NOT NULL,
-    content     VARCHAR2(600) NULL,
-    place_id    VARCHAR2(400) NULL,
-    coordinates CLOB          NULL,
+    content           VARCHAR2(600)  NULL,
+    place_id          VARCHAR2(400)  NULL,
+    coordinates       CLOB           NULL,
     travel_date       DATE           NOT NULL,
     created_date      TIMESTAMP      NOT NULL,
     updated_date      TIMESTAMP      NOT NULL,
