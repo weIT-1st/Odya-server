@@ -132,19 +132,19 @@ operation::user-controller-test/withdraw-user-fail-unauthorized[snippets='http-r
 
 === *7-1 성공*
 
-operation::user-controller-test/search-users-success[snippets='http-request,request-headers,http-response']
+operation::user-controller-test/search-users-success[snippets='http-request,query-parameters,request-headers,http-response']
 
 === *7-2 실패 - 유효하지 않은 닉네임*
 
-operation::user-controller-test/search-users-fail-nickname-blank[snippets='http-request,request-headers,http-response']
+operation::user-controller-test/search-users-fail-nickname-blank[snippets='http-request,query-parameters,request-headers,http-response']
 
 === *7-3 실패 - 유효하지 않은 마지막 id*
 
-operation::user-controller-test/search-users-fail-invalid-last-id[snippets='http-request,request-headers,http-response']
+operation::user-controller-test/search-users-fail-invalid-last-id[snippets='http-request,query-parameters,request-headers,http-response']
 
 === *7-4 실패 - 유효하지 않은 사이즈*
 
-operation::user-controller-test/search-users-fail-invalid-size[snippets='http-request,request-headers,http-response']
+operation::user-controller-test/search-users-fail-invalid-size[snippets='http-request,query-parameters,request-headers,http-response']
 
 === *7-5 실패 - 가입되지 않은 유저*
 
