@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.support.TEST_DEFAULT_PAGEABLE
+import kr.weit.odya.support.TEST_DEFAULT_SIZE
 import kr.weit.odya.support.TEST_DEFAULT_SORT_TYPE
 import kr.weit.odya.support.createFollow
 import kr.weit.odya.support.createOtherUser
@@ -21,6 +22,7 @@ class FollowRepositoryTest(
         val following: User = userRepository.save(createOtherUser())
         beforeEach {
             followRepository.save(createFollow(follower, following))
+            followRepository.save(createFollow(following, follower))
         }
 
         context("팔로우 목록 조회") {
@@ -80,6 +82,44 @@ class FollowRepositoryTest(
             expect("userId와 일치하는 팔로우 목록을 전체 삭제한다") {
                 followRepository.deleteByFollowingId(following.id)
                 followRepository.countByFollowingId(following.id) shouldBe 0
+            }
+        }
+
+        context("팔로잉 유저 id list 검색") {
+            expect("팔로잉 id list에 해당하는 팔로잉 유저를 조회한다") {
+                val userIds = listOf(following.id, following.id + 1)
+                val result = followRepository.findAllByFollowerIdAndFollowingIdInAndLastId(
+                    follower.id,
+                    userIds,
+                    TEST_DEFAULT_SIZE,
+                    null,
+                )
+                result.size shouldBe 1
+            }
+
+            expect("팔로잉 id list에 해당하는 팔로잉 유저를 size만큼 조회한다") {
+                val userIds = listOf(following.id, following.id + 1)
+                val result =
+                    followRepository.findAllByFollowerIdAndFollowingIdInAndLastId(follower.id, userIds, 1, null)
+                result.size shouldBe 1
+            }
+
+            expect("팔로잉 id list에 해당하는 lastId보다 작은 팔로잉 유저를 조회한다") {
+                val userIds = listOf(following.id, following.id + 1)
+                var result = followRepository.findAllByFollowerIdAndFollowingIdInAndLastId(
+                    follower.id,
+                    userIds,
+                    TEST_DEFAULT_SIZE,
+                    following.id + 1,
+                )
+                result.size shouldBe 1
+                result = followRepository.findAllByFollowerIdAndFollowingIdInAndLastId(
+                    follower.id,
+                    userIds,
+                    TEST_DEFAULT_SIZE,
+                    following.id,
+                )
+                result.size shouldBe 0
             }
         }
     },

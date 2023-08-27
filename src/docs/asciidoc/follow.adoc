@@ -87,3 +87,30 @@ operation::follow-controller-test/get-follower-slice-fail-invalid-user-id[snippe
 === *5-4 실패 - 유효하지 않은 토큰인 경우*
 
 operation::follow-controller-test/get-follower-slice-fail-invalid-token[snippets='http-request,request-headers,path-parameters,http-response']
+
+[[팔로잉-검색-API]]
+== *6. 팔로잉 검색 API*
+
+=== *6-1 성공*
+
+operation::follow-controller-test/search-followings-success[snippets='http-request,request-headers,http-response']
+
+=== *6-2 실패 - 유효하지 않은 닉네임*
+
+operation::follow-controller-test/search-followings-fail-nickname-blank[snippets='http-request,request-headers,http-response']
+
+=== *6-3 실패 - 유효하지 않은 마지막 id*
+
+operation::follow-controller-test/search-followings-fail-invalid-last-id[snippets='http-request,request-headers,http-response']
+
+=== *6-4 실패 - 유효하지 않은 사이즈*
+
+operation::follow-controller-test/search-followings-fail-invalid-size[snippets='http-request,request-headers,http-response']
+
+=== *6-5 실패 - 가입하지 않은 유저*
+
+operation::follow-controller-test/search-followings-fail-not-registered-user[snippets='http-request,request-headers,http-response']
+
+=== *6-5 실패 - 유효하지 않은 토큰*
+
+operation::follow-controller-test/search-followings-fail-invalid-token[snippets='http-request,request-headers,http-response']

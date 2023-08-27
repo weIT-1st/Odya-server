@@ -49,6 +49,13 @@ interface CustomFollowRepository {
         pageable: Pageable,
         sortType: FollowSortType,
     ): List<Follow>
+
+    fun findAllByFollowerIdAndFollowingIdInAndLastId(
+        follower: Long,
+        followingIds: List<Long>,
+        size: Int,
+        lastId: Long?,
+    ): List<Follow>
 }
 
 class FollowRepositoryImpl(private val queryFactory: QueryFactory) : CustomFollowRepository {
@@ -78,6 +85,26 @@ class FollowRepositoryImpl(private val queryFactory: QueryFactory) : CustomFollo
         orderBy(dynamicOrderingByFollowSortType(sortType))
         offset(pageable.offset.toInt())
         limit(pageable.pageSize + 1)
+    }
+
+    override fun findAllByFollowerIdAndFollowingIdInAndLastId(
+        follower: Long,
+        followingIds: List<Long>,
+        size: Int,
+        lastId: Long?,
+    ): List<Follow> = queryFactory.listQuery {
+        val followerUser = entity(User::class, alias = "followerUser")
+        val followingUser = entity(User::class, alias = "followingUser")
+        select(entity(Follow::class))
+        from(entity(Follow::class))
+        associate(Follow::class, followerUser, on(Follow::follower))
+        associate(Follow::class, followingUser, on(Follow::following))
+        where(col(followerUser, User::id).equal(follower))
+        where(col(followingUser, User::id).`in`(followingIds))
+        if (lastId != null) {
+            where(col(followingUser, User::id).lessThan(lastId))
+        }
+        limit(size)
     }
 
     private fun <T> CriteriaQueryDsl<T>.dynamicOrderingByFollowSortType(
