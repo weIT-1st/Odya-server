@@ -16,6 +16,7 @@ import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_CONTENT_IMAGES
 import kr.weit.odya.support.TEST_GENERATED_FILE_NAME
 import kr.weit.odya.support.TEST_IMAGE_FILE_WEBP
+import kr.weit.odya.support.TEST_OTHER_IMAGE_FILE_WEBP
 import kr.weit.odya.support.TEST_TRAVEL_COMPANION_IDS
 import kr.weit.odya.support.TEST_TRAVEL_COMPANION_USERS
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL
@@ -25,6 +26,8 @@ import kr.weit.odya.support.createImageMap
 import kr.weit.odya.support.createImageNamePairs
 import kr.weit.odya.support.createMockImageFile
 import kr.weit.odya.support.createMockImageFiles
+import kr.weit.odya.support.createMockOtherImageFile
+import kr.weit.odya.support.createOtherTravelJournalContentRequest
 import kr.weit.odya.support.createTravelJournalByTravelCompanionIdSize
 import kr.weit.odya.support.createTravelJournalContentRequest
 import kr.weit.odya.support.createTravelJournalRequest
@@ -62,11 +65,11 @@ class TravelJournalServiceTest : DescribeSpec(
                 }
             }
 
-            context("유효한 데이터가 주어지는 경우(여행 친구 및 이미지 NULL)") {
+            context("유효한 데이터가 주어지는 경우(여행 친구 NULL)") {
                 val travelJournalRequest = createTravelJournalRequest(
                     travelCompanionIds = null,
                     travelJournalContentRequests = listOf(
-                        createTravelJournalContentRequest(contentImageNames = null),
+                        createTravelJournalContentRequest(),
                     ),
                 )
                 every { userRepository.getByUserId(TEST_USER_ID) } returns TEST_USER
@@ -233,7 +236,12 @@ class TravelJournalServiceTest : DescribeSpec(
 
             context("여행 일지 콘텐츠 개수가 여행 기간보다 큰 경우") {
                 val travelJournalRequest = createTravelJournalRequestByContentSize(3)
-                val imageMap = createImageMap()
+                // 아래와 같이 사진 개수도 같이 맞춰주지 않으면 여행기간보다 콘텐츠 개수가 많아서 IllegalArgumentException이 발생하는게 아니라 사진 개수가 안맞아서 발생한다.
+                val imageMap = mapOf(
+                    TEST_IMAGE_FILE_WEBP to createMockImageFile(),
+                    TEST_OTHER_IMAGE_FILE_WEBP to createMockOtherImageFile(),
+                    TEST_GENERATED_FILE_NAME to createMockOtherImageFile(),
+                )
                 every { userRepository.existsAllByUserIds(any<Collection<Long>>(), any<Int>()) } returns true
                 it("[IllegalArgumentException] 반환한다") {
                     shouldThrow<IllegalArgumentException> {
@@ -249,6 +257,9 @@ class TravelJournalServiceTest : DescribeSpec(
                 val travelJournalRequest = createTravelJournalRequest(
                     travelJournalContentRequests = listOf(
                         createTravelJournalContentRequest(travelDate = LocalDate.parse("2022-01-01")),
+                        // 아래와 같이 여행 콘텐츠 개수를 맞춰주지 않으면 여행 기간을 벗어나서 IllegalArgumentException이 발생하는게 아니라 사진 개수로 인해 발생한다.
+                        // 다른 테스트 들도 전부 같은 이유로 createOtherTravelJournalContentRequest()가 있어야 한다
+                        createOtherTravelJournalContentRequest(),
                     ),
                 )
                 val imageMap = createImageMap()
@@ -270,12 +281,57 @@ class TravelJournalServiceTest : DescribeSpec(
                             latitudes = listOf(37.123456),
                             longitudes = listOf(127.123456, 127.123456),
                         ),
+                        createOtherTravelJournalContentRequest(),
                     ),
                 )
                 val imageMap = createImageMap()
                 every { userRepository.existsAllByUserIds(any<Collection<Long>>(), any<Int>()) } returns true
                 it("[IllegalArgumentException] 반환한다") {
                     shouldThrow<IllegalArgumentException> {
+                        travelJournalService.validateTravelJournalRequest(
+                            travelJournalRequest,
+                            imageMap,
+                        )
+                    }
+                }
+            }
+
+            context("여행 일지 콘텐츠의 위도와 경도중 하나만 보냈을 경우") {
+                val travelJournalRequest = createTravelJournalRequest(
+                    travelJournalContentRequests = listOf(
+                        createTravelJournalContentRequest(
+                            latitudes = null,
+                            longitudes = listOf(127.123456, 127.123456),
+                        ),
+                        createOtherTravelJournalContentRequest(),
+                    ),
+                )
+                val imageMap = createImageMap()
+                every { userRepository.existsAllByUserIds(any<Collection<Long>>(), any<Int>()) } returns true
+                it("[IllegalArgumentException] 반환한다") {
+                    shouldThrow<IllegalArgumentException> {
+                        travelJournalService.validateTravelJournalRequest(
+                            travelJournalRequest,
+                            imageMap,
+                        )
+                    }
+                }
+            }
+
+            context("여행 일지 콘텐츠의 위도와 경도를 둘다 안 보냈을 경우") {
+                val travelJournalRequest = createTravelJournalRequest(
+                    travelJournalContentRequests = listOf(
+                        createTravelJournalContentRequest(
+                            latitudes = null,
+                            longitudes = null,
+                        ),
+                        createOtherTravelJournalContentRequest(),
+                    ),
+                )
+                val imageMap = createImageMap()
+                every { userRepository.existsAllByUserIds(any<Collection<Long>>(), any<Int>()) } returns true
+                it("정상적으로 종료한다") {
+                    shouldNotThrowAny {
                         travelJournalService.validateTravelJournalRequest(
                             travelJournalRequest,
                             imageMap,
