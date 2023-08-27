@@ -65,7 +65,7 @@ class TravelJournalService(
             "여행 일지 콘텐츠의 이미지 이름 총 개수(${travelJournalRequest.contentImageNameTotalCount})는 여행 일지의 이미지 개수(${imageMap?.size ?: 0})와 같아야 합니다."
         }
         travelJournalRequest.travelJournalContentRequests.forEach {
-            it.contentImageNames?.forEach { contentImageName ->
+            it.contentImageNames.forEach { contentImageName ->
                 require(imageMap?.containsKey(contentImageName) ?: false) {
                     "여행 일지 콘텐츠의 이미지 이름($contentImageName)은 여행 이미지 파일 이름과 일치해야 합니다."
                 }
@@ -96,36 +96,34 @@ class TravelJournalService(
             require(it.travelDate in (travelJournalRequest.travelStartDate..travelJournalRequest.travelEndDate)) {
                 "여행 일지 콘텐츠의 여행 일자(${it.travelDate})는 여행 일지의 시작일(${travelJournalRequest.travelStartDate})과 종료일(${travelJournalRequest.travelEndDate}) 사이여야 합니다."
             }
-            require(it.latitudes.size == it.longitudes.size) {
-                "여행 일지 콘텐츠의 위도 개수(${it.latitudes.size})와 경도 개수(${it.longitudes.size})는 같아야 합니다."
+            require(it.latitudes?.size == it.longitudes?.size) {
+                "여행 일지 콘텐츠의 위도 개수(${it.latitudes?.size})와 경도 개수(${it.longitudes?.size})는 같아야 합니다."
             }
         }
     }
 
-    fun getImageMap(images: List<MultipartFile>?): Map<String, MultipartFile>? =
-        images?.associateBy {
+    fun getImageMap(images: List<MultipartFile>): Map<String, MultipartFile>? =
+        images.associateBy {
             require(!it.originalFilename.isNullOrEmpty()) { IllegalArgumentException("파일 원본 이름은 필수 값입니다.") }
             it.originalFilename!!
         }
 
     private fun getTravelJournalContent(
-        contentImages: List<ContentImage>?,
+        contentImages: List<ContentImage>,
         travelJournalContentRequest: TravelJournalContentRequest,
-    ): TravelJournalContent = if (contentImages == null) {
-        travelJournalContentRequest.toEntity(null)
-    } else {
+    ): TravelJournalContent {
         contentImageRepository.saveAll(contentImages)
         val travelJournalContentImages =
             contentImages.map { contentImage -> TravelJournalContentImage(contentImage = contentImage) }
-        travelJournalContentRequest.toEntity(travelJournalContentImages)
+        return travelJournalContentRequest.toEntity(travelJournalContentImages)
     }
 
     private fun getContentImages(
         travelJournalContent: TravelJournalContentRequest,
         contentImageMap: Map<String, ContentImage>?,
     ) = travelJournalContent.contentImageNames
-        ?.filter { contentImageMap?.contains(it) ?: false }
-        ?.mapNotNull { contentImageMap?.getValue(it) }
+        .filter { contentImageMap?.contains(it) ?: false }
+        .mapNotNull { contentImageMap?.getValue(it) }
 
     private fun getContentImageMap(
         register: User,

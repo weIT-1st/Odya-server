@@ -1,16 +1,16 @@
 CREATE TABLE users
 (
-    id            NUMERIC(19, 0) NOT NULL,
-    username      VARCHAR2(50)   NOT NULL,
-    email         VARCHAR2(255)  NULL,
-    nickname      VARCHAR2(24)   NOT NULL,
-    phone_number  VARCHAR2(13)   NULL,
-    gender        VARCHAR2(1)    NOT NULL,
-    birthday      DATE           NOT NULL,
-    user_role     VARCHAR2(255)  NOT NULL,
-    social_type   VARCHAR2(10)   NOT NULL,
-    profile_id    NUMERIC(19, 0) NULL,
-    created_date  DATE           NOT NULL,
+    id           NUMERIC(19, 0) NOT NULL,
+    username     VARCHAR2(50)   NOT NULL,
+    email        VARCHAR2(255)  NULL,
+    nickname     VARCHAR2(24)   NOT NULL,
+    phone_number VARCHAR2(13)   NULL,
+    gender       VARCHAR2(1)    NOT NULL,
+    birthday     DATE           NOT NULL,
+    user_role    VARCHAR2(255)  NOT NULL,
+    social_type  VARCHAR2(10)   NOT NULL,
+    profile_id   NUMERIC(19, 0) NULL,
+    created_date DATE           NOT NULL,
     PRIMARY KEY (id)
 );
 
@@ -122,9 +122,9 @@ CREATE TABLE travel_journal
 CREATE TABLE travel_journal_content
 (
     id                NUMERIC(19, 0) NOT NULL,
-    content           VARCHAR2(600)  NOT NULL,
-    place_id          VARCHAR2(400)  NOT NULL,
-    coordinates       CLOB           NOT NULL,
+    content     VARCHAR2(600) NULL,
+    place_id    VARCHAR2(400) NULL,
+    coordinates CLOB          NULL,
     travel_date       DATE           NOT NULL,
     created_date      TIMESTAMP      NOT NULL,
     updated_date      TIMESTAMP      NOT NULL,
