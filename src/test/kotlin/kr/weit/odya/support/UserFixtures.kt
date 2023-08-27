@@ -5,8 +5,11 @@ import kr.weit.odya.domain.user.Profile
 import kr.weit.odya.domain.user.SocialType
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRole
+import kr.weit.odya.domain.user.UsersDocument
 import kr.weit.odya.service.dto.InformationRequest
+import kr.weit.odya.service.dto.SliceResponse
 import kr.weit.odya.service.dto.UserResponse
+import kr.weit.odya.service.dto.UserSimpleResponse
 import java.time.LocalDate
 
 const val TEST_USER_ID = 1L
@@ -62,4 +65,19 @@ fun createProfile(profileId: Long = 0L, profileName: String = TEST_DEFAULT_PROFI
     id = profileId,
     profileName = profileName,
     profileColor = createProfileColor(TEST_PROFILE_COLOR_ID),
+)
+
+fun createUsersDocument(user: User = createUser()): UsersDocument = UsersDocument(user)
+
+fun createSimpleUserResponse(user: User = createUser(), profileUrl: String = TEST_PROFILE_URL): UserSimpleResponse =
+    UserSimpleResponse(
+        user = user,
+        profileUrl = profileUrl,
+    )
+
+fun createSliceSimpleUserResponse() = SliceResponse(
+    hasNext = false,
+    content = listOf(
+        createSimpleUserResponse(),
+    ),
 )

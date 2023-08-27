@@ -16,11 +16,14 @@ import kr.weit.odya.support.EXIST_EMAIL_ERROR_MESSAGE
 import kr.weit.odya.support.EXIST_NICKNAME_ERROR_MESSAGE
 import kr.weit.odya.support.EXIST_PHONE_NUMBER_ERROR_MESSAGE
 import kr.weit.odya.support.INVALID_DELETE_DEFAULT_PROFILE_ERROR_MESSAGE
+import kr.weit.odya.support.LAST_ID_PARAM
+import kr.weit.odya.support.NICKNAME_PARAM
 import kr.weit.odya.support.NOT_ALLOW_FILE_FORMAT_ERROR_MESSAGE
 import kr.weit.odya.support.NOT_EXIST_AUTHENTICATED_EMAIL_ERROR_MESSAGE
 import kr.weit.odya.support.NOT_EXIST_AUTHENTICATED_PHONE_NUMBER_ERROR_MESSAGE
 import kr.weit.odya.support.NOT_EXIST_ORIGIN_FILE_NAME_ERROR_MESSAGE
 import kr.weit.odya.support.NOT_EXIST_PROFILE_COLOR_ERROR_MESSAGE
+import kr.weit.odya.support.SIZE_PARAM
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
@@ -29,12 +32,18 @@ import kr.weit.odya.support.TEST_DEFAULT_PROFILE_PNG
 import kr.weit.odya.support.TEST_EMAIL
 import kr.weit.odya.support.TEST_GENERATED_FILE_NAME
 import kr.weit.odya.support.TEST_ID_TOKEN
+import kr.weit.odya.support.TEST_INVALID_LAST_ID
+import kr.weit.odya.support.TEST_INVALID_SIZE
+import kr.weit.odya.support.TEST_LAST_ID
 import kr.weit.odya.support.TEST_MOCK_PROFILE_NAME
+import kr.weit.odya.support.TEST_NICKNAME
 import kr.weit.odya.support.TEST_PHONE_NUMBER
 import kr.weit.odya.support.TEST_PROFILE_WEBP
+import kr.weit.odya.support.TEST_SIZE
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createInformationRequest
 import kr.weit.odya.support.createMockProfile
+import kr.weit.odya.support.createSliceSimpleUserResponse
 import kr.weit.odya.support.createUserResponse
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
 import kr.weit.odya.support.test.ControllerTestHelper.Companion.jsonContent
@@ -42,8 +51,10 @@ import kr.weit.odya.support.test.RestDocsHelper
 import kr.weit.odya.support.test.RestDocsHelper.Companion.createDocument
 import kr.weit.odya.support.test.RestDocsHelper.Companion.requestBody
 import kr.weit.odya.support.test.RestDocsHelper.Companion.responseBody
+import kr.weit.odya.support.test.example
 import kr.weit.odya.support.test.headerDescription
 import kr.weit.odya.support.test.isOptional
+import kr.weit.odya.support.test.parameterDescription
 import kr.weit.odya.support.test.requestPartDescription
 import kr.weit.odya.support.test.type
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -52,6 +63,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.restdocs.ManualRestDocumentation
 import org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders
 import org.springframework.restdocs.payload.JsonFieldType
+import org.springframework.restdocs.request.RequestDocumentation.queryParameters
 import org.springframework.restdocs.request.RequestDocumentation.requestParts
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
@@ -665,6 +677,162 @@ class UserControllerTest(
                     }.andDo {
                         createDocument(
                             "withdraw-user-fail-unauthorized",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                            ),
+                        )
+                    }
+                }
+            }
+        }
+
+        describe("GET /api/v1/users/search") {
+            val targetUri = "/api/v1/users/search"
+            context("유효한 토큰이면서, 가입된 사용자인 경우") {
+                val response = createSliceSimpleUserResponse()
+                every { userService.search(TEST_NICKNAME, TEST_SIZE, TEST_LAST_ID) } returns response
+                it("200 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(SIZE_PARAM, TEST_SIZE.toString())
+                        param(NICKNAME_PARAM, TEST_NICKNAME)
+                        param(LAST_ID_PARAM, TEST_LAST_ID.toString())
+                    }.andExpect {
+                        status { isOk() }
+                    }.andDo {
+                        val content = response.content[0]
+                        createDocument(
+                            "search-users-success",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example "null" isOptional true,
+                                LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example "null" isOptional true,
+                                NICKNAME_PARAM parameterDescription "검색할 닉네임" example TEST_NICKNAME,
+                            ),
+                            responseBody(
+                                "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
+                                "content[].userId" type JsonFieldType.NUMBER description "사용자 ID" example content.userId,
+                                "content[].nickname" type JsonFieldType.STRING description "사용자 닉네임" example content.nickname,
+                                "content[].profile.profileUrl" type JsonFieldType.STRING description "사용자 프로필 Url" example content.profile.profileUrl,
+                                "content[].profile.profileColor.colorHex" type JsonFieldType.STRING description "색상 Hex" example content.profile.profileColor?.colorHex isOptional true,
+                                "content[].profile.profileColor.red" type JsonFieldType.NUMBER description "RGB RED" example content.profile.profileColor?.red isOptional true,
+                                "content[].profile.profileColor.green" type JsonFieldType.NUMBER description "RGB GREEN" example content.profile.profileColor?.green isOptional true,
+                                "content[].profile.profileColor.blue" type JsonFieldType.NUMBER description "RGB BLUE" example content.profile.profileColor?.blue isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이면서, 닉네임이 올바르지 않은 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(SIZE_PARAM, TEST_SIZE.toString())
+                        param(NICKNAME_PARAM, " ")
+                        param(LAST_ID_PARAM, TEST_LAST_ID.toString())
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "search-users-fail-nickname-blank",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_SIZE isOptional true,
+                                LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example TEST_LAST_ID isOptional true,
+                                NICKNAME_PARAM parameterDescription "올바르지 않은 닉네임" example " ",
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이지만 조회할 마지막 ID가 양수가 아닌 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(SIZE_PARAM, TEST_SIZE.toString())
+                        param(NICKNAME_PARAM, TEST_NICKNAME)
+                        param(LAST_ID_PARAM, TEST_INVALID_LAST_ID.toString())
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "search-users-fail-invalid-last-id",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_SIZE isOptional true,
+                                LAST_ID_PARAM parameterDescription "양수가 아닌 마지막 데이터의 ID" example TEST_INVALID_LAST_ID isOptional true,
+                                NICKNAME_PARAM parameterDescription "검색할 닉네임" example TEST_NICKNAME,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이지만 size가 양수가 아닌 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(SIZE_PARAM, TEST_INVALID_SIZE.toString())
+                        param(NICKNAME_PARAM, TEST_NICKNAME)
+                        param(LAST_ID_PARAM, TEST_LAST_ID.toString())
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "search-users-fail-invalid-size",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                SIZE_PARAM parameterDescription "양수가 아닌 데이터 개수" example TEST_INVALID_SIZE isOptional true,
+                                LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example TEST_LAST_ID isOptional true,
+                                NICKNAME_PARAM parameterDescription "검색할 닉네임" example TEST_NICKNAME,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이면서, 가입되지 않은 사용자인 경우") {
+                it("401 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_NOT_EXIST_USER_ID_TOKEN)
+                        param(SIZE_PARAM, TEST_SIZE.toString())
+                        param(NICKNAME_PARAM, TEST_NICKNAME)
+                        param(LAST_ID_PARAM, TEST_LAST_ID.toString())
+                    }.andExpect {
+                        status { isUnauthorized() }
+                    }.andDo {
+                        createDocument(
+                            "search-users-fail-not-registered-user",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효하지 않은 토큰이면") {
+                it("401 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                        param(SIZE_PARAM, TEST_SIZE.toString())
+                        param(NICKNAME_PARAM, TEST_NICKNAME)
+                        param(LAST_ID_PARAM, TEST_LAST_ID.toString())
+                    }.andExpect {
+                        status { isUnauthorized() }
+                    }.andDo {
+                        createDocument(
+                            "search-users-fail-invalid-token",
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
                             ),

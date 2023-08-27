@@ -3,6 +3,7 @@ package kr.weit.odya.domain.user
 import io.kotest.core.spec.style.ExpectSpec
 import io.kotest.matchers.shouldBe
 import kr.weit.odya.support.TEST_DEFAULT_PROFILE_PNG
+import kr.weit.odya.support.TEST_DEFAULT_SIZE
 import kr.weit.odya.support.TEST_EMAIL
 import kr.weit.odya.support.TEST_NICKNAME
 import kr.weit.odya.support.TEST_OTHER_USER_ID
@@ -73,6 +74,28 @@ class UserRepositoryTest(
                 val userIds = listOf(TEST_USER_ID, TEST_OTHER_USER_ID)
                 val result = userRepository.existsAllByUserIds(userIds, userIds.size)
                 result shouldBe true
+            }
+        }
+
+        context("사용자 id list 검색") {
+            expect("사용자 id list에 해당하는 사용자를 조회한다") {
+                val userIds = listOf(TEST_USER_ID, TEST_OTHER_USER_ID)
+                val result = userRepository.findAllByUserIds(userIds, TEST_DEFAULT_SIZE, null)
+                result.size shouldBe 2
+            }
+
+            expect("사용자 id list에 해당하는 사용자를 size만큼 조회한다") {
+                val userIds = listOf(TEST_USER_ID, TEST_OTHER_USER_ID)
+                val result = userRepository.findAllByUserIds(userIds, 1, null)
+                result.size shouldBe 1
+            }
+
+            expect("사용자 id list에 해당하는 lastId보다 작은 유저를 조회한다") {
+                val userIds = listOf(TEST_USER_ID, TEST_OTHER_USER_ID)
+                var result = userRepository.findAllByUserIds(userIds, TEST_DEFAULT_SIZE, TEST_OTHER_USER_ID)
+                result.size shouldBe 1
+                result = userRepository.findAllByUserIds(userIds, TEST_DEFAULT_SIZE, TEST_USER_ID)
+                result.size shouldBe 0
             }
         }
     },
