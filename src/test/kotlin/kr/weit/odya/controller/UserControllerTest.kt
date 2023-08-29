@@ -690,7 +690,7 @@ class UserControllerTest(
             val targetUri = "/api/v1/users/search"
             context("유효한 토큰이면서, 가입된 사용자인 경우") {
                 val response = createSliceSimpleUserResponse()
-                every { userService.search(TEST_NICKNAME, TEST_SIZE, TEST_LAST_ID) } returns response
+                every { userService.searchByNickname(TEST_NICKNAME, TEST_SIZE, TEST_LAST_ID) } returns response
                 it("200 응답한다.") {
                     restDocMockMvc.get(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)

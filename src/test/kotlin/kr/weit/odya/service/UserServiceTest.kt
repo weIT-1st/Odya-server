@@ -17,6 +17,7 @@ import kr.weit.odya.domain.user.existsByPhoneNumber
 import kr.weit.odya.domain.user.getByNickname
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.domain.user.getByUserIdWithProfile
+import kr.weit.odya.domain.user.getByUserIds
 import kr.weit.odya.security.FirebaseTokenHelper
 import kr.weit.odya.security.InvalidTokenException
 import kr.weit.odya.support.DELETE_NOT_EXIST_PROFILE_ERROR_MESSAGE
@@ -318,14 +319,14 @@ class UserServiceTest : DescribeSpec(
             }
         }
 
-        describe("search") {
+        describe("searchByNickname") {
             context("유효한 nickname이 주어지면") {
                 val user = createUser()
                 every { usersDocumentRepository.getByNickname(TEST_NICKNAME) } returns listOf(createUsersDocument(user))
-                every { userRepository.findAllByUserIds(any(), any(), any()) } returns listOf(user)
+                every { userRepository.getByUserIds(any(), any(), any()) } returns listOf(user)
                 every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
                 it("유저를 조회 한다") {
-                    shouldNotThrowAny { userService.search(TEST_NICKNAME, 10, null) }
+                    shouldNotThrowAny { userService.searchByNickname(TEST_NICKNAME, 10, null) }
                 }
             }
         }

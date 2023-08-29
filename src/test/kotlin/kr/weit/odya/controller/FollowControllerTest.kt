@@ -569,7 +569,7 @@ class FollowControllerTest(
             val targetUri = "/api/v1/follows/search"
             context("유효한 토큰이면서, 가입된 사용자인 경우") {
                 val response = createFollowSlice()
-                every { followService.search(TEST_USER_ID, TEST_NICKNAME, TEST_SIZE, TEST_LAST_ID) } returns response
+                every { followService.searchByNickname(TEST_USER_ID, TEST_NICKNAME, TEST_SIZE, TEST_LAST_ID) } returns response
                 it("200 응답한다.") {
                     restDocMockMvc.get(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
