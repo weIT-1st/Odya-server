@@ -565,11 +565,11 @@ class FollowControllerTest(
             }
         }
 
-        describe("GET /api/v1/follows/search") {
-            val targetUri = "/api/v1/follows/search"
+        describe("GET /api/v1/follows/followings/search") {
+            val targetUri = "/api/v1/follows/followings/search"
             context("유효한 토큰이면서, 가입된 사용자인 경우") {
                 val response = createFollowSlice()
-                every { followService.search(TEST_USER_ID, TEST_NICKNAME, TEST_SIZE, TEST_LAST_ID) } returns response
+                every { followService.searchByNickname(TEST_USER_ID, TEST_NICKNAME, TEST_SIZE, TEST_LAST_ID) } returns response
                 it("200 응답한다.") {
                     restDocMockMvc.get(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -605,25 +605,23 @@ class FollowControllerTest(
                 }
             }
 
-            context("유효한 토큰이면서, 닉네임이 올바르지 않은 경우") {
+            context("유효한 토큰이면서, 닉네임이 없는 경우") {
                 it("400 응답한다.") {
                     restDocMockMvc.get(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         param(SIZE_PARAM, TEST_SIZE.toString())
-                        param(NICKNAME_PARAM, " ")
                         param(LAST_ID_PARAM, TEST_LAST_ID.toString())
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
                         createDocument(
-                            "search-followings-fail-nickname-blank",
+                            "search-followings-fail-nickname-null",
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
                             queryParameters(
                                 SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_SIZE isOptional true,
                                 LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example TEST_LAST_ID isOptional true,
-                                NICKNAME_PARAM parameterDescription "올바르지 않은 닉네임" example " ",
                             ),
                         )
                     }

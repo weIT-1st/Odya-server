@@ -11,6 +11,7 @@ import kr.weit.odya.domain.user.existsByPhoneNumber
 import kr.weit.odya.domain.user.getByNickname
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.domain.user.getByUserIdWithProfile
+import kr.weit.odya.domain.user.getByUserIds
 import kr.weit.odya.security.FirebaseTokenHelper
 import kr.weit.odya.service.dto.InformationRequest
 import kr.weit.odya.service.dto.SliceResponse
@@ -86,10 +87,10 @@ class UserService(
         }
     }
 
-    fun search(nickname: String, size: Int, lastId: Long?): SliceResponse<UserSimpleResponse> {
+    fun searchByNickname(nickname: String, size: Int, lastId: Long?): SliceResponse<UserSimpleResponse> {
         val usersDocuments = usersDocumentRepository.getByNickname(nickname)
         val userIds = usersDocuments.map { it.id }
-        val users = userRepository.findAllByUserIds(userIds, size + 1, lastId).map {
+        val users = userRepository.getByUserIds(userIds, size + 1, lastId).map {
             UserSimpleResponse(
                 it,
                 fileService.getPreAuthenticatedObjectUrl(it.profile.profileName),
