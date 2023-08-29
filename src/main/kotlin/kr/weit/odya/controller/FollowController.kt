@@ -81,7 +81,7 @@ class FollowController(
         return ResponseEntity.ok(followService.getSliceFollowers(userId, pageable, sortType))
     }
 
-    @GetMapping("/search")
+    @GetMapping("/following/search")
     fun search(
         @LoginUserId userId: Long,
         @NotBlank(message = "검색할 닉네임은 필수입니다.")

@@ -565,8 +565,8 @@ class FollowControllerTest(
             }
         }
 
-        describe("GET /api/v1/follows/search") {
-            val targetUri = "/api/v1/follows/search"
+        describe("GET /api/v1/follows/following/search") {
+            val targetUri = "/api/v1/follows/following/search"
             context("유효한 토큰이면서, 가입된 사용자인 경우") {
                 val response = createFollowSlice()
                 every { followService.searchByNickname(TEST_USER_ID, TEST_NICKNAME, TEST_SIZE, TEST_LAST_ID) } returns response
