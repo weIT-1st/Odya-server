@@ -71,14 +71,11 @@ data class SlicePlaceReviewResponse private constructor(
 ) : SliceResponse<PlaceReviewListResponse>(hasNext, content) {
     companion object {
         fun of(size: Int, content: List<PlaceReview>, averageRating: Double): SlicePlaceReviewResponse {
-            val contents: List<PlaceReview>
-            val hasNext: Boolean
-            if (content.size > size) {
-                hasNext = true
-                contents = content.dropLast(1)
+            val hasNext: Boolean = content.size > size
+            val contents = if (hasNext) {
+                content.dropLast(1)
             } else {
-                hasNext = false
-                contents = content
+                content
             }
             return SlicePlaceReviewResponse(hasNext, averageRating, contents.map { PlaceReviewListResponse(it) })
         }

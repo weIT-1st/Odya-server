@@ -8,6 +8,8 @@ import kr.weit.odya.domain.user.Profile
 import kr.weit.odya.domain.user.SocialType
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
+import kr.weit.odya.domain.user.UsersDocument
+import kr.weit.odya.domain.user.UsersDocumentRepository
 import kr.weit.odya.domain.user.existsByEmail
 import kr.weit.odya.domain.user.existsByNickname
 import kr.weit.odya.domain.user.existsByPhoneNumber
@@ -28,6 +30,7 @@ class AuthenticationService(
     private val profileColorService: ProfileColorService,
     private val firebaseTokenHelper: FirebaseTokenHelper,
     private val kakaoClient: KakaoClient,
+    private val usersDocumentRepository: UsersDocumentRepository,
 ) {
     fun appleLoginProcess(appleUsername: String) {
         if (!userRepository.existsByUsername(appleUsername)) {
@@ -53,6 +56,7 @@ class AuthenticationService(
             firebaseTokenHelper.createFirebaseUser(registerRequest.username)
         }
         termsService.saveAllAgreedTerms(user, termsIdList)
+        usersDocumentRepository.save(UsersDocument(user))
     }
 
     fun validateNickname(nickname: String) {

@@ -7,11 +7,13 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
+import kr.weit.odya.domain.agreedTerms.AgreedTermsRepository
 import kr.weit.odya.domain.favoritePlace.FavoritePlaceRepository
 import kr.weit.odya.domain.favoriteTopic.FavoriteTopicRepository
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.placeReview.PlaceReviewRepository
 import kr.weit.odya.domain.user.UserRepository
+import kr.weit.odya.domain.user.UsersDocumentRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.security.FirebaseTokenHelper
 import kr.weit.odya.support.TEST_USERNAME
@@ -26,6 +28,8 @@ class WithdrawServiceTest : DescribeSpec(
         val placeReviewRepository = mockk<PlaceReviewRepository>()
         val favoriteTopicRepository = mockk<FavoriteTopicRepository>()
         val firebaseTokenHelper = mockk<FirebaseTokenHelper>()
+        val usersDocumentRepository = mockk<UsersDocumentRepository>()
+        val agreedTermsRepository = mockk<AgreedTermsRepository>()
         val withdrawService =
             WithdrawService(
                 userRepository,
@@ -34,6 +38,8 @@ class WithdrawServiceTest : DescribeSpec(
                 placeReviewRepository,
                 favoriteTopicRepository,
                 firebaseTokenHelper,
+                usersDocumentRepository,
+                agreedTermsRepository,
             )
 
         describe("withdrawUser") {
@@ -46,6 +52,8 @@ class WithdrawServiceTest : DescribeSpec(
                 every { favoriteTopicRepository.deleteByUserId(any()) } just runs
                 every { userRepository.deleteById(TEST_USER_ID) } just runs
                 every { firebaseTokenHelper.withdrawUser(TEST_USERNAME) } just runs
+                every { usersDocumentRepository.deleteById(TEST_USER_ID) } just runs
+                every { agreedTermsRepository.deleteByUserId(TEST_USER_ID) } just runs
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny { withdrawService.withdrawUser(TEST_USER_ID) }
                 }
@@ -60,6 +68,8 @@ class WithdrawServiceTest : DescribeSpec(
                 every { favoriteTopicRepository.deleteByUserId(any()) } just runs
                 every { userRepository.deleteById(TEST_USER_ID) } just runs
                 every { firebaseTokenHelper.withdrawUser(TEST_USERNAME) } just runs
+                every { usersDocumentRepository.deleteById(TEST_USER_ID) } just runs
+                every { agreedTermsRepository.deleteByUserId(TEST_USER_ID) } just runs
                 it("[NoSuchElementException] 반환") {
                     shouldThrow<NoSuchElementException> { withdrawService.withdrawUser(TEST_USER_ID) }
                 }

@@ -1,6 +1,7 @@
 package kr.weit.odya.controller
 
 import jakarta.validation.Valid
+import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Positive
 import kr.weit.odya.domain.follow.FollowSortType
 import kr.weit.odya.security.LoginUserId
@@ -78,5 +79,21 @@ class FollowController(
         @RequestParam(name = "sortType", required = false, defaultValue = "LATEST") sortType: FollowSortType,
     ): ResponseEntity<SliceResponse<FollowUserResponse>> {
         return ResponseEntity.ok(followService.getSliceFollowers(userId, pageable, sortType))
+    }
+
+    @GetMapping("/followings/search")
+    fun search(
+        @LoginUserId userId: Long,
+        @NotNull(message = "검색할 닉네임은 필수입니다.")
+        @RequestParam("nickname")
+        nickname: String,
+        @Positive(message = "사이즈는 양수여야 합니다.")
+        @RequestParam(name = "size", required = false, defaultValue = "10")
+        size: Int,
+        @Positive(message = "마지막 Id는 양수여야 합니다.")
+        @RequestParam(name = "lastId", required = false)
+        lastId: Long?,
+    ): ResponseEntity<SliceResponse<FollowUserResponse>> {
+        return ResponseEntity.ok(followService.searchByNickname(userId, nickname, size, lastId))
     }
 }

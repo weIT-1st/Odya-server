@@ -3,9 +3,12 @@ package kr.weit.odya.service
 import kr.weit.odya.domain.follow.Follow
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.FollowSortType
+import kr.weit.odya.domain.follow.getByFollowerIdAndFollowingIdIn
 import kr.weit.odya.domain.follow.getFollowerListBySearchCond
 import kr.weit.odya.domain.follow.getFollowingListBySearchCond
 import kr.weit.odya.domain.user.UserRepository
+import kr.weit.odya.domain.user.UsersDocumentRepository
+import kr.weit.odya.domain.user.getByNickname
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.service.dto.FollowCountsResponse
 import kr.weit.odya.service.dto.FollowRequest
@@ -19,7 +22,8 @@ import org.springframework.transaction.annotation.Transactional
 class FollowService(
     private val followRepository: FollowRepository,
     private val userRepository: UserRepository,
-    private val objectStorageService: ObjectStorageService,
+    private val fileService: FileService,
+    private val usersDocumentRepository: UsersDocumentRepository,
 ) {
     @Transactional
     fun createFollow(followerId: Long, followRequest: FollowRequest) {
@@ -46,7 +50,7 @@ class FollowService(
             .map {
                 FollowUserResponse(
                     it.following,
-                    objectStorageService.getPreAuthenticatedObjectUrl(it.following.profile.profileName),
+                    fileService.getPreAuthenticatedObjectUrl(it.following.profile.profileName),
                 )
             }
         return SliceResponse(pageable, followingList)
@@ -62,7 +66,7 @@ class FollowService(
             .map {
                 FollowUserResponse(
                     it.follower,
-                    objectStorageService.getPreAuthenticatedObjectUrl(it.follower.profile.profileName),
+                    fileService.getPreAuthenticatedObjectUrl(it.follower.profile.profileName),
                 )
             }
         return SliceResponse(pageable, followerList)
@@ -72,5 +76,20 @@ class FollowService(
         val followingCount = followRepository.countByFollowerId(userId)
         val followerCount = followRepository.countByFollowingId(userId)
         return FollowCountsResponse(followingCount, followerCount)
+    }
+
+    @Transactional(readOnly = true)
+    fun searchByNickname(userId: Long, nickname: String, size: Int, lastId: Long?): SliceResponse<FollowUserResponse> {
+        val usersDocuments = usersDocumentRepository.getByNickname(nickname)
+        val userIds = usersDocuments.map { it.id }
+
+        val followings =
+            followRepository.getByFollowerIdAndFollowingIdIn(userId, userIds, size + 1, lastId).map {
+                FollowUserResponse(
+                    it.following,
+                    fileService.getPreAuthenticatedObjectUrl(it.following.profile.profileName),
+                )
+            }
+        return SliceResponse(size, followings)
     }
 }
