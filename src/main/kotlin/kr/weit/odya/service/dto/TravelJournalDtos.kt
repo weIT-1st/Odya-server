@@ -65,14 +65,7 @@ data class TravelJournalContentRequest(
     fun toEntity(travelJournalContentImages: List<TravelJournalContentImage>) = TravelJournalContent(
         content = content,
         placeId = placeId,
-        coordinates = if (latitudes != null && longitudes != null && latitudes.isNotEmpty()) {
-            Coordinates(
-                latitudes,
-                longitudes,
-            )
-        } else {
-            null
-        },
+        coordinates = Coordinates.of(latitudes, longitudes),
         travelDate = travelDate,
         travelJournalContentImages = travelJournalContentImages,
     )
