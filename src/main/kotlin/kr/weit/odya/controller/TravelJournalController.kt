@@ -22,9 +22,12 @@ class TravelJournalController(private val travelJournalService: TravelJournalSer
     @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun createTravelJournal(
         @LoginUserId userId: Long,
-        @Valid @RequestPart("travel-journal") travelJournalRequest: TravelJournalRequest,
-        @Size(max = 225, message = "이미지는 최대 225개까지 업로드할 수 있습니다.")
-        @RequestPart("travel-journal-content-image", required = false) images: List<MultipartFile>?,
+        @Valid
+        @RequestPart("travel-journal")
+        travelJournalRequest: TravelJournalRequest,
+        @Size(min = 1, max = 225, message = "이미지는 최소 1개, 최대 225개까지 업로드할 수 있습니다.")
+        @RequestPart("travel-journal-content-image")
+        images: List<MultipartFile>,
     ): ResponseEntity<Void> {
         val imageMap = travelJournalService.getImageMap(images)
         travelJournalService.validateTravelJournalRequest(travelJournalRequest, imageMap)
