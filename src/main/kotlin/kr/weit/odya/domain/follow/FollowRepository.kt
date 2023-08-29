@@ -23,6 +23,14 @@ fun FollowRepository.getFollowerListBySearchCond(
 ): List<Follow> =
     findSliceByFollowingIdOrderBySortType(followingId, pageable, sortType)
 
+fun FollowRepository.getByFollowerIdAndFollowingIdIn(
+    follower: Long,
+    followingIds: List<Long>,
+    size: Int,
+    lastId: Long?,
+): List<Follow> =
+    findAllByFollowerIdAndFollowingIdInAndLastId(follower, followingIds, size, lastId)
+
 interface FollowRepository : JpaRepository<Follow, Long>, CustomFollowRepository {
     fun existsByFollowerIdAndFollowingId(followerId: Long, followingId: Long): Boolean
 

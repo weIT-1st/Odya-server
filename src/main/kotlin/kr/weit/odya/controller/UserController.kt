@@ -97,7 +97,7 @@ class UserController(
         @RequestParam(name = "lastId", required = false)
         lastId: Long?,
     ): ResponseEntity<SliceResponse<UserSimpleResponse>> {
-        return ResponseEntity.ok(userService.search(nickname, size, lastId))
+        return ResponseEntity.ok(userService.searchByNickname(nickname, size, lastId))
     }
 
     @DeleteMapping

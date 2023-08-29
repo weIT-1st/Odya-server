@@ -9,6 +9,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import kr.weit.odya.domain.follow.FollowRepository
+import kr.weit.odya.domain.follow.getByFollowerIdAndFollowingIdIn
 import kr.weit.odya.domain.follow.getFollowerListBySearchCond
 import kr.weit.odya.domain.follow.getFollowingListBySearchCond
 import kr.weit.odya.domain.user.UserRepository
@@ -187,12 +188,12 @@ class FollowServiceTest : DescribeSpec(
             }
         }
 
-        describe("search") {
+        describe("searchByNickname") {
             context("유효한 nickname이 주어지면") {
                 val user = createUser()
                 every { usersDocumentRepository.getByNickname(TEST_NICKNAME) } returns listOf(createUsersDocument(user))
                 every {
-                    followRepository.findAllByFollowerIdAndFollowingIdInAndLastId(
+                    followRepository.getByFollowerIdAndFollowingIdIn(
                         any(),
                         any(),
                         any(),
@@ -201,7 +202,7 @@ class FollowServiceTest : DescribeSpec(
                 } returns listOf(createFollow(following = user))
                 every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
                 it("유저를 조회 한다") {
-                    shouldNotThrowAny { followService.search(TEST_USER_ID, TEST_NICKNAME, 10, null) }
+                    shouldNotThrowAny { followService.searchByNickname(TEST_USER_ID, TEST_NICKNAME, 10, null) }
                 }
             }
         }

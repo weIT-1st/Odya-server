@@ -81,11 +81,12 @@ class FollowController(
         return ResponseEntity.ok(followService.getSliceFollowers(userId, pageable, sortType))
     }
 
-    @GetMapping("/search")
+    @GetMapping("/following/search")
     fun search(
         @LoginUserId userId: Long,
         @NotBlank(message = "검색할 닉네임은 필수입니다.")
-        @RequestParam("nickname") nickname: String,
+        @RequestParam("nickname")
+        nickname: String,
         @Positive(message = "사이즈는 양수여야 합니다.")
         @RequestParam(name = "size", required = false, defaultValue = "10")
         size: Int,
@@ -93,6 +94,6 @@ class FollowController(
         @RequestParam(name = "lastId", required = false)
         lastId: Long?,
     ): ResponseEntity<SliceResponse<FollowUserResponse>> {
-        return ResponseEntity.ok(followService.search(userId, nickname, size, lastId))
+        return ResponseEntity.ok(followService.searchByNickname(userId, nickname, size, lastId))
     }
 }

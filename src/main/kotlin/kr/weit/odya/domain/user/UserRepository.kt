@@ -2,6 +2,7 @@ package kr.weit.odya.domain.user
 
 import com.linecorp.kotlinjdsl.QueryFactory
 import com.linecorp.kotlinjdsl.listQuery
+import com.linecorp.kotlinjdsl.query.spec.predicate.PredicateSpec
 import com.linecorp.kotlinjdsl.querydsl.expression.col
 import com.linecorp.kotlinjdsl.querydsl.from.fetch
 import org.springframework.data.jpa.repository.EntityGraph
@@ -26,6 +27,9 @@ fun UserRepository.getByUserIdWithProfile(userId: Long): User =
     findUserWithProfileById(userId) ?: throw NoSuchElementException("$userId: 사용자가 존재하지 않습니다")
 
 fun UserRepository.getByUserIds(userIds: Collection<Long>): List<User> = findByIdIn(userIds)
+
+fun UserRepository.getByUserIds(userIds: List<Long>, size: Int, lastId: Long?): List<User> =
+    findAllByUserIds(userIds, size, lastId)
 
 interface UserRepository : JpaRepository<User, Long>, CustomUserRepository {
     fun existsByUsername(username: String): Boolean
@@ -58,11 +62,17 @@ class CustomUserRepositoryImpl(private val queryFactory: QueryFactory) : CustomU
     override fun findAllByUserIds(userIds: List<Long>, size: Int, lastId: Long?): List<User> = queryFactory.listQuery {
         select(entity(User::class))
         from(entity(User::class))
-        where(col(entity(User::class), User::id).`in`(userIds))
-        if (lastId != null) {
-            where(col(User::id).lessThan(lastId))
-        }
         fetch(User::profile)
+        where(
+            and(
+                col(entity(User::class), User::id).`in`(userIds),
+                if (lastId != null) {
+                    col(User::id).lessThan(lastId)
+                } else {
+                    PredicateSpec.empty
+                },
+            ),
+        )
         orderBy(listOf(col(User::id).desc()))
         limit(size)
     }
