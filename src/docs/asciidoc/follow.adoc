@@ -95,9 +95,9 @@ operation::follow-controller-test/get-follower-slice-fail-invalid-token[snippets
 
 operation::follow-controller-test/search-followings-success[snippets='http-request,request-headers,http-response']
 
-=== *6-2 실패 - 유효하지 않은 닉네임*
+=== *6-2 실패 - 닉네임이 없는 경우*
 
-operation::follow-controller-test/search-followings-fail-nickname-blank[snippets='http-request,request-headers,http-response']
+operation::follow-controller-test/search-followings-fail-nickname-null[snippets='http-request,request-headers,http-response']
 
 === *6-3 실패 - 유효하지 않은 마지막 id*
 
