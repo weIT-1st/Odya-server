@@ -1,4 +1,4 @@
-package kr.weit.odya.domain.traveljournal
+package kr.weit.odya.domain.community
 
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
@@ -14,15 +14,15 @@ import kr.weit.odya.support.domain.BaseTimeEntity
 
 @Entity
 @SequenceGenerator(
-    name = "TRAVEL_JOURNAL_CONTENT_IMAGE_SEQ_GENERATOR",
-    sequenceName = "TRAVEL_JOURNAL_CONTENT_IMAGE_SEQ",
+    name = "COMMUNITY_CONTENT_IMAGE_SEQ_GENERATOR",
+    sequenceName = "COMMUNITY_CONTENT_IMAGE_SEQ",
     initialValue = 1,
     allocationSize = 1,
 )
-class TravelJournalContentImage(
+class CommunityContentImage(
     @Id
     @Column(columnDefinition = "NUMERIC(19, 0)")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "TRAVEL_JOURNAL_CONTENT_IMAGE_SEQ_GENERATOR")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "COMMUNITY_CONTENT_IMAGE_SEQ_GENERATOR")
     val id: Long = 0L,
 
     @OneToOne(cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE])
