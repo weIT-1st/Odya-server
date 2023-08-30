@@ -98,3 +98,11 @@ data class ProfileResponse(
         )
     }
 }
+
+data class UserStatisticsResponse(
+    val travelJournalCount: Int,
+    val placeCount: Int,
+    val followingsCount: Int,
+    val followersCount: Int,
+    val odyaCount: Int,
+)
