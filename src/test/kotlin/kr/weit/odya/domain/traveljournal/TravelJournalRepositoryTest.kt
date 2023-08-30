@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
+import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_ID
 import kr.weit.odya.support.createContentImage
 import kr.weit.odya.support.createOtherUser
@@ -22,6 +23,7 @@ class TravelJournalRepositoryTest(
     private val travelJournalRepository: TravelJournalRepository,
 ) : ExpectSpec(
     {
+
         beforeEach {
             val user: User = userRepository.save(createUser())
             val otherUser: User = userRepository.save(createOtherUser())
@@ -45,6 +47,13 @@ class TravelJournalRepositoryTest(
             expect("여행 일지 ID와 일치하는 여행 일지를 조회한다.") {
                 val result = travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID)
                 result.id shouldBe TEST_TRAVEL_JOURNAL_ID
+            }
+        }
+
+        context("여행일지 사용자 Id로 조회") {
+            expect("유저 ID와 일치하는 여행기록을 조회한다.") {
+                val result = travelJournalRepository.getByUserId(TEST_USER_ID)
+                result.size shouldBe 1
             }
         }
     },

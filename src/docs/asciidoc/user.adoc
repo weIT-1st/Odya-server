@@ -153,3 +153,22 @@ operation::user-controller-test/search-users-fail-not-registered-user[snippets='
 === *7-5 실패 - 유효하지 않은 토큰*
 
 operation::user-controller-test/search-users-fail-invalid-token[snippets='http-request,request-headers,http-response']
+
+[[유저-통계-API]]
+== *8. 유저 통계 API*
+
+=== *8-1 성공*
+
+operation::user-controller-test/get-user-statistics-success[snippets='http-request,request-headers,path-parameters,http-response']
+
+=== *8-2 실패 - USER ID가 음수인 경우*
+
+operation::user-controller-test/get-user-statistics-fail-user-id-negative[snippets='http-request,request-headers,path-parameters,http-response']
+
+=== *8-3 실패 - 가입되지 않은 사용자인 경우*
+
+operation::user-controller-test/get-user-statistics-fail-not-registered-user[snippets='http-request,request-headers,path-parameters,http-response']
+
+=== *8-4 실패 - 유효하지 않은 토큰인 경우*
+
+operation::user-controller-test/get-user-statistics-fail-invalid-token[snippets='http-request,request-headers,path-parameters,http-response']
