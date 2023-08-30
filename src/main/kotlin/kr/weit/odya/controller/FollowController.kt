@@ -96,4 +96,17 @@ class FollowController(
     ): ResponseEntity<SliceResponse<FollowUserResponse>> {
         return ResponseEntity.ok(followService.searchByNickname(userId, nickname, size, lastId))
     }
+
+    @GetMapping("/may-know") // 페이스 북에서는 알수도 있는 친구를 you may know라고 표현하길래 따라해봤습니다
+    fun getMayKnowFollowings(
+        @LoginUserId userId: Long,
+        @Positive(message = "사이즈는 양수여야 합니다.")
+        @RequestParam(name = "size", required = false, defaultValue = "10")
+        size: Int,
+        @Positive(message = "마지막 Id는 양수여야 합니다.")
+        @RequestParam(name = "lastId", required = false)
+        lastId: Long?,
+    ): ResponseEntity<SliceResponse<FollowUserResponse>> {
+        return ResponseEntity.ok(followService.getMayKnowFollowings(userId, size, lastId))
+    }
 }

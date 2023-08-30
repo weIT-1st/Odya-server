@@ -9,6 +9,7 @@ import kr.weit.odya.support.TEST_DEFAULT_SIZE
 import kr.weit.odya.support.TEST_DEFAULT_SORT_TYPE
 import kr.weit.odya.support.createFollow
 import kr.weit.odya.support.createOtherUser
+import kr.weit.odya.support.createTheAnotherUser
 import kr.weit.odya.support.createUser
 import kr.weit.odya.support.test.BaseTests.RepositoryTest
 
@@ -20,9 +21,11 @@ class FollowRepositoryTest(
     {
         val follower: User = userRepository.save(createUser())
         val following: User = userRepository.save(createOtherUser())
+        val notFollowing: User = userRepository.save(createTheAnotherUser())
         beforeEach {
             followRepository.save(createFollow(follower, following))
             followRepository.save(createFollow(following, follower))
+            followRepository.save(createFollow(following, notFollowing))
         }
 
         context("팔로우 목록 조회") {
@@ -118,6 +121,33 @@ class FollowRepositoryTest(
                     userIds,
                     TEST_DEFAULT_SIZE,
                     following.id,
+                )
+                result.size shouldBe 0
+            }
+        }
+
+        context("알수도 있는 유저 검색") {
+            expect("알수도 있는 유저를 조회한다") {
+                val result = followRepository.getMayKnowFollowings(
+                    follower.id,
+                    TEST_DEFAULT_SIZE,
+                    null,
+                )
+                result.size shouldBe 1
+            }
+
+            expect("lastId보다 작은 알수도 있는 유저를 조회한다") {
+                var result = followRepository.getMayKnowFollowings(
+                    follower.id,
+                    TEST_DEFAULT_SIZE,
+                    notFollowing.id + 1,
+                )
+                result.size shouldBe 1
+
+                result = followRepository.getMayKnowFollowings(
+                    follower.id,
+                    TEST_DEFAULT_SIZE,
+                    notFollowing.id,
                 )
                 result.size shouldBe 0
             }

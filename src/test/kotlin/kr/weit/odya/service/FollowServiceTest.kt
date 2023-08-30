@@ -12,6 +12,7 @@ import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getByFollowerIdAndFollowingIdIn
 import kr.weit.odya.domain.follow.getFollowerListBySearchCond
 import kr.weit.odya.domain.follow.getFollowingListBySearchCond
+import kr.weit.odya.domain.follow.getMayKnowFollowings
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.UsersDocumentRepository
 import kr.weit.odya.domain.user.getByNickname
@@ -203,6 +204,17 @@ class FollowServiceTest : DescribeSpec(
                 every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
                 it("유저를 조회 한다") {
                     shouldNotThrowAny { followService.searchByNickname(TEST_USER_ID, TEST_NICKNAME, 10, null) }
+                }
+            }
+        }
+
+        describe("getMayKnowFollowings") {
+            context("요청이 들어오면") {
+                val user = createUser()
+                every { followRepository.getMayKnowFollowings(any(), any(), any()) } returns createFollowList()
+                every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
+                it("알수도 있는 유저를 조회 한다") {
+                    shouldNotThrowAny { followService.getMayKnowFollowings(TEST_USER_ID, 10, null) }
                 }
             }
         }

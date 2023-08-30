@@ -93,24 +93,48 @@ operation::follow-controller-test/get-follower-slice-fail-invalid-token[snippets
 
 === *6-1 성공*
 
-operation::follow-controller-test/search-followings-success[snippets='http-request,request-headers,http-response']
+operation::follow-controller-test/search-followings-success[snippets='http-request,request-headers,query-parameters,http-response']
 
 === *6-2 실패 - 닉네임이 없는 경우*
 
-operation::follow-controller-test/search-followings-fail-nickname-null[snippets='http-request,request-headers,http-response']
+operation::follow-controller-test/search-followings-fail-nickname-null[snippets='http-request,request-headers,query-parameters,http-response']
 
 === *6-3 실패 - 유효하지 않은 마지막 id*
 
-operation::follow-controller-test/search-followings-fail-invalid-last-id[snippets='http-request,request-headers,http-response']
+operation::follow-controller-test/search-followings-fail-invalid-last-id[snippets='http-request,request-headers,query-parameters,http-response']
 
 === *6-4 실패 - 유효하지 않은 사이즈*
 
-operation::follow-controller-test/search-followings-fail-invalid-size[snippets='http-request,request-headers,http-response']
+operation::follow-controller-test/search-followings-fail-invalid-size[snippets='http-request,request-headers,query-parameters,http-response']
 
 === *6-5 실패 - 가입하지 않은 유저*
 
-operation::follow-controller-test/search-followings-fail-not-registered-user[snippets='http-request,request-headers,http-response']
+operation::follow-controller-test/search-followings-fail-not-registered-user[snippets='http-request,request-headers,query-parameters,http-response']
 
 === *6-5 실패 - 유효하지 않은 토큰*
 
-operation::follow-controller-test/search-followings-fail-invalid-token[snippets='http-request,request-headers,http-response']
+operation::follow-controller-test/search-followings-fail-invalid-token[snippets='http-request,request-headers,query-parameters,http-response']
+
+
+[[알수도-있는-유저-검색-API]]
+== *7. 알수도 있는 유저 검색 API*
+
+=== *7-1 성공*
+
+operation::follow-controller-test/get-may-know-success[snippets='http-request,request-headers,query-parameters,http-response']
+
+=== *7-2 실패 - 유효하지 않은 마지막 id*
+
+operation::follow-controller-test/get-may-know-fail-invalid-last-id[snippets='http-request,request-headers,query-parameters,http-response']
+
+=== *7-3 실패 - 유효하지 않은 사이즈*
+
+operation::follow-controller-test/get-may-know-fail-invalid-size[snippets='http-request,request-headers,query-parameters,http-response']
+
+=== *7-4 실패 - 가입하지 않은 유저*
+
+operation::follow-controller-test/get-may-know-fail-not-registered-user[snippets='http-request,request-headers,query-parameters,http-response']
+
+=== *7-5 실패 - 유효하지 않은 토큰*
+
+operation::follow-controller-test/get-may-know-fail-invalid-token[snippets='http-request,request-headers,query-parameters,http-response']
