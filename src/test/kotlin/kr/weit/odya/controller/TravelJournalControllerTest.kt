@@ -14,6 +14,7 @@ import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
 import kr.weit.odya.support.TEST_IMAGE_FILE_WEBP
 import kr.weit.odya.support.TEST_TRAVEL_CONTENT_IMAGE_MAP
+import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createImageNamePairs
 import kr.weit.odya.support.createMockImageFile
@@ -86,8 +87,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isCreated() }
                     }.andDo {
@@ -154,8 +155,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isCreated() }
                     }.andDo {
@@ -183,8 +184,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -212,8 +213,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -245,8 +246,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -278,8 +279,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -333,7 +334,7 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        files(226, createMockImageFile())
+                        files(226, createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -368,8 +369,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -394,7 +395,7 @@ class TravelJournalControllerTest(
                 val travelJournalRequestFile =
                     createTravelJournalRequestFile(contentStream = travelJournalRequestByteInputStream)
                 every { travelJournalService.getImageMap(any<List<MultipartFile>>()) } returns mapOf(
-                    TEST_IMAGE_FILE_WEBP to createMockImageFile(),
+                    TEST_IMAGE_FILE_WEBP to createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME),
                 )
                 every {
                     travelJournalService.validateTravelJournalRequest(
@@ -406,7 +407,7 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -447,8 +448,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -488,8 +489,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -524,8 +525,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -560,8 +561,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isNotFound() }
                     }.andDo {
@@ -596,8 +597,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -632,8 +633,13 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile(originalFileName = "wrong-image-name.png"))
-                        file(createMockOtherImageFile())
+                        file(
+                            createMockImageFile(
+                                mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME,
+                                originalFileName = "wrong-image-name.png",
+                            ),
+                        )
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -675,7 +681,7 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -717,7 +723,7 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -760,8 +766,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isInternalServerError() }
                     }.andDo {
@@ -811,8 +817,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isNotFound() }
                     }.andDo {
@@ -840,8 +846,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isUnauthorized() }
                     }.andDo {
