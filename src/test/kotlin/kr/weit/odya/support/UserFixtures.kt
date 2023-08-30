@@ -54,6 +54,11 @@ fun createOtherUser(): User = User(
     profile = createProfile(TEST_PROFILE_ID),
 )
 
+fun createCustomUser(
+    username: String = TEST_OTHER_USERNAME,
+    nickname: String = TEST_OTHER_NICKNAME,
+) = User(0L, username, null, nickname, null, gender = Gender.M, birthday = LocalDate.now(), socialType = SocialType.KAKAO, profile = createProfile())
+
 fun createUserResponse(): UserResponse = UserResponse(createUser(), TEST_PROFILE_URL)
 
 fun createInformationRequest(): InformationRequest = InformationRequest(TEST_NICKNAME)

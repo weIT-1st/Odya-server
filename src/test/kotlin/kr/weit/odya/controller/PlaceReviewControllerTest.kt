@@ -35,7 +35,7 @@ import kr.weit.odya.support.TEST_PLACE_SORT_TYPE
 import kr.weit.odya.support.TEST_REVIEW
 import kr.weit.odya.support.TEST_SIZE
 import kr.weit.odya.support.TEST_TOO_HIGH_RATING
-import kr.weit.odya.support.TEST_TOO_LONG_REVIEW
+import kr.weit.odya.support.TEST_TOO_LONG_PHRASE
 import kr.weit.odya.support.TEST_TOO_LOW_RATING
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.creatSlicePlaceReviewResponse
@@ -183,7 +183,7 @@ class PlaceReviewControllerTest(
             }
 
             context("유효한 토큰이지만 리뷰가 최대 길이를 초과한 경우") {
-                val request = createPlaceReviewRequest().copy(review = TEST_TOO_LONG_REVIEW)
+                val request = createPlaceReviewRequest().copy(review = TEST_TOO_LONG_PHRASE)
                 it("400을 반환한다.") {
                     restDocMockMvc.post(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -199,7 +199,7 @@ class PlaceReviewControllerTest(
                             requestBody(
                                 "placeId" type JsonFieldType.STRING description "장소 ID" example TEST_PLACE_ID,
                                 "rating" type JsonFieldType.NUMBER description "별점" example TEST_HIGHEST_RATING,
-                                "review" type JsonFieldType.STRING description "최대 길이를 초과한 리뷰" example TEST_TOO_LONG_REVIEW,
+                                "review" type JsonFieldType.STRING description "최대 길이를 초과한 리뷰" example TEST_TOO_LONG_PHRASE,
                             ),
                         )
                     }
@@ -406,7 +406,7 @@ class PlaceReviewControllerTest(
             }
 
             context("유효한 토큰이지만 리뷰가 최대 길이를 초과한 경우") {
-                val request = updatePlaceReviewRequest().copy(review = TEST_TOO_LONG_REVIEW)
+                val request = updatePlaceReviewRequest().copy(review = TEST_TOO_LONG_PHRASE)
                 it("400을 반환한다.") {
                     restDocMockMvc.patch(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -422,7 +422,7 @@ class PlaceReviewControllerTest(
                             requestBody(
                                 "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID,
                                 "rating" type JsonFieldType.NUMBER description "별점" example TEST_HIGHEST_RATING isOptional true,
-                                "review" type JsonFieldType.STRING description "최대 길이를 초과한 리뷰" example TEST_TOO_LONG_REVIEW isOptional true,
+                                "review" type JsonFieldType.STRING description "최대 길이를 초과한 리뷰" example TEST_TOO_LONG_PHRASE isOptional true,
                             ),
                         )
                     }
