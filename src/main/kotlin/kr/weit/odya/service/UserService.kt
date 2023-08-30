@@ -2,7 +2,7 @@ package kr.weit.odya.service
 
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
-import kr.weit.odya.domain.traveljournal.getByUser
+import kr.weit.odya.domain.traveljournal.getByUserId
 import kr.weit.odya.domain.user.DEFAULT_PROFILE_PNG
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
@@ -124,19 +124,18 @@ class UserService(
 
     @Transactional(readOnly = true)
     fun getStatistics(userId: Long): UserStatisticsResponse {
-        val user = userRepository.getByUserId(userId)
-        val followingCount = followRepository.countByFollowerId(userId)
-        val followerCount = followRepository.countByFollowingId(userId)
-        val travelJournals = travelJournalRepository.getByUser(user)
+        val followingsCount = followRepository.countByFollowerId(userId)
+        val followersCount = followRepository.countByFollowingId(userId)
+        val travelJournals = travelJournalRepository.getByUserId(userId)
         val travelPlaceCount = travelJournals.sumOf { travelJournal ->
             travelJournal.travelJournalContents.count { content -> content.placeId != null }
         }
         return UserStatisticsResponse(
-            followingCount,
-            followerCount,
-            travelJournals.size,
-            travelPlaceCount,
-            0, // TODO 오댜가 추가되면 그때 추가
+            travelJournalCount = travelJournals.size,
+            travelPlaceCount = travelPlaceCount,
+            followingsCount = followingsCount,
+            followersCount = followersCount,
+            odyaCount = 0, // TODO 오댜가 추가되면 그때 추가
         )
     }
 }

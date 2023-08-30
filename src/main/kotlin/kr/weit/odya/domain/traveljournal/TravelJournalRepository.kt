@@ -1,12 +1,11 @@
 package kr.weit.odya.domain.traveljournal
 
-import kr.weit.odya.domain.user.User
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
-fun TravelJournalRepository.getByUser(user: User): List<TravelJournal> = findAllByUser(user)
+fun TravelJournalRepository.getByUserId(userId: Long): List<TravelJournal> = findAllByUserId(userId)
 
 @Repository
 interface TravelJournalRepository : JpaRepository<TravelJournal, Long> {
-    fun findAllByUser(user: User): List<TravelJournal>
+    fun findAllByUserId(userId: Long): List<TravelJournal>
 }

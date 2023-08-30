@@ -34,6 +34,7 @@ import kr.weit.odya.support.TEST_GENERATED_FILE_NAME
 import kr.weit.odya.support.TEST_ID_TOKEN
 import kr.weit.odya.support.TEST_INVALID_LAST_ID
 import kr.weit.odya.support.TEST_INVALID_SIZE
+import kr.weit.odya.support.TEST_INVALID_USER_ID
 import kr.weit.odya.support.TEST_LAST_ID
 import kr.weit.odya.support.TEST_MOCK_PROFILE_NAME
 import kr.weit.odya.support.TEST_NICKNAME
@@ -45,16 +46,19 @@ import kr.weit.odya.support.createInformationRequest
 import kr.weit.odya.support.createMockProfile
 import kr.weit.odya.support.createSliceSimpleUserResponse
 import kr.weit.odya.support.createUserResponse
+import kr.weit.odya.support.createUserStatisticsResponse
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
 import kr.weit.odya.support.test.ControllerTestHelper.Companion.jsonContent
 import kr.weit.odya.support.test.RestDocsHelper
 import kr.weit.odya.support.test.RestDocsHelper.Companion.createDocument
+import kr.weit.odya.support.test.RestDocsHelper.Companion.createPathDocument
 import kr.weit.odya.support.test.RestDocsHelper.Companion.requestBody
 import kr.weit.odya.support.test.RestDocsHelper.Companion.responseBody
 import kr.weit.odya.support.test.example
 import kr.weit.odya.support.test.headerDescription
 import kr.weit.odya.support.test.isOptional
 import kr.weit.odya.support.test.parameterDescription
+import kr.weit.odya.support.test.pathDescription
 import kr.weit.odya.support.test.requestPartDescription
 import kr.weit.odya.support.test.type
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -62,13 +66,16 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.restdocs.ManualRestDocumentation
 import org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.payload.JsonFieldType
+import org.springframework.restdocs.request.RequestDocumentation.pathParameters
 import org.springframework.restdocs.request.RequestDocumentation.queryParameters
 import org.springframework.restdocs.request.RequestDocumentation.requestParts
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.multipart
 import org.springframework.test.web.servlet.patch
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.web.context.WebApplicationContext
 
 @UnitControllerTestEnvironment
@@ -838,6 +845,106 @@ class UserControllerTest(
                             ),
                         )
                     }
+                }
+            }
+        }
+
+        describe("GET /api/v1/users/{userId}/statistics") {
+            val targetUri = "/api/v1/users/{userId}/statistics"
+            context("유효한 토큰이면서, 유효한 요청인 경우") {
+                val response = createUserStatisticsResponse()
+                every { userService.getStatistics(TEST_USER_ID) } returns response
+                it("200 응답한다.") {
+
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    )
+                        .andExpect(MockMvcResultMatchers.status().isOk)
+                        .andDo(
+                            createPathDocument(
+                                "get-user-statistics-success",
+                                pathParameters(
+                                    "userId" pathDescription "유저 통계를 조회할 USER ID" example TEST_USER_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                responseBody(
+                                    "travelJournalCount" type JsonFieldType.NUMBER description "여행일지 수" example response.travelJournalCount,
+                                    "travelPlaceCount" type JsonFieldType.NUMBER description "여행한 장소 수" example response.travelPlaceCount,
+                                    "followingsCount" type JsonFieldType.NUMBER description "팔로잉 수" example response.followingsCount,
+                                    "followersCount" type JsonFieldType.NUMBER description "팔로워 수" example response.followersCount,
+                                    "odyaCount" type JsonFieldType.NUMBER description "총 오댜수" example response.odyaCount,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효한 토큰이면서, USER ID가 음수인 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_INVALID_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    )
+                        .andExpect(MockMvcResultMatchers.status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "get-user-statistics-fail-user-id-negative",
+                                pathParameters(
+                                    "userId" pathDescription "음수의 USER ID" example TEST_INVALID_USER_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                            ),
+                        )
+                }
+            }
+            context("유효한 토큰이면서, 가입되지 않은 사용자인 경우") {
+                it("401 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_NOT_EXIST_USER_ID_TOKEN),
+                    )
+                        .andExpect(MockMvcResultMatchers.status().isUnauthorized)
+                        .andDo(
+                            createPathDocument(
+                                "get-user-statistics-fail-not-registered-user",
+                                pathParameters(
+                                    "userId" pathDescription "유저 통계를 조회할 USER ID" example TEST_USER_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효하지 않은 토큰이 전달되면") {
+                it("401 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN),
+                    )
+                        .andExpect(MockMvcResultMatchers.status().isUnauthorized)
+                        .andDo(
+                            createPathDocument(
+                                "get-user-statistics-fail-invalid-token",
+                                pathParameters(
+                                    "userId" pathDescription "유저 통계를 조회할 USER ID" example TEST_USER_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                                ),
+                            ),
+                        )
                 }
             }
         }
