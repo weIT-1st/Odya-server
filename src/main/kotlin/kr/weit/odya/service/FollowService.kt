@@ -6,6 +6,7 @@ import kr.weit.odya.domain.follow.FollowSortType
 import kr.weit.odya.domain.follow.getByFollowerIdAndFollowingIdIn
 import kr.weit.odya.domain.follow.getFollowerListBySearchCond
 import kr.weit.odya.domain.follow.getFollowingListBySearchCond
+import kr.weit.odya.domain.follow.getMayKnowFollowings
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.UsersDocumentRepository
 import kr.weit.odya.domain.user.getByNickname
@@ -91,5 +92,20 @@ class FollowService(
                 )
             }
         return SliceResponse(size, followings)
+    }
+
+    @Transactional(readOnly = true)
+    fun getMayKnowFollowings(userId: Long, size: Int, lastId: Long?): SliceResponse<FollowUserResponse> {
+        val mayKnowFollowings = followRepository.getMayKnowFollowings(userId, size + 1, lastId)
+
+        return SliceResponse(
+            size,
+            mayKnowFollowings.map {
+                FollowUserResponse(
+                    it.following,
+                    fileService.getPreAuthenticatedObjectUrl(it.following.profile.profileName),
+                )
+            },
+        )
     }
 }
