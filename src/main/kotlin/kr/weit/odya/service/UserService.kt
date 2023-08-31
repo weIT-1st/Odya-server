@@ -1,5 +1,8 @@
 package kr.weit.odya.service
 
+import kr.weit.odya.domain.follow.FollowRepository
+import kr.weit.odya.domain.traveljournal.TravelJournalRepository
+import kr.weit.odya.domain.traveljournal.getByUserId
 import kr.weit.odya.domain.user.DEFAULT_PROFILE_PNG
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
@@ -17,6 +20,7 @@ import kr.weit.odya.service.dto.InformationRequest
 import kr.weit.odya.service.dto.SliceResponse
 import kr.weit.odya.service.dto.UserResponse
 import kr.weit.odya.service.dto.UserSimpleResponse
+import kr.weit.odya.service.dto.UserStatisticsResponse
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
@@ -28,6 +32,8 @@ class UserService(
     private val fileService: FileService,
     private val profileColorService: ProfileColorService,
     private val usersDocumentRepository: UsersDocumentRepository,
+    private val followRepository: FollowRepository,
+    private val travelJournalRepository: TravelJournalRepository,
 ) {
     fun getEmailByIdToken(idToken: String) = firebaseTokenHelper.getEmail(idToken)
 
@@ -114,5 +120,22 @@ class UserService(
     private fun getUserResponse(findUser: User): UserResponse {
         val profileUrl = fileService.getPreAuthenticatedObjectUrl(findUser.profile.profileName)
         return UserResponse(findUser, profileUrl)
+    }
+
+    @Transactional(readOnly = true)
+    fun getStatistics(userId: Long): UserStatisticsResponse {
+        val followingsCount = followRepository.countByFollowerId(userId)
+        val followersCount = followRepository.countByFollowingId(userId)
+        val travelJournals = travelJournalRepository.getByUserId(userId)
+        val travelPlaceCount = travelJournals.sumOf { travelJournal ->
+            travelJournal.travelJournalContents.count { content -> content.placeId != null }
+        }
+        return UserStatisticsResponse(
+            travelJournalCount = travelJournals.size,
+            travelPlaceCount = travelPlaceCount,
+            followingsCount = followingsCount,
+            followersCount = followersCount,
+            odyaCount = 0, // TODO 오댜가 추가되면 그때 추가
+        )
     }
 }
