@@ -7,9 +7,9 @@ import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.support.TEST_DEFAULT_PAGEABLE
 import kr.weit.odya.support.TEST_DEFAULT_SIZE
 import kr.weit.odya.support.TEST_DEFAULT_SORT_TYPE
+import kr.weit.odya.support.createAnotherUser
 import kr.weit.odya.support.createFollow
 import kr.weit.odya.support.createOtherUser
-import kr.weit.odya.support.createTheAnotherUser
 import kr.weit.odya.support.createUser
 import kr.weit.odya.support.test.BaseTests.RepositoryTest
 
@@ -21,7 +21,7 @@ class FollowRepositoryTest(
     {
         val follower: User = userRepository.save(createUser())
         val following: User = userRepository.save(createOtherUser())
-        val notFollowing: User = userRepository.save(createTheAnotherUser())
+        val notFollowing: User = userRepository.save(createAnotherUser())
         beforeEach {
             followRepository.save(createFollow(follower, following))
             followRepository.save(createFollow(following, follower))
