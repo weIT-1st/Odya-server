@@ -14,22 +14,22 @@ import java.time.LocalDate
 
 const val TEST_USER_ID = 1L
 const val TEST_OTHER_USER_ID = 2L
-const val TEST_THE_ANOTHER_USER_ID = 3L
+const val TEST_ANOTHER_USER_ID = 3L
 const val TEST_NOT_EXIST_USER_ID = 4L
 const val TEST_INVALID_USER_ID = -1L
 const val TEST_USERNAME = "testUsername"
 const val TEST_OTHER_USERNAME = "testOtherUsername"
-const val TEST_THE_ANOTHER_USERNAME = "testTheOtherUsername"
+const val TEST_ANOTHER_USERNAME = "testAnotherUsername"
 const val TEST_EMAIL = "test@test.com"
 const val TEST_OTHER_EMAIL = "other@test.com"
-const val TEST_THE_ANOTHER_EMAIL = "the_other@test.com"
+const val TEST_ANOTHER_EMAIL = "another@test.com"
 const val TEST_INVALID_EMAIL = "test"
 const val TEST_NICKNAME = "testNickname"
 const val TEST_OTHER_NICKNAME = "testOtherNickname"
-const val TEST_THE_ANOTHER_NICKNAME = "testTheOtherNickname"
+const val TEST_ANOTHER_NICKNAME = "testAnotherNickname"
 const val TEST_PHONE_NUMBER = "010-1234-1234"
 const val TEST_OTHER_PHONE_NUMBER = "010-1234-1235"
-const val TEST_THE_ANOTHER_PHONE_NUMBER = "010-1234-1236"
+const val TEST_ANOTHER_PHONE_NUMBER = "010-1234-1236"
 const val TEST_INVALID_PHONE_NUMBER = "01012341234"
 const val TEST_PROFILE_ID = 1L
 val TEST_GENDER: Gender = Gender.M
@@ -62,12 +62,12 @@ fun createOtherUser(): User = User(
     profile = createProfile(TEST_PROFILE_ID),
 )
 
-fun createTheAnotherUser(): User = User(
-    id = TEST_THE_ANOTHER_USER_ID,
-    username = TEST_THE_ANOTHER_USERNAME,
-    email = TEST_THE_ANOTHER_EMAIL,
-    nickname = TEST_THE_ANOTHER_NICKNAME,
-    phoneNumber = TEST_THE_ANOTHER_PHONE_NUMBER,
+fun createAnotherUser(): User = User(
+    id = TEST_ANOTHER_USER_ID,
+    username = TEST_ANOTHER_USERNAME,
+    email = TEST_ANOTHER_EMAIL,
+    nickname = TEST_ANOTHER_NICKNAME,
+    phoneNumber = TEST_ANOTHER_PHONE_NUMBER,
     gender = TEST_GENDER,
     birthday = TEST_BIRTHDAY,
     socialType = TEST_SOCIAL_TYPE,
