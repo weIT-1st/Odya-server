@@ -23,12 +23,13 @@ data class ReportPlaceReviewRequest(
     @field:Length(max = 60, message = "기타 사유는 20자 이내여야 합니다.")
     val otherReason: String? = null,
 ) {
-    fun toEntity(user: User, placeReview: PlaceReview) = ReportPlaceReview(
-        user = user,
-        reportReason = reportReason,
-        otherReason = otherReason,
-        placeReview = placeReview,
-    )
+    fun toEntity(user: User, placeReview: PlaceReview) =
+        ReportPlaceReview(
+            user = user,
+            placeReview = placeReview,
+            reportReason = reportReason,
+            reason = otherReason,
+        )
 }
 
 data class ReportTravelJournalRequest(
@@ -45,6 +46,6 @@ data class ReportTravelJournalRequest(
         user = user,
         travelJournal = travelJournal,
         reportReason = reportReason,
-        otherReason = otherReason,
+        reason = otherReason,
     )
 }

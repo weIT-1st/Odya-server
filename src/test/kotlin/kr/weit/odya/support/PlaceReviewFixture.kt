@@ -11,7 +11,7 @@ import kr.weit.odya.service.dto.SlicePlaceReviewResponse
 
 const val TEST_PLACE_REVIEW_ID = 1L
 const val TEST_INVALID_PLACE_REVIEW_ID = -1L
-const val TEST_EXIST_PLACE_REVIEW_ID = 5L
+const val TEST_NOT_EXIST_PLACE_REVIEW_ID = 5L
 const val TEST_PLACE_ID = "test_place_id"
 const val TEST_OTHER_PLACE_ID = "test_other_place_id"
 const val TEST_REVIEW = "test review"
@@ -37,7 +37,7 @@ fun updatePlaceReviewRequest(): PlaceReviewUpdateRequest {
 }
 
 fun createPlaceReview(user: User = createUser()): PlaceReview {
-    return PlaceReview(TEST_PLACE_REVIEW_ID, TEST_PLACE_ID, user, TEST_HIGHEST_RATING, TEST_REVIEW)
+    return PlaceReview(0L, TEST_PLACE_ID, user, TEST_HIGHEST_RATING, TEST_REVIEW)
 }
 
 fun createLowestRatingPlaceReview(user: User = createUser()): PlaceReview {

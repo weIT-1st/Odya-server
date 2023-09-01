@@ -14,6 +14,7 @@ import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
 import kr.weit.odya.domain.placeReview.PlaceReview
 import kr.weit.odya.domain.user.User
+import kr.weit.odya.support.domain.BaseTimeEntity
 
 @Table(
     uniqueConstraints = [
@@ -48,6 +49,8 @@ class ReportPlaceReview(
     @Column(nullable = false, updatable = false, length = 20)
     val reportReason: ReportReason,
 
+    reason: String? = null,
+) : BaseTimeEntity() {
     @Column(updatable = false, length = 60)
-    val otherReason: String? = null,
-)
+    val otherReason = if (reportReason == ReportReason.OTHER) null else reason
+}

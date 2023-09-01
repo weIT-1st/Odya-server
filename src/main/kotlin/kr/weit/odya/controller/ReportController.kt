@@ -33,11 +33,10 @@ class ReportController(private val reportService: ReportService) {
         request: ReportPlaceReviewRequest,
     ): ResponseEntity<Void> {
         reportService.reportPlaceReview(userId, request)
-        reportService.checkReportPlaceReviewCount(request.placeReviewId)
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
     }
 
-    @PostMapping("/travel-Journal")
+    @PostMapping("/travel-journal")
     fun reportTravelJournal(
         @LoginUserId
         userId: Long,

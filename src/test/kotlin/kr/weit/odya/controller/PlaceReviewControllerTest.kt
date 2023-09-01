@@ -19,13 +19,13 @@ import kr.weit.odya.support.SORT_TYPE_PARAM
 import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_NOT_EXIST_USER_ID_TOKEN
-import kr.weit.odya.support.TEST_EXIST_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_HIGHEST_RATING
 import kr.weit.odya.support.TEST_INVALID_LAST_ID
 import kr.weit.odya.support.TEST_INVALID_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_INVALID_SIZE
 import kr.weit.odya.support.TEST_INVALID_USER_ID
 import kr.weit.odya.support.TEST_LAST_ID
+import kr.weit.odya.support.TEST_NOT_EXIST_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_NOT_EXIST_USER_ID
 import kr.weit.odya.support.TEST_OTHER_PLACE_ID
 import kr.weit.odya.support.TEST_PLACE_ID
@@ -454,7 +454,7 @@ class PlaceReviewControllerTest(
             }
 
             context("유효한 토큰이지만, 존재하지 않는 장소리뷰ID인 경우") {
-                val request = updatePlaceReviewRequest().copy(id = TEST_EXIST_PLACE_REVIEW_ID)
+                val request = updatePlaceReviewRequest().copy(id = TEST_NOT_EXIST_PLACE_REVIEW_ID)
                 every { placeReviewService.updateReview(request, TEST_USER_ID) } throws NoSuchElementException(NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE)
                 it("404를 반환한다.") {
                     restDocMockMvc.patch(targetUri) {
@@ -469,7 +469,7 @@ class PlaceReviewControllerTest(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
                             requestBody(
-                                "id" type JsonFieldType.NUMBER description "잘못된 장소 리뷰 ID" example TEST_EXIST_PLACE_REVIEW_ID,
+                                "id" type JsonFieldType.NUMBER description "잘못된 장소 리뷰 ID" example TEST_NOT_EXIST_PLACE_REVIEW_ID,
                                 "rating" type JsonFieldType.NUMBER description "별점" example TEST_HIGHEST_RATING isOptional true,
                                 "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true,
                             ),
@@ -598,11 +598,11 @@ class PlaceReviewControllerTest(
             }
 
             context("유효한 토큰이지만 존재하지 않는 장소리뷰ID인 경우") {
-                every { placeReviewService.deleteReview(TEST_EXIST_PLACE_REVIEW_ID, TEST_USER_ID) } throws NoSuchElementException(NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE)
+                every { placeReviewService.deleteReview(TEST_NOT_EXIST_PLACE_REVIEW_ID, TEST_USER_ID) } throws NoSuchElementException(NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE)
                 it("404를 반환한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
-                            .delete(targetUri, TEST_EXIST_PLACE_REVIEW_ID)
+                            .delete(targetUri, TEST_NOT_EXIST_PLACE_REVIEW_ID)
                             .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
                     )
                         .andExpect(status().isNotFound)
@@ -610,7 +610,7 @@ class PlaceReviewControllerTest(
                             createPathDocument(
                                 "placeReview-delete-not-found-id",
                                 pathParameters(
-                                    "id" pathDescription "존재하지 않는 장소 리뷰 ID" example TEST_EXIST_PLACE_REVIEW_ID,
+                                    "id" pathDescription "존재하지 않는 장소 리뷰 ID" example TEST_NOT_EXIST_PLACE_REVIEW_ID,
                                 ),
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",

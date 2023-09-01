@@ -12,4 +12,6 @@ fun TravelJournalRepository.getByTravelJournalId(travelJournalId: Long): TravelJ
 @Repository
 interface TravelJournalRepository : JpaRepository<TravelJournal, Long> {
     fun findAllByUserId(userId: Long): List<TravelJournal>
+
+    fun deleteAllByUserId(userId: Long)
 }

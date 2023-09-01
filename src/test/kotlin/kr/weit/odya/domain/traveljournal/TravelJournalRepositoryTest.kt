@@ -5,8 +5,6 @@ import io.kotest.matchers.shouldBe
 import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
-import kr.weit.odya.support.TEST_USER_ID
-import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_ID
 import kr.weit.odya.support.createContentImage
 import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createTravelCompanionById
@@ -23,11 +21,11 @@ class TravelJournalRepositoryTest(
     private val travelJournalRepository: TravelJournalRepository,
 ) : ExpectSpec(
     {
-
+        lateinit var user: User
         beforeEach {
-            val user: User = userRepository.save(createUser())
+            user = userRepository.save(createUser())
             val otherUser: User = userRepository.save(createOtherUser())
-            val contentImage = contentImageRepository.save(createContentImage())
+            val contentImage = contentImageRepository.save(createContentImage(user = user))
             travelJournalRepository.save(
                 createTravelJournal(
                     user = user,
@@ -42,17 +40,32 @@ class TravelJournalRepositoryTest(
                 ),
             )
         }
-        context("여행일지 사용자 Id로 조회") {
+
+        context("여행 일지 조회") {
+            expect("여행 일지 ID와 일치하는 여행 일지를 조회한다.") {
+                val id = travelJournalRepository.findAll()[0].id
+                val result = travelJournalRepository.getByTravelJournalId(id)
+                result.id shouldBe id
+            }
+        }
+
+        context("여행일지 사용자 ID로 조회") {
             expect("유저 ID와 일치하는 여행기록을 조회한다.") {
-                val result = travelJournalRepository.getByUserId(TEST_USER_ID)
+                val result = travelJournalRepository.getByUserId(user.id)
                 result.size shouldBe 1
             }
         }
 
-        context("여행 일지 조회") {
-            expect("여행 일지 ID와 일치하는 여행 일지를 조회한다.") {
-                val result = travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID)
-                result.id shouldBe TEST_TRAVEL_JOURNAL_ID
+        context("여행 일지 삭제") {
+            expect("여행 일지 ID와 일치하는 여행 일지를 삭제한다.") {
+                val id = travelJournalRepository.findAll()[0].id
+                travelJournalRepository.deleteById(id)
+                travelJournalRepository.existsById(id) shouldBe false
+            }
+
+            expect("USER ID와 일치하는 여행 일지 모두 삭제한다.") {
+                travelJournalRepository.deleteAllByUserId(user.id)
+                travelJournalRepository.count() shouldBe 0
             }
         }
     },
