@@ -24,8 +24,8 @@ class CommunityController(
     fun createCommunity(
         @LoginUserId userId: Long,
         @Valid @RequestPart("community") communityRequest: CommunityCreateRequest,
-        @Size(max = 15, message = "이미지는 최대 15개까지 업로드할 수 있습니다.")
-        @RequestPart("community-content-image") contentImages: List<MultipartFile>?,
+        @Size(min = 1, max = 15, message = "이미지는 최소 1개, 최대 15개까지 업로드할 수 있습니다.")
+        @RequestPart("community-content-image") contentImages: List<MultipartFile>,
     ): ResponseEntity<Void> {
         val contentImagePairs = communityService.uploadContentImages(contentImages)
         communityService.createCommunity(userId, communityRequest, contentImagePairs)

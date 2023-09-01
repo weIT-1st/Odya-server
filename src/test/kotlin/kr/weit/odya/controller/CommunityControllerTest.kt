@@ -17,13 +17,9 @@ import kr.weit.odya.support.createCommunityCreateRequest
 import kr.weit.odya.support.createCommunityRequestFile
 import kr.weit.odya.support.createMockImageFile
 import kr.weit.odya.support.createMockOtherImageFile
+import kr.weit.odya.support.test.*
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
-import kr.weit.odya.support.test.ControllerTestHelper
-import kr.weit.odya.support.test.RestDocsHelper
 import kr.weit.odya.support.test.RestDocsHelper.Companion.createDocument
-import kr.weit.odya.support.test.headerDescription
-import kr.weit.odya.support.test.isOptional
-import kr.weit.odya.support.test.requestPartDescription
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -79,7 +75,59 @@ class CommunityControllerTest(
                                     "placeId(String): 장소 ID(Nullable)\n " +
                                     "travelJournalId(Long): 여행 일지 아이디(Nullable)\n " +
                                     "topicId(Long): 토픽 아이디(Nullable)\n ",
-                                "community-content-image" requestPartDescription "커뮤니티 콘텐츠 사진" isOptional true,
+                                "community-content-image" requestPartDescription "커뮤니티 콘텐츠 사진",
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("커뮤니티 콘텐츠 이미지가 없을 경우") {
+                val request = createCommunityCreateRequest()
+                val requestByteInputStream =
+                    ControllerTestHelper.jsonContent(request).byteInputStream()
+                val communityRequestFile = createCommunityRequestFile(contentStream = requestByteInputStream)
+                it("400 응답한다.") {
+                    restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        file(communityRequestFile)
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "community-create-fail-file-is-null",
+                            HeaderDocumentation.requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            RequestDocumentation.requestParts(
+                                "community" requestPartDescription "유효한 커뮤니티 요청 데이터",
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("커뮤니티 콘텐츠 이미지가 15개를 넘을 경우") {
+                val request = createCommunityCreateRequest()
+                val requestByteInputStream =
+                    ControllerTestHelper.jsonContent(request).byteInputStream()
+                val communityRequestFile = createCommunityRequestFile(contentStream = requestByteInputStream)
+                it("400 응답한다.") {
+                    restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        file(communityRequestFile)
+                        files(16, createMockImageFile(mockFileName = TEST_COMMUNITY_MOCK_FILE_NAME))
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "community-create-fail-over-size-files",
+                            HeaderDocumentation.requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            RequestDocumentation.requestParts(
+                                "community" requestPartDescription "유효한 커뮤니티 요청 데이터",
+                                "community-content-image" requestPartDescription "15개가 넘는 커뮤니티 콘텐츠 사진",
                             ),
                         )
                     }
@@ -115,7 +163,7 @@ class CommunityControllerTest(
                             ),
                             RequestDocumentation.requestParts(
                                 "community" requestPartDescription "유효한 커뮤니티 요청 데이터",
-                                "community-content-image" requestPartDescription "원본 이름이 없는 커뮤니티 콘텐츠 사진" isOptional true,
+                                "community-content-image" requestPartDescription "원본 이름이 없는 커뮤니티 콘텐츠 사진",
                             ),
                         )
                     }
@@ -155,7 +203,7 @@ class CommunityControllerTest(
                             ),
                             RequestDocumentation.requestParts(
                                 "community" requestPartDescription "유효한 커뮤니티 요청 데이터",
-                                "community-content-image" requestPartDescription "커뮤니티 콘텐츠 사진" isOptional true,
+                                "community-content-image" requestPartDescription "커뮤니티 콘텐츠 사진",
                             ),
                         )
                     }
@@ -194,7 +242,7 @@ class CommunityControllerTest(
                             ),
                             RequestDocumentation.requestParts(
                                 "community" requestPartDescription "비공개 여행 일지 아이디가 포함된 커뮤니티 요청 데이터",
-                                "community-content-image" requestPartDescription "커뮤니티 콘텐츠 사진" isOptional true,
+                                "community-content-image" requestPartDescription "커뮤니티 콘텐츠 사진",
                             ),
                         )
                     }
@@ -222,7 +270,7 @@ class CommunityControllerTest(
                             ),
                             RequestDocumentation.requestParts(
                                 "community" requestPartDescription "유효한 커뮤니티 요청 데이터",
-                                "community-content-image" requestPartDescription "커뮤니티 콘텐츠 사진" isOptional true,
+                                "community-content-image" requestPartDescription "커뮤니티 콘텐츠 사진",
                             ),
                         )
                     }
