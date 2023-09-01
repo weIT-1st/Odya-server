@@ -9,9 +9,6 @@ fun TravelJournalRepository.getByTravelJournalId(travelJournalId: Long): TravelJ
 
 fun TravelJournalRepository.getByUserId(userId: Long): List<TravelJournal> = findAllByUserId(userId)
 
-fun TravelJournalRepository.getByTravelJournalId(travelJournalId: Long): TravelJournal =
-    findByIdOrNull(travelJournalId) ?: throw NoSuchElementException("$travelJournalId : 해당 여행 일지가 존재하지 않습니다.")
-
 @Repository
 interface TravelJournalRepository : JpaRepository<TravelJournal, Long> {
     fun findAllByUserId(userId: Long): List<TravelJournal>

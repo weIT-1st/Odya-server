@@ -3,7 +3,6 @@ spring.config.activate.on-profile: sandbox
 
 open-search:
   indices:
-    test: sandbox-logstash-logs
     place-search-history: sandbox-place-search-history
     users: sandbox-users
 
@@ -12,6 +11,5 @@ spring.config.activate.on-profile: stable
 
 open-search:
   indices:
-    test: stable-logstash-logs
     place-search-history: stable-place-search-history
     users: stable-users
