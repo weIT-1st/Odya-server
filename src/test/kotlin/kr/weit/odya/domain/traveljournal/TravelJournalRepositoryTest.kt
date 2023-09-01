@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
+import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_ID
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_ID
 import kr.weit.odya.support.createContentImage
