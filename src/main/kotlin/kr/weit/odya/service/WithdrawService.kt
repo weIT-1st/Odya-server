@@ -1,6 +1,7 @@
 package kr.weit.odya.service
 
 import kr.weit.odya.domain.agreedTerms.AgreedTermsRepository
+import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.favoritePlace.FavoritePlaceRepository
 import kr.weit.odya.domain.favoriteTopic.FavoriteTopicRepository
 import kr.weit.odya.domain.follow.FollowRepository
@@ -30,6 +31,7 @@ class WithdrawService(
     private val reportPlaceReviewRepository: ReportPlaceReviewRepository,
     private val travelJournalRepository: TravelJournalRepository,
     private val reportTravelJournalRepository: ReportTravelJournalRepository,
+    private val contentImageRepository: ContentImageRepository,
 ) {
     @Transactional
     fun withdrawUser(userId: Long) {
@@ -45,6 +47,7 @@ class WithdrawService(
         reportTravelJournalRepository.deleteAllByUserId(userId)
         reportTravelJournalRepository.deleteAllByTravelJournalIn(travelJournalRepository.getByUserId(userId))
         travelJournalRepository.deleteAllByUserId(userId)
+        contentImageRepository.deleteAllByUserId(userId)
         userRepository.deleteById(userId)
         usersDocumentRepository.deleteById(userId)
         firebaseTokenHelper.withdrawUser(uid)

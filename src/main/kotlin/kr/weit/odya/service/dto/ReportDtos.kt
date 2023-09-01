@@ -28,7 +28,7 @@ data class ReportPlaceReviewRequest(
             user = user,
             placeReview = placeReview,
             reportReason = reportReason,
-            reason = otherReason,
+            otherReason = if (reportReason != ReportReason.OTHER) null else otherReason,
         )
 }
 
@@ -46,6 +46,6 @@ data class ReportTravelJournalRequest(
         user = user,
         travelJournal = travelJournal,
         reportReason = reportReason,
-        reason = otherReason,
+        otherReason = if (reportReason != ReportReason.OTHER) null else otherReason,
     )
 }

@@ -1,6 +1,30 @@
 [[Report-API]]
 = *Report API*
 
+== *ReportReason*
+
+|===
+| status | value
+
+| `SPAM`
+| 스팸 및 홍보글
+
+| `PORNOGRAPHY`
+| 음란성이 포함된 글
+
+| `SWEAR_WORD`
+| 욕설/생명경시/혐오/차별적인 글
+
+| `OVER_POST`
+| 게시글 도배
+
+| `INFO_LEAK`
+| 개인정보 노출 및 불법 정보
+
+| `OTHER`
+| 기타
+|===
+
 [[신고사유리스트출력-API]]
 == *1. 신고 사유 리스트 출력 API*
 
@@ -27,31 +51,27 @@ operation::report-controller-test/report-place-review-other-reason-success[snipp
 
 operation::report-controller-test/report-place-review-fail-invalid-place-review-id[snippets='http-request,request-headers,request-fields,http-response']
 
-=== *1-4 실패 - 등록되지 않은 사유*
-
-//TODO: 사유가 등록되지 않았을 때의 실패 테스트 코드 작성
-
-=== *1-5 실패 - 공백인 기타 사유*
+=== *1-4 실패 - 공백인 기타 사유*
 
 operation::report-controller-test/report-place-review-fail-empty-other-reason[snippets='http-request,request-headers,request-fields,http-response']
 
-=== *1-6 실패 - 최대 길이를 초과한 기타 사유(20자)*
+=== *1-5 실패 - 최대 길이를 초과한 기타 사유(20자)*
 
 operation::report-controller-test/report-place-review-fail-too-long-other-reason[snippets='http-request,request-headers,request-fields,http-response']
 
-=== *1-7 실패 - 존재하지 않는 한 줄 리뷰 ID*
+=== *1-6 실패 - 존재하지 않는 한 줄 리뷰 ID*
 
 operation::report-controller-test/report-place-review-fail-not-exist-place-review-id[snippets='http-request,request-headers,request-fields,http-response']
 
-=== *1-8 실패 - 자신의 한 줄 리뷰 신고*
+=== *1-7 실패 - 자신의 한 줄 리뷰 신고*
 
 operation::report-controller-test/report-place-review-fail-can-not-report-own-post[snippets='http-request,request-headers,request-fields,http-response']
 
-=== *1-9 실패 - 이미 신고한 한 줄 리뷰 ID*
+=== *1-8 실패 - 이미 신고한 한 줄 리뷰 ID*
 
 operation::report-controller-test/report-place-review-fail-already-report-post[snippets='http-request,request-headers,request-fields,http-response']
 
-=== *1-10 실패 - 유효하지 않은 토큰*
+=== *1-9 실패 - 유효하지 않은 토큰*
 
 operation::report-controller-test/report-place-review-fail-invalid-token[snippets='http-request,request-headers,http-response']
 
@@ -70,30 +90,26 @@ operation::report-controller-test/report-travel-journal-other-reason-success[sni
 
 operation::report-controller-test/report-travel-journal-fail-invalid-travel-journal-id[snippets='http-request,request-headers,request-fields,http-response']
 
-=== *1-4 실패 - 등록되지 않은 사유*
-
-//TODO: 사유가 등록되지 않았을 때의 실패 테스트 코드 작성
-
-=== *1-5 실패 - 공백인 기타 사유*
+=== *1-4 실패 - 공백인 기타 사유*
 
 operation::report-controller-test/report-travel-journal-fail-empty-other-reason[snippets='http-request,request-headers,request-fields,http-response']
 
-=== *1-6 실패 - 최대 길이를 초과한 기타 사유(20자)*
+=== *1-5 실패 - 최대 길이를 초과한 기타 사유(20자)*
 
 operation::report-controller-test/report-travel-journal-fail-too-long-other-reason[snippets='http-request,request-headers,request-fields,http-response']
 
-=== *1-7 실패 - 존재하지 않는 여행 일지 ID*
+=== *1-6 실패 - 존재하지 않는 여행 일지 ID*
 
 operation::report-controller-test/report-travel-journal-fail-not-exist-travel-journal-id[snippets='http-request,request-headers,request-fields,http-response']
 
-=== *1-8 실패 - 자신의 여행 일지 신고*
+=== *1-7 실패 - 자신의 여행 일지 신고*
 
 operation::report-controller-test/report-travel-journal-fail-can-not-report-own-post[snippets='http-request,request-headers,request-fields,http-response']
 
-=== *1-9 실패 - 이미 신고한 여행 일지 ID*
+=== *1-8 실패 - 이미 신고한 여행 일지 ID*
 
 operation::report-controller-test/report-travel-journal-fail-already-report-post[snippets='http-request,request-headers,request-fields,http-response']
 
-=== *1-10 실패 - 유효하지 않은 토큰*
+=== *1-9 실패 - 유효하지 않은 토큰*
 
 operation::report-controller-test/report-travel-journal-fail-invalid-token[snippets='http-request,request-headers,http-response']

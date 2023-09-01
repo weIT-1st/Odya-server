@@ -49,8 +49,6 @@ class ReportTravelJournal(
     @Column(nullable = false, updatable = false, length = 20)
     val reportReason: ReportReason,
 
-    reason: String? = null,
-) : BaseTimeEntity() {
     @Column(updatable = false, length = 60)
-    val otherReason = if (reportReason == ReportReason.OTHER) null else reason
-}
+    val otherReason: String? = null,
+) : BaseTimeEntity()

@@ -8,6 +8,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import kr.weit.odya.domain.agreedTerms.AgreedTermsRepository
+import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.favoritePlace.FavoritePlaceRepository
 import kr.weit.odya.domain.favoriteTopic.FavoriteTopicRepository
 import kr.weit.odya.domain.follow.FollowRepository
@@ -40,6 +41,7 @@ class WithdrawServiceTest : DescribeSpec(
         val reportPlaceReviewRepository = mockk<ReportPlaceReviewRepository>()
         val reportTravelJournalRepository = mockk<ReportTravelJournalRepository>()
         val travelJournalRepository = mockk<TravelJournalRepository>()
+        val contentImageRepository = mockk<ContentImageRepository>()
         val withdrawService =
             WithdrawService(
                 userRepository,
@@ -53,6 +55,7 @@ class WithdrawServiceTest : DescribeSpec(
                 reportPlaceReviewRepository,
                 travelJournalRepository,
                 reportTravelJournalRepository,
+                contentImageRepository,
             )
 
         describe("withdrawUser") {
@@ -74,6 +77,7 @@ class WithdrawServiceTest : DescribeSpec(
                 every { travelJournalRepository.deleteAllByUserId(TEST_USER_ID) } just runs
                 every { reportTravelJournalRepository.deleteAllByUserId(TEST_USER_ID) } just runs
                 every { reportTravelJournalRepository.deleteAllByTravelJournalIn(any()) } just runs
+                every { contentImageRepository.deleteAllByUserId(any()) } just runs
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny { withdrawService.withdrawUser(TEST_USER_ID) }
                 }
