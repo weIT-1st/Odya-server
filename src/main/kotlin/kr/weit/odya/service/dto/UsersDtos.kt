@@ -60,3 +60,49 @@ data class UserProfileResponse(
         )
     }
 }
+
+data class UserSimpleResponse(
+    val userId: Long,
+    val nickname: String,
+    val profile: ProfileResponse,
+) {
+    constructor(user: User, profileUrl: String) : this(
+        user.id,
+        user.nickname,
+        ProfileResponse(
+            profileUrl,
+            if (user.profile.profileColor.colorHex != NONE_PROFILE_COLOR_HEX) {
+                ProfileResponse.ProfileColorResponse(user.profile.profileColor)
+            } else {
+                null
+            },
+        ),
+    )
+}
+
+data class ProfileResponse(
+    val profileUrl: String,
+    val profileColor: ProfileColorResponse?,
+) {
+    data class ProfileColorResponse(
+        val colorHex: String,
+        val red: Int,
+        val green: Int,
+        val blue: Int,
+    ) {
+        constructor(profileColor: ProfileColor) : this(
+            profileColor.colorHex,
+            profileColor.red,
+            profileColor.green,
+            profileColor.blue,
+        )
+    }
+}
+
+data class UserStatisticsResponse(
+    val travelJournalCount: Int,
+    val travelPlaceCount: Int,
+    val followingsCount: Int,
+    val followersCount: Int,
+    val odyaCount: Int,
+)

@@ -14,10 +14,12 @@ import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
 import kr.weit.odya.support.TEST_IMAGE_FILE_WEBP
 import kr.weit.odya.support.TEST_TRAVEL_CONTENT_IMAGE_MAP
+import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createImageNamePairs
 import kr.weit.odya.support.createMockImageFile
 import kr.weit.odya.support.createMockOtherImageFile
+import kr.weit.odya.support.createOtherTravelJournalContentRequest
 import kr.weit.odya.support.createTravelJournalByTravelCompanionIdSize
 import kr.weit.odya.support.createTravelJournalContentRequest
 import kr.weit.odya.support.createTravelJournalContentRequestByImageNameSize
@@ -30,7 +32,6 @@ import kr.weit.odya.support.test.RestDocsHelper
 import kr.weit.odya.support.test.RestDocsHelper.Companion.createDocument
 import kr.weit.odya.support.test.files
 import kr.weit.odya.support.test.headerDescription
-import kr.weit.odya.support.test.isOptional
 import kr.weit.odya.support.test.requestPartDescription
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.HttpHeaders
@@ -86,8 +87,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isCreated() }
                     }.andDo {
@@ -104,13 +105,69 @@ class TravelJournalControllerTest(
                                     "visibility(String): 여행 일지 접근 권한 지정(Not Null)\n " +
                                     "travelCompanionIds(List<Number>): 친구 아이디 목록(Nullable)\n " +
                                     "travelJournalContentRequests(List<Object>): 여행 일지 콘텐츠 목록(Not Null)\n " +
-                                    "travelJournalContentRequests.content(String): 여행 일지 콘텐츠 내용(Not Null)\n " +
-                                    "travelJournalContentRequests.placeId(String): 여행 일지 콘텐츠 장소 아이디(Not Null)\n " +
-                                    "travelJournalContentRequests.latitudes(List<Double>): 여행 일지 콘텐츠 위도 목록(Not Null)\n " +
-                                    "travelJournalContentRequests.longitudes(List<Double>): 여행 일지 콘텐츠 경도 목록(Not Null)\n " +
+                                    "travelJournalContentRequests.content(String): 여행 일지 콘텐츠 내용(Nullable)\n " +
+                                    "travelJournalContentRequests.placeId(String): 여행 일지 콘텐츠 장소 아이디(Nullable)\n " +
+                                    "travelJournalContentRequests.latitudes(List<Double>): 여행 일지 콘텐츠 위도 목록(Nullable)\n " +
+                                    "travelJournalContentRequests.longitudes(List<Double>): 여행 일지 콘텐츠 경도 목록(Nullable)\n " +
                                     "travelJournalContentRequests.travelDate(String): 여행 일지 콘텐츠 일자(Not Null)\n " +
-                                    "travelJournalContentRequests.contentImageNames(List<String>): 여행 일지 콘텐츠 사진 제목 + 형식(Nullable)\n ",
-                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진" isOptional true,
+                                    "travelJournalContentRequests.contentImageNames(List<String>): 여행 일지 콘텐츠 사진 제목 + 형식(Not NULL)\n ",
+                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진",
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 요청이 왔을 경우(nullable한 값들이 null)") {
+                val travelJournalRequest = createTravelJournalRequest(
+                    travelJournalContentRequests = listOf(
+                        createTravelJournalContentRequest(
+                            content = null,
+                            latitudes = null,
+                            longitudes = null,
+                            placeId = null,
+                        ),
+                        createOtherTravelJournalContentRequest(),
+                    ),
+                )
+                val travelJournalRequestByteInputStream =
+                    ControllerTestHelper.jsonContent(travelJournalRequest).byteInputStream()
+                val travelJournalRequestFile =
+                    createTravelJournalRequestFile(contentStream = travelJournalRequestByteInputStream)
+                val imageNamePairs = createImageNamePairs()
+                every { travelJournalService.getImageMap(any<List<MultipartFile>>()) } returns TEST_TRAVEL_CONTENT_IMAGE_MAP
+                every {
+                    travelJournalService.validateTravelJournalRequest(
+                        any<TravelJournalRequest>(),
+                        any<Map<String, MultipartFile>>(),
+                    )
+                } just runs
+                every {
+                    travelJournalService.uploadTravelContentImages(
+                        any<TravelJournalRequest>(),
+                        any<Map<String, MultipartFile>>(),
+                    )
+                } returns imageNamePairs
+                every {
+                    travelJournalService.createTravelJournal(TEST_USER_ID, travelJournalRequest, imageNamePairs)
+                } just runs
+                it("201 응답한다.") {
+                    restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        file(travelJournalRequestFile)
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                    }.andExpect {
+                        status { isCreated() }
+                    }.andDo {
+                        createDocument(
+                            "travel-journals-nullable-success",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            requestParts(
+                                "travel-journal" requestPartDescription "nullable인 값들이 전부 null인 여행 일지",
+                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진",
                             ),
                         )
                     }
@@ -127,8 +184,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -139,7 +196,7 @@ class TravelJournalControllerTest(
                             ),
                             requestParts(
                                 "travel-journal" requestPartDescription "20자가 넘는 제목을 가진 여행 일지",
-                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진" isOptional true,
+                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진",
                             ),
                         )
                     }
@@ -156,8 +213,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -168,7 +225,40 @@ class TravelJournalControllerTest(
                             ),
                             requestParts(
                                 "travel-journal" requestPartDescription "15개가 넘는 콘텐츠를 가진 여행 일지",
-                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진" isOptional true,
+                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진",
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("여행 일지 콘텐츠의 이미지 제목이 비어있을 경우") {
+                val travelJournalRequest = createTravelJournalRequest(
+                    travelJournalContentRequests = listOf(
+                        createTravelJournalContentRequestByImageNameSize(0),
+                    ),
+                )
+                val travelJournalRequestByteInputStream =
+                    ControllerTestHelper.jsonContent(travelJournalRequest).byteInputStream()
+                val travelJournalRequestFile =
+                    createTravelJournalRequestFile(contentStream = travelJournalRequestByteInputStream)
+                it("400 응답한다.") {
+                    restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        file(travelJournalRequestFile)
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "travel-journals-failure-image-name-empty",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            requestParts(
+                                "travel-journal" requestPartDescription "여행 콘텐츠의 이미지 이름이 비어 있는 여행 일지",
+                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진",
                             ),
                         )
                     }
@@ -189,8 +279,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -201,7 +291,33 @@ class TravelJournalControllerTest(
                             ),
                             requestParts(
                                 "travel-journal" requestPartDescription "여행 콘텐츠의 이미지 이름 개수가 15개를 초과하는 여행 일지",
-                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진" isOptional true,
+                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진",
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("여행 이미지가 비어있는 경우") {
+                val travelJournalRequest = createTravelJournalRequest()
+                val travelJournalRequestByteInputStream =
+                    ControllerTestHelper.jsonContent(travelJournalRequest).byteInputStream()
+                val travelJournalRequestFile =
+                    createTravelJournalRequestFile(contentStream = travelJournalRequestByteInputStream)
+                it("400 응답한다.") {
+                    restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        file(travelJournalRequestFile)
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "travel-journals-fail-image-size-empty",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            requestParts(
+                                "travel-journal" requestPartDescription "여행 이미지가 비어있는 여행 일지",
                             ),
                         )
                     }
@@ -218,7 +334,7 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        files(226, createMockImageFile())
+                        files(226, createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -229,7 +345,7 @@ class TravelJournalControllerTest(
                             ),
                             requestParts(
                                 "travel-journal" requestPartDescription "여행 이미지가 225개를 초과하는 여행 일지",
-                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠들의 이미지 이름 개수 보다 적은 수의 여행 일지 콘텐츠 사진" isOptional true,
+                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠들의 이미지 이름 개수 보다 적은 수의 여행 일지 콘텐츠 사진",
                             ),
                         )
                     }
@@ -253,8 +369,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -265,7 +381,7 @@ class TravelJournalControllerTest(
                             ),
                             requestParts(
                                 "travel-journal" requestPartDescription "여행 시작일이 종료일보다 이후인 여행 일지",
-                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진" isOptional true,
+                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진",
                             ),
                         )
                     }
@@ -279,7 +395,7 @@ class TravelJournalControllerTest(
                 val travelJournalRequestFile =
                     createTravelJournalRequestFile(contentStream = travelJournalRequestByteInputStream)
                 every { travelJournalService.getImageMap(any<List<MultipartFile>>()) } returns mapOf(
-                    TEST_IMAGE_FILE_WEBP to createMockImageFile(),
+                    TEST_IMAGE_FILE_WEBP to createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME),
                 )
                 every {
                     travelJournalService.validateTravelJournalRequest(
@@ -291,7 +407,7 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -302,7 +418,7 @@ class TravelJournalControllerTest(
                             ),
                             requestParts(
                                 "travel-journal" requestPartDescription "여행 일지",
-                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠들의 이미지 이름 개수 보다 적은 수의 여행 일지 콘텐츠 사진" isOptional true,
+                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠들의 이미지 이름 개수 보다 적은 수의 여행 일지 콘텐츠 사진",
                             ),
                         )
                     }
@@ -332,8 +448,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -344,7 +460,7 @@ class TravelJournalControllerTest(
                             ),
                             requestParts(
                                 "travel-journal" requestPartDescription "여행 일자보다 많은 수의 여행 일지 콘텐츠",
-                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진" isOptional true,
+                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진",
                             ),
                         )
                     }
@@ -373,8 +489,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -385,7 +501,7 @@ class TravelJournalControllerTest(
                             ),
                             requestParts(
                                 "travel-journal" requestPartDescription "여행 콘텐츠 일자가 여행 시작일보다 이전이거나 여행 종료일보다 이후인 여행 일지 콘텐츠",
-                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진" isOptional true,
+                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진",
                             ),
                         )
                     }
@@ -409,8 +525,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -421,7 +537,7 @@ class TravelJournalControllerTest(
                             ),
                             requestParts(
                                 "travel-journal" requestPartDescription "여행 일자가 15일 초과인 여행 일지",
-                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진" isOptional true,
+                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진",
                             ),
                         )
                     }
@@ -445,8 +561,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isNotFound() }
                     }.andDo {
@@ -457,7 +573,7 @@ class TravelJournalControllerTest(
                             ),
                             requestParts(
                                 "travel-journal" requestPartDescription "여행 친구의 아이디가 잘못 설정된 여행 일지",
-                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진" isOptional true,
+                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진",
                             ),
                         )
                     }
@@ -481,8 +597,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -493,7 +609,7 @@ class TravelJournalControllerTest(
                             ),
                             requestParts(
                                 "travel-journal" requestPartDescription "여행 친구가 10명이 넘는 여행 일지",
-                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진" isOptional true,
+                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진",
                             ),
                         )
                     }
@@ -517,8 +633,13 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile(originalFileName = "wrong-image-name.png"))
-                        file(createMockOtherImageFile())
+                        file(
+                            createMockImageFile(
+                                mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME,
+                                originalFileName = "wrong-image-name.png",
+                            ),
+                        )
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -529,7 +650,49 @@ class TravelJournalControllerTest(
                             ),
                             requestParts(
                                 "travel-journal" requestPartDescription "여행 일지",
-                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠의 이미지 이름과 다른 여행 일지 콘텐츠 사진" isOptional true,
+                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠의 이미지 이름과 다른 여행 일지 콘텐츠 사진",
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("위도와 경도중에 하나만 null인 경우") {
+                val travelJournalRequest = createTravelJournalRequest(
+                    travelJournalContentRequests = listOf(
+                        createTravelJournalContentRequest(
+                            latitudes = listOf(37.123456),
+                            longitudes = null,
+                        ),
+                    ),
+                )
+                val travelJournalRequestByteInputStream =
+                    ControllerTestHelper.jsonContent(travelJournalRequest).byteInputStream()
+                val travelJournalRequestFile =
+                    createTravelJournalRequestFile(contentStream = travelJournalRequestByteInputStream)
+                every { travelJournalService.getImageMap(any<List<MultipartFile>>()) } returns TEST_TRAVEL_CONTENT_IMAGE_MAP
+                every {
+                    travelJournalService.validateTravelJournalRequest(
+                        any<TravelJournalRequest>(),
+                        any<Map<String, MultipartFile>>(),
+                    )
+                } throws IllegalArgumentException(SOMETHING_ERROR_MESSAGE)
+                it("400 응답한다.") {
+                    restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        file(travelJournalRequestFile)
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "travel-journals-fail-latitude-longitude-only-one-null",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            requestParts(
+                                "travel-journal" requestPartDescription "위도와 경도의 개수가 일치하지 않은 컨텐츠를 가진 여행 일지",
+                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진",
                             ),
                         )
                     }
@@ -560,7 +723,7 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -571,7 +734,7 @@ class TravelJournalControllerTest(
                             ),
                             requestParts(
                                 "travel-journal" requestPartDescription "위도와 경도의 개수가 일치하지 않은 컨텐츠를 가진 여행 일지",
-                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진" isOptional true,
+                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진",
                             ),
                         )
                     }
@@ -603,8 +766,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isInternalServerError() }
                     }.andDo {
@@ -615,7 +778,7 @@ class TravelJournalControllerTest(
                             ),
                             requestParts(
                                 "travel-journal" requestPartDescription "여행 일지",
-                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진" isOptional true,
+                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진",
                             ),
                         )
                     }
@@ -654,8 +817,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isNotFound() }
                     }.andDo {
@@ -666,7 +829,7 @@ class TravelJournalControllerTest(
                             ),
                             requestParts(
                                 "travel-journal" requestPartDescription "여행 일지",
-                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진" isOptional true,
+                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진",
                             ),
                         )
                     }
@@ -683,8 +846,8 @@ class TravelJournalControllerTest(
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
                         file(travelJournalRequestFile)
-                        file(createMockImageFile())
-                        file(createMockOtherImageFile())
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
                     }.andExpect {
                         status { isUnauthorized() }
                     }.andDo {
@@ -695,7 +858,7 @@ class TravelJournalControllerTest(
                             ),
                             requestParts(
                                 "travel-journal" requestPartDescription "여행 일지",
-                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진" isOptional true,
+                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진",
                             ),
                         )
                     }

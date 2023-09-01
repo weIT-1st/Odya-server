@@ -14,10 +14,14 @@ import org.springframework.mock.web.MockMultipartFile
 import java.io.InputStream
 import java.time.LocalDate
 
+const val TEST_TRAVEL_JOURNAL_ID = 1L
+const val TEST_PRIVATE_TRAVEL_JOURNAL_ID = 2L
 const val TEST_TRAVEL_JOURNAL_TITLE = "testTitle"
 const val TEST_TRAVEL_JOURNAL_CONTENT = "testContent"
 const val TEST_OTHER_TRAVEL_JOURNAL_CONTENT = "testContent2"
 const val TEST_TRAVEL_COMPANION_NAME = "testCompanion"
+const val TEST_TRAVEL_JOURNAL_COUNT = 1
+const val TEST_TRAVEL_PLACE_COUNT = 2
 val TEST_TRAVEL_JOURNAL_START_DATE: LocalDate = LocalDate.parse("2021-01-01")
 val TEST_TRAVEL_JOURNAL_END_DATE: LocalDate = LocalDate.parse("2021-01-02")
 val TEST_TRAVEL_DATE: LocalDate = LocalDate.parse("2021-01-01")
@@ -28,8 +32,10 @@ val TEST_TRAVEL_COMPANION_IDS = listOf(TEST_OTHER_USER_ID)
 val TEST_TRAVEL_COMPANION_NAMES = listOf(TEST_TRAVEL_COMPANION_NAME)
 val TEST_TRAVEL_COMPANION_USERS = listOf(createOtherUser())
 val TEST_TRAVEL_COMPANIONS = listOf(createTravelCompanionById(), createTravelCompanionByName())
-val TEST_TRAVEL_CONTENT_IMAGE_MAP = createImageMap()
+const val TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME = "travel-journal-content-image"
+val TEST_TRAVEL_CONTENT_IMAGE_MAP = createImageMap(TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME)
 val TEST_TRAVEL_JOURNAL = createTravelJournal()
+const val TEST_TRAVEL_JOURNAL_REQUEST_NAME = "travel-journal"
 
 fun createTravelJournalRequest(
     title: String = TEST_TRAVEL_JOURNAL_TITLE,
@@ -57,12 +63,12 @@ fun createTravelJournalRequestByContentSize(size: Int) = createTravelJournalRequ
 )
 
 fun createTravelJournalContentRequest(
-    content: String = TEST_TRAVEL_JOURNAL_CONTENT,
-    latitudes: List<Double> = TEST_TRAVEL_JOURNAL_LATITUDES,
-    longitudes: List<Double> = TEST_TRAVEL_JOURNAL_LONGITUDES,
-    placeId: String = TEST_PLACE_ID,
+    content: String? = TEST_TRAVEL_JOURNAL_CONTENT,
+    latitudes: List<Double>? = TEST_TRAVEL_JOURNAL_LATITUDES,
+    longitudes: List<Double>? = TEST_TRAVEL_JOURNAL_LONGITUDES,
+    placeId: String? = TEST_PLACE_ID,
     travelDate: LocalDate = TEST_TRAVEL_DATE,
-    contentImageNames: List<String>? = listOf(TEST_IMAGE_FILE_WEBP),
+    contentImageNames: List<String> = listOf(TEST_IMAGE_FILE_WEBP),
 ) = TravelJournalContentRequest(
     content = content,
     latitudes = latitudes,
@@ -82,9 +88,13 @@ fun createOtherTravelJournalContentRequest() = createTravelJournalContentRequest
     contentImageNames = listOf(TEST_OTHER_IMAGE_FILE_WEBP),
 )
 
-fun createImageMap(fileName: String = TEST_IMAGE_FILE_WEBP, otherFileName: String = TEST_OTHER_IMAGE_FILE_WEBP) = mapOf(
-    fileName to createMockImageFile(),
-    otherFileName to createMockOtherImageFile(),
+fun createImageMap(
+    mockFileName: String,
+    fileName: String = TEST_IMAGE_FILE_WEBP,
+    otherFileName: String = TEST_OTHER_IMAGE_FILE_WEBP,
+) = mapOf(
+    fileName to createMockImageFile(mockFileName),
+    otherFileName to createMockOtherImageFile(mockFileName),
 )
 
 fun createImageNamePairs() = listOf(
@@ -103,6 +113,7 @@ fun createTravelCompanionByName(name: String = TEST_TRAVEL_COMPANION_NAME) = Tra
 )
 
 fun createTravelJournal(
+    id: Long = TEST_TRAVEL_JOURNAL_ID,
     title: String = TEST_TRAVEL_JOURNAL_TITLE,
     travelStartDate: LocalDate = TEST_TRAVEL_JOURNAL_START_DATE,
     travelEndDate: LocalDate = TEST_TRAVEL_JOURNAL_END_DATE,
@@ -116,6 +127,32 @@ fun createTravelJournal(
         ),
     ),
 ) = TravelJournal(
+    id = id,
+    title = title,
+    travelStartDate = travelStartDate,
+    travelEndDate = travelEndDate,
+    visibility = visibility,
+    user = user,
+    travelCompanions = travelCompanions,
+    travelJournalContents = travelJournalContents,
+)
+
+fun createPrivateTravelJournal(
+    id: Long = TEST_PRIVATE_TRAVEL_JOURNAL_ID,
+    title: String = TEST_TRAVEL_JOURNAL_TITLE,
+    travelStartDate: LocalDate = TEST_TRAVEL_JOURNAL_START_DATE,
+    travelEndDate: LocalDate = TEST_TRAVEL_JOURNAL_END_DATE,
+    visibility: TravelJournalVisibility = TravelJournalVisibility.PRIVATE,
+    user: User = createOtherUser(),
+    travelCompanions: List<TravelCompanion> = TEST_TRAVEL_COMPANIONS,
+    travelJournalContents: List<TravelJournalContent> = listOf(
+        createTravelJournalContent(),
+        createTravelJournalContent(
+            travelJournalContentImages = listOf(createTravelJournalContentImage(createOtherContentImage())),
+        ),
+    ),
+) = TravelJournal(
+    id = id,
     title = title,
     travelStartDate = travelStartDate,
     travelEndDate = travelEndDate,

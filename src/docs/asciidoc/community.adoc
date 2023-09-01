@@ -1,0 +1,46 @@
+[[Community-API]]
+= *Community API*
+
+== *Visibility*
+
+|===
+| status | value
+
+| `PUBLIC`
+| 모두 공개
+
+| `FRIEND_ONLY`
+| 친구에게만 공개
+
+|===
+
+[[커뮤니티생성-API]]
+== *1. 커뮤니티 생성 API*
+
+=== *1-1 성공*
+
+operation::community-controller-test/community-create-success[snippets='http-request,request-headers,request-parts,http-response']
+
+=== *1-2 실패 - 커뮤니티 콘텐츠 이미지가 없을 경우*
+
+operation::community-controller-test/community-create-fail-file-original-name-is-null[snippets='http-request,request-headers,request-parts,http-response']
+
+=== *1-3 실패 - 커뮤니티 콘텐츠 이미지가 15개를 넘을 경우*
+
+operation::community-controller-test/community-create-fail-file-original-name-is-null[snippets='http-request,request-headers,request-parts,http-response']
+
+=== *1-4 실패 - 커뮤니티 콘텐츠 이미지의 원본 이름이 없는 경우*
+
+operation::community-controller-test/community-create-fail-file-original-name-is-null[snippets='http-request,request-headers,request-parts,http-response']
+
+=== *1-5 실패 - 커뮤니티 이미지 업로드에 실패하는 경우*
+
+operation::community-controller-test/community-create-fail-file-upload[snippets='http-request,request-headers,request-parts,http-response']
+
+=== *1-6 실패 - 연결하려는 여행 일지가 비공개인 경우*
+
+operation::community-controller-test/community-create-fail-travel-journal-is-private[snippets='http-request,request-headers,request-parts,http-response']
+
+=== *1-7 실패 - 유효하지 않은 토큰인 경우*
+
+operation::community-controller-test/community-create-fail-invalid-token[snippets='http-request,request-headers,request-parts,http-response']

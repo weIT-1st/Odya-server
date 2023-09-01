@@ -5,8 +5,12 @@ import kr.weit.odya.domain.user.Profile
 import kr.weit.odya.domain.user.SocialType
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRole
+import kr.weit.odya.domain.user.UsersDocument
 import kr.weit.odya.service.dto.InformationRequest
+import kr.weit.odya.service.dto.SliceResponse
 import kr.weit.odya.service.dto.UserResponse
+import kr.weit.odya.service.dto.UserSimpleResponse
+import kr.weit.odya.service.dto.UserStatisticsResponse
 import java.time.LocalDate
 
 const val TEST_USER_ID = 1L
@@ -23,6 +27,7 @@ const val TEST_PHONE_NUMBER = "010-1234-1234"
 const val TEST_OTHER_PHONE_NUMBER = "010-1234-1235"
 const val TEST_INVALID_PHONE_NUMBER = "01012341234"
 const val TEST_PROFILE_ID = 1L
+const val TEST_ODYA_COUNT = 0 // TODO 오댜가 추가되면 수정
 val TEST_GENDER: Gender = Gender.M
 val TEST_BIRTHDAY: LocalDate = LocalDate.of(1999, 10, 10)
 val TEST_SOCIAL_TYPE: SocialType = SocialType.KAKAO
@@ -67,4 +72,27 @@ fun createProfile(profileId: Long = 0L, profileName: String = TEST_DEFAULT_PROFI
     id = profileId,
     profileName = profileName,
     profileColor = createProfileColor(TEST_PROFILE_COLOR_ID),
+)
+
+fun createUsersDocument(user: User = createUser()): UsersDocument = UsersDocument(user)
+
+fun createSimpleUserResponse(user: User = createUser(), profileUrl: String = TEST_PROFILE_URL): UserSimpleResponse =
+    UserSimpleResponse(
+        user = user,
+        profileUrl = profileUrl,
+    )
+
+fun createSliceSimpleUserResponse() = SliceResponse(
+    hasNext = false,
+    content = listOf(
+        createSimpleUserResponse(),
+    ),
+)
+
+fun createUserStatisticsResponse() = UserStatisticsResponse(
+    travelJournalCount = TEST_TRAVEL_JOURNAL_COUNT,
+    travelPlaceCount = TEST_TRAVEL_PLACE_COUNT,
+    followingsCount = TEST_FOLLOWING_COUNT,
+    followersCount = TEST_FOLLOWER_COUNT,
+    odyaCount = TEST_ODYA_COUNT,
 )

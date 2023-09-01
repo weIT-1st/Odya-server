@@ -8,12 +8,19 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
+import kr.weit.odya.domain.follow.FollowRepository
+import kr.weit.odya.domain.traveljournal.TravelJournalRepository
+import kr.weit.odya.domain.traveljournal.getByUserId
 import kr.weit.odya.domain.user.UserRepository
+import kr.weit.odya.domain.user.UsersDocument
+import kr.weit.odya.domain.user.UsersDocumentRepository
 import kr.weit.odya.domain.user.existsByEmail
 import kr.weit.odya.domain.user.existsByNickname
 import kr.weit.odya.domain.user.existsByPhoneNumber
+import kr.weit.odya.domain.user.getByNickname
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.domain.user.getByUserIdWithProfile
+import kr.weit.odya.domain.user.getByUserIds
 import kr.weit.odya.security.FirebaseTokenHelper
 import kr.weit.odya.security.InvalidTokenException
 import kr.weit.odya.support.DELETE_NOT_EXIST_PROFILE_ERROR_MESSAGE
@@ -21,6 +28,8 @@ import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_DEFAULT_PROFILE_NAME
 import kr.weit.odya.support.TEST_DEFAULT_PROFILE_PNG
 import kr.weit.odya.support.TEST_EMAIL
+import kr.weit.odya.support.TEST_FOLLOWER_COUNT
+import kr.weit.odya.support.TEST_FOLLOWING_COUNT
 import kr.weit.odya.support.TEST_ID_TOKEN
 import kr.weit.odya.support.TEST_INVALID_PROFILE_ORIGINAL_NAME
 import kr.weit.odya.support.TEST_NICKNAME
@@ -32,8 +41,11 @@ import kr.weit.odya.support.createInformationRequest
 import kr.weit.odya.support.createMockProfile
 import kr.weit.odya.support.createNoneProfileColor
 import kr.weit.odya.support.createProfileColor
+import kr.weit.odya.support.createTravelJournal
 import kr.weit.odya.support.createUser
 import kr.weit.odya.support.createUserResponse
+import kr.weit.odya.support.createUserStatisticsResponse
+import kr.weit.odya.support.createUsersDocument
 
 class UserServiceTest : DescribeSpec(
     {
@@ -41,7 +53,11 @@ class UserServiceTest : DescribeSpec(
         val firebaseTokenHelper = mockk<FirebaseTokenHelper>()
         val fileService = mockk<FileService>()
         val profileColorService = mockk<ProfileColorService>()
-        val userService = UserService(userRepository, firebaseTokenHelper, fileService, profileColorService)
+        val usersDocumentRepository = mockk<UsersDocumentRepository>()
+        val followRepository = mockk<FollowRepository>()
+        val travelJournalRepository = mockk<TravelJournalRepository>()
+        val userService =
+            UserService(userRepository, firebaseTokenHelper, fileService, profileColorService, usersDocumentRepository, followRepository, travelJournalRepository)
 
         describe("getInformation") {
             context("가입되어 있는 USER ID가 주어지는 경우") {
@@ -178,6 +194,7 @@ class UserServiceTest : DescribeSpec(
             context("가입되어 있는 USER ID와 유효한 정보 요청이 주어지는 경우") {
                 every { userRepository.existsByNickname(TEST_NICKNAME) } returns false
                 every { userRepository.getByUserId(TEST_USER_ID) } returns createUser()
+                every { usersDocumentRepository.save(any()) } returns UsersDocument(TEST_USER_ID, TEST_NICKNAME)
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny { userService.updateInformation(TEST_USER_ID, informationRequest) }
                 }
@@ -307,6 +324,30 @@ class UserServiceTest : DescribeSpec(
                     shouldThrow<NoSuchElementException> {
                         userService.updateProfile(TEST_USER_ID, TEST_PROFILE_WEBP, TEST_PROFILE_WEBP)
                     }
+                }
+            }
+        }
+
+        describe("searchByNickname") {
+            context("유효한 nickname이 주어지면") {
+                val user = createUser()
+                every { usersDocumentRepository.getByNickname(TEST_NICKNAME) } returns listOf(createUsersDocument(user))
+                every { userRepository.getByUserIds(any(), any(), any()) } returns listOf(user)
+                every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
+                it("유저를 조회 한다") {
+                    shouldNotThrowAny { userService.searchByNickname(TEST_NICKNAME, 10, null) }
+                }
+            }
+        }
+
+        describe("getStatistics") {
+            context("가입된 USER ID 정보가 주어지는 경우") {
+                every { followRepository.countByFollowerId(TEST_USER_ID) } returns TEST_FOLLOWING_COUNT
+                every { followRepository.countByFollowingId(TEST_USER_ID) } returns TEST_FOLLOWER_COUNT
+                every { travelJournalRepository.getByUserId(TEST_USER_ID) } returns listOf(createTravelJournal())
+                it("[FollowCountsResponse] 반환한다.") {
+                    val response = userService.getStatistics(TEST_USER_ID)
+                    response shouldBe createUserStatisticsResponse()
                 }
             }
         }

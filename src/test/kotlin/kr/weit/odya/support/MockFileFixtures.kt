@@ -18,8 +18,6 @@ const val TEST_PROFILE_WEBP = "example.webp"
 val TEST_FILE_IMAGE_CONTENT_BYTE_ARRAY = "example".byteInputStream()
 val TEST_PROFILE_CONTENT_BYTE_ARRAY = "example".byteInputStream()
 const val TEST_MOCK_PROFILE_NAME = "profile"
-const val TEST_MOCK_FILE_NAME = "travel-journal-content-image"
-const val TEST_TRAVEL_JOURNAL_REQUEST_NAME = "travel-journal"
 const val TEST_FILE_CONTENT_TYPE = "application/json"
 
 fun createMockProfile(
@@ -36,12 +34,12 @@ fun createMockProfile(
 }
 
 fun createMockImageFile(
-    name: String = TEST_MOCK_FILE_NAME,
+    mockFileName: String,
     originalFileName: String? = TEST_IMAGE_FILE_WEBP,
     contentType: String? = TEST_IMAGE_FILE_CONTENT_TYPE,
 ): MockMultipartFile {
     return MockMultipartFile(
-        name,
+        mockFileName,
         originalFileName,
         contentType,
         TEST_FILE_IMAGE_CONTENT_BYTE_ARRAY,
@@ -49,19 +47,19 @@ fun createMockImageFile(
 }
 
 fun createMockOtherImageFile(
-    name: String = TEST_MOCK_FILE_NAME,
+    mockFileName: String,
     originalFileName: String? = TEST_OTHER_IMAGE_FILE_WEBP,
     contentType: String? = TEST_IMAGE_FILE_CONTENT_TYPE,
 ): MockMultipartFile {
     return MockMultipartFile(
-        name,
+        mockFileName,
         originalFileName,
         contentType,
         TEST_FILE_IMAGE_CONTENT_BYTE_ARRAY,
     )
 }
 
-fun createMockImageFiles() = listOf(
-    createMockImageFile(),
-    createMockOtherImageFile(),
+fun createMockImageFiles(mockFileName: String) = listOf(
+    createMockImageFile(mockFileName),
+    createMockOtherImageFile(mockFileName),
 )

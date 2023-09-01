@@ -1,23 +1,32 @@
 package kr.weit.odya.controller
 
 import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Positive
 import kr.weit.odya.security.LoginUserId
 import kr.weit.odya.service.UserService
 import kr.weit.odya.service.WithdrawService
 import kr.weit.odya.service.dto.InformationRequest
+import kr.weit.odya.service.dto.SliceResponse
 import kr.weit.odya.service.dto.UserResponse
+import kr.weit.odya.service.dto.UserSimpleResponse
+import kr.weit.odya.service.dto.UserStatisticsResponse
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 
+@Validated
 @RestController
 @RequestMapping("/api/v1/users")
 class UserController(
@@ -76,6 +85,31 @@ class UserController(
         }
         userService.updateProfile(userId, profileName, multipartFile?.originalFilename)
         return ResponseEntity.noContent().build()
+    }
+
+    @GetMapping("/search")
+    fun search(
+        @NotBlank(message = "검색할 닉네임은 필수입니다.")
+        @RequestParam("nickname")
+        nickname: String,
+        @Positive(message = "사이즈는 양수여야 합니다.")
+        @RequestParam(name = "size", required = false, defaultValue = "10")
+        size: Int,
+        @Positive(message = "마지막 Id는 양수여야 합니다.")
+        @RequestParam(name = "lastId", required = false)
+        lastId: Long?,
+    ): ResponseEntity<SliceResponse<UserSimpleResponse>> {
+        return ResponseEntity.ok(userService.searchByNickname(nickname, size, lastId))
+    }
+
+    @GetMapping("/{userId}/statistics")
+    fun getStatistics(
+        @Positive(message = "USER ID는 양수여야 합니다.")
+        @PathVariable("userId")
+        userId: Long,
+    ): ResponseEntity<UserStatisticsResponse> {
+        val response = userService.getStatistics(userId)
+        return ResponseEntity.ok(response)
     }
 
     @DeleteMapping
