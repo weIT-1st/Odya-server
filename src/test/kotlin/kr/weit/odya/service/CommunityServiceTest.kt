@@ -73,6 +73,7 @@ class CommunityServiceTest : DescribeSpec(
             context("유효한 데이터가 주어지는 경우(토픽 및 여행 일지 NULL)") {
                 val communityCreateRequest = createCommunityCreateRequest()
                 val register = createUser()
+                val imageNamePairs = createCommunityContentImagePairs()
                 every { userRepository.getByUserId(TEST_USER_ID) } returns register
                 every { communityRepository.save(any<Community>()) } returns createCommunity()
                 it("정상적으로 종료한다") {
@@ -80,7 +81,7 @@ class CommunityServiceTest : DescribeSpec(
                         communityService.createCommunity(
                             TEST_USER_ID,
                             communityCreateRequest,
-                            null,
+                            imageNamePairs,
                         )
                     }
                 }
@@ -88,6 +89,7 @@ class CommunityServiceTest : DescribeSpec(
 
             context("비공개 여행일지를 연결하려고 하는 경우") {
                 val communityCreateRequest = createCommunityCreateRequest(travelJournalId = 2L)
+                val imageNamePairs = createCommunityContentImagePairs()
                 every { userRepository.getByUserId(TEST_USER_ID) } returns createUser()
                 every { travelJournalRepository.getByTravelJournalId(2L) } returns createPrivateTravelJournal()
                 it("[IllegalArgumentException] 반환한다") {
@@ -95,7 +97,7 @@ class CommunityServiceTest : DescribeSpec(
                         communityService.createCommunity(
                             TEST_USER_ID,
                             communityCreateRequest,
-                            null,
+                            imageNamePairs,
                         )
                     }
                 }

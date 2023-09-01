@@ -29,7 +29,7 @@ class CommunityService(
     fun createCommunity(
         userId: Long,
         request: CommunityCreateRequest,
-        contentImagePairs: List<Pair<String, String>>?,
+        contentImagePairs: List<Pair<String, String>>,
     ) {
         val user = userRepository.getByUserId(userId)
         val travelJournal = getNonPrivateTravelJournal(request.travelJournalId)
@@ -39,8 +39,8 @@ class CommunityService(
         communityRepository.save(community)
     }
 
-    fun uploadContentImages(contentImages: List<MultipartFile>?): List<Pair<String, String>>? {
-        return contentImages?.map {
+    fun uploadContentImages(contentImages: List<MultipartFile>): List<Pair<String, String>> {
+        return contentImages.map {
             require(it.originalFilename != null) { "파일 원본 이름은 필수 값입니다." }
             val fileName = fileService.saveFile(it)
             fileName to it.originalFilename!!
@@ -54,8 +54,8 @@ class CommunityService(
             }
         }
 
-    private fun getCommunityContentImages(contentImagePairs: List<Pair<String, String>>?, user: User) =
-        contentImagePairs?.map { (name, originName) ->
+    private fun getCommunityContentImages(contentImagePairs: List<Pair<String, String>>, user: User) =
+        contentImagePairs.map { (name, originName) ->
             val contentImage = ContentImage(name = name, originName = originName, user = user)
             CommunityContentImage(contentImage = contentImage)
         }
