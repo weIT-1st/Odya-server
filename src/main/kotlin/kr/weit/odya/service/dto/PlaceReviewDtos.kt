@@ -9,6 +9,7 @@ import kr.weit.odya.domain.placeReview.PlaceReview
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.support.validator.NullOrNotBlank
 import org.hibernate.validator.constraints.Length
+import java.time.LocalDateTime
 
 data class PlaceReviewCreateRequest(
     @field:NotBlank(message = "장소는 필수 입력값입니다.")
@@ -53,6 +54,7 @@ data class PlaceReviewListResponse(
     val writerNickname: String,
     val starRating: Int,
     val review: String,
+    val createdAt: LocalDateTime,
 ) {
     constructor(placeReview: PlaceReview) : this(
         placeReview.id,
@@ -61,6 +63,7 @@ data class PlaceReviewListResponse(
         placeReview.writerNickname,
         placeReview.starRating,
         placeReview.review,
+        placeReview.createdDate,
     )
 }
 
