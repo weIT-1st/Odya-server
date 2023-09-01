@@ -1,7 +1,6 @@
 package kr.weit.odya.service
 
 import kr.weit.odya.domain.contentimage.ContentImage
-import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.traveljournal.TravelCompanion
 import kr.weit.odya.domain.traveljournal.TravelJournalContent
 import kr.weit.odya.domain.traveljournal.TravelJournalContentImage
@@ -24,7 +23,6 @@ private const val MAX_TRAVEL_COMPANION_COUNT = 10
 class TravelJournalService(
     private val userRepository: UserRepository,
     private val travelJournalRepository: TravelJournalRepository,
-    private val contentImageRepository: ContentImageRepository,
     private val fileService: FileService,
 ) {
     @Transactional
@@ -112,7 +110,6 @@ class TravelJournalService(
         contentImages: List<ContentImage>,
         travelJournalContentRequest: TravelJournalContentRequest,
     ): TravelJournalContent {
-        contentImageRepository.saveAll(contentImages)
         val travelJournalContentImages =
             contentImages.map { contentImage -> TravelJournalContentImage(contentImage = contentImage) }
         return travelJournalContentRequest.toEntity(travelJournalContentImages)
