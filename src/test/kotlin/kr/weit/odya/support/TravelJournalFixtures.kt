@@ -16,6 +16,8 @@ import java.time.LocalDate
 
 const val TEST_TRAVEL_JOURNAL_ID = 1L
 const val TEST_PRIVATE_TRAVEL_JOURNAL_ID = 2L
+const val TEST_NOT_EXIST_TRAVEL_JOURNAL_ID = 5L
+const val TEST_INVALID_TRAVEL_JOURNAL_ID = -1L
 const val TEST_TRAVEL_JOURNAL_TITLE = "testTitle"
 const val TEST_TRAVEL_JOURNAL_CONTENT = "testContent"
 const val TEST_OTHER_TRAVEL_JOURNAL_CONTENT = "testContent2"

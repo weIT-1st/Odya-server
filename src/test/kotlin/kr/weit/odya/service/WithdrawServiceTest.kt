@@ -8,16 +8,24 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import kr.weit.odya.domain.agreedTerms.AgreedTermsRepository
+import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.favoritePlace.FavoritePlaceRepository
 import kr.weit.odya.domain.favoriteTopic.FavoriteTopicRepository
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.placeReview.PlaceReviewRepository
+import kr.weit.odya.domain.placeReview.getByUserId
+import kr.weit.odya.domain.report.ReportPlaceReviewRepository
+import kr.weit.odya.domain.report.ReportTravelJournalRepository
+import kr.weit.odya.domain.traveljournal.TravelJournalRepository
+import kr.weit.odya.domain.traveljournal.getByUserId
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.UsersDocumentRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.security.FirebaseTokenHelper
 import kr.weit.odya.support.TEST_USERNAME
 import kr.weit.odya.support.TEST_USER_ID
+import kr.weit.odya.support.createPlaceReview
+import kr.weit.odya.support.createTravelJournal
 import kr.weit.odya.support.createUser
 
 class WithdrawServiceTest : DescribeSpec(
@@ -30,6 +38,10 @@ class WithdrawServiceTest : DescribeSpec(
         val firebaseTokenHelper = mockk<FirebaseTokenHelper>()
         val usersDocumentRepository = mockk<UsersDocumentRepository>()
         val agreedTermsRepository = mockk<AgreedTermsRepository>()
+        val reportPlaceReviewRepository = mockk<ReportPlaceReviewRepository>()
+        val reportTravelJournalRepository = mockk<ReportTravelJournalRepository>()
+        val travelJournalRepository = mockk<TravelJournalRepository>()
+        val contentImageRepository = mockk<ContentImageRepository>()
         val withdrawService =
             WithdrawService(
                 userRepository,
@@ -40,6 +52,10 @@ class WithdrawServiceTest : DescribeSpec(
                 firebaseTokenHelper,
                 usersDocumentRepository,
                 agreedTermsRepository,
+                reportPlaceReviewRepository,
+                travelJournalRepository,
+                reportTravelJournalRepository,
+                contentImageRepository,
             )
 
         describe("withdrawUser") {
@@ -54,6 +70,14 @@ class WithdrawServiceTest : DescribeSpec(
                 every { firebaseTokenHelper.withdrawUser(TEST_USERNAME) } just runs
                 every { usersDocumentRepository.deleteById(TEST_USER_ID) } just runs
                 every { agreedTermsRepository.deleteByUserId(TEST_USER_ID) } just runs
+                every { placeReviewRepository.getByUserId(TEST_USER_ID) } returns listOf(createPlaceReview())
+                every { reportPlaceReviewRepository.deleteAllByUserId(TEST_USER_ID) } just runs
+                every { reportPlaceReviewRepository.deleteAllByPlaceReviewIn(any()) } just runs
+                every { travelJournalRepository.getByUserId(TEST_USER_ID) } returns listOf(createTravelJournal())
+                every { travelJournalRepository.deleteAllByUserId(TEST_USER_ID) } just runs
+                every { reportTravelJournalRepository.deleteAllByUserId(TEST_USER_ID) } just runs
+                every { reportTravelJournalRepository.deleteAllByTravelJournalIn(any()) } just runs
+                every { contentImageRepository.deleteAllByUserId(any()) } just runs
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny { withdrawService.withdrawUser(TEST_USER_ID) }
                 }

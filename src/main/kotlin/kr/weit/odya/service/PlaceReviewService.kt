@@ -7,6 +7,7 @@ import kr.weit.odya.domain.placeReview.PlaceReviewSortType
 import kr.weit.odya.domain.placeReview.getByPlaceReviewId
 import kr.weit.odya.domain.placeReview.getPlaceReviewListByPlaceId
 import kr.weit.odya.domain.placeReview.getPlaceReviewListByUser
+import kr.weit.odya.domain.report.ReportPlaceReviewRepository
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
@@ -23,6 +24,7 @@ import kotlin.math.roundToInt
 class PlaceReviewService(
     private val placeReviewRepository: PlaceReviewRepository,
     private val userRepository: UserRepository,
+    private val reportPlaceReviewRepository: ReportPlaceReviewRepository,
 ) {
     @Transactional
     fun createReview(request: PlaceReviewCreateRequest, userId: Long) {
@@ -48,6 +50,7 @@ class PlaceReviewService(
     fun deleteReview(placeReviewId: Long, userId: Long) {
         val placeReview = placeReviewRepository.getByPlaceReviewId(placeReviewId)
         checkPermissions(placeReview, userId)
+        reportPlaceReviewRepository.deleteAllByPlaceReview(placeReview)
         placeReviewRepository.delete(placeReview)
     }
 
