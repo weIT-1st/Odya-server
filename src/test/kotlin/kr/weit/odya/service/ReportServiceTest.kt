@@ -53,148 +53,147 @@ class ReportServiceTest : DescribeSpec(
 
         describe("reportPlaceReview 메소드") {
             val placeReview = createPlaceReview()
-            val reportReview = createReportPlaceReviewRequest()
+            val request = createReportPlaceReviewRequest()
             context("신고한 유저와 신고 사유가 전달될 경우") {
-                every { reportPlaceReviewRepository.existsByPlaceReviewIdAndUserId(reportReview.placeReviewId, user.id) } returns false
+                every { reportPlaceReviewRepository.existsByPlaceReviewIdAndUserId(request.placeReviewId, user.id) } returns false
                 every { userRepository.getByUserId(user.id) } returns user
-                every { placeReviewRepository.getByPlaceReviewId(reportReview.placeReviewId) } returns placeReview
-                every { reportPlaceReviewRepository.save(any()) } returns createReportPlaceReview(placeReview, user, TEST_REPORT_ID, reportReview.reportReason)
-                every { reportPlaceReviewRepository.countAllByPlaceReviewId(reportReview.placeReviewId) } returns 4
+                every { placeReviewRepository.getByPlaceReviewId(request.placeReviewId) } returns placeReview
+                every { reportPlaceReviewRepository.save(any()) } returns createReportPlaceReview(placeReview, user, TEST_REPORT_ID, request.reportReason)
+                every { reportPlaceReviewRepository.countAllByPlaceReviewId(request.placeReviewId) } returns 4
                 it("신고가 정상적으로 등록된다.(신고 5회 미만)") {
-                    shouldNotThrowAny { reportService.reportPlaceReview(user.id, reportReview) }
+                    shouldNotThrowAny { reportService.reportPlaceReview(user.id, request) }
                 }
             }
 
             context("신고한 유저와 기타 신고 사유가 전달될 경우") {
-                val otherReportReview = reportReview.copy(reportReason = ReportReason.OTHER, otherReason = TEST_REPORT_OTHER_REASON)
-                every { reportPlaceReviewRepository.existsByPlaceReviewIdAndUserId(otherReportReview.placeReviewId, user.id) } returns false
+                val otherRequest = request.copy(reportReason = ReportReason.OTHER, otherReason = TEST_REPORT_OTHER_REASON)
+                every { reportPlaceReviewRepository.existsByPlaceReviewIdAndUserId(otherRequest.placeReviewId, user.id) } returns false
                 every { userRepository.getByUserId(user.id) } returns user
-                every { placeReviewRepository.getByPlaceReviewId(otherReportReview.placeReviewId) } returns placeReview
-                every { reportPlaceReviewRepository.save(any()) } returns createReportPlaceReview(placeReview, user, TEST_REPORT_ID, otherReportReview.reportReason, otherReportReview.otherReason)
-                every { reportPlaceReviewRepository.countAllByPlaceReviewId(otherReportReview.placeReviewId) } returns 4
+                every { placeReviewRepository.getByPlaceReviewId(otherRequest.placeReviewId) } returns placeReview
+                every { reportPlaceReviewRepository.save(any()) } returns createReportPlaceReview(placeReview, user, TEST_REPORT_ID, otherRequest.reportReason, otherRequest.otherReason)
+                every { reportPlaceReviewRepository.countAllByPlaceReviewId(otherRequest.placeReviewId) } returns 4
                 it("신고가 기타 신고 사유와 함께 정상적으로 등록된다.(신고 5회 미만)") {
-                    shouldNotThrowAny { reportService.reportPlaceReview(user.id, otherReportReview) }
+                    shouldNotThrowAny { reportService.reportPlaceReview(user.id, otherRequest) }
                 }
             }
 
             context("신고 등록 후 한줄 리뷰의 신고가 5회 이상일 경우") {
-                val deleteReportReview = createReportPlaceReviewRequest()
-                every { reportPlaceReviewRepository.existsByPlaceReviewIdAndUserId(deleteReportReview.placeReviewId, user.id) } returns false
+                every { reportPlaceReviewRepository.existsByPlaceReviewIdAndUserId(request.placeReviewId, user.id) } returns false
                 every { userRepository.getByUserId(user.id) } returns user
-                every { placeReviewRepository.getByPlaceReviewId(deleteReportReview.placeReviewId) } returns placeReview
-                every { reportPlaceReviewRepository.save(any()) } returns createReportPlaceReview(placeReview, user, TEST_REPORT_ID, deleteReportReview.reportReason, deleteReportReview.otherReason)
-                every { reportPlaceReviewRepository.countAllByPlaceReviewId(deleteReportReview.placeReviewId) } returns 5
-                every { reportPlaceReviewRepository.deleteByPlaceReviewId(deleteReportReview.placeReviewId) } just runs
-                every { placeReviewRepository.deleteById(deleteReportReview.placeReviewId) } just runs
+                every { placeReviewRepository.getByPlaceReviewId(request.placeReviewId) } returns placeReview
+                every { reportPlaceReviewRepository.save(any()) } returns createReportPlaceReview(placeReview, user, TEST_REPORT_ID, request.reportReason, request.otherReason)
+                every { reportPlaceReviewRepository.countAllByPlaceReviewId(request.placeReviewId) } returns 5
+                every { reportPlaceReviewRepository.deleteByPlaceReviewId(request.placeReviewId) } just runs
+                every { placeReviewRepository.deleteById(request.placeReviewId) } just runs
                 it("해당 한 줄 리뷰를 삭제한다.") {
-                    shouldNotThrowAny { reportService.reportPlaceReview(user.id, deleteReportReview) }
+                    shouldNotThrowAny { reportService.reportPlaceReview(user.id, request) }
                 }
             }
 
             context("작성자가 자신의 리뷰를 신고 등록을 요청한 경우") {
                 val otherPlaceReview = createPlaceReview(user)
-                every { reportPlaceReviewRepository.existsByPlaceReviewIdAndUserId(reportReview.placeReviewId, user.id) } returns false
-                every { placeReviewRepository.getByPlaceReviewId(reportReview.placeReviewId) } returns otherPlaceReview
+                every { reportPlaceReviewRepository.existsByPlaceReviewIdAndUserId(request.placeReviewId, user.id) } returns false
+                every { placeReviewRepository.getByPlaceReviewId(request.placeReviewId) } returns otherPlaceReview
                 it("[IllegalArgumentException]을 반환한다.") {
-                    shouldThrow<IllegalArgumentException> { reportService.reportPlaceReview(user.id, reportReview) }
+                    shouldThrow<IllegalArgumentException> { reportService.reportPlaceReview(user.id, request) }
                 }
             }
 
             context("이미 신고한 리뷰를 신고 등록을 요청한 경우") {
-                every { reportPlaceReviewRepository.existsByPlaceReviewIdAndUserId(reportReview.placeReviewId, user.id) } returns true
-                every { placeReviewRepository.getByPlaceReviewId(reportReview.placeReviewId) } returns placeReview
+                every { reportPlaceReviewRepository.existsByPlaceReviewIdAndUserId(request.placeReviewId, user.id) } returns true
+                every { placeReviewRepository.getByPlaceReviewId(request.placeReviewId) } returns placeReview
                 it("[ExistResourceException]을 반환한다.") {
-                    shouldThrow<ExistResourceException> { reportService.reportPlaceReview(user.id, reportReview) }
+                    shouldThrow<ExistResourceException> { reportService.reportPlaceReview(user.id, request) }
                 }
             }
 
             context("존재하지 않는 유저ID가 전달될 경우") {
-                every { reportPlaceReviewRepository.existsByPlaceReviewIdAndUserId(reportReview.placeReviewId, user.id) } returns false
+                every { reportPlaceReviewRepository.existsByPlaceReviewIdAndUserId(request.placeReviewId, user.id) } returns false
                 every { userRepository.getByUserId(user.id) } throws NoSuchElementException(NOT_EXIST_USER_ERROR_MESSAGE)
                 it("[NoSuchElementException]을 반환한다.") {
-                    shouldThrow<NoSuchElementException> { reportService.reportPlaceReview(user.id, reportReview) }
+                    shouldThrow<NoSuchElementException> { reportService.reportPlaceReview(user.id, request) }
                 }
             }
 
             context("존재하지 않는 한줄 리뷰 ID가 전달될 경우") {
-                every { reportPlaceReviewRepository.existsByPlaceReviewIdAndUserId(reportReview.placeReviewId, user.id) } returns false
+                every { reportPlaceReviewRepository.existsByPlaceReviewIdAndUserId(request.placeReviewId, user.id) } returns false
                 every { userRepository.getByUserId(user.id) } returns user
-                every { placeReviewRepository.getByPlaceReviewId(reportReview.placeReviewId) } throws NoSuchElementException(NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE)
+                every { placeReviewRepository.getByPlaceReviewId(request.placeReviewId) } throws NoSuchElementException(NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE)
                 it("[NoSuchElementException]을 반환한다.") {
-                    shouldThrow<NoSuchElementException> { reportService.reportPlaceReview(user.id, reportReview) }
+                    shouldThrow<NoSuchElementException> { reportService.reportPlaceReview(user.id, request) }
                 }
             }
         }
 
         describe("reportTravelJournal 메소드") {
             val travelJournal = createTravelJournal()
-            val reportTravelJournal = createReportTravelJournalRequest()
+            val request = createReportTravelJournalRequest()
             context("신고한 유저와 신고 사유가 전달될 경우") {
-                every { reportTravelJournalRepository.existsByTravelJournalIdAndUserId(reportTravelJournal.travelJournalId, user.id) } returns false
+                every { reportTravelJournalRepository.existsByTravelJournalIdAndUserId(request.travelJournalId, user.id) } returns false
                 every { userRepository.getByUserId(user.id) } returns user
-                every { travelJournalRepository.getByTravelJournalId(reportTravelJournal.travelJournalId) } returns travelJournal
+                every { travelJournalRepository.getByTravelJournalId(request.travelJournalId) } returns travelJournal
                 every { reportTravelJournalRepository.save(any()) } returns createReportTravelJournal(travelJournal, user)
-                every { reportTravelJournalRepository.countAllByTravelJournalId(reportTravelJournal.travelJournalId) } returns 4
+                every { reportTravelJournalRepository.countAllByTravelJournalId(request.travelJournalId) } returns 4
                 it("신고가 정상적으로 등록된다") {
-                    shouldNotThrowAny { reportService.reportTravelJournal(user.id, reportTravelJournal) }
+                    shouldNotThrowAny { reportService.reportTravelJournal(user.id, request) }
                 }
             }
             context("신고한 유저와 기타 신고 사유가 전달될 경우") {
-                val reportOtherReview = reportTravelJournal.copy(reportReason = ReportReason.OTHER, otherReason = TEST_REPORT_OTHER_REASON)
-                every { reportTravelJournalRepository.existsByTravelJournalIdAndUserId(reportOtherReview.travelJournalId, user.id) } returns false
+                val otherRequest = request.copy(reportReason = ReportReason.OTHER, otherReason = TEST_REPORT_OTHER_REASON)
+                every { reportTravelJournalRepository.existsByTravelJournalIdAndUserId(otherRequest.travelJournalId, user.id) } returns false
                 every { userRepository.getByUserId(user.id) } returns user
-                every { travelJournalRepository.getByTravelJournalId(reportTravelJournal.travelJournalId) } returns travelJournal
-                every { reportTravelJournalRepository.save(any()) } returns createReportTravelJournal(travelJournal, user, TEST_REPORT_ID, reportOtherReview.reportReason, reportOtherReview.otherReason)
-                every { reportTravelJournalRepository.countAllByTravelJournalId(reportTravelJournal.travelJournalId) } returns 4
+                every { travelJournalRepository.getByTravelJournalId(otherRequest.travelJournalId) } returns travelJournal
+                every { reportTravelJournalRepository.save(any()) } returns createReportTravelJournal(travelJournal, user, TEST_REPORT_ID, otherRequest.reportReason, otherRequest.otherReason)
+                every { reportTravelJournalRepository.countAllByTravelJournalId(request.travelJournalId) } returns 4
                 it("신고가 기타 신고 사유와 함께 정상적으로 등록된다.(신고 5회 미만)") {
-                    shouldNotThrowAny { reportService.reportTravelJournal(user.id, reportTravelJournal) }
+                    shouldNotThrowAny { reportService.reportTravelJournal(user.id, request) }
                 }
             }
 
             context("신고 등록 후 한줄 리뷰의 신고가 5회 이상일 경우") {
-                every { reportTravelJournalRepository.existsByTravelJournalIdAndUserId(reportTravelJournal.travelJournalId, user.id) } returns false
+                every { reportTravelJournalRepository.existsByTravelJournalIdAndUserId(request.travelJournalId, user.id) } returns false
                 every { userRepository.getByUserId(user.id) } returns user
-                every { travelJournalRepository.getByTravelJournalId(reportTravelJournal.travelJournalId) } returns travelJournal
-                every { reportTravelJournalRepository.save(any()) } returns createReportTravelJournal(travelJournal, user, TEST_REPORT_ID, reportTravelJournal.reportReason, reportTravelJournal.otherReason)
-                every { reportTravelJournalRepository.countAllByTravelJournalId(reportTravelJournal.travelJournalId) } returns 5
-                every { reportTravelJournalRepository.deleteAllByTravelJournalId(reportTravelJournal.travelJournalId) } just runs
-                every { travelJournalRepository.deleteById(reportTravelJournal.travelJournalId) } just runs
+                every { travelJournalRepository.getByTravelJournalId(request.travelJournalId) } returns travelJournal
+                every { reportTravelJournalRepository.save(any()) } returns createReportTravelJournal(travelJournal, user, TEST_REPORT_ID, request.reportReason, request.otherReason)
+                every { reportTravelJournalRepository.countAllByTravelJournalId(request.travelJournalId) } returns 5
+                every { reportTravelJournalRepository.deleteAllByTravelJournalId(request.travelJournalId) } just runs
+                every { travelJournalRepository.deleteById(request.travelJournalId) } just runs
                 it("해당 한 줄 리뷰를 삭제한다.") {
-                    shouldNotThrowAny { reportService.reportTravelJournal(user.id, reportTravelJournal) }
+                    shouldNotThrowAny { reportService.reportTravelJournal(user.id, request) }
                 }
             }
 
             context("작성자가 자신의 리뷰를 신고 등록을 요청한 경우") {
                 val travelJournal2 = createTravelJournal(TEST_TRAVEL_JOURNAL_ID, TEST_TRAVEL_JOURNAL_TITLE, TEST_TRAVEL_JOURNAL_START_DATE, TEST_TRAVEL_JOURNAL_END_DATE, TravelJournalVisibility.PUBLIC, user)
-                every { reportTravelJournalRepository.existsByTravelJournalIdAndUserId(reportTravelJournal.travelJournalId, user.id) } returns false
-                every { travelJournalRepository.getByTravelJournalId(reportTravelJournal.travelJournalId) } returns travelJournal2
+                every { reportTravelJournalRepository.existsByTravelJournalIdAndUserId(request.travelJournalId, user.id) } returns false
+                every { travelJournalRepository.getByTravelJournalId(request.travelJournalId) } returns travelJournal2
                 it("[IllegalArgumentException]을 반환한다.") {
-                    shouldThrow<IllegalArgumentException> { reportService.reportTravelJournal(user.id, reportTravelJournal) }
+                    shouldThrow<IllegalArgumentException> { reportService.reportTravelJournal(user.id, request) }
                 }
             }
 
             context("이미 신고한 리뷰를 신고 등록을 요청한 경우") {
-                every { travelJournalRepository.getByTravelJournalId(reportTravelJournal.travelJournalId) } returns travelJournal
-                every { reportTravelJournalRepository.existsByTravelJournalIdAndUserId(reportTravelJournal.travelJournalId, user.id) } returns true
+                every { travelJournalRepository.getByTravelJournalId(request.travelJournalId) } returns travelJournal
+                every { reportTravelJournalRepository.existsByTravelJournalIdAndUserId(request.travelJournalId, user.id) } returns true
                 it("[ExistResourceException]을 반환한다.") {
-                    shouldThrow<ExistResourceException> { reportService.reportTravelJournal(user.id, reportTravelJournal) }
+                    shouldThrow<ExistResourceException> { reportService.reportTravelJournal(user.id, request) }
                 }
             }
 
             context("존재하지 않는 유저ID가 전달될 경우") {
-                every { reportTravelJournalRepository.existsByTravelJournalIdAndUserId(reportTravelJournal.travelJournalId, user.id) } returns false
+                every { reportTravelJournalRepository.existsByTravelJournalIdAndUserId(request.travelJournalId, user.id) } returns false
                 every { userRepository.getByUserId(user.id) } throws NoSuchElementException(NOT_EXIST_USER_ERROR_MESSAGE)
                 it("[NoSuchElementException]을 반환한다.") {
-                    shouldThrow<NoSuchElementException> { reportService.reportTravelJournal(user.id, reportTravelJournal) }
+                    shouldThrow<NoSuchElementException> { reportService.reportTravelJournal(user.id, request) }
                 }
             }
 
             context("존재하지 않는 한줄 리뷰 ID가 전달될 경우") {
-                every { reportTravelJournalRepository.existsByTravelJournalIdAndUserId(reportTravelJournal.travelJournalId, user.id) } returns false
+                every { reportTravelJournalRepository.existsByTravelJournalIdAndUserId(request.travelJournalId, user.id) } returns false
                 every { userRepository.getByUserId(user.id) } returns user
-                every { travelJournalRepository.getByTravelJournalId(reportTravelJournal.travelJournalId) } throws NoSuchElementException(NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE)
+                every { travelJournalRepository.getByTravelJournalId(request.travelJournalId) } throws NoSuchElementException(NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE)
                 it("[NoSuchElementException]을 반환한다.") {
-                    shouldThrow<NoSuchElementException> { reportService.reportTravelJournal(user.id, reportTravelJournal) }
+                    shouldThrow<NoSuchElementException> { reportService.reportTravelJournal(user.id, request) }
                 }
             }
         }
