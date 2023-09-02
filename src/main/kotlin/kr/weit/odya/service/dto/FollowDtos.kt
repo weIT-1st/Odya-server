@@ -54,3 +54,8 @@ data class FollowProfileResponse(
         )
     }
 }
+
+data class VisitedFollowingResponse(
+    val count: Int,
+    val followings: List<FollowUserResponse>,
+)
