@@ -8,10 +8,12 @@ import kr.weit.odya.domain.favoriteTopic.getByUserId
 import kr.weit.odya.domain.topic.Topic
 import kr.weit.odya.domain.topic.TopicRepository
 import kr.weit.odya.domain.topic.getByTopicId
+import kr.weit.odya.domain.topic.getPopularTopicsAtPlace
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.service.dto.AddFavoriteTopicRequest
 import kr.weit.odya.service.dto.FavoriteTopicListResponse
+import kr.weit.odya.service.dto.TopicResponse
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -49,5 +51,9 @@ class TopicService(
 
     fun getFavoriteTopicList(userId: Long): List<FavoriteTopicListResponse> {
         return favoriteTopicRepository.getByUserId(userId).map { FavoriteTopicListResponse(it) }
+    }
+
+    fun getPopularTopicsAtPlace(placeId: String, size: Int): List<TopicResponse> {
+        return topicRepository.getPopularTopicsAtPlace(placeId, size).map { TopicResponse(it.id, it.word) }
     }
 }
