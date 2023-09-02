@@ -361,7 +361,7 @@ class TopicControllerTest(
                 val response = createTopicResponseList()
                 val content = response[0]
                 every { topicService.getPopularTopicsAtPlace(TEST_PLACE_ID, TEST_SIZE) } returns response
-                it("200 및 장소 리스트를 응답한다.") {
+                it("200 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
                             .get(targetUri, TEST_PLACE_ID)
