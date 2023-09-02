@@ -2,14 +2,22 @@ package kr.weit.odya.domain.follow
 
 import io.kotest.core.spec.style.ExpectSpec
 import io.kotest.matchers.shouldBe
+import kr.weit.odya.domain.community.CommunityRepository
+import kr.weit.odya.domain.placeReview.PlaceReviewRepository
+import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.support.TEST_DEFAULT_PAGEABLE
 import kr.weit.odya.support.TEST_DEFAULT_SIZE
 import kr.weit.odya.support.TEST_DEFAULT_SORT_TYPE
-import kr.weit.odya.support.createCustomUser
+import kr.weit.odya.support.TEST_PLACE_ID
+import kr.weit.odya.support.createAnotherUser
+import kr.weit.odya.support.createCommunity
 import kr.weit.odya.support.createFollow
 import kr.weit.odya.support.createOtherUser
+import kr.weit.odya.support.createPlaceReview
+import kr.weit.odya.support.createTravelJournal
+import kr.weit.odya.support.createTravelJournalContent
 import kr.weit.odya.support.createUser
 import kr.weit.odya.support.test.BaseTests.RepositoryTest
 
@@ -17,6 +25,10 @@ import kr.weit.odya.support.test.BaseTests.RepositoryTest
 class FollowRepositoryTest(
     private val followRepository: FollowRepository,
     private val userRepository: UserRepository,
+
+    private val placeReviewRepository: PlaceReviewRepository,
+    private val travelJournalRepository: TravelJournalRepository,
+    private val communityRepository: CommunityRepository,
 ) : ExpectSpec(
     {
         val follower: User = userRepository.save(createUser())
@@ -150,6 +162,59 @@ class FollowRepositoryTest(
                     notFollowing.id,
                 )
                 result.size shouldBe 0
+            }
+        }
+
+        context("방문한 친구 id 검색") {
+            expect("장소 리뷰에 작성된 친구를 조회한다") {
+                placeReviewRepository.save(
+                    createPlaceReview(
+                        following,
+                    ),
+                )
+
+                val result = followRepository.getVisitedFollowingIds(
+                    TEST_PLACE_ID,
+                    follower.id,
+                )
+                result shouldBe listOf(following.id)
+            }
+
+            expect("여행일지에 작성된 친구를 조회한다") {
+                travelJournalRepository.save(
+                    createTravelJournal(
+                        user = following,
+                        travelJournalContents = listOf(
+                            createTravelJournalContent(),
+                        ),
+                    ),
+                )
+
+                val result = followRepository.getVisitedFollowingIds(
+                    TEST_PLACE_ID,
+                    follower.id,
+                )
+                result shouldBe listOf(following.id)
+            }
+
+            expect("커뮤니티에 작성된 친구를 조회한다") {
+                communityRepository.save(
+                    createCommunity(user = following, travelJournal = null),
+                )
+
+                val result = followRepository.getVisitedFollowingIds(
+                    TEST_PLACE_ID,
+                    follower.id,
+                )
+                result shouldBe listOf(following.id)
+            }
+
+            expect("해당 장소에 들린 유저가 없다면 아무것도 반환되지 않는다") {
+                val result = followRepository.getVisitedFollowingIds(
+                    TEST_PLACE_ID,
+                    follower.id,
+                )
+                result shouldBe emptyList()
             }
         }
     },

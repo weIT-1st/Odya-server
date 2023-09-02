@@ -5,9 +5,14 @@ import com.linecorp.kotlinjdsl.listQuery
 import com.linecorp.kotlinjdsl.query.spec.OrderSpec
 import com.linecorp.kotlinjdsl.querydsl.CriteriaQueryDsl
 import com.linecorp.kotlinjdsl.querydsl.expression.col
+import kr.weit.odya.domain.community.Community
+import kr.weit.odya.domain.placeReview.PlaceReview
+import kr.weit.odya.domain.traveljournal.TravelJournal
+import kr.weit.odya.domain.traveljournal.TravelJournalContent
 import kr.weit.odya.domain.user.User
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.transaction.annotation.Transactional
 
 fun FollowRepository.getFollowingListBySearchCond(
     followerId: Long,
@@ -37,6 +42,9 @@ fun FollowRepository.getMayKnowFollowings(
     lastId: Long?,
 ): List<Follow> =
     findMayKnowFollowings(followerId, size, lastId)
+
+fun FollowRepository.getVisitedFollowingIds(placeID: String, followerId: Long): List<Long> =
+    findVisitedFollowingIdsByPlaceIdAndFollowerId(placeID, followerId)
 
 interface FollowRepository : JpaRepository<Follow, Long>, CustomFollowRepository {
     fun existsByFollowerIdAndFollowingId(followerId: Long, followingId: Long): Boolean
@@ -77,9 +85,11 @@ interface CustomFollowRepository {
         size: Int,
         lastId: Long?,
     ): List<Follow>
+
+    fun findVisitedFollowingIdsByPlaceIdAndFollowerId(placeID: String, followerId: Long): List<Long>
 }
 
-class FollowRepositoryImpl(private val queryFactory: QueryFactory) : CustomFollowRepository {
+open class FollowRepositoryImpl(private val queryFactory: QueryFactory) : CustomFollowRepository {
     override fun findSliceByFollowerIdOrderBySortType(
         followerId: Long,
         pageable: Pageable,
@@ -132,6 +142,7 @@ class FollowRepositoryImpl(private val queryFactory: QueryFactory) : CustomFollo
         limit(size)
     }
 
+    @Transactional(readOnly = true)
     override fun findMayKnowFollowings(
         followerId: Long,
         size: Int,
@@ -159,6 +170,47 @@ class FollowRepositoryImpl(private val queryFactory: QueryFactory) : CustomFollo
                 where(col(entity(User::class), User::id).lessThan(lastId))
             }
             limit(size)
+        }
+    }
+
+    @Transactional(readOnly = true)
+    override fun findVisitedFollowingIdsByPlaceIdAndFollowerId(placeID: String, followerId: Long): List<Long> {
+        val placeReviewWriter = queryFactory.listQuery {
+            select(col(User::id))
+            from(entity(PlaceReview::class))
+            associate(PlaceReview::class, entity(User::class), on(PlaceReview::user))
+            where(col(PlaceReview::placeId).equal(placeID))
+        }
+        val travelJournalWriter = queryFactory.listQuery {
+            select(col(User::id))
+            from(entity(TravelJournal::class))
+            associate(TravelJournal::class, entity(TravelJournalContent::class), on(TravelJournal::travelJournalContents))
+            associate(TravelJournal::class, entity(User::class), on(TravelJournal::user))
+            where(col(TravelJournalContent::placeId).equal(placeID))
+        }
+        val communityWriter = queryFactory.listQuery {
+            select(col(User::id))
+            from(entity(Community::class))
+            associate(Community::class, entity(User::class), on(Community::user))
+            where(col(Community::placeId).equal(placeID))
+        }
+
+        // JPA는 유니온을 지원하지 않기 때문에 아래와 같이 작업을 했다
+        val userList = (placeReviewWriter + travelJournalWriter + communityWriter).distinct()
+
+        return queryFactory.listQuery {
+            val followerUser = entity(User::class, alias = "followerUser")
+            val followingUser = entity(User::class, alias = "followingUser")
+            select(col(followingUser, User::id))
+            from(entity(Follow::class))
+            associate(Follow::class, followerUser, on(Follow::follower))
+            associate(Follow::class, followingUser, on(Follow::following))
+            where(
+                and(
+                    col(followerUser, User::id).equal(followerId),
+                    col(followingUser, User::id).`in`(userList),
+                ),
+            )
         }
     }
 
