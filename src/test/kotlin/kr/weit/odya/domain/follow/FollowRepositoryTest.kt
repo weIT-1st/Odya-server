@@ -11,8 +11,8 @@ import kr.weit.odya.support.TEST_DEFAULT_PAGEABLE
 import kr.weit.odya.support.TEST_DEFAULT_SIZE
 import kr.weit.odya.support.TEST_DEFAULT_SORT_TYPE
 import kr.weit.odya.support.TEST_PLACE_ID
-import kr.weit.odya.support.createAnotherUser
 import kr.weit.odya.support.createCommunity
+import kr.weit.odya.support.createCustomUser
 import kr.weit.odya.support.createFollow
 import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createPlaceReview

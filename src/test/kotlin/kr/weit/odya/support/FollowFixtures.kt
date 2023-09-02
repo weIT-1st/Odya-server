@@ -51,4 +51,4 @@ fun createVisitedFollowingResponse(): VisitedFollowingResponse =
         ),
     )
 
-fun createVisitedFollowingIds() = listOf(TEST_OTHER_USER_ID, TEST_ANOTHER_USER_ID)
+fun createVisitedFollowingIds() = listOf(TEST_USER_ID, TEST_OTHER_USER_ID)
