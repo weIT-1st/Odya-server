@@ -13,10 +13,12 @@ import kr.weit.odya.domain.follow.getByFollowerIdAndFollowingIdIn
 import kr.weit.odya.domain.follow.getFollowerListBySearchCond
 import kr.weit.odya.domain.follow.getFollowingListBySearchCond
 import kr.weit.odya.domain.follow.getMayKnowFollowings
+import kr.weit.odya.domain.follow.getVisitedFollowingIds
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.UsersDocumentRepository
 import kr.weit.odya.domain.user.getByNickname
 import kr.weit.odya.domain.user.getByUserId
+import kr.weit.odya.domain.user.getByUserIds
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_DEFAULT_PAGEABLE
 import kr.weit.odya.support.TEST_DEFAULT_PROFILE_PNG
@@ -25,6 +27,7 @@ import kr.weit.odya.support.TEST_FOLLOWER_COUNT
 import kr.weit.odya.support.TEST_FOLLOWING_COUNT
 import kr.weit.odya.support.TEST_NICKNAME
 import kr.weit.odya.support.TEST_OTHER_USER_ID
+import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_PROFILE_URL
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createFollow
@@ -34,6 +37,7 @@ import kr.weit.odya.support.createFollowRequest
 import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createUser
 import kr.weit.odya.support.createUsersDocument
+import kr.weit.odya.support.createVisitedFollowingIds
 
 class FollowServiceTest : DescribeSpec(
     {
@@ -210,11 +214,21 @@ class FollowServiceTest : DescribeSpec(
 
         describe("getMayKnowFollowings") {
             context("요청이 들어오면") {
-                val user = createUser()
                 every { followRepository.getMayKnowFollowings(any(), any(), any()) } returns createFollowList()
                 every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
                 it("알수도 있는 유저를 조회 한다") {
                     shouldNotThrowAny { followService.getMayKnowFollowings(TEST_USER_ID, 10, null) }
+                }
+            }
+        }
+
+        describe("getVisitedFollowings") {
+            context("요청이 들어오면") {
+                every { followRepository.getVisitedFollowingIds(any(), any()) } returns createVisitedFollowingIds()
+                every { userRepository.getByUserIds(any()) } returns listOf(createOtherUser(), createOtherUser())
+                every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
+                it("방문한 유저를 조회 한다") {
+                    shouldNotThrowAny { followService.getVisitedFollowings(TEST_PLACE_ID, TEST_USER_ID) }
                 }
             }
         }
