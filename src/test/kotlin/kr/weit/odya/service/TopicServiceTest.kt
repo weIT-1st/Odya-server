@@ -12,12 +12,14 @@ import kr.weit.odya.domain.favoriteTopic.getByFavoriteTopicId
 import kr.weit.odya.domain.favoriteTopic.getByUserId
 import kr.weit.odya.domain.topic.TopicRepository
 import kr.weit.odya.domain.topic.getByTopicId
+import kr.weit.odya.domain.topic.getPopularTopicsAtPlace
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.support.TEST_FAVORITE_TOPIC_ID
 import kr.weit.odya.support.TEST_INVALID_TOPIC_ID
 import kr.weit.odya.support.TEST_NOT_EXIST_FAVORITE_TOPIC_ID
 import kr.weit.odya.support.TEST_NOT_EXIST_USER_ID
+import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createAddFavoriteTopicRequest
 import kr.weit.odya.support.createFavoriteTopic
@@ -102,6 +104,15 @@ class TopicServiceTest : DescribeSpec(
                 every { favoriteTopicRepository.getByUserId(TEST_USER_ID) } returns createFavoriteTopicList()
                 it("해당 유저의 관심 토픽 리스트를 반환한다") {
                     shouldNotThrowAny { topicService.getFavoriteTopicList(TEST_USER_ID) }
+                }
+            }
+        }
+
+        describe("getPopularTopicsAtPlace 메소드") {
+            context("유효한 placeId와 size가 주어졌을 경우") {
+                every { topicRepository.getPopularTopicsAtPlace(any(), any()) } returns createTopicList()
+                it("해당 장소의 인기 토픽 리스트를 반환한다") {
+                    shouldNotThrowAny { topicService.getPopularTopicsAtPlace(TEST_PLACE_ID, 5) }
                 }
             }
         }
