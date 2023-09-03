@@ -83,12 +83,12 @@ class ReportTravelJournalRepositoryTest(
                 reportTravelJournalRepository.existsById(reportTravelJournal3.id) shouldBe false
             }
 
-            expect("USER_ID와 일치하는 한줄 리뷰의 신고 모두 삭제한다") {
+            expect("USER_ID와 일치하는 여행 일지의 신고 모두 삭제한다") {
                 reportTravelJournalRepository.deleteAllByUserId(user1.id)
                 reportTravelJournalRepository.count() shouldBe 2
             }
 
-            expect("PLACE_REVIEW 리스트에 포함된 한줄 리뷰의 신고를 삭제한다") {
+            expect("TRAVEL_JOURNAL 리스트에 포함된 여행 일지의 신고를 삭제한다") {
                 reportTravelJournalRepository.deleteAllByTravelJournalIn(listOf(travelJournal))
                 reportTravelJournalRepository.count() shouldBe 0
             }
