@@ -8,6 +8,7 @@ import kr.weit.odya.domain.follow.getFollowerListBySearchCond
 import kr.weit.odya.domain.follow.getFollowingListBySearchCond
 import kr.weit.odya.domain.follow.getMayKnowFollowings
 import kr.weit.odya.domain.follow.getVisitedFollowingIds
+import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.UsersDocumentRepository
 import kr.weit.odya.domain.user.getByNickname
@@ -28,6 +29,7 @@ class FollowService(
     private val userRepository: UserRepository,
     private val fileService: FileService,
     private val usersDocumentRepository: UsersDocumentRepository,
+    private val firebaseCloudMessageService: FirebaseCloudMessageService,
 ) {
     @Transactional
     fun createFollow(followerId: Long, followRequest: FollowRequest) {
@@ -37,6 +39,22 @@ class FollowService(
         val follower = userRepository.getByUserId(followerId)
         val following = userRepository.getByUserId(followRequest.followingId)
         followRepository.save(Follow(follower = follower, following = following))
+        sendPushNotification(following, follower)
+    }
+
+    private fun sendPushNotification(
+        following: User,
+        follower: User,
+    ) {
+        val token = following.fcmToken ?: return
+        firebaseCloudMessageService.sendPushNotification(
+            PushNotificationRequest(
+                title = "팔로우 알림",
+                body = "${follower.nickname}님이 팔로우 했어요!",
+                token = token,
+                data = mapOf("followerId" to follower.id.toString()),
+            ),
+        )
     }
 
     @Transactional

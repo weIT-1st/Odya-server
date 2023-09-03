@@ -1,8 +1,11 @@
 package kr.weit.odya.service
 
+import kr.weit.odya.domain.community.Community
 import kr.weit.odya.domain.community.CommunityContentImage
 import kr.weit.odya.domain.community.CommunityRepository
 import kr.weit.odya.domain.contentimage.ContentImage
+import kr.weit.odya.domain.follow.FollowRepository
+import kr.weit.odya.domain.follow.getFollowerFcmTokens
 import kr.weit.odya.domain.topic.TopicRepository
 import kr.weit.odya.domain.topic.getByTopicId
 import kr.weit.odya.domain.traveljournal.TravelJournal
@@ -24,6 +27,8 @@ class CommunityService(
     private val travelJournalRepository: TravelJournalRepository,
     private val userRepository: UserRepository,
     private val fileService: FileService,
+    private val firebaseCloudMessageService: FirebaseCloudMessageService,
+    private val followRepository: FollowRepository,
 ) {
     @Transactional
     fun createCommunity(
@@ -37,6 +42,23 @@ class CommunityService(
         val communityContentImages = getCommunityContentImages(contentImagePairs, user)
         val community = request.toEntity(user, topic, travelJournal, communityContentImages)
         communityRepository.save(community)
+        sendPushNotification(user, community)
+    }
+
+    private fun sendPushNotification(
+        user: User,
+        community: Community,
+    ) {
+        followRepository.getFollowerFcmTokens(user.id).let { fcmTokens ->
+            firebaseCloudMessageService.sendPushNotification(
+                PushNotificationRequest(
+                    title = "피드 알림",
+                    body = "${user.nickname}님이 피드를 작성했어요!",
+                    tokens = fcmTokens,
+                    data = mapOf("communityId" to community.id.toString()),
+                ),
+            )
+        }
     }
 
     fun uploadContentImages(contentImages: List<MultipartFile>): List<Pair<String, String>> {

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Positive
 import kr.weit.odya.security.LoginUserId
 import kr.weit.odya.service.UserService
 import kr.weit.odya.service.WithdrawService
+import kr.weit.odya.service.dto.FCMTokenRequest
 import kr.weit.odya.service.dto.InformationRequest
 import kr.weit.odya.service.dto.SliceResponse
 import kr.weit.odya.service.dto.UserResponse
@@ -84,6 +85,17 @@ class UserController(
             null
         }
         userService.updateProfile(userId, profileName, multipartFile?.originalFilename)
+        return ResponseEntity.noContent().build()
+    }
+
+    @PatchMapping("/fcm-token")
+    fun updateFcmToken(
+        @RequestBody
+        @Valid
+        fcmTokenRequest: FCMTokenRequest,
+        @LoginUserId userId: Long,
+    ): ResponseEntity<Void> {
+        userService.updateFcmToken(userId, fcmTokenRequest)
         return ResponseEntity.noContent().build()
     }
 

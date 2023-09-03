@@ -45,8 +45,9 @@ class FollowServiceTest : DescribeSpec(
         val followRepository = mockk<FollowRepository>()
         val fileService = mockk<FileService>()
         val usersDocumentRepository = mockk<UsersDocumentRepository>()
+        val firebaseCloudMessageService = mockk<FirebaseCloudMessageService>()
         val followService =
-            FollowService(followRepository, userRepository, fileService, usersDocumentRepository)
+            FollowService(followRepository, userRepository, fileService, usersDocumentRepository, firebaseCloudMessageService)
 
         describe("createFollow") {
             context("이미 존재하지 않는 팔로우를 생성하는 경우") {
