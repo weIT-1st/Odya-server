@@ -150,7 +150,7 @@ class ReportServiceTest : DescribeSpec(
                 }
             }
 
-            context("신고 등록 후 한줄 리뷰의 신고가 5회 이상일 경우") {
+            context("신고 등록 후 여행 일지의 신고가 5회 이상일 경우") {
                 every { reportTravelJournalRepository.existsByTravelJournalIdAndUserId(request.travelJournalId, user.id) } returns false
                 every { userRepository.getByUserId(user.id) } returns user
                 every { travelJournalRepository.getByTravelJournalId(request.travelJournalId) } returns travelJournal
@@ -158,12 +158,12 @@ class ReportServiceTest : DescribeSpec(
                 every { reportTravelJournalRepository.countAllByTravelJournalId(request.travelJournalId) } returns 5
                 every { reportTravelJournalRepository.deleteAllByTravelJournalId(request.travelJournalId) } just runs
                 every { travelJournalRepository.deleteById(request.travelJournalId) } just runs
-                it("해당 한 줄 리뷰를 삭제한다.") {
+                it("해당 한 줄 여행 일지를 삭제한다.") {
                     shouldNotThrowAny { reportService.reportTravelJournal(user.id, request) }
                 }
             }
 
-            context("작성자가 자신의 리뷰를 신고 등록을 요청한 경우") {
+            context("작성자가 자신의 여행 일지를 신고 등록을 요청한 경우") {
                 val travelJournal2 = createTravelJournal(TEST_TRAVEL_JOURNAL_ID, TEST_TRAVEL_JOURNAL_TITLE, TEST_TRAVEL_JOURNAL_START_DATE, TEST_TRAVEL_JOURNAL_END_DATE, TravelJournalVisibility.PUBLIC, user)
                 every { reportTravelJournalRepository.existsByTravelJournalIdAndUserId(request.travelJournalId, user.id) } returns false
                 every { travelJournalRepository.getByTravelJournalId(request.travelJournalId) } returns travelJournal2
@@ -172,7 +172,7 @@ class ReportServiceTest : DescribeSpec(
                 }
             }
 
-            context("이미 신고한 리뷰를 신고 등록을 요청한 경우") {
+            context("이미 신고한 여행 일지를 신고 등록을 요청한 경우") {
                 every { travelJournalRepository.getByTravelJournalId(request.travelJournalId) } returns travelJournal
                 every { reportTravelJournalRepository.existsByTravelJournalIdAndUserId(request.travelJournalId, user.id) } returns true
                 it("[ExistResourceException]을 반환한다.") {
@@ -188,7 +188,7 @@ class ReportServiceTest : DescribeSpec(
                 }
             }
 
-            context("존재하지 않는 한줄 리뷰 ID가 전달될 경우") {
+            context("존재하지 않는 여행 일지 ID가 전달될 경우") {
                 every { reportTravelJournalRepository.existsByTravelJournalIdAndUserId(request.travelJournalId, user.id) } returns false
                 every { userRepository.getByUserId(user.id) } returns user
                 every { travelJournalRepository.getByTravelJournalId(request.travelJournalId) } throws NoSuchElementException(NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE)

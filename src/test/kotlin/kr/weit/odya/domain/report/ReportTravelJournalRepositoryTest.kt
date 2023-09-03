@@ -88,7 +88,7 @@ class ReportTravelJournalRepositoryTest(
                 reportTravelJournalRepository.count() shouldBe 2
             }
 
-            expect("PLACE_REVIEW 리스트에 포함된 한줄 리뷰의 신고를 삭제한다") {
+            expect("TRAVEL_JOURNAL 리스트에 포함된 한줄 리뷰의 신고를 삭제한다") {
                 reportTravelJournalRepository.deleteAllByTravelJournalIn(listOf(travelJournal))
                 reportTravelJournalRepository.count() shouldBe 0
             }
