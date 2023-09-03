@@ -4,7 +4,10 @@ import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
+import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.user.UserRepository
@@ -20,6 +23,7 @@ import kr.weit.odya.support.TEST_TRAVEL_JOURNAL
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME
 import kr.weit.odya.support.TEST_USER
 import kr.weit.odya.support.TEST_USER_ID
+import kr.weit.odya.support.createFollowerFcmTokenList
 import kr.weit.odya.support.createImageMap
 import kr.weit.odya.support.createImageNamePairs
 import kr.weit.odya.support.createMockImageFile
@@ -39,8 +43,10 @@ class TravelJournalServiceTest : DescribeSpec(
         val userRepository = mockk<UserRepository>()
         val travelJournalRepository = mockk<TravelJournalRepository>()
         val fileService = mockk<FileService>()
+        val firebaseCloudMessageService = mockk<FirebaseCloudMessageService>()
+        val followRepository = mockk<FollowRepository>()
         val travelJournalService =
-            TravelJournalService(userRepository, travelJournalRepository, fileService)
+            TravelJournalService(userRepository, travelJournalRepository, fileService, followRepository, firebaseCloudMessageService)
 
         describe("createTravelJournal") {
             context("유효한 데이터가 주어지는 경우") {
@@ -50,6 +56,8 @@ class TravelJournalServiceTest : DescribeSpec(
                 every { userRepository.getByUserId(TEST_USER_ID) } returns register
                 every { userRepository.getByUserIds(TEST_TRAVEL_COMPANION_IDS) } returns TEST_TRAVEL_COMPANION_USERS
                 every { travelJournalRepository.save(any<TravelJournal>()) } returns TEST_TRAVEL_JOURNAL
+                every { followRepository.findFollowerFcmTokenByFollowingId(TEST_USER_ID) } returns createFollowerFcmTokenList()
+                every { firebaseCloudMessageService.sendPushNotification(any()) } just runs
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalService.createTravelJournal(
@@ -70,6 +78,8 @@ class TravelJournalServiceTest : DescribeSpec(
                 )
                 every { userRepository.getByUserId(TEST_USER_ID) } returns TEST_USER
                 every { travelJournalRepository.save(any<TravelJournal>()) } returns TEST_TRAVEL_JOURNAL
+                every { followRepository.findFollowerFcmTokenByFollowingId(TEST_USER_ID) } returns createFollowerFcmTokenList()
+                every { firebaseCloudMessageService.sendPushNotification(any()) } just runs
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalService.createTravelJournal(
