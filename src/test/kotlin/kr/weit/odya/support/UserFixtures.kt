@@ -6,6 +6,7 @@ import kr.weit.odya.domain.user.SocialType
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRole
 import kr.weit.odya.domain.user.UsersDocument
+import kr.weit.odya.service.dto.FCMTokenRequest
 import kr.weit.odya.service.dto.InformationRequest
 import kr.weit.odya.service.dto.SliceResponse
 import kr.weit.odya.service.dto.UserResponse
@@ -79,6 +80,8 @@ fun createAnotherUser(): User = User(
 fun createUserResponse(): UserResponse = UserResponse(createUser(), TEST_PROFILE_URL)
 
 fun createInformationRequest(): InformationRequest = InformationRequest(TEST_NICKNAME)
+
+fun createFcmTokenRequest(fcmToken: String = TEST_FCM_TOKEN): FCMTokenRequest = FCMTokenRequest(fcmToken)
 
 fun createProfile(profileId: Long = 0L, profileName: String = TEST_DEFAULT_PROFILE_PNG): Profile = Profile(
     id = profileId,
