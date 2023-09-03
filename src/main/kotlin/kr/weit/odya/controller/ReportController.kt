@@ -3,6 +3,7 @@ package kr.weit.odya.controller
 import jakarta.validation.Valid
 import kr.weit.odya.security.LoginUserId
 import kr.weit.odya.service.ReportService
+import kr.weit.odya.service.dto.ReportCommunityRequest
 import kr.weit.odya.service.dto.ReportPlaceReviewRequest
 import kr.weit.odya.service.dto.ReportReasonsResponse
 import kr.weit.odya.service.dto.ReportTravelJournalRequest
@@ -45,6 +46,18 @@ class ReportController(private val reportService: ReportService) {
         request: ReportTravelJournalRequest,
     ): ResponseEntity<Void> {
         reportService.reportTravelJournal(userId, request)
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
+    }
+
+    @PostMapping("/community")
+    fun reportCommunity(
+        @LoginUserId
+        userId: Long,
+        @Valid
+        @RequestBody
+        request: ReportCommunityRequest,
+    ): ResponseEntity<Void> {
+        reportService.reportCommunity(userId, request)
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
     }
 }

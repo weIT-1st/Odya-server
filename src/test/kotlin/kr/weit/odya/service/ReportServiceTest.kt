@@ -7,8 +7,11 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
+import kr.weit.odya.domain.community.CommunityRepository
+import kr.weit.odya.domain.community.getByCommunityId
 import kr.weit.odya.domain.placeReview.PlaceReviewRepository
 import kr.weit.odya.domain.placeReview.getByPlaceReviewId
+import kr.weit.odya.domain.report.ReportCommunityRepository
 import kr.weit.odya.domain.report.ReportPlaceReviewRepository
 import kr.weit.odya.domain.report.ReportReason
 import kr.weit.odya.domain.report.ReportTravelJournalRepository
@@ -25,8 +28,11 @@ import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_END_DATE
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_ID
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_START_DATE
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_TITLE
+import kr.weit.odya.support.createCommunity
 import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createPlaceReview
+import kr.weit.odya.support.createReportCommunity
+import kr.weit.odya.support.createReportCommunityRequest
 import kr.weit.odya.support.createReportPlaceReview
 import kr.weit.odya.support.createReportPlaceReviewRequest
 import kr.weit.odya.support.createReportTravelJournal
@@ -40,7 +46,9 @@ class ReportServiceTest : DescribeSpec(
         val reportTravelJournalRepository = mockk<ReportTravelJournalRepository>()
         val travelJournalRepository = mockk<TravelJournalRepository>()
         val placeReviewRepository = mockk<PlaceReviewRepository>()
-        val reportService = ReportService(reportPlaceReviewRepository, reportTravelJournalRepository, travelJournalRepository, userRepository, placeReviewRepository)
+        val reportCommunityRepository = mockk<ReportCommunityRepository>()
+        val communityRepository = mockk<CommunityRepository>()
+        val reportService = ReportService(reportPlaceReviewRepository, reportTravelJournalRepository, travelJournalRepository, userRepository, placeReviewRepository, reportCommunityRepository, communityRepository)
         val user = createOtherUser()
 
         describe("getReportReasons 메소드") {
@@ -194,6 +202,79 @@ class ReportServiceTest : DescribeSpec(
                 every { travelJournalRepository.getByTravelJournalId(request.travelJournalId) } throws NoSuchElementException(NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE)
                 it("[NoSuchElementException]을 반환한다.") {
                     shouldThrow<NoSuchElementException> { reportService.reportTravelJournal(user.id, request) }
+                }
+            }
+        }
+
+        describe("reportCommunity 메소드") {
+            val community = createCommunity()
+            val request = createReportCommunityRequest()
+            context("신고한 유저와 신고 사유가 전달될 경우") {
+                every { reportCommunityRepository.existsByCommunityIdAndUserId(request.communityId, user.id) } returns false
+                every { userRepository.getByUserId(user.id) } returns user
+                every { communityRepository.getByCommunityId(request.communityId) } returns community
+                every { reportCommunityRepository.save(any()) } returns createReportCommunity(community, user)
+                every { reportCommunityRepository.countAllByCommunityId(request.communityId) } returns 4
+                it("신고가 정상적으로 등록된다") {
+                    shouldNotThrowAny { reportService.reportCommunity(user.id, request) }
+                }
+            }
+            context("신고한 유저와 기타 신고 사유가 전달될 경우") {
+                val otherRequest = request.copy(reportReason = ReportReason.OTHER, otherReason = TEST_REPORT_OTHER_REASON)
+                every { reportCommunityRepository.existsByCommunityIdAndUserId(otherRequest.communityId, user.id) } returns false
+                every { userRepository.getByUserId(user.id) } returns user
+                every { communityRepository.getByCommunityId(otherRequest.communityId) } returns community
+                every { reportCommunityRepository.save(any()) } returns createReportCommunity(community, user, TEST_REPORT_ID, otherRequest.reportReason, otherRequest.otherReason)
+                every { reportCommunityRepository.countAllByCommunityId(request.communityId) } returns 4
+                it("신고가 기타 신고 사유와 함께 정상적으로 등록된다.(신고 5회 미만)") {
+                    shouldNotThrowAny { reportService.reportCommunity(user.id, request) }
+                }
+            }
+
+            context("신고 등록 후 한줄 리뷰의 신고가 5회 이상일 경우") {
+                every { reportCommunityRepository.existsByCommunityIdAndUserId(request.communityId, user.id) } returns false
+                every { userRepository.getByUserId(user.id) } returns user
+                every { communityRepository.getByCommunityId(request.communityId) } returns community
+                every { reportCommunityRepository.save(any()) } returns createReportCommunity(community, user, TEST_REPORT_ID, request.reportReason, request.otherReason)
+                every { reportCommunityRepository.countAllByCommunityId(request.communityId) } returns 5
+                every { reportCommunityRepository.deleteAllByCommunityId(request.communityId) } just runs
+                every { communityRepository.deleteById(request.communityId) } just runs
+                it("해당 한 줄 리뷰를 삭제한다.") {
+                    shouldNotThrowAny { reportService.reportCommunity(user.id, request) }
+                }
+            }
+
+            context("작성자가 자신의 리뷰를 신고 등록을 요청한 경우") {
+                val community2 = createCommunity(user = user)
+                every { reportCommunityRepository.existsByCommunityIdAndUserId(request.communityId, user.id) } returns false
+                every { communityRepository.getByCommunityId(request.communityId) } returns community2
+                it("[IllegalArgumentException]을 반환한다.") {
+                    shouldThrow<IllegalArgumentException> { reportService.reportCommunity(user.id, request) }
+                }
+            }
+
+            context("이미 신고한 리뷰를 신고 등록을 요청한 경우") {
+                every { communityRepository.getByCommunityId(request.communityId) } returns community
+                every { reportCommunityRepository.existsByCommunityIdAndUserId(request.communityId, user.id) } returns true
+                it("[ExistResourceException]을 반환한다.") {
+                    shouldThrow<ExistResourceException> { reportService.reportCommunity(user.id, request) }
+                }
+            }
+
+            context("존재하지 않는 유저ID가 전달될 경우") {
+                every { reportCommunityRepository.existsByCommunityIdAndUserId(request.communityId, user.id) } returns false
+                every { userRepository.getByUserId(user.id) } throws NoSuchElementException(NOT_EXIST_USER_ERROR_MESSAGE)
+                it("[NoSuchElementException]을 반환한다.") {
+                    shouldThrow<NoSuchElementException> { reportService.reportCommunity(user.id, request) }
+                }
+            }
+
+            context("존재하지 않는 한줄 리뷰 ID가 전달될 경우") {
+                every { reportCommunityRepository.existsByCommunityIdAndUserId(request.communityId, user.id) } returns false
+                every { userRepository.getByUserId(user.id) } returns user
+                every { communityRepository.getByCommunityId(request.communityId) } throws NoSuchElementException(NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE)
+                it("[NoSuchElementException]을 반환한다.") {
+                    shouldThrow<NoSuchElementException> { reportService.reportCommunity(user.id, request) }
                 }
             }
         }

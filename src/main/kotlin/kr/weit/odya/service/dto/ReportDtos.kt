@@ -2,7 +2,9 @@ package kr.weit.odya.service.dto
 
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Positive
+import kr.weit.odya.domain.community.Community
 import kr.weit.odya.domain.placeReview.PlaceReview
+import kr.weit.odya.domain.report.ReportCommunity
 import kr.weit.odya.domain.report.ReportPlaceReview
 import kr.weit.odya.domain.report.ReportReason
 import kr.weit.odya.domain.report.ReportTravelJournal
@@ -45,6 +47,24 @@ data class ReportTravelJournalRequest(
     fun toEntity(user: User, travelJournal: TravelJournal) = ReportTravelJournal(
         user = user,
         travelJournal = travelJournal,
+        reportReason = reportReason,
+        otherReason = if (reportReason != ReportReason.OTHER) null else otherReason,
+    )
+}
+
+data class ReportCommunityRequest(
+    @field:NotNull(message = "communityId는 필수 입력값입니다.")
+    @field:Positive(message = "communityId는 양수여야 합니다.")
+    val communityId: Long,
+    @field:NotNull(message = "신고 사유는 필수 입력값입니다.")
+    val reportReason: ReportReason,
+    @field:NullOrNotBlank(message = "기타 사유는 공백일 수 없습니다.")
+    @field:Length(max = 60, message = "기타 사유는 20자 이내여야 합니다.")
+    val otherReason: String? = null,
+) {
+    fun toEntity(user: User, community: Community) = ReportCommunity(
+        user = user,
+        community = community,
         reportReason = reportReason,
         otherReason = if (reportReason != ReportReason.OTHER) null else otherReason,
     )

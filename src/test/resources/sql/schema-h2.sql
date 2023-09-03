@@ -347,3 +347,25 @@ ALTER TABLE report_travel_journal
 
 ALTER TABLE report_travel_journal
     ADD CONSTRAINT FK_REPORT_TRAVEL_JOURNAL_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
+CREATE SEQUENCE report_community_seq START WITH 1 INCREMENT BY 1;
+
+CREATE TABLE report_community
+(
+    id            NUMBER(19, 0) NOT NULL,
+    created_date  TIMESTAMP     NOT NULL,
+    user_id       NUMBER(19, 0) NOT NULL,
+    community_id  NUMBER(19, 0) NOT NULL,
+    report_reason VARCHAR2(20)  NOT NULL,
+    other_reason  VARCHAR2(60),
+    CONSTRAINT pk_report_community PRIMARY KEY (id)
+);
+
+ALTER TABLE report_community
+    ADD CONSTRAINT report_community_unique UNIQUE (community_id,user_id);
+
+ALTER TABLE report_community
+    ADD CONSTRAINT FK_REPORT_COMMUNITY_ON_COMMUNITY FOREIGN KEY (community_id) REFERENCES community (id);
+
+ALTER TABLE report_community
+    ADD CONSTRAINT FK_REPORT_COMMUNITY_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
