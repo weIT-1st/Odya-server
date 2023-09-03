@@ -170,7 +170,7 @@ class FollowRepositoryTest(
         }
 
         context("방문한 친구 id 검색") {
-            expect("장소 리뷰에 작성된 친구를 조회한다") {
+            expect("장소 리뷰를 작성된 친구를 조회한다") {
                 placeReviewRepository.save(
                     createPlaceReview(
                         following,
@@ -184,7 +184,7 @@ class FollowRepositoryTest(
                 result shouldBe listOf(following.id)
             }
 
-            expect("여행일지에 작성된 친구를 조회한다") {
+            expect("여행일지를 작성된 친구를 조회한다") {
                 travelJournalRepository.save(
                     createTravelJournal(
                         user = following,
@@ -202,7 +202,7 @@ class FollowRepositoryTest(
                 result shouldBe listOf(following.id)
             }
 
-            expect("커뮤니티에 작성된 친구를 조회한다") {
+            expect("커뮤니티를 작성된 친구를 조회한다") {
                 communityRepository.save(
                     createCommunity(user = following, travelJournal = null),
                 )
