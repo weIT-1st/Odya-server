@@ -64,3 +64,26 @@ operation::topic-controller-test/favorite-topic-list-success[snippets='http-requ
 === *4-2 실패 - 유효하지 않은 토큰*
 
 operation::topic-controller-test/favorite-topic-list-fail-invalid-token[snippets='http-request,request-headers,http-response']
+
+[[인기-토픽-조회-API]]
+== *5. 인기 토픽 조회 API*
+
+=== *5-1 성공*
+
+operation::topic-controller-test/get-popular-topic-success[snippets='http-request,request-headers,path-parameters,query-parameters,http-response']
+
+=== *5-2 실패 - 잘못된 장소 Id*
+
+operation::topic-controller-test/get-popular-topic-fail-invalid-placeId[snippets='http-request,request-headers,path-parameters,query-parameters,http-response']
+
+=== *5-3 실패 - size가 양수가 아닌 경우*
+
+operation::topic-controller-test/get-popular-topic-fail-invalid-size[snippets='http-request,request-headers,path-parameters,query-parameters,http-response']
+
+=== *5-4 실패 - 가입되어 있지 않은 USER*
+
+operation::topic-controller-test/get-popular-topic-fail-not-registered-user[snippets='http-request,request-headers,path-parameters,query-parameters,http-response']
+
+=== *5-5 실패 - 유효하지 않은 토큰*
+
+operation::topic-controller-test/get-popular-topic-fail-invalid-token[snippets='http-request,request-headers,path-parameters,query-parameters,http-response']

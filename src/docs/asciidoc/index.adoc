@@ -13,7 +13,6 @@ ifndef::page[]
 endif::[]
 
 include::overview.adoc[]
-include::test.adoc[]
 include::auth.adoc[]
 include::user.adoc[]
 include::placeReview.adoc[]

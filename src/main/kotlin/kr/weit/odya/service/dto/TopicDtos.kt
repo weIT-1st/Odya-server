@@ -16,3 +16,8 @@ data class FavoriteTopicListResponse(val id: Long, val userId: Long, val topicId
         favoriteTopic.topic.word,
     )
 }
+
+data class TopicResponse(
+    val id: Long,
+    val topic: String,
+)

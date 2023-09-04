@@ -5,6 +5,7 @@ import kr.weit.odya.domain.topic.Topic
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.service.dto.AddFavoriteTopicRequest
 import kr.weit.odya.service.dto.FavoriteTopicListResponse
+import kr.weit.odya.service.dto.TopicResponse
 
 const val TEST_TOPIC_ID = 1L
 const val TEST_OTHER_TOPIC_ID = 2L
@@ -24,3 +25,7 @@ fun createInvalidAddFavoriteTopicRequest() = AddFavoriteTopicRequest(listOf(TEST
 fun createFavoriteTopic(user: User = createUser(), topic: Topic = createTopic()) = FavoriteTopic(TEST_FAVORITE_TOPIC_ID, user, topic)
 fun createFavoriteTopicList() = listOf(createFavoriteTopic(), FavoriteTopic(TEST_OTHER_FAVORITE_TOPIC_ID, createUser(), createOtherTopic()))
 fun createFavoriteTopicListResponse() = createFavoriteTopicList().map { FavoriteTopicListResponse(it) }
+
+fun createTopicResponse() = TopicResponse(TEST_TOPIC_ID, TEST_TOPIC)
+
+fun createTopicResponseList() = listOf(createTopicResponse(), TopicResponse(TEST_OTHER_TOPIC_ID, TEST_OTHER_TOPIC))
