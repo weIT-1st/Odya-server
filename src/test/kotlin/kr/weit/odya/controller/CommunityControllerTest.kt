@@ -17,9 +17,13 @@ import kr.weit.odya.support.createCommunityCreateRequest
 import kr.weit.odya.support.createCommunityRequestFile
 import kr.weit.odya.support.createMockImageFile
 import kr.weit.odya.support.createMockOtherImageFile
-import kr.weit.odya.support.test.*
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
+import kr.weit.odya.support.test.ControllerTestHelper
+import kr.weit.odya.support.test.RestDocsHelper
 import kr.weit.odya.support.test.RestDocsHelper.Companion.createDocument
+import kr.weit.odya.support.test.files
+import kr.weit.odya.support.test.headerDescription
+import kr.weit.odya.support.test.requestPartDescription
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
