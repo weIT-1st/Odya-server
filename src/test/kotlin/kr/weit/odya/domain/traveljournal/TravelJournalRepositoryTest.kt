@@ -22,11 +22,12 @@ class TravelJournalRepositoryTest(
 ) : ExpectSpec(
     {
         lateinit var user: User
+        lateinit var travelJournal: TravelJournal
         beforeEach {
             user = userRepository.save(createUser())
             val otherUser: User = userRepository.save(createOtherUser())
             val contentImage = contentImageRepository.save(createContentImage(user = user))
-            travelJournalRepository.save(
+            travelJournal = travelJournalRepository.save(
                 createTravelJournal(
                     user = user,
                     travelCompanions = listOf(createTravelCompanionById(user = otherUser)),
@@ -43,9 +44,8 @@ class TravelJournalRepositoryTest(
 
         context("여행 일지 조회") {
             expect("여행 일지 ID와 일치하는 여행 일지를 조회한다.") {
-                val id = travelJournalRepository.findAll()[0].id
-                val result = travelJournalRepository.getByTravelJournalId(id)
-                result.id shouldBe id
+                val result = travelJournalRepository.getByTravelJournalId(travelJournal.id)
+                result.id shouldBe travelJournal.id
             }
         }
 

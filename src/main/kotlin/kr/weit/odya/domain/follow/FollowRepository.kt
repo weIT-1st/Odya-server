@@ -178,7 +178,6 @@ open class FollowRepositoryImpl(private val queryFactory: QueryFactory) : Custom
         }
     }
 
-    @Transactional(readOnly = true)
     override fun findVisitedFollowingIdsByPlaceIdAndFollowerId(placeID: String, followerId: Long): List<Long> {
         val placeReviewWriter = queryFactory.listQuery {
             select(col(User::id))
