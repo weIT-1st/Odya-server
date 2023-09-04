@@ -7,9 +7,11 @@ import kr.weit.odya.service.dto.FollowProfileResponse
 import kr.weit.odya.service.dto.FollowRequest
 import kr.weit.odya.service.dto.FollowUserResponse
 import kr.weit.odya.service.dto.SliceResponse
+import kr.weit.odya.service.dto.VisitedFollowingResponse
 
 const val TEST_FOLLOWING_COUNT = 1
 const val TEST_FOLLOWER_COUNT = 2
+const val TEST_VISITED_FOLLOWING_COUNT = 2
 
 fun createFollowRequest(): FollowRequest = FollowRequest(TEST_OTHER_USER_ID)
 
@@ -39,3 +41,14 @@ fun createFollowProfileResponse(): FollowProfileResponse =
 
 fun createFollowProfileColorResponse(): FollowProfileResponse.ProfileColorResponse =
     FollowProfileResponse.ProfileColorResponse(createProfileColor(TEST_PROFILE_COLOR_ID))
+
+fun createVisitedFollowingResponse(): VisitedFollowingResponse =
+    VisitedFollowingResponse(
+        TEST_VISITED_FOLLOWING_COUNT,
+        listOf(
+            createFollowUserResponse(),
+            createFollowUserResponse(TEST_OTHER_USER_ID, TEST_OTHER_NICKNAME),
+        ),
+    )
+
+fun createVisitedFollowingIds() = listOf(TEST_OTHER_USER_ID, TEST_ANOTHER_USER_ID)

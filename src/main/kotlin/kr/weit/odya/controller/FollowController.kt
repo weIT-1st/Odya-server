@@ -1,6 +1,7 @@
 package kr.weit.odya.controller
 
 import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Positive
 import kr.weit.odya.domain.follow.FollowSortType
@@ -10,6 +11,7 @@ import kr.weit.odya.service.dto.FollowCountsResponse
 import kr.weit.odya.service.dto.FollowRequest
 import kr.weit.odya.service.dto.FollowUserResponse
 import kr.weit.odya.service.dto.SliceResponse
+import kr.weit.odya.service.dto.VisitedFollowingResponse
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
@@ -108,5 +110,15 @@ class FollowController(
         lastId: Long?,
     ): ResponseEntity<SliceResponse<FollowUserResponse>> {
         return ResponseEntity.ok(followService.getMayKnowFollowings(userId, size, lastId))
+    }
+
+    @GetMapping("/{placeID}")
+    fun getVisitedFollowings(
+        @LoginUserId userId: Long,
+        @NotBlank(message = "장소 ID는 필수 입력 값입니다.")
+        @PathVariable("placeID")
+        placeID: String,
+    ): ResponseEntity<VisitedFollowingResponse> {
+        return ResponseEntity.ok(followService.getVisitedFollowings(placeID, userId))
     }
 }
