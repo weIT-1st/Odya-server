@@ -16,7 +16,7 @@ class ContentImageRepositoryTest(private val userRepository: UserRepository, pri
         lateinit var contentImage1: ContentImage
         lateinit var contentImage2: ContentImage
         lateinit var user: User
-        beforeTest {
+        beforeEach {
             user = userRepository.save(createUser())
             contentImage1 = contentImageRepository.save(createContentImage(user = user))
             contentImage2 = contentImageRepository.save(createContentImage(user = user))
