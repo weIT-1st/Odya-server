@@ -1,10 +1,14 @@
-package kr.weit.odya.domain.traveljournal
+package kr.weit.odya.domain.community
 
 import io.kotest.core.spec.style.ExpectSpec
 import io.kotest.matchers.shouldBe
+import kr.weit.odya.domain.traveljournal.TravelJournal
+import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
-import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_TITLE
+import kr.weit.odya.support.TEST_COMMUNITY_CONTENT
+import kr.weit.odya.support.createCommunity
+import kr.weit.odya.support.createCommunityContentImage
 import kr.weit.odya.support.createContentImage
 import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createTravelCompanionById
@@ -15,7 +19,8 @@ import kr.weit.odya.support.createUser
 import kr.weit.odya.support.test.BaseTests.RepositoryTest
 
 @RepositoryTest
-class TravelJournalRepositoryTest(
+class CommunityRepositoryTest(
+    private val communityRepository: CommunityRepository,
     private val userRepository: UserRepository,
     private val travelJournalRepository: TravelJournalRepository,
 ) : ExpectSpec(
@@ -23,6 +28,8 @@ class TravelJournalRepositoryTest(
         lateinit var user: User
         lateinit var otherUser: User
         lateinit var travelJournal: TravelJournal
+        lateinit var community: Community
+
         beforeEach {
             user = userRepository.save(createUser())
             otherUser = userRepository.save(createOtherUser())
@@ -39,32 +46,21 @@ class TravelJournalRepositoryTest(
                     ),
                 ),
             )
+            community = communityRepository.save(
+                createCommunity(
+                    travelJournal = travelJournal,
+                    user = user,
+                    communityContentImages = listOf(
+                        createCommunityContentImage(contentImage = createContentImage(user = user)),
+                    ),
+                ),
+            )
         }
 
-        context("여행 일지 조회") {
-            expect("여행 일지 ID와 일치하는 여행 일지를 조회한다.") {
-                val result = travelJournalRepository.getByTravelJournalId(travelJournal.id)
-                result.title shouldBe TEST_TRAVEL_JOURNAL_TITLE
-            }
-        }
-
-        context("여행일지 사용자 ID로 조회") {
-            expect("유저 ID와 일치하는 여행기록을 조회한다.") {
-                val result = travelJournalRepository.getByUserId(user.id)
-                result.size shouldBe 1
-            }
-        }
-
-        context("여행 일지 삭제") {
-            expect("여행 일지 ID와 일치하는 여행 일지를 삭제한다.") {
-                val id = travelJournalRepository.findAll()[0].id
-                travelJournalRepository.deleteById(id)
-                travelJournalRepository.existsById(id) shouldBe false
-            }
-
-            expect("USER ID와 일치하는 여행 일지 모두 삭제한다.") {
-                travelJournalRepository.deleteAllByUserId(user.id)
-                travelJournalRepository.count() shouldBe 0
+        context("커뮤니티 아이디") {
+            expect("커뮤니티 ID와 일치하는 커뮤니티를 조회한다") {
+                val result = communityRepository.getByCommunityId(community.id)
+                result.content shouldBe TEST_COMMUNITY_CONTENT
             }
         }
     },

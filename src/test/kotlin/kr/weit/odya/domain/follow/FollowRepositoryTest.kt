@@ -13,12 +13,16 @@ import kr.weit.odya.support.TEST_DEFAULT_SORT_TYPE
 import kr.weit.odya.support.TEST_FCM_TOKEN
 import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.createCommunity
+import kr.weit.odya.support.createCommunityContentImage
+import kr.weit.odya.support.createContentImage
 import kr.weit.odya.support.createCustomUser
 import kr.weit.odya.support.createFollow
 import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createPlaceReview
+import kr.weit.odya.support.createTravelCompanionById
 import kr.weit.odya.support.createTravelJournal
 import kr.weit.odya.support.createTravelJournalContent
+import kr.weit.odya.support.createTravelJournalContentImage
 import kr.weit.odya.support.createUser
 import kr.weit.odya.support.test.BaseTests.RepositoryTest
 
@@ -189,7 +193,11 @@ class FollowRepositoryTest(
                     createTravelJournal(
                         user = following,
                         travelJournalContents = listOf(
-                            createTravelJournalContent(),
+                            createTravelJournalContent(
+                                travelJournalContentImages = listOf(
+                                    createTravelJournalContentImage(contentImage = createContentImage(user = following)),
+                                ),
+                            ),
                         ),
                         travelCompanions = emptyList(),
                     ),
@@ -204,7 +212,13 @@ class FollowRepositoryTest(
 
             expect("같은 장소에 커뮤니티를 작성한 친구를 조회한다") {
                 communityRepository.save(
-                    createCommunity(user = following, travelJournal = null),
+                    createCommunity(
+                        travelJournal = null,
+                        user = following,
+                        communityContentImages = listOf(
+                            createCommunityContentImage(contentImage = createContentImage(user = following)),
+                        ),
+                    ),
                 )
 
                 val result = followRepository.getVisitedFollowingIds(

@@ -1,0 +1,70 @@
+[[Community-Comment-API]]
+= *Community Comment API*
+
+[[커뮤니티-댓글-생성-API]]
+== *1. 커뮤니티 댓글 생성 API*
+
+=== *1-1 성공*
+
+operation::community-comment-controller-test/comment-create-success[snippets='http-request,request-headers,path-parameters,request-fields,http-response']
+
+=== *1-2 실패 - 존재하지 않는 커뮤니티 ID가 주어졌을 때*
+
+operation::community-comment-controller-test/comment-create-fail-not-exists-community[snippets='http-request,request-headers,path-parameters,request-fields,http-response']
+
+=== *1-3 실패 - 유효하지 않은 토큰이 주어졌을 때*
+
+operation::community-comment-controller-test/comment-create-fail-invalid-token[snippets='http-request,request-headers,path-parameters,request-fields,http-response']
+
+[[커뮤니티-댓글-목록-조회-API]]
+== *2. 커뮤니티 댓글 목록 조회 API*
+
+=== *2-1 성공 (lastId null)*
+
+operation::community-comment-controller-test/comment-get-success[snippets='http-request,request-headers,path-parameters,query-parameters,http-response,response-fields']
+
+=== *2-2 성공*
+
+operation::community-comment-controller-test/comment-get-success-with-last-id[snippets='http-request,request-headers,path-parameters,query-parameters,http-response,response-fields']
+
+=== *2-3 실패 - 유효하지 않은 토큰이 주어졌을 때*
+
+operation::community-comment-controller-test/comment-get-fail-invalid-token[snippets='http-request,request-headers,path-parameters,request-fields,http-response']
+
+[[커뮤니티-댓글-수정-API]]
+== *3. 커뮤니티 댓글 수정 API*
+
+=== *3-1 성공*
+
+operation::community-comment-controller-test/comment-update-success[snippets='http-request,request-headers,path-parameters,request-fields,http-response']
+
+=== *3-2 실패 - 커뮤니티 ID와 커뮤니티 댓글 ID에 일치하는 커뮤니티 댓글이 없을 때*
+
+operation::community-comment-controller-test/comment-update-fail-not-exists-community[snippets='http-request,request-headers,path-parameters,request-fields,http-response']
+
+=== *3-3 실패 - 커뮤니티 댓글 작성자와 다른 사용자가 수정을 시도할 때*
+
+operation::community-comment-controller-test/comment-update-fail-not-permitted-user[snippets='http-request,request-headers,path-parameters,request-fields,http-response']
+
+=== *3-4 실패 - 유효하지 않은 토큰이 주어졌을 때*
+
+operation::community-comment-controller-test/comment-update-fail-invalid-token[snippets='http-request,request-headers,path-parameters,request-fields,http-response']
+
+[[커뮤니티-댓글-삭제-API]]
+== *4. 커뮤니티 댓글 삭제 API*
+
+=== *4-1 성공*
+
+operation::community-comment-controller-test/comment-delete-success[snippets='http-request,request-headers,path-parameters,http-response']
+
+=== *4-2 실패 - 커뮤니티 ID와 커뮤니티 댓글 ID에 일치하는 커뮤니티 댓글이 없을 때*
+
+operation::community-comment-controller-test/comment-delete-fail-not-exists-community[snippets='http-request,request-headers,path-parameters,http-response']
+
+=== *4-3 실패 - 커뮤니티 댓글 작성자와 다른 사용자가 수정을 시도할 때*
+
+operation::community-comment-controller-test/comment-delete-fail-not-permitted-user[snippets='http-request,request-headers,path-parameters,http-response']
+
+=== *4-4 실패 - 유효하지 않은 토큰이 주어졌을 때*
+
+operation::community-comment-controller-test/comment-delete-fail-invalid-token[snippets='http-request,request-headers,path-parameters,http-response']

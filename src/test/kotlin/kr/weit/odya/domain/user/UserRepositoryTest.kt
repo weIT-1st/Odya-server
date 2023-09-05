@@ -9,8 +9,6 @@ import kr.weit.odya.support.TEST_FCM_TOKEN
 import kr.weit.odya.support.TEST_NICKNAME
 import kr.weit.odya.support.TEST_OTHER_USER_ID
 import kr.weit.odya.support.TEST_PHONE_NUMBER
-import kr.weit.odya.support.TEST_USERNAME
-import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createUser
 import kr.weit.odya.support.test.BaseTests.RepositoryTest
@@ -22,6 +20,7 @@ class UserRepositoryTest(
     {
         lateinit var user: User
         lateinit var otherUser: User
+
         beforeEach {
             user = userRepository.save(createUser().apply { changeFcmToken(TEST_FCM_TOKEN) })
             otherUser = userRepository.save(createOtherUser())
@@ -29,17 +28,17 @@ class UserRepositoryTest(
 
         context("사용자 조회") {
             expect("USERNAME이 일치하는 사용자를 조회한다") {
-                val result = userRepository.getByUsername(TEST_USERNAME)
-                result.username shouldBe TEST_USERNAME
+                val result = userRepository.getByUsername(user.username)
+                result.username shouldBe user.username
             }
 
             expect("USER_ID가 일치하는 사용자를 조회한다") {
-                val result = userRepository.getByUserId(TEST_USER_ID)
-                result.username shouldBe TEST_USERNAME
+                val result = userRepository.getByUserId(user.id)
+                result.username shouldBe user.username
             }
 
             expect("USER_ID가 일치하는 사용자를 프로필과 함께 조회한다") {
-                val result = userRepository.getByUserIdWithProfile(TEST_USER_ID)
+                val result = userRepository.getByUserIdWithProfile(user.id)
                 result.profile.profileName shouldBe TEST_DEFAULT_PROFILE_PNG
             }
         }
@@ -54,12 +53,12 @@ class UserRepositoryTest(
 
         context("사용자 여부 확인") {
             expect("USERNAME이 일치하는 사용자 여부를 확인한다") {
-                val result = userRepository.existsByUsername(TEST_USERNAME)
+                val result = userRepository.existsByUsername(user.username)
                 result shouldBe true
             }
 
             expect("닉네임이 일치하는 사용자 여부를 확인한다") {
-                val result = userRepository.existsByNickname(TEST_NICKNAME)
+                val result = userRepository.existsByNickname(user.nickname)
                 result shouldBe true
             }
 
@@ -95,9 +94,9 @@ class UserRepositoryTest(
 
             expect("사용자 id list에 해당하는 lastId보다 작은 유저를 조회한다") {
                 val userIds = listOf(user.id, otherUser.id)
-                var result = userRepository.getByUserIds(userIds, TEST_DEFAULT_SIZE, TEST_OTHER_USER_ID)
+                var result = userRepository.getByUserIds(userIds, TEST_DEFAULT_SIZE, otherUser.id)
                 result.size shouldBe 1
-                result = userRepository.getByUserIds(userIds, TEST_DEFAULT_SIZE, TEST_USER_ID)
+                result = userRepository.getByUserIds(userIds, TEST_DEFAULT_SIZE, user.id)
                 result.size shouldBe 0
             }
         }
