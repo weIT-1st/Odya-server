@@ -13,11 +13,15 @@ import kr.weit.odya.support.TEST_DEFAULT_SORT_TYPE
 import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.createAnotherUser
 import kr.weit.odya.support.createCommunity
+import kr.weit.odya.support.createCommunityContentImage
+import kr.weit.odya.support.createContentImage
 import kr.weit.odya.support.createFollow
 import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createPlaceReview
+import kr.weit.odya.support.createTravelCompanionById
 import kr.weit.odya.support.createTravelJournal
 import kr.weit.odya.support.createTravelJournalContent
+import kr.weit.odya.support.createTravelJournalContentImage
 import kr.weit.odya.support.createUser
 import kr.weit.odya.support.test.BaseTests.RepositoryTest
 
@@ -31,10 +35,13 @@ class FollowRepositoryTest(
     private val communityRepository: CommunityRepository,
 ) : ExpectSpec(
     {
-        val follower: User = userRepository.save(createUser())
-        val following: User = userRepository.save(createOtherUser())
-        val notFollowing: User = userRepository.save(createAnotherUser())
+        lateinit var follower: User
+        lateinit var following: User
+        lateinit var notFollowing: User
         beforeEach {
+            follower = userRepository.save(createUser())
+            following = userRepository.save(createOtherUser())
+            notFollowing = userRepository.save(createAnotherUser())
             followRepository.save(createFollow(follower, following))
             followRepository.save(createFollow(following, follower))
             followRepository.save(createFollow(following, notFollowing))
@@ -184,10 +191,14 @@ class FollowRepositoryTest(
                 travelJournalRepository.save(
                     createTravelJournal(
                         user = following,
+                        travelCompanions = listOf(createTravelCompanionById(user = notFollowing)),
                         travelJournalContents = listOf(
-                            createTravelJournalContent(),
+                            createTravelJournalContent(
+                                travelJournalContentImages = listOf(
+                                    createTravelJournalContentImage(contentImage = createContentImage(user = following)),
+                                ),
+                            ),
                         ),
-                        travelCompanions = emptyList(),
                     ),
                 )
 
@@ -200,7 +211,13 @@ class FollowRepositoryTest(
 
             expect("같은 장소에 커뮤니티를 작성한 친구를 조회한다") {
                 communityRepository.save(
-                    createCommunity(user = following, travelJournal = null),
+                    createCommunity(
+                        travelJournal = null,
+                        user = following,
+                        communityContentImages = listOf(
+                            createCommunityContentImage(contentImage = createContentImage(user = following)),
+                        ),
+                    ),
                 )
 
                 val result = followRepository.getVisitedFollowingIds(

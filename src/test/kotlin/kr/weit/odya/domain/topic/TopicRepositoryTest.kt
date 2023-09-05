@@ -6,7 +6,6 @@ import kr.weit.odya.domain.community.CommunityRepository
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.support.TEST_DEFAULT_SIZE
 import kr.weit.odya.support.TEST_PLACE_ID
-import kr.weit.odya.support.TEST_TOPIC_ID
 import kr.weit.odya.support.createCommunity
 import kr.weit.odya.support.createOtherTopic
 import kr.weit.odya.support.createTopic
@@ -37,8 +36,8 @@ class TopicRepositoryTest(
                 result.size shouldBe 2
             }
             expect("토픽 ID와 일치하는 토픽을 조회한다.") {
-                val result = topicRepository.getByTopicId(TEST_TOPIC_ID)
-                result.id shouldBe TEST_TOPIC_ID
+                val result = topicRepository.getByTopicId(topic.id)
+                result.id shouldBe topic.id
             }
         }
 
