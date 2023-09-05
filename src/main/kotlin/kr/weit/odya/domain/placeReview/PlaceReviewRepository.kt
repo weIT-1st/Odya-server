@@ -32,8 +32,6 @@ fun PlaceReviewRepository.getPlaceReviewListByUser(
 ): List<PlaceReview> =
     findSliceByUserOrderBySortType(user, size, sortType, lastId)
 
-fun PlaceReviewRepository.getByUserId(userId: Long): List<PlaceReview> = findAllByUserId(userId)
-
 @Repository
 interface PlaceReviewRepository : JpaRepository<PlaceReview, Long>, CustomPlaceReviewRepository {
     fun existsByUserIdAndPlaceId(userId: Long, placeId: String): Boolean
@@ -47,8 +45,6 @@ interface PlaceReviewRepository : JpaRepository<PlaceReview, Long>, CustomPlaceR
     fun deleteByUserId(userId: Long)
 
     fun countByPlaceId(placeId: String): Int
-
-    fun findAllByUserId(userId: Long): List<PlaceReview>
 }
 
 interface CustomPlaceReviewRepository {

@@ -13,5 +13,5 @@ interface AgreedTermsRepository : JpaRepository<AgreedTerms, Long> {
 
     fun existsByUserIdAndTermsId(userId: Long, termsId: Long): Boolean
 
-    fun deleteByUserId(userId: Long)
+    fun deleteAllByUserId(userId: Long)
 }

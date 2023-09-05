@@ -19,10 +19,13 @@ class FollowRepositoryTest(
     private val userRepository: UserRepository,
 ) : ExpectSpec(
     {
-        val follower: User = userRepository.save(createUser())
-        val following: User = userRepository.save(createOtherUser())
-        val notFollowing: User = userRepository.save(createCustomUser("test_user_3", "test_user_3"))
+        lateinit var follower: User
+        lateinit var following: User
+        lateinit var notFollowing: User
         beforeEach {
+            follower = userRepository.save(createUser())
+            following = userRepository.save(createOtherUser())
+            notFollowing = userRepository.save(createCustomUser("test_user_3", "test_user_3"))
             followRepository.save(createFollow(follower, following))
             followRepository.save(createFollow(following, follower))
             followRepository.save(createFollow(following, notFollowing))

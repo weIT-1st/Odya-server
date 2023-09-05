@@ -4,13 +4,19 @@ import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
+import kr.weit.odya.domain.contentimage.ContentImageRepository
+import kr.weit.odya.domain.report.ReportTravelJournalRepository
+import kr.weit.odya.domain.traveljournal.TravelCompanionRepository
 import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.domain.user.getByUserIds
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
+import kr.weit.odya.support.TEST_CONTENT_IMAGES
 import kr.weit.odya.support.TEST_GENERATED_FILE_NAME
 import kr.weit.odya.support.TEST_IMAGE_FILE_WEBP
 import kr.weit.odya.support.TEST_OTHER_IMAGE_FILE_WEBP
@@ -39,8 +45,11 @@ class TravelJournalServiceTest : DescribeSpec(
         val userRepository = mockk<UserRepository>()
         val travelJournalRepository = mockk<TravelJournalRepository>()
         val fileService = mockk<FileService>()
+        val reportTravelJournalRepository = mockk<ReportTravelJournalRepository>()
+        val contentImageRepository = mockk<ContentImageRepository>()
+        val travelCompanionRepository = mockk<TravelCompanionRepository>()
         val travelJournalService =
-            TravelJournalService(userRepository, travelJournalRepository, fileService)
+            TravelJournalService(userRepository, travelJournalRepository, fileService, reportTravelJournalRepository, contentImageRepository, travelCompanionRepository)
 
         describe("createTravelJournal") {
             context("유효한 데이터가 주어지는 경우") {
@@ -362,6 +371,22 @@ class TravelJournalServiceTest : DescribeSpec(
                         travelJournalService.getImageMap(
                             mockFiles,
                         )
+                    }
+                }
+            }
+        }
+
+        describe("deleteTravelJournalByUserId") {
+            context("유효한 UserId가 주어지는 경우") {
+                it("정상적으로 종료한다") {
+                    every { contentImageRepository.findAllByUserId(TEST_USER_ID) } returns TEST_CONTENT_IMAGES
+                    every { fileService.deleteFile(any()) } just runs
+                    every { contentImageRepository.deleteAllByUserId(TEST_USER_ID) } just runs
+                    every { reportTravelJournalRepository.deleteAllByCommonReportInformationUserId(TEST_USER_ID) } just runs
+                    every { travelCompanionRepository.deleteAllByUserId(TEST_USER_ID) } just runs
+                    every { travelJournalRepository.deleteAllByUserId(TEST_USER_ID) } just runs
+                    shouldNotThrowAny {
+                        travelJournalService.deleteTravelJournalByUserId(TEST_USER_ID)
                     }
                 }
             }

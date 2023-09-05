@@ -1,9 +1,8 @@
 package kr.weit.odya.domain.report
 
 import jakarta.persistence.Column
+import jakarta.persistence.Embedded
 import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -13,7 +12,6 @@ import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
 import kr.weit.odya.domain.traveljournal.TravelJournal
-import kr.weit.odya.domain.user.User
 import kr.weit.odya.support.domain.BaseTimeEntity
 
 @Table(
@@ -38,17 +36,9 @@ class ReportTravelJournal(
     val id: Long = 0L,
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false, updatable = false, columnDefinition = "NUMERIC(19, 0)")
-    val user: User,
-
-    @ManyToOne
     @JoinColumn(name = "travel_journal_id", nullable = false, updatable = false, columnDefinition = "NUMERIC(19, 0)")
     val travelJournal: TravelJournal,
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, updatable = false, length = 20)
-    val reportReason: ReportReason,
-
-    @Column(updatable = false, length = 60)
-    val otherReason: String? = null,
+    @Embedded
+    val commonReportInformation: CommonReportInformation,
 ) : BaseTimeEntity()

@@ -32,6 +32,7 @@ import kr.weit.odya.support.TEST_FOLLOWER_COUNT
 import kr.weit.odya.support.TEST_FOLLOWING_COUNT
 import kr.weit.odya.support.TEST_ID_TOKEN
 import kr.weit.odya.support.TEST_INVALID_PROFILE_ORIGINAL_NAME
+import kr.weit.odya.support.TEST_MOCK_PROFILE_NAME
 import kr.weit.odya.support.TEST_NICKNAME
 import kr.weit.odya.support.TEST_PHONE_NUMBER
 import kr.weit.odya.support.TEST_PROFILE_URL
@@ -348,6 +349,38 @@ class UserServiceTest : DescribeSpec(
                 it("[FollowCountsResponse] 반환한다.") {
                     val response = userService.getStatistics(TEST_USER_ID)
                     response shouldBe createUserStatisticsResponse()
+                }
+            }
+        }
+
+        describe("deleteUserRelatedData") {
+            context("가입된 USER ID 정보가 주어지는 경우(프로필 Default X)") {
+                every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser(TEST_MOCK_PROFILE_NAME)
+                every { followRepository.deleteByFollowingId(TEST_USER_ID) } just runs
+                every { followRepository.deleteByFollowerId(TEST_USER_ID) } just runs
+                every { userRepository.deleteById(TEST_USER_ID) } just runs
+                every { usersDocumentRepository.deleteById(TEST_USER_ID) } just runs
+                every { fileService.deleteFile(TEST_MOCK_PROFILE_NAME) } just runs
+                it("정상적으로 종료한다.") {
+                    shouldNotThrowAny { userService.deleteUserRelatedData(TEST_USER_ID) }
+                }
+            }
+
+            context("가입된 USER ID 정보가 주어지는 경우(프로필 Default)") {
+                every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } returns createUser()
+                every { followRepository.deleteByFollowingId(TEST_USER_ID) } just runs
+                every { followRepository.deleteByFollowerId(TEST_USER_ID) } just runs
+                every { userRepository.deleteById(TEST_USER_ID) } just runs
+                every { usersDocumentRepository.deleteById(TEST_USER_ID) } just runs
+                it("정상적으로 종료한다.") {
+                    shouldNotThrowAny { userService.deleteUserRelatedData(TEST_USER_ID) }
+                }
+            }
+
+            context("가입되지 않은 USER ID 정보가 주어지는 경우") {
+                every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } throws NoSuchElementException()
+                it("[NosuchElementException]을 반환한다") {
+                    shouldThrow<NoSuchElementException> { userService.deleteUserRelatedData(TEST_USER_ID) }
                 }
             }
         }

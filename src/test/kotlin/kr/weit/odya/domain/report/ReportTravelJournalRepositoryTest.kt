@@ -36,7 +36,6 @@ class ReportTravelJournalRepositoryTest(
             user1 = userRepository.save(createUser())
             user2 = userRepository.save(createOtherUser())
             user3 = userRepository.save(createCustomUser("test_user3", "test_user3"))
-            val contentImage = contentImageRepository.save(createContentImage(user = user1))
             travelJournal = travelJournalRepository.save(
                 createTravelJournal(
                     user = user1,
@@ -44,7 +43,7 @@ class ReportTravelJournalRepositoryTest(
                     travelJournalContents = listOf(
                         createTravelJournalContent(
                             travelJournalContentImages = listOf(
-                                createTravelJournalContentImage(contentImage = contentImage),
+                                createTravelJournalContentImage(contentImage = createContentImage(user = user1)),
                             ),
                         ),
                     ),
@@ -63,30 +62,25 @@ class ReportTravelJournalRepositoryTest(
 
         context("여행 일지 신고 여부 확인(존재)") {
             expect("TRAVEL_JOURNAL_ID와 USER_ID가 일치하는 여행 일지의 신고 여부 확인(존재)") {
-                val result = reportTravelJournalRepository.existsByTravelJournalIdAndUserId(travelJournal.id, user1.id)
+                val result = reportTravelJournalRepository.existsByTravelJournalIdAndCommonReportInformationUserId(travelJournal.id, user1.id)
                 result shouldBe true
             }
 
             expect("TRAVEL_JOURNAL_ID와 USER_ID가 일치하는 여행 일지의 신고 여부 확인(존재하지 않음)") {
-                val result = reportTravelJournalRepository.existsByTravelJournalIdAndUserId(travelJournal.id, user3.id)
+                val result = reportTravelJournalRepository.existsByTravelJournalIdAndCommonReportInformationUserId(travelJournal.id, user3.id)
                 result shouldBe false
             }
         }
 
         context("여행 일지 신고 삭제") {
             expect("여행 일지 ID와 일치하는 여행 일지를 삭제한다.") {
-                reportTravelJournalRepository.deleteById(reportTravelJournal2.id)
-                reportTravelJournalRepository.existsById(reportTravelJournal2.id) shouldBe false
+                reportTravelJournalRepository.deleteAllByTravelJournalId(travelJournal.id)
+                reportTravelJournalRepository.existsById(travelJournal.id) shouldBe false
             }
 
             expect("USER_ID와 일치하는 여행 일지의 신고 모두 삭제한다") {
-                reportTravelJournalRepository.deleteAllByUserId(user1.id)
+                reportTravelJournalRepository.deleteAllByCommonReportInformationUserId(user1.id)
                 reportTravelJournalRepository.count() shouldBe 1
-            }
-
-            expect("TRAVEL_JOURNAL 리스트에 포함된 여행 일지의 신고를 삭제한다") {
-                reportTravelJournalRepository.deleteAllByTravelJournalIn(listOf(travelJournal))
-                reportTravelJournalRepository.count() shouldBe 0
             }
         }
     },

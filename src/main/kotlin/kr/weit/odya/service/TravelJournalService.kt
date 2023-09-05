@@ -1,7 +1,10 @@
 package kr.weit.odya.service
 
 import kr.weit.odya.domain.contentimage.ContentImage
+import kr.weit.odya.domain.contentimage.ContentImageRepository
+import kr.weit.odya.domain.report.ReportTravelJournalRepository
 import kr.weit.odya.domain.traveljournal.TravelCompanion
+import kr.weit.odya.domain.traveljournal.TravelCompanionRepository
 import kr.weit.odya.domain.traveljournal.TravelJournalContent
 import kr.weit.odya.domain.traveljournal.TravelJournalContentImage
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
@@ -24,6 +27,9 @@ class TravelJournalService(
     private val userRepository: UserRepository,
     private val travelJournalRepository: TravelJournalRepository,
     private val fileService: FileService,
+    private val reportTravelJournalRepository: ReportTravelJournalRepository,
+    private val contentImageRepository: ContentImageRepository,
+    private val travelCompanionRepository: TravelCompanionRepository,
 ) {
     @Transactional
     fun createTravelJournal(
@@ -105,6 +111,15 @@ class TravelJournalService(
             require(!it.originalFilename.isNullOrEmpty()) { IllegalArgumentException("파일 원본 이름은 필수 값입니다.") }
             it.originalFilename!!
         }
+
+    @Transactional
+    fun deleteTravelJournalByUserId(userId: Long) {
+        contentImageRepository.findAllByUserId(userId).map { fileService.deleteFile(it.name) }
+        contentImageRepository.deleteAllByUserId(userId)
+        reportTravelJournalRepository.deleteAllByCommonReportInformationUserId(userId)
+        travelCompanionRepository.deleteAllByUserId(userId)
+        travelJournalRepository.deleteAllByUserId(userId)
+    }
 
     private fun getTravelJournalContent(
         contentImages: List<ContentImage>,

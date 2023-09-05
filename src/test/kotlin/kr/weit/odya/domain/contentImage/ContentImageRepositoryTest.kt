@@ -16,7 +16,7 @@ class ContentImageRepositoryTest(private val userRepository: UserRepository, pri
         lateinit var contentImage1: ContentImage
         lateinit var contentImage2: ContentImage
         lateinit var user: User
-        beforeTest {
+        beforeEach {
             user = userRepository.save(createUser())
             contentImage1 = contentImageRepository.save(createContentImage(user = user))
             contentImage2 = contentImageRepository.save(createContentImage(user = user))
@@ -26,6 +26,13 @@ class ContentImageRepositoryTest(private val userRepository: UserRepository, pri
             expect("user와 일치하는 contentImage 모두 삭제한다") {
                 contentImageRepository.deleteAllByUserId(user.id)
                 contentImageRepository.count() shouldBe 0
+            }
+        }
+
+        context("contentImage 조회") {
+            expect("userId와 일치하는 contentImage 모두 조회한다") {
+                contentImageRepository.findAllByUserId(user.id)
+                contentImageRepository.count() shouldBe 2
             }
         }
     },

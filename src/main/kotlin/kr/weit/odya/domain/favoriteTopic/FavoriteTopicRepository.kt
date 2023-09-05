@@ -17,5 +17,5 @@ interface FavoriteTopicRepository : JpaRepository<FavoriteTopic, Long> {
 
     fun findByUserId(userId: Long): List<FavoriteTopic>
 
-    fun deleteByUserId(userId: Long)
+    fun deleteAllByUserId(userId: Long)
 }

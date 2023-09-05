@@ -51,30 +51,25 @@ class ReportPlaceReviewRepositoryTest(
 
         context("한줄 리뷰 신고 여부 확인") {
             expect("PLACE REVIEW ID와 USER ID가 일치하는 한줄 리뷰의 신고 여부를 확인한다(존재)") {
-                val result = reportPlaceReviewRepository.existsByPlaceReviewIdAndUserId(placeReview.id, user1.id)
+                val result = reportPlaceReviewRepository.existsByPlaceReviewIdAndCommonReportInformationUserId(placeReview.id, user1.id)
                 result shouldBe true
             }
 
             expect("PLACE REVIEW ID와 USER ID가 일치하는 한줄 리뷰의 신고 여부를 확인한다(존재하지 않음)") {
-                val result = reportPlaceReviewRepository.existsByPlaceReviewIdAndUserId(placeReview.id, user3.id)
+                val result = reportPlaceReviewRepository.existsByPlaceReviewIdAndCommonReportInformationUserId(placeReview.id, user3.id)
                 result shouldBe false
             }
         }
 
         context("한줄 리뷰 신고 수 삭제") {
             expect("PLACE_REVIEW_ID와 일치하는 한줄 리뷰의 신고 모두 삭제한다") {
-                reportPlaceReviewRepository.deleteByPlaceReviewId(placeReview.id)
+                reportPlaceReviewRepository.deleteAllByPlaceReviewId(placeReview.id)
                 reportPlaceReviewRepository.count() shouldBe 2
             }
 
             expect("USER_ID와 일치하는 한줄 리뷰의 신고 모두 삭제한다") {
-                reportPlaceReviewRepository.deleteAllByUserId(user1.id)
+                reportPlaceReviewRepository.deleteAllByCommonReportInformationUserId(user1.id)
                 reportPlaceReviewRepository.count() shouldBe 2
-            }
-
-            expect("PLACE_REVIEW 리스트에 포함된 한줄 리뷰의 신고를 삭제한다") {
-                reportPlaceReviewRepository.deleteAllByPlaceReviewIn(listOf(placeReview, placeReview2))
-                reportPlaceReviewRepository.count() shouldBe 0
             }
         }
     },
