@@ -19,7 +19,6 @@ import kr.weit.odya.support.createCustomUser
 import kr.weit.odya.support.createFollow
 import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createPlaceReview
-import kr.weit.odya.support.createTravelCompanionById
 import kr.weit.odya.support.createTravelJournal
 import kr.weit.odya.support.createTravelJournalContent
 import kr.weit.odya.support.createTravelJournalContentImage
