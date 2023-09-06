@@ -706,6 +706,7 @@ class PlaceReviewControllerTest(
                                     "content[].writerNickname" type JsonFieldType.STRING description "유저 닉네임" example content.writerNickname,
                                     "content[].starRating" type JsonFieldType.NUMBER description "별점" example content.starRating,
                                     "content[].review" type JsonFieldType.STRING description "리뷰" example content.review,
+                                    "content[].createdAt" type JsonFieldType.STRING description "생성일시" example content.createdAt,
                                 ),
                             ),
                         )
@@ -877,6 +878,7 @@ class PlaceReviewControllerTest(
                                     "content[].writerNickname" type JsonFieldType.STRING description "유저 닉네임" example content.writerNickname,
                                     "content[].starRating" type JsonFieldType.NUMBER description "별점" example content.starRating,
                                     "content[].review" type JsonFieldType.STRING description "리뷰" example content.review,
+                                    "content[].createdAt" type JsonFieldType.STRING description "생성일시" example content.createdAt,
                                 ),
                             ),
                         )
