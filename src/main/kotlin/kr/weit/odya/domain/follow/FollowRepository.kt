@@ -43,6 +43,9 @@ fun FollowRepository.getMayKnowFollowings(
 ): List<Follow> =
     findMayKnowFollowings(followerId, size, lastId)
 
+fun FollowRepository.getFollowerFcmTokens(followingId: Long): List<String> =
+    findFollowerFcmTokenByFollowingId(followingId).filterNotNull()
+
 fun FollowRepository.getVisitedFollowingIds(placeID: String, followerId: Long): List<Long> =
     findVisitedFollowingIdsByPlaceIdAndFollowerId(placeID, followerId)
 
@@ -85,6 +88,8 @@ interface CustomFollowRepository {
         size: Int,
         lastId: Long?,
     ): List<Follow>
+
+    fun findFollowerFcmTokenByFollowingId(followingId: Long): List<String?>
 
     fun findVisitedFollowingIdsByPlaceIdAndFollowerId(placeID: String, followerId: Long): List<Long>
 }
@@ -171,6 +176,16 @@ open class FollowRepositoryImpl(private val queryFactory: QueryFactory) : Custom
             }
             limit(size)
         }
+    }
+
+    override fun findFollowerFcmTokenByFollowingId(followingId: Long): List<String?> = queryFactory.listQuery {
+        val followerUser = entity(User::class, alias = "followerUser")
+        val followingUser = entity(User::class, alias = "followingUser")
+        select(column(followerUser, User::fcmToken))
+        from(entity(Follow::class))
+        associate(Follow::class, followerUser, on(Follow::follower))
+        associate(Follow::class, followingUser, on(Follow::following))
+        where(col(followingUser, User::id).equal(followingId))
     }
 
     override fun findVisitedFollowingIdsByPlaceIdAndFollowerId(placeID: String, followerId: Long): List<Long> {

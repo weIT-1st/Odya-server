@@ -1,5 +1,6 @@
 package kr.weit.odya.service
 
+import kr.weit.odya.client.push.PushNotificationEvent
 import kr.weit.odya.domain.follow.Follow
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.FollowSortType
@@ -8,6 +9,7 @@ import kr.weit.odya.domain.follow.getFollowerListBySearchCond
 import kr.weit.odya.domain.follow.getFollowingListBySearchCond
 import kr.weit.odya.domain.follow.getMayKnowFollowings
 import kr.weit.odya.domain.follow.getVisitedFollowingIds
+import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.UsersDocumentRepository
 import kr.weit.odya.domain.user.getByNickname
@@ -18,6 +20,7 @@ import kr.weit.odya.service.dto.FollowRequest
 import kr.weit.odya.service.dto.FollowUserResponse
 import kr.weit.odya.service.dto.SliceResponse
 import kr.weit.odya.service.dto.VisitedFollowingResponse
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -28,6 +31,7 @@ class FollowService(
     private val userRepository: UserRepository,
     private val fileService: FileService,
     private val usersDocumentRepository: UsersDocumentRepository,
+    private val eventPublisher: ApplicationEventPublisher,
 ) {
     @Transactional
     fun createFollow(followerId: Long, followRequest: FollowRequest) {
@@ -37,6 +41,22 @@ class FollowService(
         val follower = userRepository.getByUserId(followerId)
         val following = userRepository.getByUserId(followRequest.followingId)
         followRepository.save(Follow(follower = follower, following = following))
+        publishFollowPushEvent(following, follower)
+    }
+
+    private fun publishFollowPushEvent(
+        following: User,
+        follower: User,
+    ) {
+        val token = following.fcmToken ?: return
+        eventPublisher.publishEvent(
+            PushNotificationEvent(
+                title = "팔로우 알림",
+                body = "${follower.nickname}님이 팔로우 했어요!",
+                token = token,
+                data = mapOf("followerId" to follower.id.toString()),
+            ),
+        )
     }
 
     @Transactional

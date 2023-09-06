@@ -42,6 +42,7 @@ import kr.weit.odya.support.TEST_PHONE_NUMBER
 import kr.weit.odya.support.TEST_PROFILE_WEBP
 import kr.weit.odya.support.TEST_SIZE
 import kr.weit.odya.support.TEST_USER_ID
+import kr.weit.odya.support.createFcmTokenRequest
 import kr.weit.odya.support.createInformationRequest
 import kr.weit.odya.support.createMockProfile
 import kr.weit.odya.support.createSliceSimpleUserResponse
@@ -75,6 +76,7 @@ import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.multipart
 import org.springframework.test.web.servlet.patch
+import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.web.context.WebApplicationContext
 
@@ -648,6 +650,76 @@ class UserControllerTest(
                             ),
                             requestParts(
                                 "profile" requestPartDescription "프로필 사진" isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+        }
+
+        describe("PATCH /api/v1/users/fcm-token") {
+            val targetUri = "/api/v1/users/fcm-token"
+            context("유효한 토큰이면서, 유효한 FCM Token인 경우") {
+                val request = createFcmTokenRequest()
+                every { userService.updateFcmToken(TEST_USER_ID, request) } just runs
+                it("204 응답한다.") {
+                    restDocMockMvc.patch(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        jsonContent(request)
+                    }.andExpect {
+                        status { isNoContent() }
+                    }.andDo {
+                        createDocument(
+                            "update-fcm-token-success",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN WITH VALID PHONE NUMBER",
+                            ),
+                            requestBody(
+                                "fcmToken" type JsonFieldType.STRING description "FCM 토큰" example request.fcmToken,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이면서 FCM Token이 빈 문자열이면") {
+                val request = createFcmTokenRequest(" ")
+                it("400를 반환한다.") {
+                    restDocMockMvc.post(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        jsonContent(request)
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "update-fcm-token-failed-invalid-fcm-token",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            requestBody(
+                                "fcmToken" type JsonFieldType.STRING description "유효하지 않은 fcmToken" example " ",
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효하지 않은 토큰이면") {
+                val request = createFcmTokenRequest()
+                it("401 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                        jsonContent(request)
+                    }.andExpect {
+                        status { isUnauthorized() }
+                    }.andDo {
+                        createDocument(
+                            "update-fcm-token-fail-invalid-token",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                            ),
+                            requestBody(
+                                "fcmToken" type JsonFieldType.STRING description "FCM 토큰" example request.fcmToken,
                             ),
                         )
                     }

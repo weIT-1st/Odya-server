@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import kr.weit.odya.support.TEST_DEFAULT_PROFILE_PNG
 import kr.weit.odya.support.TEST_DEFAULT_SIZE
 import kr.weit.odya.support.TEST_EMAIL
+import kr.weit.odya.support.TEST_FCM_TOKEN
 import kr.weit.odya.support.TEST_NICKNAME
 import kr.weit.odya.support.TEST_OTHER_USER_ID
 import kr.weit.odya.support.TEST_PHONE_NUMBER
@@ -19,9 +20,11 @@ class UserRepositoryTest(
     private val userRepository: UserRepository,
 ) : ExpectSpec(
     {
+        lateinit var user: User
+        lateinit var otherUser: User
         beforeEach {
-            userRepository.save(createUser())
-            userRepository.save(createOtherUser())
+            user = userRepository.save(createUser().apply { changeFcmToken(TEST_FCM_TOKEN) })
+            otherUser = userRepository.save(createOtherUser())
         }
 
         context("사용자 조회") {
@@ -43,7 +46,7 @@ class UserRepositoryTest(
 
         context("사용자 목록 조회") {
             expect("사용자 ID 목록에 해당되는 모든 사용자를 조회한다") {
-                val userIds = listOf(TEST_USER_ID, TEST_OTHER_USER_ID)
+                val userIds = listOf(user.id, otherUser.id)
                 val result = userRepository.getByUserIds(userIds)
                 result.size shouldBe 2
             }
@@ -71,7 +74,7 @@ class UserRepositoryTest(
             }
 
             expect("사용자 ID 목록에 해당하는 모든 사용자 여부를 확인한다") {
-                val userIds = listOf(TEST_USER_ID, TEST_OTHER_USER_ID)
+                val userIds = listOf(user.id, otherUser.id)
                 val result = userRepository.existsAllByUserIds(userIds, userIds.size)
                 result shouldBe true
             }
@@ -79,23 +82,30 @@ class UserRepositoryTest(
 
         context("사용자 id list 검색") {
             expect("사용자 id list에 해당하는 사용자를 조회한다") {
-                val userIds = listOf(TEST_USER_ID, TEST_OTHER_USER_ID)
+                val userIds = listOf(user.id, otherUser.id)
                 val result = userRepository.getByUserIds(userIds, TEST_DEFAULT_SIZE, null)
                 result.size shouldBe 2
             }
 
             expect("사용자 id list에 해당하는 사용자를 size만큼 조회한다") {
-                val userIds = listOf(TEST_USER_ID, TEST_OTHER_USER_ID)
+                val userIds = listOf(user.id, otherUser.id)
                 val result = userRepository.getByUserIds(userIds, 1, null)
                 result.size shouldBe 1
             }
 
             expect("사용자 id list에 해당하는 lastId보다 작은 유저를 조회한다") {
-                val userIds = listOf(TEST_USER_ID, TEST_OTHER_USER_ID)
+                val userIds = listOf(user.id, otherUser.id)
                 var result = userRepository.getByUserIds(userIds, TEST_DEFAULT_SIZE, TEST_OTHER_USER_ID)
                 result.size shouldBe 1
                 result = userRepository.getByUserIds(userIds, TEST_DEFAULT_SIZE, TEST_USER_ID)
                 result.size shouldBe 0
+            }
+        }
+
+        context("사용자를 FCM Token으로 검색") {
+            expect("FCM Token이 일치하는 사용자를 조회한다") {
+                val result = userRepository.findByFcmToken(TEST_FCM_TOKEN)
+                result?.fcmToken shouldBe TEST_FCM_TOKEN
             }
         }
     },
