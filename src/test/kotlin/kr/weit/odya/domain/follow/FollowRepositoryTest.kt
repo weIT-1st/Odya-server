@@ -172,6 +172,13 @@ class FollowRepositoryTest(
             }
         }
 
+        context("팔로워들의 FCM 토큰 검색") {
+            expect("팔로워들의 FCM 토큰을 조회한다") {
+                val result = followRepository.getFollowerFcmTokens(following.id)
+                result shouldBe listOf(TEST_FCM_TOKEN)
+            }
+        }
+
         context("방문한 친구 id 검색") {
             expect("같은 장소에 리뷰를 작성한 친구를 조회한다") {
                 placeReviewRepository.save(
@@ -233,13 +240,6 @@ class FollowRepositoryTest(
                     follower.id,
                 )
                 result shouldBe emptyList()
-            }
-        }
-
-        context("팔로워들의 FCM 토큰 검색") {
-            expect("팔로워들의 FCM 토큰을 조회한다") {
-                val result = followRepository.getFollowerFcmTokens(following.id)
-                result shouldBe listOf(TEST_FCM_TOKEN)
             }
         }
     },

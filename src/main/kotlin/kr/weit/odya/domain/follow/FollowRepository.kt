@@ -43,11 +43,11 @@ fun FollowRepository.getMayKnowFollowings(
 ): List<Follow> =
     findMayKnowFollowings(followerId, size, lastId)
 
-fun FollowRepository.getVisitedFollowingIds(placeID: String, followerId: Long): List<Long> =
-    findVisitedFollowingIdsByPlaceIdAndFollowerId(placeID, followerId)
-
 fun FollowRepository.getFollowerFcmTokens(followingId: Long): List<String> =
     findFollowerFcmTokenByFollowingId(followingId).filterNotNull()
+
+fun FollowRepository.getVisitedFollowingIds(placeID: String, followerId: Long): List<Long> =
+    findVisitedFollowingIdsByPlaceIdAndFollowerId(placeID, followerId)
 
 interface FollowRepository : JpaRepository<Follow, Long>, CustomFollowRepository {
     fun existsByFollowerIdAndFollowingId(followerId: Long, followingId: Long): Boolean
@@ -89,9 +89,9 @@ interface CustomFollowRepository {
         lastId: Long?,
     ): List<Follow>
 
-    fun findVisitedFollowingIdsByPlaceIdAndFollowerId(placeID: String, followerId: Long): List<Long>
-
     fun findFollowerFcmTokenByFollowingId(followingId: Long): List<String?>
+
+    fun findVisitedFollowingIdsByPlaceIdAndFollowerId(placeID: String, followerId: Long): List<Long>
 }
 
 open class FollowRepositoryImpl(private val queryFactory: QueryFactory) : CustomFollowRepository {
@@ -178,6 +178,16 @@ open class FollowRepositoryImpl(private val queryFactory: QueryFactory) : Custom
         }
     }
 
+    override fun findFollowerFcmTokenByFollowingId(followingId: Long): List<String?> = queryFactory.listQuery {
+        val followerUser = entity(User::class, alias = "followerUser")
+        val followingUser = entity(User::class, alias = "followingUser")
+        select(column(followerUser, User::fcmToken))
+        from(entity(Follow::class))
+        associate(Follow::class, followerUser, on(Follow::follower))
+        associate(Follow::class, followingUser, on(Follow::following))
+        where(col(followingUser, User::id).equal(followingId))
+    }
+
     override fun findVisitedFollowingIdsByPlaceIdAndFollowerId(placeID: String, followerId: Long): List<Long> {
         val placeReviewWriter = queryFactory.listQuery {
             select(col(User::id))
@@ -216,16 +226,6 @@ open class FollowRepositoryImpl(private val queryFactory: QueryFactory) : Custom
                 ),
             )
         }
-    }
-
-    override fun findFollowerFcmTokenByFollowingId(followingId: Long): List<String?> = queryFactory.listQuery {
-        val followerUser = entity(User::class, alias = "followerUser")
-        val followingUser = entity(User::class, alias = "followingUser")
-        select(column(followerUser, User::fcmToken))
-        from(entity(Follow::class))
-        associate(Follow::class, followerUser, on(Follow::follower))
-        associate(Follow::class, followingUser, on(Follow::following))
-        where(col(followingUser, User::id).equal(followingId))
     }
 
     private fun <T> CriteriaQueryDsl<T>.dynamicOrderingByFollowSortType(

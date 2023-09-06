@@ -7,6 +7,7 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
+import kr.weit.odya.client.push.PushNotificationEvent
 import kr.weit.odya.domain.community.Community
 import kr.weit.odya.domain.community.CommunityRepository
 import kr.weit.odya.domain.follow.FollowRepository
@@ -33,6 +34,7 @@ import kr.weit.odya.support.createPrivateTravelJournal
 import kr.weit.odya.support.createTopic
 import kr.weit.odya.support.createTravelJournal
 import kr.weit.odya.support.createUser
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.web.multipart.MultipartFile
 
 class CommunityServiceTest : DescribeSpec(
@@ -42,7 +44,7 @@ class CommunityServiceTest : DescribeSpec(
         val travelJournalRepository = mockk<TravelJournalRepository>()
         val userRepository = mockk<UserRepository>()
         val fileService = mockk<FileService>()
-        val firebaseCloudMessageService = mockk<FirebaseCloudMessageService>()
+        val applicationEventPublisher = mockk<ApplicationEventPublisher>()
         val followRepository = mockk<FollowRepository>()
         val communityService =
             CommunityService(
@@ -51,7 +53,7 @@ class CommunityServiceTest : DescribeSpec(
                 travelJournalRepository,
                 userRepository,
                 fileService,
-                firebaseCloudMessageService,
+                applicationEventPublisher,
                 followRepository,
             )
 
@@ -68,7 +70,7 @@ class CommunityServiceTest : DescribeSpec(
                 every { topicRepository.getByTopicId(TEST_TOPIC_ID) } returns createTopic()
                 every { communityRepository.save(any<Community>()) } returns createCommunity()
                 every { followRepository.findFollowerFcmTokenByFollowingId(TEST_USER_ID) } returns createFollowerFcmTokenList()
-                every { firebaseCloudMessageService.sendPushNotification(any()) } just runs
+                every { applicationEventPublisher.publishEvent(any<PushNotificationEvent>()) } just runs
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         communityService.createCommunity(
@@ -87,7 +89,7 @@ class CommunityServiceTest : DescribeSpec(
                 every { userRepository.getByUserId(TEST_USER_ID) } returns register
                 every { communityRepository.save(any<Community>()) } returns createCommunity()
                 every { followRepository.findFollowerFcmTokenByFollowingId(TEST_USER_ID) } returns createFollowerFcmTokenList()
-                every { firebaseCloudMessageService.sendPushNotification(any()) } just runs
+                every { applicationEventPublisher.publishEvent(any<PushNotificationEvent>()) } just runs
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         communityService.createCommunity(

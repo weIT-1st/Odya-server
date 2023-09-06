@@ -1,5 +1,6 @@
 package kr.weit.odya.service
 
+import kr.weit.odya.client.push.PushNotificationEvent
 import kr.weit.odya.domain.community.Community
 import kr.weit.odya.domain.community.CommunityContentImage
 import kr.weit.odya.domain.community.CommunityRepository
@@ -16,6 +17,7 @@ import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.service.dto.CommunityCreateRequest
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
@@ -27,7 +29,7 @@ class CommunityService(
     private val travelJournalRepository: TravelJournalRepository,
     private val userRepository: UserRepository,
     private val fileService: FileService,
-    private val firebaseCloudMessageService: FirebaseCloudMessageService,
+    private val eventPublisher: ApplicationEventPublisher,
     private val followRepository: FollowRepository,
 ) {
     @Transactional
@@ -42,23 +44,22 @@ class CommunityService(
         val communityContentImages = getCommunityContentImages(contentImagePairs, user)
         val community = request.toEntity(user, topic, travelJournal, communityContentImages)
         communityRepository.save(community)
-        sendPushNotification(user, community)
+        publishFeedPushEvent(user, community)
     }
 
-    private fun sendPushNotification(
+    private fun publishFeedPushEvent(
         user: User,
         community: Community,
     ) {
-        followRepository.getFollowerFcmTokens(user.id).let { fcmTokens ->
-            firebaseCloudMessageService.sendPushNotification(
-                PushNotificationRequest(
-                    title = "피드 알림",
-                    body = "${user.nickname}님이 피드를 작성했어요!",
-                    tokens = fcmTokens,
-                    data = mapOf("communityId" to community.id.toString()),
-                ),
-            )
-        }
+        val fcmTokens = followRepository.getFollowerFcmTokens(user.id)
+        eventPublisher.publishEvent(
+            PushNotificationEvent(
+                title = "피드 알림",
+                body = "${user.nickname}님이 피드를 작성했어요!",
+                tokens = fcmTokens,
+                data = mapOf("communityId" to community.id.toString()),
+            ),
+        )
     }
 
     fun uploadContentImages(contentImages: List<MultipartFile>): List<Pair<String, String>> {
