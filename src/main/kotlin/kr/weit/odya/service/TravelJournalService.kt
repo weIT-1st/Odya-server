@@ -1,5 +1,6 @@
 package kr.weit.odya.service
 
+import kr.weit.odya.client.push.PushNotificationEvent
 import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowerFcmTokens
@@ -14,6 +15,7 @@ import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.domain.user.getByUserIds
 import kr.weit.odya.service.dto.TravelJournalContentRequest
 import kr.weit.odya.service.dto.TravelJournalRequest
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
@@ -28,7 +30,7 @@ class TravelJournalService(
     private val travelJournalRepository: TravelJournalRepository,
     private val fileService: FileService,
     private val followRepository: FollowRepository,
-    private val firebaseCloudMessageService: FirebaseCloudMessageService,
+    private val eventPublisher: ApplicationEventPublisher,
 ) {
     @Transactional
     fun createTravelJournal(
@@ -46,19 +48,19 @@ class TravelJournalService(
         }
         val travelJournal = travelJournalRequest.toEntity(register, travelCompanions, travelJournalContents)
         travelJournalRepository.save(travelJournal)
-        sendPushNotification(register, travelJournal)
+        publishTravelJournalPushEvent(register, travelJournal)
     }
 
-    private fun sendPushNotification(
+    private fun publishTravelJournalPushEvent(
         user: User,
         travelJournal: TravelJournal,
     ) {
         // 같이간 친구에게 알림
-        firebaseCloudMessageService.sendPushNotification(
+        eventPublisher.publishEvent(
             travelJournal.travelCompanions.mapNotNull { travelCompanion ->
                 travelCompanion.user?.fcmToken
             }.let { fcmTokens ->
-                PushNotificationRequest(
+                PushNotificationEvent(
                     title = "같이간 친구 알림",
                     body = "${user.nickname}님이 여행 일지에 같이간 친구로 등록했어요!",
                     tokens = fcmTokens,
@@ -68,8 +70,8 @@ class TravelJournalService(
         )
 
         // 팔로워에게 알림
-        firebaseCloudMessageService.sendPushNotification(
-            PushNotificationRequest(
+        eventPublisher.publishEvent(
+            PushNotificationEvent(
                 title = "여행일지 알림",
                 body = "${user.nickname}님이 여행 일지를 작성했어요!",
                 tokens = followRepository.getFollowerFcmTokens(user.id),
