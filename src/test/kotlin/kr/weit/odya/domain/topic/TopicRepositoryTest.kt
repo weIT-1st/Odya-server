@@ -6,7 +6,6 @@ import kr.weit.odya.domain.community.CommunityRepository
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.support.TEST_DEFAULT_SIZE
 import kr.weit.odya.support.TEST_PLACE_ID
-import kr.weit.odya.support.TEST_TOPIC_ID
 import kr.weit.odya.support.createCommunity
 import kr.weit.odya.support.createOtherTopic
 import kr.weit.odya.support.createTopic

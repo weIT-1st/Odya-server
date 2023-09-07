@@ -16,7 +16,6 @@ import kr.weit.odya.support.test.BaseTests.RepositoryTest
 @RepositoryTest
 class TravelJournalRepositoryTest(
     private val userRepository: UserRepository,
-    private val contentImageRepository: ContentImageRepository,
     private val travelJournalRepository: TravelJournalRepository,
 ) : ExpectSpec(
     {

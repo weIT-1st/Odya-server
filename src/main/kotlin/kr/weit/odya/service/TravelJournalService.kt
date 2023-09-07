@@ -2,13 +2,13 @@ package kr.weit.odya.service
 
 import kr.weit.odya.client.push.PushNotificationEvent
 import kr.weit.odya.domain.contentimage.ContentImage
+import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowerFcmTokens
-import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.report.ReportTravelJournalRepository
 import kr.weit.odya.domain.traveljournal.TravelCompanion
-import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.traveljournal.TravelCompanionRepository
+import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.traveljournal.TravelJournalContent
 import kr.weit.odya.domain.traveljournal.TravelJournalContentImage
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
@@ -32,11 +32,11 @@ class TravelJournalService(
     private val userRepository: UserRepository,
     private val travelJournalRepository: TravelJournalRepository,
     private val fileService: FileService,
+    private val followRepository: FollowRepository,
+    private val eventPublisher: ApplicationEventPublisher,
     private val reportTravelJournalRepository: ReportTravelJournalRepository,
     private val contentImageRepository: ContentImageRepository,
     private val travelCompanionRepository: TravelCompanionRepository,
-    private val followRepository: FollowRepository,
-    private val eventPublisher: ApplicationEventPublisher,
 ) {
     @Transactional
     fun createTravelJournal(

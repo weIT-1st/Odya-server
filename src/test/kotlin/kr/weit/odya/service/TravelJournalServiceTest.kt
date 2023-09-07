@@ -7,12 +7,11 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
+import kr.weit.odya.client.push.PushNotificationEvent
 import kr.weit.odya.domain.contentimage.ContentImageRepository
+import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.report.ReportTravelJournalRepository
 import kr.weit.odya.domain.traveljournal.TravelCompanionRepository
-import io.mockk.runs
-import kr.weit.odya.client.push.PushNotificationEvent
-import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.user.UserRepository
@@ -56,7 +55,7 @@ class TravelJournalServiceTest : DescribeSpec(
         val applicationEventPublisher = mockk<ApplicationEventPublisher>()
         val followRepository = mockk<FollowRepository>()
         val travelJournalService =
-            TravelJournalService(userRepository, travelJournalRepository, fileService, reportTravelJournalRepository, contentImageRepository, travelCompanionRepository,followRepository, applicationEventPublisher)
+            TravelJournalService(userRepository, travelJournalRepository, fileService, followRepository, applicationEventPublisher, reportTravelJournalRepository, contentImageRepository, travelCompanionRepository)
 
         describe("createTravelJournal") {
             context("유효한 데이터가 주어지는 경우") {
