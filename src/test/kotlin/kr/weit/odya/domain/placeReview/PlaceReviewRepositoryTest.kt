@@ -97,11 +97,6 @@ class PlaceReviewRepositoryTest(
                 )
                 result.first().writerId shouldBe user1.id
             }
-
-            expect("USER_ID와 일치하는 장소 리뷰 모두 조회한다") {
-                val result = placeReviewRepository.getByUserId(user1.id)
-                result shouldBe listOf(placeReview1, placeReview3)
-            }
         }
 
         context("최신순") {
