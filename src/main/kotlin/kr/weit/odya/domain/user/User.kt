@@ -48,6 +48,10 @@ class User(
     var information: UserInformation = userInformation
         protected set
 
+    @Column(unique = true)
+    var fcmToken: String? = null
+        protected set
+
     constructor(
         id: Long = 0L,
         username: String,
@@ -97,6 +101,10 @@ class User(
 
     fun changeProfile(profileName: String, originFileName: String, profileColor: ProfileColor) {
         profile.changeProfile(profileName, originFileName, profileColor)
+    }
+
+    fun changeFcmToken(fcmToken: String?) {
+        this.fcmToken = fcmToken
     }
 
     fun getAgeRange(): Int {

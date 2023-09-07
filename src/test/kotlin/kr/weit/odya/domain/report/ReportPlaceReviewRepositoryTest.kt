@@ -24,28 +24,22 @@ class ReportPlaceReviewRepositoryTest(
         lateinit var user1: User
         lateinit var user2: User
         lateinit var user3: User
-        lateinit var user4: User
-        lateinit var user5: User
         lateinit var placeReview: PlaceReview
         lateinit var placeReview2: PlaceReview
         lateinit var reportPlaceReview1: ReportPlaceReview
         lateinit var reportPlaceReview2: ReportPlaceReview
         lateinit var reportPlaceReview3: ReportPlaceReview
         lateinit var reportPlaceReview4: ReportPlaceReview
-        lateinit var reportPlaceReview5: ReportPlaceReview
         beforeEach {
             user1 = userRepository.save(createUser())
             user2 = userRepository.save(createOtherUser())
             user3 = userRepository.save(createCustomUser("test_user3", "test_user3"))
-            user4 = userRepository.save(createCustomUser("test_user4", "test_user4"))
-            user5 = userRepository.save(createCustomUser("test_user5", "test_user5"))
             placeReview = placeReviewRepository.save(createPlaceReview(user1))
             placeReview2 = placeReviewRepository.save(createLowestRatingPlaceReview(user2))
             reportPlaceReview1 = reportPlaceReviewRepository.save(createReportPlaceReview(placeReview, user1))
             reportPlaceReview2 = reportPlaceReviewRepository.save(createReportPlaceReview(placeReview, user2))
-            reportPlaceReview3 = reportPlaceReviewRepository.save(createReportPlaceReview(placeReview2, user3))
-            reportPlaceReview4 = reportPlaceReviewRepository.save(createReportPlaceReview(placeReview2, user4))
-            reportPlaceReview5 = reportPlaceReviewRepository.save(createReportPlaceReview(placeReview2, user5))
+            reportPlaceReview3 = reportPlaceReviewRepository.save(createReportPlaceReview(placeReview2, user1))
+            reportPlaceReview4 = reportPlaceReviewRepository.save(createReportPlaceReview(placeReview2, user3))
         }
 
         context("한줄 리뷰 신고 수 조회") {
@@ -57,30 +51,25 @@ class ReportPlaceReviewRepositoryTest(
 
         context("한줄 리뷰 신고 여부 확인") {
             expect("PLACE REVIEW ID와 USER ID가 일치하는 한줄 리뷰의 신고 여부를 확인한다(존재)") {
-                val result = reportPlaceReviewRepository.existsByPlaceReviewIdAndUserId(placeReview.id, user1.id)
+                val result = reportPlaceReviewRepository.existsByPlaceReviewIdAndCommonReportInformationUserId(placeReview.id, user1.id)
                 result shouldBe true
             }
 
             expect("PLACE REVIEW ID와 USER ID가 일치하는 한줄 리뷰의 신고 여부를 확인한다(존재하지 않음)") {
-                val result = reportPlaceReviewRepository.existsByPlaceReviewIdAndUserId(placeReview.id, user4.id)
+                val result = reportPlaceReviewRepository.existsByPlaceReviewIdAndCommonReportInformationUserId(placeReview.id, user3.id)
                 result shouldBe false
             }
         }
 
         context("한줄 리뷰 신고 수 삭제") {
             expect("PLACE_REVIEW_ID와 일치하는 한줄 리뷰의 신고 모두 삭제한다") {
-                reportPlaceReviewRepository.deleteByPlaceReviewId(placeReview.id)
-                reportPlaceReviewRepository.count() shouldBe 3
+                reportPlaceReviewRepository.deleteAllByPlaceReviewId(placeReview.id)
+                reportPlaceReviewRepository.count() shouldBe 2
             }
 
             expect("USER_ID와 일치하는 한줄 리뷰의 신고 모두 삭제한다") {
-                reportPlaceReviewRepository.deleteAllByUserId(user1.id)
-                reportPlaceReviewRepository.count() shouldBe 4
-            }
-
-            expect("PLACE_REVIEW 리스트에 포함된 한줄 리뷰의 신고를 삭제한다") {
-                reportPlaceReviewRepository.deleteAllByPlaceReviewIn(listOf(placeReview, placeReview2))
-                reportPlaceReviewRepository.count() shouldBe 0
+                reportPlaceReviewRepository.deleteAllByCommonReportInformationUserId(user1.id)
+                reportPlaceReviewRepository.count() shouldBe 2
             }
         }
     },

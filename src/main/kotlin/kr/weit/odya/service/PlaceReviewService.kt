@@ -50,14 +50,8 @@ class PlaceReviewService(
     fun deleteReview(placeReviewId: Long, userId: Long) {
         val placeReview = placeReviewRepository.getByPlaceReviewId(placeReviewId)
         checkPermissions(placeReview, userId)
-        reportPlaceReviewRepository.deleteAllByPlaceReview(placeReview)
-        placeReviewRepository.delete(placeReview)
-    }
-
-    private fun checkPermissions(placeReview: PlaceReview, userId: Long) {
-        if (placeReview.writerId != userId) {
-            throw ForbiddenException("권한 없음")
-        }
+        reportPlaceReviewRepository.deleteAllByPlaceReviewId(placeReviewId)
+        placeReviewRepository.deleteById(placeReviewId)
     }
 
     @Transactional
@@ -77,6 +71,18 @@ class PlaceReviewService(
 
     fun getReviewCount(placeId: String): ReviewCountResponse {
         return ReviewCountResponse(placeReviewRepository.countByPlaceId(placeId))
+    }
+
+    @Transactional
+    fun deleteReviewRelatedData(userId: Long) {
+        reportPlaceReviewRepository.deleteAllByCommonReportInformationUserId(userId)
+        placeReviewRepository.deleteByUserId(userId)
+    }
+
+    private fun checkPermissions(placeReview: PlaceReview, userId: Long) {
+        if (placeReview.writerId != userId) {
+            throw ForbiddenException("권한 없음")
+        }
     }
 
     private fun getAverage(averageRating: Double?): Double {

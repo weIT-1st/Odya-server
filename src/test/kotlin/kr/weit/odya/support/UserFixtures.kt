@@ -6,6 +6,7 @@ import kr.weit.odya.domain.user.SocialType
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRole
 import kr.weit.odya.domain.user.UsersDocument
+import kr.weit.odya.service.dto.FCMTokenRequest
 import kr.weit.odya.service.dto.InformationRequest
 import kr.weit.odya.service.dto.SliceResponse
 import kr.weit.odya.service.dto.UserResponse
@@ -15,6 +16,7 @@ import java.time.LocalDate
 
 const val TEST_USER_ID = 1L
 const val TEST_OTHER_USER_ID = 2L
+const val TEST_ANOTHER_USER_ID = 3L
 const val TEST_NOT_EXIST_USER_ID = 4L
 const val TEST_INVALID_USER_ID = -1L
 const val TEST_USERNAME = "testUsername"
@@ -56,17 +58,29 @@ fun createOtherUser(): User = User(
     gender = TEST_GENDER,
     birthday = TEST_BIRTHDAY,
     socialType = TEST_SOCIAL_TYPE,
-    profile = createProfile(TEST_PROFILE_ID),
+    profile = createProfile(),
 )
 
 fun createCustomUser(
     username: String = TEST_OTHER_USERNAME,
     nickname: String = TEST_OTHER_NICKNAME,
-) = User(0L, username, null, nickname, null, gender = Gender.M, birthday = LocalDate.now(), socialType = SocialType.KAKAO, profile = createProfile())
+) = User(
+    id = 0L,
+    username,
+    null,
+    nickname,
+    null,
+    gender = TEST_GENDER,
+    birthday = TEST_BIRTHDAY,
+    socialType = TEST_SOCIAL_TYPE,
+    profile = createProfile(),
+)
 
 fun createUserResponse(): UserResponse = UserResponse(createUser(), TEST_PROFILE_URL)
 
 fun createInformationRequest(): InformationRequest = InformationRequest(TEST_NICKNAME)
+
+fun createFcmTokenRequest(fcmToken: String = TEST_FCM_TOKEN): FCMTokenRequest = FCMTokenRequest(fcmToken)
 
 fun createProfile(profileId: Long = 0L, profileName: String = TEST_DEFAULT_PROFILE_PNG): Profile = Profile(
     id = profileId,

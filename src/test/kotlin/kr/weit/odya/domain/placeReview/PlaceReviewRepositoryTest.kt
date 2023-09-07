@@ -11,7 +11,6 @@ import kr.weit.odya.support.TEST_OTHER_PLACE_ID
 import kr.weit.odya.support.TEST_OTHER_USER_ID
 import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_PLACE_REVIEW_COUNT
-import kr.weit.odya.support.TEST_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_PLACE_SORT_TYPE
 import kr.weit.odya.support.TEST_SIZE
 import kr.weit.odya.support.createLatestReview
@@ -42,8 +41,8 @@ class PlaceReviewRepositoryTest(
 
         context("장소 리뷰 조회") {
             expect("PLACE_REVIEW_ID와 일치하는 장소 리뷰를 조회한다") {
-                val result = placeReviewRepository.getByPlaceReviewId(TEST_PLACE_REVIEW_ID)
-                result.id shouldBe TEST_PLACE_REVIEW_ID
+                val result = placeReviewRepository.getByPlaceReviewId(placeReview1.id)
+                result.id shouldBe placeReview1.id
             }
 
             expect("PLACE_ID와 일치하는 장소의 평균 별점을 조회한다") {
@@ -57,51 +56,81 @@ class PlaceReviewRepositoryTest(
             }
 
             expect("PLACE_ID와 일치하는 lastId 초과의 id인 장소 리뷰를 조회한다") {
-                val result = placeReviewRepository.getPlaceReviewListByPlaceId(TEST_PLACE_ID, TEST_DEFAULT_SIZE, TEST_PLACE_SORT_TYPE, placeReview3.id)
+                val result = placeReviewRepository.getPlaceReviewListByPlaceId(
+                    TEST_PLACE_ID,
+                    TEST_DEFAULT_SIZE,
+                    TEST_PLACE_SORT_TYPE,
+                    placeReview3.id,
+                )
                 result.first().placeId shouldBe TEST_PLACE_ID
                 result.first().id shouldBeLessThan placeReview3.id
             }
 
             expect("PLACE_ID와 일치하는 장소 리뷰를 size만큼 조회한다") {
-                val result = placeReviewRepository.getPlaceReviewListByPlaceId(TEST_PLACE_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, null)
+                val result = placeReviewRepository.getPlaceReviewListByPlaceId(
+                    TEST_PLACE_ID,
+                    TEST_SIZE,
+                    TEST_PLACE_SORT_TYPE,
+                    null,
+                )
                 result.size shouldBe TEST_SIZE + 1
                 result.first().placeId shouldBe TEST_PLACE_ID
             }
 
             expect("USER와 일치하는 lastId 초과의 id인 조회한다") {
-                val result = placeReviewRepository.getPlaceReviewListByUser(user1, TEST_DEFAULT_SIZE, TEST_PLACE_SORT_TYPE, placeReview3.id)
+                val result = placeReviewRepository.getPlaceReviewListByUser(
+                    user1,
+                    TEST_DEFAULT_SIZE,
+                    TEST_PLACE_SORT_TYPE,
+                    placeReview3.id,
+                )
                 result.first().writerId shouldBe user1.id
                 result.first().id shouldBeLessThan placeReview3.id
             }
 
             expect("USER와 일치하는 장소 리뷰를 조회한다") {
-                val result = placeReviewRepository.getPlaceReviewListByUser(user1, TEST_DEFAULT_SIZE, TEST_PLACE_SORT_TYPE, null)
+                val result = placeReviewRepository.getPlaceReviewListByUser(
+                    user1,
+                    TEST_DEFAULT_SIZE,
+                    TEST_PLACE_SORT_TYPE,
+                    null,
+                )
                 result.first().writerId shouldBe user1.id
-            }
-
-            expect("USER_ID와 일치하는 장소 리뷰 모두 조회한다") {
-                val result = placeReviewRepository.getByUserId(user1.id)
-                result shouldBe listOf(placeReview1, placeReview3)
             }
         }
 
         context("최신순") {
             expect("최신순 정렬") {
-                val result = placeReviewRepository.getPlaceReviewListByPlaceId(TEST_OTHER_PLACE_ID, TEST_DEFAULT_SIZE, TEST_PLACE_SORT_TYPE, null)
+                val result = placeReviewRepository.getPlaceReviewListByPlaceId(
+                    TEST_OTHER_PLACE_ID,
+                    TEST_DEFAULT_SIZE,
+                    TEST_PLACE_SORT_TYPE,
+                    null,
+                )
                 result shouldBe listOf(placeReview3)
             }
         }
 
         context("높은 순") {
             expect("평점 높은 순 정렬") {
-                val result = placeReviewRepository.getPlaceReviewListByPlaceId(TEST_PLACE_ID, TEST_DEFAULT_SIZE, PlaceReviewSortType.HIGHEST, null)
+                val result = placeReviewRepository.getPlaceReviewListByPlaceId(
+                    TEST_PLACE_ID,
+                    TEST_DEFAULT_SIZE,
+                    PlaceReviewSortType.HIGHEST,
+                    null,
+                )
                 result shouldBe listOf(placeReview1, placeReview2)
             }
         }
 
         context("낮은 순") {
             expect("평점 낮은 순 정렬") {
-                val result = placeReviewRepository.getPlaceReviewListByPlaceId(TEST_PLACE_ID, TEST_DEFAULT_SIZE, PlaceReviewSortType.LOWEST, null)
+                val result = placeReviewRepository.getPlaceReviewListByPlaceId(
+                    TEST_PLACE_ID,
+                    TEST_DEFAULT_SIZE,
+                    PlaceReviewSortType.LOWEST,
+                    null,
+                )
                 result shouldBe listOf(placeReview2, placeReview1)
             }
         }

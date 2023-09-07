@@ -58,6 +58,7 @@ fun createCommunity(
             createOtherContentImage(),
         ),
     ),
+    placeId: String? = TEST_PLACE_ID,
     user: User = createUser(),
 ) = Community(
     content = TEST_COMMUNITY_CONTENT,
@@ -66,6 +67,7 @@ fun createCommunity(
     topic = topic,
     travelJournal = travelJournal,
     communityContentImages = communityContentImages,
+    placeId = placeId,
 )
 
 fun createCommunityContentImage(contentImage: ContentImage = createContentImage()) = CommunityContentImage(

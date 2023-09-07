@@ -23,14 +23,12 @@ import kr.weit.odya.support.TEST_TOO_LONG_PHRASE
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createReportCommunityRequest
 import kr.weit.odya.support.createReportPlaceReviewRequest
-import kr.weit.odya.support.createReportReasonsResponse
 import kr.weit.odya.support.createReportTravelJournalRequest
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
 import kr.weit.odya.support.test.ControllerTestHelper.Companion.jsonContent
 import kr.weit.odya.support.test.RestDocsHelper
 import kr.weit.odya.support.test.RestDocsHelper.Companion.createDocument
 import kr.weit.odya.support.test.RestDocsHelper.Companion.requestBody
-import kr.weit.odya.support.test.RestDocsHelper.Companion.responseBody
 import kr.weit.odya.support.test.headerDescription
 import kr.weit.odya.support.test.type
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -38,7 +36,6 @@ import org.springframework.http.HttpHeaders
 import org.springframework.restdocs.ManualRestDocumentation
 import org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders
 import org.springframework.restdocs.payload.JsonFieldType
-import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.web.context.WebApplicationContext
 
@@ -55,49 +52,6 @@ class ReportControllerTest(
 
         beforeEach {
             restDocumentation.beforeTest(javaClass, it.name.testName)
-        }
-
-        describe("GET /api/v1/reports") {
-            val targetUri = "/api/v1/reports"
-            context("유효한 요청이 전달되면") {
-                val response = createReportReasonsResponse()
-                every { reportService.getReportReasons() } returns response
-                it("신고 사유 리스트 및 200을 반환한다.") {
-                    restDocMockMvc.get(targetUri) {
-                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
-                    }.andExpect {
-                        status { isOk() }
-                    }.andDo {
-                        createDocument(
-                            "report-reasons-get-success",
-                            requestHeaders(
-                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
-                            ),
-                            responseBody(
-                                "[].name" type JsonFieldType.STRING description "신고 사유 이름" example response[0].name,
-                                "[].reason" type JsonFieldType.STRING description "신고 사유" example response[0].reason,
-                            ),
-                        )
-                    }
-                }
-            }
-
-            context("유효하지 않은 토큰 전달되면") {
-                it("401를 반환한다.") {
-                    restDocMockMvc.get(targetUri) {
-                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
-                    }.andExpect {
-                        status { isUnauthorized() }
-                    }.andDo {
-                        createDocument(
-                            "report-reasons-get-fail-invalid-token",
-                            requestHeaders(
-                                HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
-                            ),
-                        )
-                    }
-                }
-            }
         }
 
         describe("POST /api/v1/reports/place-review") {

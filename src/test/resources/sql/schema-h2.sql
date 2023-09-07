@@ -11,6 +11,7 @@ CREATE TABLE users
     social_type  VARCHAR2(10)   NOT NULL,
     profile_id   NUMERIC(19, 0) NULL,
     created_date DATE           NOT NULL,
+    fcm_token    VARCHAR(255)   NULL,
     PRIMARY KEY (id)
 );
 
@@ -24,6 +25,8 @@ ALTER TABLE users
     ADD CONSTRAINT UK_EMAIL_ON_USERS UNIQUE (email);
 ALTER TABLE users
     ADD CONSTRAINT UK_PHONE_NUMBER_ON_USERS UNIQUE (phone_number);
+ALTER TABLE users
+    ADD CONSTRAINT UK_FCM_TOKEN_ON_USERS UNIQUE (fcm_token);
 
 CREATE SEQUENCE place_review_seq START WITH 1 INCREMENT BY 1;
 
@@ -309,9 +312,9 @@ CREATE SEQUENCE report_place_review_seq START WITH 1 INCREMENT BY 1;
 CREATE TABLE report_place_review
 (
     id              NUMBER(19, 0) NOT NULL,
-    created_date    TIMESTAMP     NOT NULL,
-    user_id         NUMBER(19, 0) NOT NULL,
+    created_date      TIMESTAMP   NOT NULL,
     place_review_id NUMBER(19, 0) NOT NULL,
+    user_id         NUMBER(19, 0) NOT NULL,
     report_reason   VARCHAR2(20)  NOT NULL,
     other_reason    VARCHAR2(60),
     CONSTRAINT pk_report_place_review PRIMARY KEY (id)
@@ -332,8 +335,8 @@ CREATE TABLE report_travel_journal
 (
     id                NUMBER(19, 0) NOT NULL,
     created_date      TIMESTAMP     NOT NULL,
-    user_id           NUMBER(19, 0) NOT NULL,
     travel_journal_id NUMBER(19, 0) NOT NULL,
+    user_id           NUMBER(19, 0) NOT NULL,
     report_reason     VARCHAR2(20)  NOT NULL,
     other_reason      VARCHAR2(60),
     CONSTRAINT pk_report_travel_journal PRIMARY KEY (id)

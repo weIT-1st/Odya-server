@@ -26,12 +26,14 @@ import kr.weit.odya.support.TEST_LAST_ID
 import kr.weit.odya.support.TEST_NICKNAME
 import kr.weit.odya.support.TEST_PAGE
 import kr.weit.odya.support.TEST_PAGEABLE
+import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_SIZE
 import kr.weit.odya.support.TEST_SORT_TYPE
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createFollowCountsResponse
 import kr.weit.odya.support.createFollowRequest
 import kr.weit.odya.support.createFollowSlice
+import kr.weit.odya.support.createVisitedFollowingResponse
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
 import kr.weit.odya.support.test.ControllerTestHelper.Companion.jsonContent
 import kr.weit.odya.support.test.RestDocsHelper
@@ -856,6 +858,110 @@ class FollowControllerTest(
                             ),
                         )
                     }
+                }
+            }
+        }
+
+        describe("GET /api/v1/follows/{placeId}") {
+            val targetUri = "/api/v1/follows/{placeId}"
+            context("유효한 요청 데이터가 전달되면") {
+                val response = createVisitedFollowingResponse()
+                val following = response.followings[0]
+                every { followService.getVisitedFollowings(TEST_PLACE_ID, any()) } returns response
+                it("200 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_PLACE_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    )
+                        .andExpect(status().isOk)
+                        .andDo(
+                            createPathDocument(
+                                "get-visited-followings-success",
+                                pathParameters(
+                                    "placeId" pathDescription "장소 ID" example TEST_PLACE_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                responseBody(
+                                    "count" type JsonFieldType.NUMBER description "방문한 친구 수" example response.count,
+                                    "followings[].userId" type JsonFieldType.NUMBER description "사용자 ID" example following.userId,
+                                    "followings[].nickname" type JsonFieldType.STRING description "사용자 닉네임" example following.nickname,
+                                    "followings[].profile.profileUrl" type JsonFieldType.STRING description "사용자 프로필 Url" example following.profile.profileUrl,
+                                    "followings[].profile.profileColor.colorHex" type JsonFieldType.STRING description "색상 Hex" example following.profile.profileColor?.colorHex isOptional true,
+                                    "followings[].profile.profileColor.red" type JsonFieldType.NUMBER description "RGB RED" example following.profile.profileColor?.red isOptional true,
+                                    "followings[].profile.profileColor.green" type JsonFieldType.NUMBER description "RGB GREEN" example following.profile.profileColor?.green isOptional true,
+                                    "followings[].profile.profileColor.blue" type JsonFieldType.NUMBER description "RGB BLUE" example following.profile.profileColor?.blue isOptional true,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("placeId가 비어있는 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, " ")
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    )
+                        .andExpect(status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "get-visited-followings-fail-invalid-placeId",
+                                pathParameters(
+                                    "placeId" pathDescription "잘못된 장소 Id" example " ",
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("가입되어 있지 않은 USERID이 주어지는 경우") {
+                it("401 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_PLACE_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_NOT_EXIST_USER_ID_TOKEN),
+                    )
+                        .andExpect(status().isUnauthorized)
+                        .andDo(
+                            createPathDocument(
+                                "get-visited-followings-fail-not-registered-user",
+                                pathParameters(
+                                    "placeId" pathDescription "장소 ID" example TEST_PLACE_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효하지 않은 토큰이 전달되면") {
+                it("401 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_PLACE_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN),
+                    )
+                        .andExpect(status().isUnauthorized)
+                        .andDo(
+                            createPathDocument(
+                                "get-visited-followings-fail-invalid-token",
+                                pathParameters(
+                                    "placeId" pathDescription "장소 ID" example TEST_PLACE_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                                ),
+                            ),
+                        )
                 }
             }
         }
