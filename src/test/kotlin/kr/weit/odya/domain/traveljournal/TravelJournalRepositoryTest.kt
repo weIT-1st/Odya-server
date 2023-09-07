@@ -16,6 +16,7 @@ import kr.weit.odya.support.test.BaseTests.RepositoryTest
 @RepositoryTest
 class TravelJournalRepositoryTest(
     private val userRepository: UserRepository,
+    private val contentImageRepository: ContentImageRepository,
     private val travelJournalRepository: TravelJournalRepository,
 ) : ExpectSpec(
     {
@@ -41,10 +42,10 @@ class TravelJournalRepositoryTest(
             )
         }
 
-        context("ContentImage name 조회") {
-            expect("여행 일지 ID와 일치하는 ContentImage name를 조회한다.") {
-                val result = travelJournalRepository.getByContentImageNames(travelJournal.id)
-                result shouldBe listOf("generated_file.webp", "test1.webp")
+        context("여행 일지 조회") {
+            expect("여행 일지 ID와 일치하는 여행 일지를 조회한다.") {
+                val result = travelJournalRepository.getByTravelJournalId(travelJournal.id)
+                result.id shouldBe travelJournal.id
             }
         }
 
@@ -52,6 +53,13 @@ class TravelJournalRepositoryTest(
             expect("유저 ID와 일치하는 여행기록을 조회한다.") {
                 val result = travelJournalRepository.getByUserId(user.id)
                 result.size shouldBe 1
+            }
+        }
+
+        context("ContentImage name 조회") {
+            expect("여행 일지 ID와 일치하는 ContentImage name를 조회한다.") {
+                val result = travelJournalRepository.getByContentImageNames(travelJournal.id)
+                result shouldBe listOf("generated_file.webp", "test1.webp")
             }
         }
 

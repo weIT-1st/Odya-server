@@ -5,16 +5,22 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.mockk.every
 import jakarta.ws.rs.ForbiddenException
 import kr.weit.odya.service.TopicService
+import kr.weit.odya.support.SIZE_PARAM
 import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
+import kr.weit.odya.support.TEST_BEARER_NOT_EXIST_USER_ID_TOKEN
 import kr.weit.odya.support.TEST_FAVORITE_TOPIC_ID
 import kr.weit.odya.support.TEST_INVALID_FAVORITE_TOPIC_ID
+import kr.weit.odya.support.TEST_INVALID_SIZE
 import kr.weit.odya.support.TEST_NOT_EXIST_FAVORITE_TOPIC_ID
+import kr.weit.odya.support.TEST_PLACE_ID
+import kr.weit.odya.support.TEST_SIZE
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createAddFavoriteTopicRequest
 import kr.weit.odya.support.createFavoriteTopicListResponse
 import kr.weit.odya.support.createInvalidAddFavoriteTopicRequest
 import kr.weit.odya.support.createTopicList
+import kr.weit.odya.support.createTopicResponseList
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
 import kr.weit.odya.support.test.ControllerTestHelper.Companion.jsonContent
 import kr.weit.odya.support.test.RestDocsHelper
@@ -24,6 +30,8 @@ import kr.weit.odya.support.test.RestDocsHelper.Companion.requestBody
 import kr.weit.odya.support.test.RestDocsHelper.Companion.responseBody
 import kr.weit.odya.support.test.example
 import kr.weit.odya.support.test.headerDescription
+import kr.weit.odya.support.test.isOptional
+import kr.weit.odya.support.test.parameterDescription
 import kr.weit.odya.support.test.pathDescription
 import kr.weit.odya.support.test.type
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -343,6 +351,146 @@ class TopicControllerTest(
                             ),
                         )
                     }
+                }
+            }
+        }
+
+        describe("GET /api/v1/topics/{placeId}") {
+            val targetUri = "/api/v1/topics/{placeId}"
+            context("유효한 요청 데이터가 전달되면") {
+                val response = createTopicResponseList()
+                val content = response[0]
+                every { topicService.getPopularTopicsAtPlace(TEST_PLACE_ID, TEST_SIZE) } returns response
+                it("200 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_PLACE_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_SIZE.toString()),
+                    )
+                        .andExpect(status().isOk)
+                        .andDo(
+                            createPathDocument(
+                                "get-popular-topic-success",
+                                RequestDocumentation.pathParameters(
+                                    "placeId" pathDescription "장소 ID" example TEST_PLACE_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                RequestDocumentation.queryParameters(
+                                    SIZE_PARAM parameterDescription "데이터 개수 (default = 5)" example TEST_SIZE isOptional true,
+                                ),
+                                responseBody(
+                                    "[].id" type JsonFieldType.NUMBER description "토픽 ID" example content.id,
+                                    "[].topic" type JsonFieldType.STRING description "토픽 단어" example content.topic,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("placeId가 비어있는 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, " ")
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_INVALID_SIZE.toString()),
+                    )
+                        .andExpect(status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "get-popular-topic-fail-invalid-placeId",
+                                RequestDocumentation.pathParameters(
+                                    "placeId" pathDescription "잘못된 장소 Id" example " ",
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                RequestDocumentation.queryParameters(
+                                    SIZE_PARAM parameterDescription "데이터 개수 (default = 5)" example TEST_SIZE isOptional true,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("size가 양수가 아닌 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_PLACE_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_INVALID_SIZE.toString()),
+                    )
+                        .andExpect(status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "get-popular-topic-fail-invalid-size",
+                                RequestDocumentation.pathParameters(
+                                    "placeId" pathDescription "장소 ID" example TEST_PLACE_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                RequestDocumentation.queryParameters(
+                                    SIZE_PARAM parameterDescription "양수가 아닌 데이터 개수" example TEST_INVALID_SIZE isOptional true,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("가입되어 있지 않은 USERID이 주어지는 경우") {
+                it("401 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_PLACE_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_NOT_EXIST_USER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_SIZE.toString()),
+                    )
+                        .andExpect(status().isUnauthorized)
+                        .andDo(
+                            createPathDocument(
+                                "get-popular-topic-fail-not-registered-user",
+                                RequestDocumentation.pathParameters(
+                                    "placeId" pathDescription "장소 ID" example TEST_PLACE_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                RequestDocumentation.queryParameters(
+                                    SIZE_PARAM parameterDescription "데이터 개수 (default = 5)" example TEST_SIZE isOptional true,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효하지 않은 토큰이 전달되면") {
+                it("401 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_PLACE_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_SIZE.toString()),
+                    )
+                        .andExpect(status().isUnauthorized)
+                        .andDo(
+                            createPathDocument(
+                                "get-popular-topic-fail-invalid-token",
+                                RequestDocumentation.pathParameters(
+                                    "placeId" pathDescription "장소 ID" example TEST_PLACE_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                                ),
+                                RequestDocumentation.queryParameters(
+                                    SIZE_PARAM parameterDescription "데이터 개수 (default = 5)" example TEST_SIZE isOptional true,
+                                ),
+                            ),
+                        )
                 }
             }
         }

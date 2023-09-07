@@ -138,3 +138,23 @@ operation::follow-controller-test/get-may-know-fail-not-registered-user[snippets
 === *7-5 실패 - 유효하지 않은 토큰*
 
 operation::follow-controller-test/get-may-know-fail-invalid-token[snippets='http-request,request-headers,query-parameters,http-response']
+
+[[방문한-친구수-조회-API]]
+
+== *8. 방문한 친구수 조회 API*
+
+=== *8-1 성공*
+
+operation::follow-controller-test/get-visited-followings-success[snippets='http-request,request-headers,path-parameters,http-response']
+
+=== *8-2 실패 - 잘못된 장소 Id*
+
+operation::follow-controller-test/get-visited-followings-fail-invalid-placeId[snippets='http-request,request-headers,path-parameters,http-response']
+
+=== *8-3 실패 - 가입되어 있지 않은 USER*
+
+operation::follow-controller-test/get-visited-followings-fail-not-registered-user[snippets='http-request,request-headers,path-parameters,http-response']
+
+=== *8-4 실패 - 유효하지 않은 토큰*
+
+operation::follow-controller-test/get-visited-followings-fail-invalid-token[snippets='http-request,request-headers,path-parameters,http-response']

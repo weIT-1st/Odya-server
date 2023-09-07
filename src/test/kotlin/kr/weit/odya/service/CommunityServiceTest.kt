@@ -4,9 +4,13 @@ import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
+import kr.weit.odya.client.push.PushNotificationEvent
 import kr.weit.odya.domain.community.Community
 import kr.weit.odya.domain.community.CommunityRepository
+import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.topic.TopicRepository
 import kr.weit.odya.domain.topic.getByTopicId
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
@@ -23,12 +27,14 @@ import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createCommunity
 import kr.weit.odya.support.createCommunityContentImagePairs
 import kr.weit.odya.support.createCommunityCreateRequest
+import kr.weit.odya.support.createFollowerFcmTokenList
 import kr.weit.odya.support.createMockImageFile
 import kr.weit.odya.support.createMockImageFiles
 import kr.weit.odya.support.createPrivateTravelJournal
 import kr.weit.odya.support.createTopic
 import kr.weit.odya.support.createTravelJournal
 import kr.weit.odya.support.createUser
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.web.multipart.MultipartFile
 
 class CommunityServiceTest : DescribeSpec(
@@ -38,6 +44,8 @@ class CommunityServiceTest : DescribeSpec(
         val travelJournalRepository = mockk<TravelJournalRepository>()
         val userRepository = mockk<UserRepository>()
         val fileService = mockk<FileService>()
+        val applicationEventPublisher = mockk<ApplicationEventPublisher>()
+        val followRepository = mockk<FollowRepository>()
         val communityService =
             CommunityService(
                 communityRepository,
@@ -45,6 +53,8 @@ class CommunityServiceTest : DescribeSpec(
                 travelJournalRepository,
                 userRepository,
                 fileService,
+                applicationEventPublisher,
+                followRepository,
             )
 
         describe("createCommunity") {
@@ -59,6 +69,8 @@ class CommunityServiceTest : DescribeSpec(
                 every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns createTravelJournal()
                 every { topicRepository.getByTopicId(TEST_TOPIC_ID) } returns createTopic()
                 every { communityRepository.save(any<Community>()) } returns createCommunity()
+                every { followRepository.findFollowerFcmTokenByFollowingId(TEST_USER_ID) } returns createFollowerFcmTokenList()
+                every { applicationEventPublisher.publishEvent(any<PushNotificationEvent>()) } just runs
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         communityService.createCommunity(
@@ -76,6 +88,8 @@ class CommunityServiceTest : DescribeSpec(
                 val imageNamePairs = createCommunityContentImagePairs()
                 every { userRepository.getByUserId(TEST_USER_ID) } returns register
                 every { communityRepository.save(any<Community>()) } returns createCommunity()
+                every { followRepository.findFollowerFcmTokenByFollowingId(TEST_USER_ID) } returns createFollowerFcmTokenList()
+                every { applicationEventPublisher.publishEvent(any<PushNotificationEvent>()) } just runs
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         communityService.createCommunity(

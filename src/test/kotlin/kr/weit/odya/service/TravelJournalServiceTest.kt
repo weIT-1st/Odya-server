@@ -10,6 +10,9 @@ import io.mockk.runs
 import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.report.ReportTravelJournalRepository
 import kr.weit.odya.domain.traveljournal.TravelCompanionRepository
+import io.mockk.runs
+import kr.weit.odya.client.push.PushNotificationEvent
+import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.user.UserRepository
@@ -26,6 +29,7 @@ import kr.weit.odya.support.TEST_TRAVEL_JOURNAL
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME
 import kr.weit.odya.support.TEST_USER
 import kr.weit.odya.support.TEST_USER_ID
+import kr.weit.odya.support.createFollowerFcmTokenList
 import kr.weit.odya.support.createImageMap
 import kr.weit.odya.support.createImageNamePairs
 import kr.weit.odya.support.createMockImageFile
@@ -37,6 +41,7 @@ import kr.weit.odya.support.createTravelJournalContentRequest
 import kr.weit.odya.support.createTravelJournalRequest
 import kr.weit.odya.support.createTravelJournalRequestByContentSize
 import kr.weit.odya.support.createUser
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDate
 
@@ -48,8 +53,10 @@ class TravelJournalServiceTest : DescribeSpec(
         val reportTravelJournalRepository = mockk<ReportTravelJournalRepository>()
         val contentImageRepository = mockk<ContentImageRepository>()
         val travelCompanionRepository = mockk<TravelCompanionRepository>()
+        val applicationEventPublisher = mockk<ApplicationEventPublisher>()
+        val followRepository = mockk<FollowRepository>()
         val travelJournalService =
-            TravelJournalService(userRepository, travelJournalRepository, fileService, reportTravelJournalRepository, contentImageRepository, travelCompanionRepository)
+            TravelJournalService(userRepository, travelJournalRepository, fileService, reportTravelJournalRepository, contentImageRepository, travelCompanionRepository,followRepository, applicationEventPublisher)
 
         describe("createTravelJournal") {
             context("유효한 데이터가 주어지는 경우") {
@@ -59,6 +66,8 @@ class TravelJournalServiceTest : DescribeSpec(
                 every { userRepository.getByUserId(TEST_USER_ID) } returns register
                 every { userRepository.getByUserIds(TEST_TRAVEL_COMPANION_IDS) } returns TEST_TRAVEL_COMPANION_USERS
                 every { travelJournalRepository.save(any<TravelJournal>()) } returns TEST_TRAVEL_JOURNAL
+                every { followRepository.findFollowerFcmTokenByFollowingId(TEST_USER_ID) } returns createFollowerFcmTokenList()
+                every { applicationEventPublisher.publishEvent(any<PushNotificationEvent>()) } just runs
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalService.createTravelJournal(
@@ -79,6 +88,8 @@ class TravelJournalServiceTest : DescribeSpec(
                 )
                 every { userRepository.getByUserId(TEST_USER_ID) } returns TEST_USER
                 every { travelJournalRepository.save(any<TravelJournal>()) } returns TEST_TRAVEL_JOURNAL
+                every { followRepository.findFollowerFcmTokenByFollowingId(TEST_USER_ID) } returns createFollowerFcmTokenList()
+                every { applicationEventPublisher.publishEvent(any<PushNotificationEvent>()) } just runs
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalService.createTravelJournal(

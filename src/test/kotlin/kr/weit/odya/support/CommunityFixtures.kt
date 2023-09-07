@@ -6,6 +6,7 @@ import kr.weit.odya.domain.community.CommunityVisibility
 import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.topic.Topic
 import kr.weit.odya.domain.traveljournal.TravelJournal
+import kr.weit.odya.domain.user.User
 import kr.weit.odya.service.dto.CommunityCreateRequest
 import org.springframework.mock.web.MockMultipartFile
 import java.io.InputStream
@@ -57,13 +58,16 @@ fun createCommunity(
             createOtherContentImage(),
         ),
     ),
+    placeId: String? = TEST_PLACE_ID,
+    user: User = createUser(),
 ) = Community(
     content = TEST_COMMUNITY_CONTENT,
     visibility = TEST_COMMUNITY_VISIBILITY,
-    user = createUser(),
+    user = user,
     topic = topic,
     travelJournal = travelJournal,
     communityContentImages = communityContentImages,
+    placeId = placeId,
 )
 
 fun createCommunityContentImage(contentImage: ContentImage = createContentImage()) = CommunityContentImage(

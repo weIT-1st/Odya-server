@@ -28,6 +28,7 @@ import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_DEFAULT_PROFILE_NAME
 import kr.weit.odya.support.TEST_DEFAULT_PROFILE_PNG
 import kr.weit.odya.support.TEST_EMAIL
+import kr.weit.odya.support.TEST_FCM_TOKEN
 import kr.weit.odya.support.TEST_FOLLOWER_COUNT
 import kr.weit.odya.support.TEST_FOLLOWING_COUNT
 import kr.weit.odya.support.TEST_ID_TOKEN
@@ -38,6 +39,7 @@ import kr.weit.odya.support.TEST_PHONE_NUMBER
 import kr.weit.odya.support.TEST_PROFILE_URL
 import kr.weit.odya.support.TEST_PROFILE_WEBP
 import kr.weit.odya.support.TEST_USER_ID
+import kr.weit.odya.support.createFcmTokenRequest
 import kr.weit.odya.support.createInformationRequest
 import kr.weit.odya.support.createMockProfile
 import kr.weit.odya.support.createNoneProfileColor
@@ -349,6 +351,16 @@ class UserServiceTest : DescribeSpec(
                 it("[FollowCountsResponse] 반환한다.") {
                     val response = userService.getStatistics(TEST_USER_ID)
                     response shouldBe createUserStatisticsResponse()
+                }
+            }
+        }
+
+        describe("updateFcmToken") {
+            context("유효한 USER ID와 FCM TOKEN이 주어지는 경우") {
+                every { userRepository.getByUserId(TEST_USER_ID) } returns createUser()
+                every { userRepository.findByFcmToken(TEST_FCM_TOKEN) } returns null
+                it("정상적으로 종료한다") {
+                    shouldNotThrowAny { userService.updateFcmToken(TEST_USER_ID, createFcmTokenRequest()) }
                 }
             }
         }

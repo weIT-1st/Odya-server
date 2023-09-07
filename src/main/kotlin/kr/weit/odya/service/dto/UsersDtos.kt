@@ -1,5 +1,6 @@
 package kr.weit.odya.service.dto
 
+import jakarta.validation.constraints.NotBlank
 import kr.weit.odya.domain.profilecolor.NONE_PROFILE_COLOR_HEX
 import kr.weit.odya.domain.profilecolor.ProfileColor
 import kr.weit.odya.domain.user.Gender
@@ -40,6 +41,11 @@ data class UserResponse(
 data class InformationRequest(
     @field:Nickname
     val nickname: String,
+)
+
+data class FCMTokenRequest(
+    @field:NotBlank(message = "FCM Token은 필수입니다.")
+    val fcmToken: String,
 )
 
 data class UserProfileResponse(

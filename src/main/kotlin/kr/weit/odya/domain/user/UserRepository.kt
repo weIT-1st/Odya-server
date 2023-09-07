@@ -52,6 +52,8 @@ interface UserRepository : JpaRepository<User, Long>, CustomUserRepository {
 
     @EntityGraph(attributePaths = ["profile", "profile.profileColor"])
     fun findUserWithProfileById(userId: Long): User?
+
+    fun findByFcmToken(fcmToken: String): User?
 }
 
 interface CustomUserRepository {

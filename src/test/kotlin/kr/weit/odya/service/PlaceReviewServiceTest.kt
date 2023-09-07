@@ -27,6 +27,7 @@ import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.creatSlicePlaceReviewResponse
 import kr.weit.odya.support.createCountPlaceReviewResponse
 import kr.weit.odya.support.createExistReviewResponse
+import kr.weit.odya.support.createMockPlaceReview
 import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createPlaceReview
 import kr.weit.odya.support.createPlaceReviewRequest
@@ -125,7 +126,7 @@ class PlaceReviewServiceTest : DescribeSpec(
 
         describe("getByPlaceReviewList 메소드") {
             context("유효한 placeId가 전달되면") {
-                every { placeReviewRepository.findSliceByPlaceIdOrderBySortType(TEST_PLACE_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) } returns listOf(createPlaceReview(user))
+                every { placeReviewRepository.findSliceByPlaceIdOrderBySortType(TEST_PLACE_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) } returns listOf(createMockPlaceReview(user))
                 every { placeReviewRepository.getAverageRatingByPlaceId(TEST_PLACE_ID) } returns TEST_AVERAGE_RATING
                 it("리뷰를 조회한다.") {
                     sut.getByPlaceReviewList(TEST_PLACE_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) shouldBe creatSlicePlaceReviewResponse()
@@ -136,7 +137,7 @@ class PlaceReviewServiceTest : DescribeSpec(
         describe("getByUserReviewList 메소드") {
             context("유효한 userId가 전달되면") {
                 every { userRepository.getByUserId(TEST_USER_ID) } returns user
-                every { placeReviewRepository.findSliceByUserOrderBySortType(any(), TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) } returns listOf(createPlaceReview(user))
+                every { placeReviewRepository.findSliceByUserOrderBySortType(any(), TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) } returns listOf(createMockPlaceReview(user))
                 every { placeReviewRepository.getAverageRatingByUser(user) } returns TEST_AVERAGE_RATING
                 it("리뷰를 조회한다.") {
                     sut.getByUserReviewList(TEST_USER_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) shouldBe creatSlicePlaceReviewResponse()
