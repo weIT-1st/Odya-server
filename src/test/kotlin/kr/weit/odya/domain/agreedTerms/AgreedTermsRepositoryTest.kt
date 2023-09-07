@@ -51,6 +51,11 @@ class AgreedTermsRepositoryTest(private val agreedTermsRepository: AgreedTermsRe
                 result shouldBe false
                 result2 shouldBe false
             }
+
+            expect("userId와 일치하는 동의한 약관을 삭제한다") {
+                agreedTermsRepository.deleteAllByUserId(user.id)
+                agreedTermsRepository.count() shouldBe 0
+            }
         }
 
         context("동의한 약관 존재 여부 조회") {

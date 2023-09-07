@@ -1,6 +1,5 @@
 package kr.weit.odya.domain.report
 
-import kr.weit.odya.domain.traveljournal.TravelJournal
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
@@ -10,9 +9,7 @@ interface ReportTravelJournalRepository : JpaRepository<ReportTravelJournal, Lon
 
     fun deleteAllByTravelJournalId(travelJournalId: Long)
 
-    fun existsByTravelJournalIdAndUserId(travelJournalId: Long, userId: Long): Boolean
+    fun existsByTravelJournalIdAndCommonReportInformationUserId(travelJournalId: Long, userId: Long): Boolean
 
-    fun deleteAllByUserId(userId: Long)
-
-    fun deleteAllByTravelJournalIn(travelJournals: List<TravelJournal>)
+    fun deleteAllByCommonReportInformationUserId(userId: Long)
 }

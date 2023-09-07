@@ -29,7 +29,6 @@ import kr.weit.odya.support.test.BaseTests.RepositoryTest
 class FollowRepositoryTest(
     private val followRepository: FollowRepository,
     private val userRepository: UserRepository,
-
     private val placeReviewRepository: PlaceReviewRepository,
     private val travelJournalRepository: TravelJournalRepository,
     private val communityRepository: CommunityRepository,
@@ -198,6 +197,7 @@ class FollowRepositoryTest(
                 travelJournalRepository.save(
                     createTravelJournal(
                         user = following,
+                        travelCompanions = emptyList(),
                         travelJournalContents = listOf(
                             createTravelJournalContent(
                                 travelJournalContentImages = listOf(
@@ -205,7 +205,6 @@ class FollowRepositoryTest(
                                 ),
                             ),
                         ),
-                        travelCompanions = emptyList(),
                     ),
                 )
 
@@ -219,8 +218,8 @@ class FollowRepositoryTest(
             expect("같은 장소에 커뮤니티를 작성한 친구를 조회한다") {
                 communityRepository.save(
                     createCommunity(
-                        travelJournal = null,
                         user = following,
+                        travelJournal = null,
                         communityContentImages = listOf(
                             createCommunityContentImage(contentImage = createContentImage(user = following)),
                         ),

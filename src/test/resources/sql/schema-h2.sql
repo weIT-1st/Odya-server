@@ -312,9 +312,9 @@ CREATE SEQUENCE report_place_review_seq START WITH 1 INCREMENT BY 1;
 CREATE TABLE report_place_review
 (
     id              NUMBER(19, 0) NOT NULL,
-    created_date    TIMESTAMP     NOT NULL,
-    user_id         NUMBER(19, 0) NOT NULL,
+    created_date      TIMESTAMP   NOT NULL,
     place_review_id NUMBER(19, 0) NOT NULL,
+    user_id         NUMBER(19, 0) NOT NULL,
     report_reason   VARCHAR2(20)  NOT NULL,
     other_reason    VARCHAR2(60),
     CONSTRAINT pk_report_place_review PRIMARY KEY (id)
@@ -335,8 +335,8 @@ CREATE TABLE report_travel_journal
 (
     id                NUMBER(19, 0) NOT NULL,
     created_date      TIMESTAMP     NOT NULL,
-    user_id           NUMBER(19, 0) NOT NULL,
     travel_journal_id NUMBER(19, 0) NOT NULL,
+    user_id           NUMBER(19, 0) NOT NULL,
     report_reason     VARCHAR2(20)  NOT NULL,
     other_reason      VARCHAR2(60),
     CONSTRAINT pk_report_travel_journal PRIMARY KEY (id)

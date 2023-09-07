@@ -89,8 +89,12 @@ class PlaceReviewRepositoryTest(
             }
 
             expect("USER와 일치하는 장소 리뷰를 조회한다") {
-                val result =
-                    placeReviewRepository.getPlaceReviewListByUser(user1, TEST_DEFAULT_SIZE, TEST_PLACE_SORT_TYPE, null)
+                val result = placeReviewRepository.getPlaceReviewListByUser(
+                    user1,
+                    TEST_DEFAULT_SIZE,
+                    TEST_PLACE_SORT_TYPE,
+                    null,
+                )
                 result.first().writerId shouldBe user1.id
             }
 

@@ -28,5 +28,12 @@ class ContentImageRepositoryTest(private val userRepository: UserRepository, pri
                 contentImageRepository.count() shouldBe 0
             }
         }
+
+        context("contentImage 조회") {
+            expect("userId와 일치하는 contentImage 모두 조회한다") {
+                contentImageRepository.findAllByUserId(user.id)
+                contentImageRepository.count() shouldBe 2
+            }
+        }
     },
 )
