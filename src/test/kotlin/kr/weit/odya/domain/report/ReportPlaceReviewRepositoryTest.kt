@@ -51,12 +51,12 @@ class ReportPlaceReviewRepositoryTest(
 
         context("한줄 리뷰 신고 여부 확인") {
             expect("PLACE REVIEW ID와 USER ID가 일치하는 한줄 리뷰의 신고 여부를 확인한다(존재)") {
-                val result = reportPlaceReviewRepository.existsByPlaceReviewIdAndCommonReportInformationUserId(placeReview.id, user1.id)
+                val result = reportPlaceReviewRepository.existsByReviewAndUserId(placeReview.id, user1.id)
                 result shouldBe true
             }
 
             expect("PLACE REVIEW ID와 USER ID가 일치하는 한줄 리뷰의 신고 여부를 확인한다(존재하지 않음)") {
-                val result = reportPlaceReviewRepository.existsByPlaceReviewIdAndCommonReportInformationUserId(placeReview.id, user3.id)
+                val result = reportPlaceReviewRepository.existsByReviewAndUserId(placeReview.id, user3.id)
                 result shouldBe false
             }
         }

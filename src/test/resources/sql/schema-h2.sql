@@ -50,6 +50,8 @@ CREATE INDEX place_id_index ON place_review (place_id);
 ALTER TABLE place_review
     ADD CONSTRAINT FK_PLACE_REVIEW_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
+CREATE INDEX place_review_foreign_index ON place_review (user_id);
+
 CREATE TABLE follow
 (
     follower_id  NUMERIC(19, 0) NOT NULL,
@@ -329,6 +331,9 @@ ALTER TABLE report_place_review
 ALTER TABLE report_place_review
     ADD CONSTRAINT FK_REPORT_PLACE_REVIEW_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
+CREATE INDEX report_place_review_foreign_index ON REPORT_PLACE_REVIEW (place_review_id);
+CREATE INDEX report_place_review_foreign_index_2 ON REPORT_PLACE_REVIEW (user_id);
+
 CREATE SEQUENCE report_travel_journal_seq START WITH 1 INCREMENT BY 1;
 
 CREATE TABLE report_travel_journal
@@ -350,3 +355,6 @@ ALTER TABLE report_travel_journal
 
 ALTER TABLE report_travel_journal
     ADD CONSTRAINT FK_REPORT_TRAVEL_JOURNAL_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
+CREATE INDEX report_travel_journal_foreign_index ON REPORT_TRAVEL_JOURNAL (travel_journal_id);
+CREATE INDEX report_travel_journal_foreign_index_2 ON REPORT_TRAVEL_JOURNAL (user_id);
