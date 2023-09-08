@@ -9,7 +9,6 @@ import kr.weit.odya.support.TEST_OTHER_AGREED_TERMS_ID
 import kr.weit.odya.support.TEST_OTHER_AGREED_TERMS_ID_2
 import kr.weit.odya.support.TEST_OTHER_TERMS_ID_2
 import kr.weit.odya.support.TEST_REQUIRED_TERMS_TITLE_2
-import kr.weit.odya.support.TEST_TERMS_ID
 import kr.weit.odya.support.createAgreedTerms
 import kr.weit.odya.support.createOptionalTerms
 import kr.weit.odya.support.createRequiredTerms
@@ -23,7 +22,7 @@ class AgreedTermsRepositoryTest(private val agreedTermsRepository: AgreedTermsRe
         lateinit var requiredAgreedTerms2: AgreedTerms
         lateinit var optionalAgreedTerms: AgreedTerms
         lateinit var user: User
-        beforeTest {
+        beforeEach {
             user = userRepository.save(createUser())
             requiredAgreedTerms = agreedTermsRepository.save(createAgreedTerms(user))
             optionalAgreedTerms = agreedTermsRepository.save(createAgreedTerms(user, TEST_OTHER_AGREED_TERMS_ID, createOptionalTerms()))
@@ -56,7 +55,7 @@ class AgreedTermsRepositoryTest(private val agreedTermsRepository: AgreedTermsRe
 
         context("동의한 약관 존재 여부 조회") {
             expect("userId와 termsId와 일치하는 동의한 약관 여부를 조회한다(존재함)") {
-                val result = agreedTermsRepository.existsByUserIdAndTermsId(user.id, TEST_TERMS_ID)
+                val result = agreedTermsRepository.existsByUserIdAndTermsId(user.id, requiredAgreedTerms.terms.id)
                 result shouldBe true
             }
 

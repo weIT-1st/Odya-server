@@ -5,11 +5,9 @@ import io.kotest.matchers.shouldBe
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.support.TEST_DEFAULT_SIZE
-import kr.weit.odya.support.TEST_FAVORITE_PLACE_ID
 import kr.weit.odya.support.TEST_FAVORITE_PLACE_SORT_TYPE
 import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_SIZE
-import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createFavoritePlace
 import kr.weit.odya.support.createOtherFavoritePlace
 import kr.weit.odya.support.createUser
@@ -32,8 +30,8 @@ class FavoritePlaceRepositoryTest(
 
         context("관심 장소 조회") {
             expect("user와 placeId가 일치하는 관심 장소를 조회한다") {
-                val result = favoritePlaceRepository.getByFavoritePlaceId(TEST_FAVORITE_PLACE_ID)
-                result.id shouldBe TEST_FAVORITE_PLACE_ID
+                val result = favoritePlaceRepository.getByFavoritePlaceId(favoritePlace.id)
+                result.placeId shouldBe TEST_PLACE_ID
             }
         }
 
@@ -70,7 +68,7 @@ class FavoritePlaceRepositoryTest(
         context("관심 장소 삭제") {
             expect("user와 placeId가 일치하는 관심 장소를 삭제한다") {
                 favoritePlaceRepository.delete(favoritePlace)
-                favoritePlaceRepository.existsByUserIdAndPlaceId(TEST_USER_ID, TEST_PLACE_ID) shouldBe false
+                favoritePlaceRepository.existsByUserIdAndPlaceId(user.id, TEST_PLACE_ID) shouldBe false
             }
         }
 
