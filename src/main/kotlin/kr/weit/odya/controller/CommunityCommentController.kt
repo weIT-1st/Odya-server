@@ -27,7 +27,7 @@ class CommunityCommentController(
 ) {
     @PostMapping
     fun createCommunityComment(
-        @Positive(message = "communityId는 1보다 커야합니다.")
+        @Positive(message = "communityId는 0보다 커야합니다.")
         @PathVariable("communityId") communityId: Long,
         @RequestBody communityCommentRequest: CommunityCommentRequest,
         @LoginUserId userId: Long,
@@ -41,7 +41,7 @@ class CommunityCommentController(
 
     @GetMapping
     fun getCommunityComments(
-        @Positive(message = "communityId는 1보다 커야합니다.")
+        @Positive(message = "communityId는 0보다 커야합니다.")
         @PathVariable("communityId") communityId: Long,
         @Positive(message = "조회할 개수는 양수여야 합니다.")
         @RequestParam("size", defaultValue = "10", required = false)
@@ -56,7 +56,7 @@ class CommunityCommentController(
 
     @PatchMapping("/{communityCommentId}")
     fun updateCommunityComment(
-        @Positive(message = "communityId는 1보다 커야합니다.")
+        @Positive(message = "communityId는 0보다 커야합니다.")
         @PathVariable("communityId") communityId: Long,
         @Positive(message = "communityCommentId는 1보다 커야합니다.")
         @PathVariable("communityCommentId") communityCommentId: Long,
@@ -69,7 +69,7 @@ class CommunityCommentController(
 
     @DeleteMapping("/{communityCommentId}")
     fun deleteCommunityComment(
-        @Positive(message = "communityId는 1보다 커야합니다.")
+        @Positive(message = "communityId는 0보다 커야합니다.")
         @PathVariable("communityId") communityId: Long,
         @Positive(message = "communityCommentId는 1보다 커야합니다.")
         @PathVariable("communityCommentId") communityCommentId: Long,

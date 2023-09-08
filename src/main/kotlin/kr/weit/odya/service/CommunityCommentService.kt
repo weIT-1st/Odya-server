@@ -22,6 +22,7 @@ class CommunityCommentService(
     private val userRepository: UserRepository,
     private val fileService: FileService,
 ) {
+    @Transactional
     fun createCommunityComment(userId: Long, communityId: Long, request: CommunityCommentRequest): Long {
         val community = communityRepository.getByCommunityId(communityId)
         val user = userRepository.getByUserId(userId)

@@ -236,7 +236,7 @@ class CommunityCommentControllerTest(
                                 ),
                                 queryParameters(
                                     SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_DEFAULT_SIZE isOptional true,
-                                    LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example "null" isOptional true,
+                                    LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example TEST_COMMUNITY_ID isOptional true,
                                 ),
                                 responseBody(
                                     "hasNext" type JsonFieldType.BOOLEAN description "다음 페이지가 있는지 여부" example response.hasNext,
