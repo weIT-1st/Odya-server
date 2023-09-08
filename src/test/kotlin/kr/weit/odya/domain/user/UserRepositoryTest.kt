@@ -6,8 +6,6 @@ import kr.weit.odya.support.TEST_DEFAULT_PROFILE_PNG
 import kr.weit.odya.support.TEST_DEFAULT_SIZE
 import kr.weit.odya.support.TEST_EMAIL
 import kr.weit.odya.support.TEST_FCM_TOKEN
-import kr.weit.odya.support.TEST_NICKNAME
-import kr.weit.odya.support.TEST_OTHER_USER_ID
 import kr.weit.odya.support.TEST_PHONE_NUMBER
 import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createUser
