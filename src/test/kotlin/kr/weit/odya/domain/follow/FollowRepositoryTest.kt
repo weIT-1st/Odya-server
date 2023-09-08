@@ -10,6 +10,7 @@ import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.support.TEST_DEFAULT_PAGEABLE
 import kr.weit.odya.support.TEST_DEFAULT_SIZE
 import kr.weit.odya.support.TEST_DEFAULT_SORT_TYPE
+import kr.weit.odya.support.TEST_FCM_TOKEN
 import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.createAnotherUser
 import kr.weit.odya.support.createCommunity
@@ -39,7 +40,7 @@ class FollowRepositoryTest(
         lateinit var following: User
         lateinit var notFollowing: User
         beforeEach {
-            follower = userRepository.save(createUser())
+            follower = userRepository.save(createUser().apply { changeFcmToken(TEST_FCM_TOKEN) })
             following = userRepository.save(createOtherUser())
             notFollowing = userRepository.save(createAnotherUser())
             followRepository.save(createFollow(follower, following))
@@ -169,6 +170,13 @@ class FollowRepositoryTest(
                     notFollowing.id,
                 )
                 result.size shouldBe 0
+            }
+        }
+
+        context("팔로워들의 FCM 토큰 검색") {
+            expect("팔로워들의 FCM 토큰을 조회한다") {
+                val result = followRepository.getFollowerFcmTokens(following.id)
+                result shouldBe listOf(TEST_FCM_TOKEN)
             }
         }
 

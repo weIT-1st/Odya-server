@@ -12,6 +12,7 @@ import kr.weit.odya.service.dto.VisitedFollowingResponse
 const val TEST_FOLLOWING_COUNT = 1
 const val TEST_FOLLOWER_COUNT = 2
 const val TEST_VISITED_FOLLOWING_COUNT = 2
+const val TEST_FCM_TOKEN = "testFcmToken"
 
 fun createFollowRequest(): FollowRequest = FollowRequest(TEST_OTHER_USER_ID)
 
@@ -41,6 +42,8 @@ fun createFollowProfileResponse(): FollowProfileResponse =
 
 fun createFollowProfileColorResponse(): FollowProfileResponse.ProfileColorResponse =
     FollowProfileResponse.ProfileColorResponse(createProfileColor(TEST_PROFILE_COLOR_ID))
+
+fun createFollowerFcmTokenList() = listOf(TEST_FCM_TOKEN)
 
 fun createVisitedFollowingResponse(): VisitedFollowingResponse =
     VisitedFollowingResponse(

@@ -5,6 +5,9 @@ import io.kotest.matchers.shouldBe
 import kr.weit.odya.support.TEST_DEFAULT_PROFILE_PNG
 import kr.weit.odya.support.TEST_DEFAULT_SIZE
 import kr.weit.odya.support.TEST_EMAIL
+import kr.weit.odya.support.TEST_FCM_TOKEN
+import kr.weit.odya.support.TEST_NICKNAME
+import kr.weit.odya.support.TEST_OTHER_USER_ID
 import kr.weit.odya.support.TEST_PHONE_NUMBER
 import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createUser
@@ -17,9 +20,8 @@ class UserRepositoryTest(
     {
         lateinit var user: User
         lateinit var otherUser: User
-
         beforeEach {
-            user = userRepository.save(createUser())
+            user = userRepository.save(createUser().apply { changeFcmToken(TEST_FCM_TOKEN) })
             otherUser = userRepository.save(createOtherUser())
         }
 
@@ -95,6 +97,13 @@ class UserRepositoryTest(
                 result.size shouldBe 1
                 result = userRepository.getByUserIds(userIds, TEST_DEFAULT_SIZE, user.id)
                 result.size shouldBe 0
+            }
+        }
+
+        context("사용자를 FCM Token으로 검색") {
+            expect("FCM Token이 일치하는 사용자를 조회한다") {
+                val result = userRepository.findByFcmToken(TEST_FCM_TOKEN)
+                result?.fcmToken shouldBe TEST_FCM_TOKEN
             }
         }
     },
