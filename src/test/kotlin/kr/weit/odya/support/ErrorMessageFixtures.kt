@@ -20,7 +20,7 @@ const val NOT_EXIST_AUTHENTICATED_PHONE_NUMBER_ERROR_MESSAGE = "인증된 전화
 
 const val EXIST_PLACE_REVIEW_ERROR_MESSAGE = "이미 리뷰를 작성한 장소입니다."
 
-const val NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE = "존재하지 않는 장소 리뷰입니다."
+const val NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE = "$TEST_NOT_EXIST_PLACE_REVIEW_ID : 존재하지 않는 장소 리뷰입니다."
 
 const val FORBIDDEN_PLACE_REVIEW_ERROR_MESSAGE = "작성자만 수정할 수 있습니다."
 
@@ -49,3 +49,9 @@ const val NOT_FOUND_REQUIRED_TERMS_ERROR_MESSAGE = "$TEST_TERMS_ID : 필수 약�
 const val NOT_FOUND_TERMS_ERROR_MESSAGE = "$TEST_NOT_EXIST_TERMS_ID : 해당 약관이 존재하지 않습니다."
 
 const val DISAGREE_REQUIRED_TERMS_ERROR_MESSAGE = "$TEST_TERMS_ID : 필수 약관은 비동의할 수 없습니다."
+
+const val CAN_NOT_REPORT_OWN_POST = "$TEST_REPORT_ID : 자신이 쓴 글은 신고할 수 없습니다."
+
+const val ALREADY_REPORT_POST = "$TEST_REPORT_ID : 이미 신고한 글입니다."
+
+const val NOT_EXIST_TRAVEL_JOURNAL_ERROR_MESSAGE = "$TEST_NOT_EXIST_TRAVEL_JOURNAL_ID : 존재하지 않는 여행 일지입니다."

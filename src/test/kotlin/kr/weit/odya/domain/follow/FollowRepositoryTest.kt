@@ -12,10 +12,10 @@ import kr.weit.odya.support.TEST_DEFAULT_SIZE
 import kr.weit.odya.support.TEST_DEFAULT_SORT_TYPE
 import kr.weit.odya.support.TEST_FCM_TOKEN
 import kr.weit.odya.support.TEST_PLACE_ID
-import kr.weit.odya.support.createAnotherUser
 import kr.weit.odya.support.createCommunity
 import kr.weit.odya.support.createCommunityContentImage
 import kr.weit.odya.support.createContentImage
+import kr.weit.odya.support.createCustomUser
 import kr.weit.odya.support.createFollow
 import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createPlaceReview
@@ -30,7 +30,6 @@ import kr.weit.odya.support.test.BaseTests.RepositoryTest
 class FollowRepositoryTest(
     private val followRepository: FollowRepository,
     private val userRepository: UserRepository,
-
     private val placeReviewRepository: PlaceReviewRepository,
     private val travelJournalRepository: TravelJournalRepository,
     private val communityRepository: CommunityRepository,
@@ -42,7 +41,7 @@ class FollowRepositoryTest(
         beforeEach {
             follower = userRepository.save(createUser().apply { changeFcmToken(TEST_FCM_TOKEN) })
             following = userRepository.save(createOtherUser())
-            notFollowing = userRepository.save(createAnotherUser())
+            notFollowing = userRepository.save(createCustomUser("test_user_3", "test_user_3"))
             followRepository.save(createFollow(follower, following))
             followRepository.save(createFollow(following, follower))
             followRepository.save(createFollow(following, notFollowing))

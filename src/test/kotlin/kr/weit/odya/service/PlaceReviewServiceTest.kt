@@ -8,14 +8,16 @@ import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
 import jakarta.ws.rs.ForbiddenException
 import kr.weit.odya.domain.placeReview.PlaceReviewRepository
 import kr.weit.odya.domain.placeReview.getByPlaceReviewId
+import kr.weit.odya.domain.report.ReportPlaceReviewRepository
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.support.TEST_AVERAGE_RATING
-import kr.weit.odya.support.TEST_EXIST_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_LAST_ID
+import kr.weit.odya.support.TEST_NOT_EXIST_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_PLACE_REVIEW_COUNT
 import kr.weit.odya.support.TEST_PLACE_REVIEW_ID
@@ -36,7 +38,8 @@ class PlaceReviewServiceTest : DescribeSpec(
     {
         val userRepository = mockk<UserRepository>()
         val placeReviewRepository = mockk<PlaceReviewRepository>()
-        val sut = PlaceReviewService(placeReviewRepository, userRepository)
+        val reportPlaceReviewRepository = mockk<ReportPlaceReviewRepository>()
+        val sut = PlaceReviewService(placeReviewRepository, userRepository, reportPlaceReviewRepository)
         val user = createUser()
 
         describe("createPlaceReview 메소드") {
@@ -75,11 +78,11 @@ class PlaceReviewServiceTest : DescribeSpec(
             }
 
             context("존재하지 않는 장소리뷰ID인 경우") {
-                every { placeReviewRepository.getByPlaceReviewId(TEST_EXIST_PLACE_REVIEW_ID) } throws NoSuchElementException()
+                every { placeReviewRepository.getByPlaceReviewId(TEST_NOT_EXIST_PLACE_REVIEW_ID) } throws NoSuchElementException()
                 it("[NoSuchElementException] 예외가 발생한다") {
                     shouldThrow<NoSuchElementException> {
                         sut.updateReview(
-                            updatePlaceReviewRequest().copy(id = TEST_EXIST_PLACE_REVIEW_ID),
+                            updatePlaceReviewRequest().copy(id = TEST_NOT_EXIST_PLACE_REVIEW_ID),
                             TEST_USER_ID,
                         )
                     }
@@ -99,23 +102,22 @@ class PlaceReviewServiceTest : DescribeSpec(
         describe("DeletePlaceReview 메소드") {
             context("유효한 데이터가 전달되면") {
                 every { placeReviewRepository.getByPlaceReviewId(TEST_USER_ID) } returns createPlaceReview(user)
-                every { placeReviewRepository.delete(any()) } just Runs
+                every { placeReviewRepository.deleteById(any()) } just Runs
+                every { reportPlaceReviewRepository.deleteAllByPlaceReviewId(any()) } just Runs
                 it("리뷰를 삭제한다.") {
                     shouldNotThrowAny { sut.deleteReview(TEST_PLACE_REVIEW_ID, TEST_USER_ID) }
                 }
             }
 
             context("존재하지 않는 장소리뷰ID인 경우") {
-                every { placeReviewRepository.getByPlaceReviewId(TEST_EXIST_PLACE_REVIEW_ID) } throws NoSuchElementException()
+                every { placeReviewRepository.getByPlaceReviewId(TEST_NOT_EXIST_PLACE_REVIEW_ID) } throws NoSuchElementException()
                 it("[NoSuchElementException] 예외가 발생한다") {
-                    shouldThrow<NoSuchElementException> { sut.deleteReview(TEST_EXIST_PLACE_REVIEW_ID, TEST_USER_ID) }
+                    shouldThrow<NoSuchElementException> { sut.deleteReview(TEST_NOT_EXIST_PLACE_REVIEW_ID, TEST_USER_ID) }
                 }
             }
 
             context("삭제할 권한이 없는 경우") {
-                every { placeReviewRepository.getByPlaceReviewId(TEST_PLACE_REVIEW_ID) } returns createPlaceReview(
-                    createOtherUser(),
-                )
+                every { placeReviewRepository.getByPlaceReviewId(TEST_PLACE_REVIEW_ID) } returns createPlaceReview(createOtherUser())
                 it("[ForbiddenException] 예외가 발생한다") {
                     shouldThrow<ForbiddenException> { sut.deleteReview(TEST_PLACE_REVIEW_ID, TEST_USER_ID) }
                 }
@@ -171,6 +173,16 @@ class PlaceReviewServiceTest : DescribeSpec(
                 every { placeReviewRepository.countByPlaceId(TEST_PLACE_ID) } returns TEST_PLACE_REVIEW_COUNT
                 it("해당 장소의 한줄 리뷰 수를 반환") {
                     sut.getReviewCount(TEST_PLACE_ID) shouldBe createCountPlaceReviewResponse()
+                }
+            }
+        }
+
+        describe("deleteReviewRelatedData 메소드") {
+            context("userId가 전달되면") {
+                every { reportPlaceReviewRepository.deleteAllByCommonReportInformationUserId(TEST_USER_ID) } just runs
+                every { placeReviewRepository.deleteByUserId(TEST_USER_ID) } just runs
+                it("유저의 한 줄 리뷰 관련된 데이터 전부 삭제") {
+                    shouldNotThrowAny { sut.deleteReviewRelatedData(TEST_USER_ID) }
                 }
             }
         }

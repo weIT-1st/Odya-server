@@ -7,6 +7,7 @@ import kr.weit.odya.domain.placeReview.PlaceReviewSortType
 import kr.weit.odya.domain.placeReview.getByPlaceReviewId
 import kr.weit.odya.domain.placeReview.getPlaceReviewListByPlaceId
 import kr.weit.odya.domain.placeReview.getPlaceReviewListByUser
+import kr.weit.odya.domain.report.ReportPlaceReviewRepository
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
@@ -23,6 +24,7 @@ import kotlin.math.roundToInt
 class PlaceReviewService(
     private val placeReviewRepository: PlaceReviewRepository,
     private val userRepository: UserRepository,
+    private val reportPlaceReviewRepository: ReportPlaceReviewRepository,
 ) {
     @Transactional
     fun createReview(request: PlaceReviewCreateRequest, userId: Long) {
@@ -48,13 +50,8 @@ class PlaceReviewService(
     fun deleteReview(placeReviewId: Long, userId: Long) {
         val placeReview = placeReviewRepository.getByPlaceReviewId(placeReviewId)
         checkPermissions(placeReview, userId)
-        placeReviewRepository.delete(placeReview)
-    }
-
-    private fun checkPermissions(placeReview: PlaceReview, userId: Long) {
-        if (placeReview.writerId != userId) {
-            throw ForbiddenException("권한 없음")
-        }
+        reportPlaceReviewRepository.deleteAllByPlaceReviewId(placeReviewId)
+        placeReviewRepository.deleteById(placeReviewId)
     }
 
     @Transactional
@@ -74,6 +71,18 @@ class PlaceReviewService(
 
     fun getReviewCount(placeId: String): ReviewCountResponse {
         return ReviewCountResponse(placeReviewRepository.countByPlaceId(placeId))
+    }
+
+    @Transactional
+    fun deleteReviewRelatedData(userId: Long) {
+        reportPlaceReviewRepository.deleteAllByCommonReportInformationUserId(userId)
+        placeReviewRepository.deleteByUserId(userId)
+    }
+
+    private fun checkPermissions(placeReview: PlaceReview, userId: Long) {
+        if (placeReview.writerId != userId) {
+            throw ForbiddenException("권한 없음")
+        }
     }
 
     private fun getAverage(averageRating: Double?): Double {

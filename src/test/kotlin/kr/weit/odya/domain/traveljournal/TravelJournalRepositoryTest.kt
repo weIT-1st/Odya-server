@@ -34,6 +34,7 @@ class TravelJournalRepositoryTest(
                         createTravelJournalContent(
                             travelJournalContentImages = listOf(
                                 createTravelJournalContentImage(contentImage = createContentImage(user = user)),
+                                createTravelJournalContentImage(contentImage = createContentImage(name = "test1.webp", originName = "test1.webp", user = user)),
                             ),
                         ),
                     ),
@@ -52,6 +53,25 @@ class TravelJournalRepositoryTest(
             expect("유저 ID와 일치하는 여행기록을 조회한다.") {
                 val result = travelJournalRepository.getByUserId(user.id)
                 result.size shouldBe 1
+            }
+        }
+
+        context("ContentImage name 조회") {
+            expect("여행 일지 ID와 일치하는 ContentImage name를 조회한다.") {
+                val result = travelJournalRepository.getByContentImageNames(travelJournal.id)
+                result shouldBe listOf("generated_file.webp", "test1.webp")
+            }
+        }
+
+        context("여행 일지 삭제") {
+            expect("여행 일지 ID와 일치하는 여행 일지를 삭제한다.") {
+                travelJournalRepository.deleteById(travelJournal.id)
+                travelJournalRepository.existsById(travelJournal.id) shouldBe false
+            }
+
+            expect("USER ID와 일치하는 여행 일지 모두 삭제한다.") {
+                travelJournalRepository.deleteAllByUserId(user.id)
+                travelJournalRepository.count() shouldBe 0
             }
         }
     },

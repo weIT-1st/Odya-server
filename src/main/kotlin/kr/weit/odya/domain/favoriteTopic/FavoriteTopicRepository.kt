@@ -1,6 +1,5 @@
 package kr.weit.odya.domain.favoriteTopic
 
-import jakarta.transaction.Transactional
 import kr.weit.odya.domain.user.User
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -18,6 +17,5 @@ interface FavoriteTopicRepository : JpaRepository<FavoriteTopic, Long> {
 
     fun findByUserId(userId: Long): List<FavoriteTopic>
 
-    @Transactional
-    fun deleteByUserId(userId: Long)
+    fun deleteAllByUserId(userId: Long)
 }
