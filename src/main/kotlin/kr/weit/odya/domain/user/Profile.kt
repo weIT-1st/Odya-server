@@ -5,14 +5,21 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.SequenceGenerator
+import jakarta.persistence.Table
 import kr.weit.odya.domain.profilecolor.ProfileColor
 import kr.weit.odya.support.domain.BaseModifiableEntity
 
 const val DEFAULT_PROFILE_PNG = "default_profile.png"
 
+@Table(
+    indexes = [
+        Index(name = "profile_profile_color_id_index", columnList = "profile_color_id"),
+    ],
+)
 @Entity
 @SequenceGenerator(name = "PROFILE_SEQ_GENERATOR", sequenceName = "PROFILE_SEQ", initialValue = 1, allocationSize = 1)
 class Profile(

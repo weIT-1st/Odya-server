@@ -5,6 +5,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.SequenceGenerator
@@ -20,6 +21,9 @@ import kr.weit.odya.support.domain.BaseTimeEntity
             name = "FavoriteTopic_unique",
             columnNames = ["user_id", "topic_id"],
         ),
+    ],
+    indexes = [
+        Index(name = "favorite_topic_topic_id_index", columnList = "topic_id"),
     ],
 )
 @SequenceGenerator(

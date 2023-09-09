@@ -9,14 +9,21 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
 import jakarta.persistence.SequenceGenerator
+import jakarta.persistence.Table
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.support.domain.BaseModifiableEntity
 import java.time.LocalDate
 
+@Table(
+    indexes = [
+        Index(name = "travel_journal_user_id_index", columnList = "user_id"),
+    ],
+)
 @Entity
 @SequenceGenerator(
     name = "TRAVEL_JOURNAL_SEQ_GENERATOR",
