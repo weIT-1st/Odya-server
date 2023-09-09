@@ -24,11 +24,7 @@ data class ReportPlaceReviewRequest(
 ) {
     fun toEntity(user: User, placeReview: PlaceReview) = ReportPlaceReview(
         placeReview = placeReview,
-        commonReportInformation = CommonReportInformation(
-            user,
-            reportReason,
-            otherReason = if (reportReason != ReportReason.OTHER) null else otherReason,
-        ),
+        commonReportInformation = CommonReportInformation.of(user, reportReason, otherReason),
     )
 }
 
@@ -44,10 +40,6 @@ data class ReportTravelJournalRequest(
 ) {
     fun toEntity(user: User, travelJournal: TravelJournal) = ReportTravelJournal(
         travelJournal = travelJournal,
-        commonReportInformation = CommonReportInformation(
-            user,
-            reportReason,
-            otherReason = if (reportReason != ReportReason.OTHER) null else otherReason,
-        ),
+        commonReportInformation = CommonReportInformation.of(user, reportReason, otherReason),
     )
 }

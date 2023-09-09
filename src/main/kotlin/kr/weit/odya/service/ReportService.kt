@@ -6,6 +6,8 @@ import kr.weit.odya.domain.placeReview.getByPlaceReviewId
 import kr.weit.odya.domain.report.ReportPlaceReviewRepository
 import kr.weit.odya.domain.report.ReportReason
 import kr.weit.odya.domain.report.ReportTravelJournalRepository
+import kr.weit.odya.domain.report.existsByJournalAndUserId
+import kr.weit.odya.domain.report.existsByReviewAndUserId
 import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.traveljournal.getByContentImageNames
@@ -48,7 +50,7 @@ class ReportService(
 
     private fun verificationReportReview(userId: Long, placeReview: PlaceReview, reportPlaceReviewRequest: ReportPlaceReviewRequest) {
         require(placeReview.writerId != userId) { "${placeReview.id} : 자신이 쓴 글은 신고할 수 없습니다." }
-        if (reportPlaceReviewRepository.existsByPlaceReviewIdAndCommonReportInformationUserId(placeReview.id, userId)) {
+        if (reportPlaceReviewRepository.existsByReviewAndUserId(placeReview.id, userId)) {
             throw ExistResourceException("${placeReview.id} : 이미 신고한 글입니다.")
         }
         require(reportPlaceReviewRequest.reportReason != ReportReason.OTHER || reportPlaceReviewRequest.otherReason != null) { "기타 사유는 필수 입력값입니다." }
@@ -63,7 +65,7 @@ class ReportService(
 
     private fun verificationReportTravelJournal(userId: Long, travelJournal: TravelJournal, reportTravelJournalRequest: ReportTravelJournalRequest) {
         require(travelJournal.user.id != userId) { "${travelJournal.id} : 자신이 쓴 글은 신고할 수 없습니다." }
-        if (reportTravelJournalRepository.existsByTravelJournalIdAndCommonReportInformationUserId(travelJournal.id, userId)) {
+        if (reportTravelJournalRepository.existsByJournalAndUserId(travelJournal.id, userId)) {
             throw ExistResourceException("${travelJournal.id} : 이미 신고한 글입니다.")
         }
         require(reportTravelJournalRequest.reportReason != ReportReason.OTHER || reportTravelJournalRequest.otherReason != null) { "기타 사유는 필수 입력값입니다." }

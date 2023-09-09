@@ -19,6 +19,7 @@ import kr.weit.odya.support.createCustomUser
 import kr.weit.odya.support.createFollow
 import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createPlaceReview
+import kr.weit.odya.support.createTravelCompanionById
 import kr.weit.odya.support.createTravelJournal
 import kr.weit.odya.support.createTravelJournalContent
 import kr.weit.odya.support.createTravelJournalContentImage
@@ -197,7 +198,7 @@ class FollowRepositoryTest(
                 travelJournalRepository.save(
                     createTravelJournal(
                         user = following,
-                        travelCompanions = emptyList(),
+                        travelCompanions = listOf(createTravelCompanionById(user = notFollowing)),
                         travelJournalContents = listOf(
                             createTravelJournalContent(
                                 travelJournalContentImages = listOf(
@@ -218,8 +219,8 @@ class FollowRepositoryTest(
             expect("같은 장소에 커뮤니티를 작성한 친구를 조회한다") {
                 communityRepository.save(
                     createCommunity(
-                        user = following,
                         travelJournal = null,
+                        user = following,
                         communityContentImages = listOf(
                             createCommunityContentImage(contentImage = createContentImage(user = following)),
                         ),
