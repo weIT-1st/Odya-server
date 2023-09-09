@@ -11,6 +11,8 @@ import kr.weit.odya.service.dto.CommunityCreateRequest
 import org.springframework.mock.web.MockMultipartFile
 import java.io.InputStream
 
+const val TEST_COMMUNITY_ID = 1L
+const val TEST_NOT_EXISTS_COMMUNITY_ID = 2L
 const val TEST_COMMUNITY_CONTENT = "테스트 커뮤니티 글입니다."
 val TEST_COMMUNITY_VISIBILITY = CommunityVisibility.PUBLIC
 const val TEST_COMMUNITY_REQUEST_NAME = "community"
@@ -58,8 +60,8 @@ fun createCommunity(
             createOtherContentImage(),
         ),
     ),
-    placeId: String? = TEST_PLACE_ID,
     user: User = createUser(),
+    placeId: String? = TEST_PLACE_ID,
 ) = Community(
     content = TEST_COMMUNITY_CONTENT,
     visibility = TEST_COMMUNITY_VISIBILITY,

@@ -11,7 +11,7 @@ import kr.weit.odya.service.dto.TermsUpdateResponse
 const val TEST_TERMS_ID = 1L
 const val TEST_OTHER_TERMS_ID = 2L
 const val TEST_OTHER_TERMS_ID_2 = 3L
-const val TEST_NOT_EXIST_TERMS_ID = 10L
+const val TEST_NOT_EXIST_TERMS_ID = 9999L
 const val TEST_INVALID_TERMS_ID = -1L
 const val TEST_REQUIRED_TERMS_TITLE = "필수 테스트 약관"
 const val TEST_REQUIRED_TERMS_TITLE_2 = "필수 테스트 약관2"

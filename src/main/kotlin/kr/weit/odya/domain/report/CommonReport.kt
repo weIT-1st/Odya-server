@@ -20,4 +20,13 @@ data class CommonReportInformation(
 
     @Column(updatable = false, length = 60)
     val otherReason: String? = null,
-)
+) {
+    companion object {
+        fun of(user: User, reportReason: ReportReason, otherReason: String?): CommonReportInformation =
+            CommonReportInformation(
+                user,
+                reportReason,
+                if (reportReason != ReportReason.OTHER) null else otherReason,
+            )
+    }
+}

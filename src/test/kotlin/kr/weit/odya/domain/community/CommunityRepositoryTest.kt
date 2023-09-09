@@ -8,6 +8,7 @@ import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
+import kr.weit.odya.support.TEST_COMMUNITY_CONTENT
 import kr.weit.odya.support.createCommunity
 import kr.weit.odya.support.createCommunityContentImage
 import kr.weit.odya.support.createContentImage
@@ -86,10 +87,10 @@ class CommunityRepositoryTest(
             )
         }
 
-        context("커뮤니티 조회") {
-            expect("COMMUNITY_ID와 일치하는 커뮤니티 조회") {
+        context("커뮤니티 아이디") {
+            expect("커뮤니티 ID와 일치하는 커뮤니티를 조회한다") {
                 val result = communityRepository.getByCommunityId(community1.id)
-                result shouldBe community1
+                result.content shouldBe TEST_COMMUNITY_CONTENT
             }
         }
     },
