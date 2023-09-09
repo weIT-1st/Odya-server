@@ -25,6 +25,7 @@ import kr.weit.odya.support.domain.BaseModifiableEntity
         Index(name = "community_topic_id_index", columnList = "topic_id"),
         Index(name = "community_travel_journal_id_index", columnList = "travel_journal_id"),
         Index(name = "community_user_id_index", columnList = "user_id"),
+        Index(name = "community_place_id_index", columnList = "placeId"),
     ],
 )
 @Entity

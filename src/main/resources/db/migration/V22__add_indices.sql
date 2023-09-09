@@ -33,6 +33,8 @@ CREATE INDEX community_travel_journal_id_index ON COMMUNITY (travel_journal_id);
 
 CREATE INDEX community_user_id_index ON COMMUNITY (user_id);
 
+CREATE INDEX community_place_id_index ON COMMUNITY (place_id);
+
 CREATE INDEX community_content_image_community_id_index ON COMMUNITY_CONTENT_IMAGE (community_id);
 
 CREATE INDEX community_content_image_content_image_id_index ON COMMUNITY_CONTENT_IMAGE (content_image_id);
