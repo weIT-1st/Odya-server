@@ -16,8 +16,6 @@ import kr.weit.odya.support.createCommunity
 import kr.weit.odya.support.createCommunityContentImage
 import kr.weit.odya.support.createContentImage
 import kr.weit.odya.support.createCustomUser
-import kr.weit.odya.support.createCommunityContentImage
-import kr.weit.odya.support.createContentImage
 import kr.weit.odya.support.createFollow
 import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createPlaceReview
