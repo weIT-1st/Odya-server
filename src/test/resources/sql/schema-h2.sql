@@ -92,7 +92,7 @@ create sequence profile_color_seq start with 1 increment by 1;
 alter table profile
     add constraint FK_PROFILE_ON_PROFILE_COLOR foreign key (profile_color_id) references profile_color (id);
 
-CREATE INDEX profile_profile_color_id_index on PROFILE(profile_color_id);
+CREATE INDEX profile_profile_color_id_index on PROFILE (profile_color_id);
 
 alter table users
     add constraint FK_USERS_ON_PROFILE foreign key (profile_id) references profile (id);
@@ -322,6 +322,8 @@ CREATE TABLE community_content_image
 
 CREATE SEQUENCE community_content_image_seq START WITH 1 INCREMENT BY 1;
 
+CREATE INDEX community_place_id_index ON COMMUNITY (place_id);
+
 alter table community
     add constraint FK_COMMUNITY_ON_TOPIC foreign key (topic_id) references topic (id);
 
@@ -349,12 +351,12 @@ CREATE INDEX community_content_image_content_image_id_index ON COMMUNITY_CONTENT
 
 CREATE TABLE community_comment
 (
-    id              NUMBER(19, 0) NOT NULL,
-    content         VARCHAR2(300) NOT NULL,
-    created_date    TIMESTAMP     NOT NULL,
-    updated_date    TIMESTAMP     NOT NULL,
-    user_id         NUMBER(19, 0) NOT NULL,
-    community_id    NUMBER(19, 0) NOT NULL,
+    id           NUMBER(19, 0) NOT NULL,
+    content      VARCHAR2(300) NOT NULL,
+    created_date TIMESTAMP     NOT NULL,
+    updated_date TIMESTAMP     NOT NULL,
+    user_id      NUMBER(19, 0) NOT NULL,
+    community_id NUMBER(19, 0) NOT NULL,
     CONSTRAINT pk_community_comment PRIMARY KEY (id)
 );
 
@@ -375,7 +377,7 @@ CREATE SEQUENCE report_place_review_seq START WITH 1 INCREMENT BY 1;
 CREATE TABLE report_place_review
 (
     id              NUMBER(19, 0) NOT NULL,
-    created_date      TIMESTAMP   NOT NULL,
+    created_date    TIMESTAMP     NOT NULL,
     place_review_id NUMBER(19, 0) NOT NULL,
     user_id         NUMBER(19, 0) NOT NULL,
     report_reason   VARCHAR2(20)  NOT NULL,
