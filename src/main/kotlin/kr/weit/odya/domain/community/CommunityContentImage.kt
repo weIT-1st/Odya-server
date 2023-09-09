@@ -6,12 +6,20 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.OneToOne
 import jakarta.persistence.SequenceGenerator
+import jakarta.persistence.Table
 import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.support.domain.BaseTimeEntity
 
+@Table(
+    indexes = [
+        Index(name = "community_content_image_community_id_index", columnList = "community_id"),
+        Index(name = "community_content_image_content_image_id_index", columnList = "content_image_id"),
+    ],
+)
 @Entity
 @SequenceGenerator(
     name = "COMMUNITY_CONTENT_IMAGE_SEQ_GENERATOR",
