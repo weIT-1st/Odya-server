@@ -25,6 +25,7 @@ import kr.weit.odya.support.domain.BaseModifiableEntity
 @Table(
     indexes = [
         Index(name = "community_index", columnList = "community_id"),
+        Index(name = "community_comment_user_id_index", columnList = "user_id"),
     ],
 )
 class CommunityComment(
