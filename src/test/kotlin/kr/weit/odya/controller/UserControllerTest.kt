@@ -7,6 +7,7 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.runs
 import kr.weit.odya.service.ExistResourceException
+import kr.weit.odya.service.ImageService
 import kr.weit.odya.service.NotFoundDefaultResourceException
 import kr.weit.odya.service.ObjectStorageException
 import kr.weit.odya.service.UserService
@@ -86,6 +87,7 @@ class UserControllerTest(
     private val context: WebApplicationContext,
     @MockkBean private val userService: UserService,
     @MockkBean private val withdrawService: WithdrawService,
+    @MockkBean private val imageService: ImageService,
 ) : DescribeSpec(
     {
         val restDocumentation = ManualRestDocumentation()

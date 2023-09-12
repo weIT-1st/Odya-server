@@ -155,6 +155,8 @@ CREATE TABLE content_image
     is_life_shot NUMBER(1)      NOT NULL,
     created_date TIMESTAMP      NOT NULL,
     user_id      NUMERIC(19, 0) NOT NULL,
+    place_id     VARCHAR2(400)  NULL,
+    coordinate   GEOMETRY       NULL,
     CONSTRAINT pk_content_image PRIMARY KEY (id)
 );
 
@@ -311,12 +313,12 @@ alter table community_content_image
 
 CREATE TABLE community_comment
 (
-    id              NUMBER(19, 0) NOT NULL,
-    content         VARCHAR2(300) NOT NULL,
-    created_date    TIMESTAMP     NOT NULL,
-    updated_date    TIMESTAMP     NOT NULL,
-    user_id         NUMBER(19, 0) NOT NULL,
-    community_id    NUMBER(19, 0) NOT NULL,
+    id           NUMBER(19, 0) NOT NULL,
+    content      VARCHAR2(300) NOT NULL,
+    created_date TIMESTAMP     NOT NULL,
+    updated_date TIMESTAMP     NOT NULL,
+    user_id      NUMBER(19, 0) NOT NULL,
+    community_id NUMBER(19, 0) NOT NULL,
     CONSTRAINT pk_community_comment PRIMARY KEY (id)
 );
 
@@ -335,7 +337,7 @@ CREATE SEQUENCE report_place_review_seq START WITH 1 INCREMENT BY 1;
 CREATE TABLE report_place_review
 (
     id              NUMBER(19, 0) NOT NULL,
-    created_date      TIMESTAMP   NOT NULL,
+    created_date    TIMESTAMP     NOT NULL,
     place_review_id NUMBER(19, 0) NOT NULL,
     user_id         NUMBER(19, 0) NOT NULL,
     report_reason   VARCHAR2(20)  NOT NULL,
