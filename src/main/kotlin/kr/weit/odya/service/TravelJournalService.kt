@@ -1,5 +1,7 @@
 package kr.weit.odya.service
 
+import com.google.maps.model.PlaceDetails
+import kr.weit.odya.client.GoogleMapsClient
 import kr.weit.odya.client.push.PushNotificationEvent
 import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.contentimage.ContentImageRepository
@@ -37,19 +39,21 @@ class TravelJournalService(
     private val reportTravelJournalRepository: ReportTravelJournalRepository,
     private val contentImageRepository: ContentImageRepository,
     private val travelCompanionRepository: TravelCompanionRepository,
+    private val googleMapsClient: GoogleMapsClient,
 ) {
     @Transactional
     fun createTravelJournal(
         userId: Long,
         travelJournalRequest: TravelJournalRequest,
         imageNamePairs: List<Pair<String, String>>,
+        placeDetailsMap: Map<String, PlaceDetails>,
     ) {
         val register = userRepository.getByUserId(userId)
         val travelCompanions =
             getTravelCompanions(travelJournalRequest.travelCompanionIds, travelJournalRequest.travelCompanionNames)
         val contentImageMap = getContentImageMap(register, imageNamePairs)
         val travelJournalContents = travelJournalRequest.travelJournalContentRequests.map { travelJournalContent ->
-            val contentImages = getContentImages(travelJournalContent, contentImageMap)
+            val contentImages = getContentImages(travelJournalContent, contentImageMap, placeDetailsMap)
             getTravelJournalContent(contentImages, travelJournalContent)
         }
         val travelJournal = travelJournalRequest.toEntity(register, travelCompanions, travelJournalContents)
@@ -90,7 +94,7 @@ class TravelJournalService(
         travelJournalRequest: TravelJournalRequest,
         imageMap: Map<String, MultipartFile>?,
     ): List<Pair<String, String>> = travelJournalRequest.travelJournalContentRequests.flatMap { travelJournalContent ->
-        travelJournalContent.contentImageNames.orEmpty().mapNotNull { contentImageName ->
+        travelJournalContent.contentImageNames.mapNotNull { contentImageName ->
             imageMap?.getValue(contentImageName)?.let { image ->
                 val fileName = fileService.saveFile(image)
                 fileName to image.originalFilename!!
@@ -158,6 +162,9 @@ class TravelJournalService(
         travelJournalRepository.deleteAllByUserId(userId)
     }
 
+    fun getPlaceDetailsMap(placeIdList: Set<String>): Map<String, PlaceDetails> =
+        placeIdList.associateWith { googleMapsClient.findPlaceDetailsByPlaceId(it) }
+
     private fun getTravelJournalContent(
         contentImages: List<ContentImage>,
         travelJournalContentRequest: TravelJournalContentRequest,
@@ -170,9 +177,16 @@ class TravelJournalService(
     private fun getContentImages(
         travelJournalContent: TravelJournalContentRequest,
         contentImageMap: Map<String, ContentImage>?,
+        placeDetailsMap: Map<String, PlaceDetails>,
     ) = travelJournalContent.contentImageNames
         .filter { contentImageMap?.contains(it) ?: false }
         .mapNotNull { contentImageMap?.getValue(it) }
+        .apply {
+            if (travelJournalContent.placeId != null) { // 여행일지 day에 장소가 태그되었다면 썸네일에 장소 정보id와 좌표 저장해서 나중에 지도에 뿌릴수 있도록 한다
+                get(0) // 첫번째 사진이 대표사진, 썸네일로 사용된다
+                    .setPlace(placeDetailsMap.getValue(travelJournalContent.placeId))
+            }
+        }
 
     private fun getContentImageMap(
         register: User,

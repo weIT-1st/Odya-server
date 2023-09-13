@@ -1,5 +1,6 @@
 package kr.weit.odya.support.config
 
+import kr.weit.odya.client.GoogleMapsClient
 import kr.weit.odya.domain.placeSearchHistory.PlaceSearchHistoryRepository
 import kr.weit.odya.domain.user.UsersDocumentRepository
 import kr.weit.odya.service.ObjectStorageService
@@ -16,4 +17,7 @@ class TestMockBeanConfig {
 
     @MockBean
     lateinit var usersDocumentRepository: UsersDocumentRepository
+
+    @MockBean
+    lateinit var googleMapsClient: GoogleMapsClient
 }

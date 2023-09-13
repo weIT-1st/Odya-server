@@ -23,4 +23,6 @@ include::topic.adoc[]
 include::travelJournal.adoc[]
 include::terms.adoc[]
 include::community.adoc[]
+include::communityComment.adoc[]
 include::report.adoc[]
+include::image.adoc

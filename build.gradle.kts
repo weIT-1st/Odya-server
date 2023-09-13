@@ -51,9 +51,11 @@ dependencies {
     implementation("org.flywaydb:flyway-core")
 
     implementation("com.google.firebase:firebase-admin:9.1.1")
+    implementation("com.google.maps:google-maps-services:2.2.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("com.h2database:h2:2.1.214")
+    testImplementation("com.h2database:h2:2.2.222")
+
     testImplementation("io.mockk:mockk:1.13.5")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
     testImplementation("io.kotest:kotest-runner-junit5:5.6.2")
@@ -64,6 +66,7 @@ dependencies {
     implementation("com.oracle.oci.sdk:oci-java-sdk-common-httpclient-jersey3:3.14.0")
 
     implementation("com.linecorp.kotlin-jdsl:hibernate-kotlin-jdsl-jakarta:2.2.1.RELEASE")
+    implementation("org.hibernate.orm:hibernate-spatial:6.2.2.Final")
 
     implementation("org.opensearch.client:spring-data-opensearch-starter:1.2.0") {
         exclude("org.opensearch.client", "opensearch-rest-client-sniffer")
