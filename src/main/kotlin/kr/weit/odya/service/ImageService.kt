@@ -1,7 +1,6 @@
 package kr.weit.odya.service
 
 import jakarta.ws.rs.ForbiddenException
-import kr.weit.odya.client.GoogleMapsClient
 import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.contentimage.getImageById
 import kr.weit.odya.domain.contentimage.getImageByUserId
@@ -9,9 +8,6 @@ import kr.weit.odya.domain.contentimage.getLifeShotByUserId
 import kr.weit.odya.service.dto.ImageResponse
 import kr.weit.odya.service.dto.LifeShotRequest
 import kr.weit.odya.service.dto.SliceResponse
-import org.locationtech.jts.geom.Coordinate
-import org.locationtech.jts.geom.GeometryFactory
-import org.locationtech.jts.geom.Point
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -19,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional
 class ImageService(
     private val contentImageRepository: ContentImageRepository,
     private val fileService: FileService,
-    private val googleMapsClient: GoogleMapsClient,
 ) {
 
     @Transactional(readOnly = true)
@@ -40,17 +35,7 @@ class ImageService(
         if (image.user.id != userId) {
             throw ForbiddenException("해당 이미지의 인생샷으로 등록할 권한이 없습니다.")
         }
-        image.setLifeShot()
-        val placeId = lifeShotRequest.placeId
-        var coordinate: Point? = null
-        var placeName: String? = null
-        if (placeId != null) {
-            val placeDetail = googleMapsClient.findPlaceDetailsByPlaceId(placeId)
-            val location = placeDetail.geometry.location
-            coordinate = GeometryFactory().createPoint(Coordinate(location.lng, location.lat))
-            placeName = placeDetail.name
-        }
-        image.setPlace(placeId, coordinate, placeName)
+        image.setLifeShotInfo(lifeShotRequest.placeName)
     }
 
     @Transactional

@@ -1,5 +1,6 @@
 package kr.weit.odya.domain.contentimage
 
+import com.google.maps.model.PlaceDetails
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -16,6 +17,8 @@ import kr.weit.odya.domain.community.CommunityContentImage
 import kr.weit.odya.domain.traveljournal.TravelJournalContentImage
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.support.domain.BaseTimeEntity
+import org.locationtech.jts.geom.Coordinate
+import org.locationtech.jts.geom.GeometryFactory
 import org.locationtech.jts.geom.Point
 
 @Table(indexes = [Index(name = "content_image_place_id_index", columnList = "place_id")])
@@ -61,24 +64,23 @@ class ContentImage(
     var coordinate: Point? = null
         protected set
 
-    @Column(length = 45)
+    @Column(length = 90)
     var placeName: String? = null
         protected set
 
-    fun setLifeShot() {
+    fun setLifeShotInfo(placeName: String?) {
         isLifeShot = true
+        this.placeName = placeName
     }
 
     fun unsetLifeShot() {
         isLifeShot = false
-        placeId = null
-        coordinate = null
-        placeName = null
+        this.placeName = null
     }
 
-    fun setPlace(placeId: String?, coordinate: Point?, placeName: String?) {
-        this.placeId = placeId
-        this.coordinate = coordinate
-        this.placeName = placeName
+    fun setPlace(placeDetails: PlaceDetails) {
+        this.placeId = placeDetails.placeId
+        val location = placeDetails.geometry.location
+        this.coordinate = GeometryFactory().createPoint(Coordinate(location.lng, location.lat))
     }
 }

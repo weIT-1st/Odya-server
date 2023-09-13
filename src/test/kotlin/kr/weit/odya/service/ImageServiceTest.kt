@@ -1,9 +1,5 @@
 package kr.weit.odya.service
 
-import com.google.maps.errors.InvalidRequestException
-import com.google.maps.model.Geometry
-import com.google.maps.model.LatLng
-import com.google.maps.model.PlaceDetails
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
@@ -11,7 +7,6 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import jakarta.ws.rs.ForbiddenException
-import kr.weit.odya.client.GoogleMapsClient
 import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.contentimage.getImageById
 import kr.weit.odya.domain.contentimage.getImageByUserId
@@ -29,8 +24,7 @@ class ImageServiceTest : DescribeSpec(
     {
         val contentImageRepository = mockk<ContentImageRepository>()
         val fileService = mockk<FileService>()
-        val googleMapsClient = mockk<GoogleMapsClient>()
-        val imageService = ImageService(contentImageRepository, fileService, googleMapsClient)
+        val imageService = ImageService(contentImageRepository, fileService)
         every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
 
         describe("getImages") {
@@ -69,25 +63,8 @@ class ImageServiceTest : DescribeSpec(
                 }
             }
 
-            context("구글 맵에 존재하지 않는 장소 id를 요청했을 경우") {
-                every { contentImageRepository.getImageById(any()) } returns createContentImage()
-                every { googleMapsClient.findPlaceDetailsByPlaceId(any()) } throws InvalidRequestException("존재하지 않는 장소 입니다")
-                it("[InvalidRequestException] 예외가 발생한다.") {
-                    shouldThrow<InvalidRequestException> {
-                        imageService.setLifeShot(
-                            TEST_USER_ID,
-                            TEST_IMAGE_ID,
-                            createLifeShotRequest(),
-                        )
-                    }
-                }
-            }
-
             context("유효한 유저 id와 사진 id, 인생샷 설정 요청이 주어지는 경우") {
                 every { contentImageRepository.getImageById(any()) } returns createContentImage()
-                every { googleMapsClient.findPlaceDetailsByPlaceId(any()) } returns PlaceDetails().apply {
-                    geometry = Geometry().apply { location = LatLng(0.0, 0.0) }
-                }
                 it("정상적으로 종료한다.") {
                     shouldNotThrowAny {
                         imageService.setLifeShot(
@@ -106,7 +83,7 @@ class ImageServiceTest : DescribeSpec(
                         imageService.setLifeShot(
                             TEST_USER_ID,
                             TEST_IMAGE_ID,
-                            createLifeShotRequest(placeId = null),
+                            createLifeShotRequest(placeName = null),
                         )
                     }
                 }

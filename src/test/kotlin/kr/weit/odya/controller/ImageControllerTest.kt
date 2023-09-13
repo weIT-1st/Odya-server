@@ -1,6 +1,5 @@
 package kr.weit.odya.controller
 
-import com.google.maps.errors.InvalidRequestException
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.DescribeSpec
 import io.mockk.every
@@ -18,6 +17,7 @@ import kr.weit.odya.support.TEST_INVALID_LAST_ID
 import kr.weit.odya.support.TEST_INVALID_SIZE
 import kr.weit.odya.support.TEST_LAST_ID
 import kr.weit.odya.support.TEST_SIZE
+import kr.weit.odya.support.TEST_TOO_LONG_PHRASE
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createLifeShotRequest
 import kr.weit.odya.support.createSliceImageResponse
@@ -202,7 +202,7 @@ class ImageControllerTest(
                                 pathParameters(
                                     "imageId" pathDescription "인생샷 설정할 사진 id" example TEST_IMAGE_ID,
                                 ),
-                                requestBody("placeId" type JsonFieldType.STRING description "설정할 장소 id" example request.placeId isOptional true),
+                                requestBody("placeName" type JsonFieldType.STRING description "장소명" example request.placeName isOptional true),
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                                 ),
@@ -211,8 +211,8 @@ class ImageControllerTest(
                 }
             }
 
-            context("유효한 토큰이면서, placeId가 null인 유효한 장소 설정 취소 요청인 경우") {
-                val request = createLifeShotRequest(placeId = null)
+            context("유효한 토큰이면서, 장소명이 null인 장소 설정 취소 요청인 경우") {
+                val request = createLifeShotRequest(placeName = null)
                 every { imageService.setLifeShot(TEST_USER_ID, TEST_IMAGE_ID, request) } just runs
                 it("200 응답한다.") {
                     restDocMockMvc.perform(
@@ -228,7 +228,7 @@ class ImageControllerTest(
                                 pathParameters(
                                     "imageId" pathDescription "인생샷 설정할 사진 id" example TEST_IMAGE_ID,
                                 ),
-                                requestBody("placeId" type JsonFieldType.STRING description "장소 id 설정 취소" example "Null" isOptional true),
+                                requestBody("placeName" type JsonFieldType.STRING description "장소명" example request.placeName isOptional true),
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                                 ),
@@ -252,7 +252,7 @@ class ImageControllerTest(
                                 pathParameters(
                                     "imageId" pathDescription "음수인 사진 id" example TEST_INVALID_IMAGE_ID,
                                 ),
-                                requestBody("placeId" type JsonFieldType.STRING description "설정할 장소 id" example request.placeId isOptional true),
+                                requestBody("placeName" type JsonFieldType.STRING description "장소명" example request.placeName isOptional true),
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                                 ),
@@ -261,9 +261,9 @@ class ImageControllerTest(
                 }
             }
 
-            context("유효한 토큰이면서, 장소id가 공백인 경우") {
+            context("유효한 토큰이면서, 장소명이 공백인 경우") {
                 it("400 응답한다.") {
-                    val request = createLifeShotRequest(placeId = " ")
+                    val request = createLifeShotRequest(placeName = " ")
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
                             .post(targetUri, TEST_IMAGE_ID)
@@ -277,7 +277,7 @@ class ImageControllerTest(
                                 pathParameters(
                                     "imageId" pathDescription "인생샷 설정할 사진 id" example TEST_IMAGE_ID,
                                 ),
-                                requestBody("placeId" type JsonFieldType.STRING description "공백인 장소 id" example "' '" isOptional true),
+                                requestBody("placeName" type JsonFieldType.STRING description "공백인 장소명" example request.placeName isOptional true),
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                                 ),
@@ -286,9 +286,9 @@ class ImageControllerTest(
                 }
             }
 
-            context("유효한 토큰이면서, 장소id가 구글맵에 존재하지 않는경우") {
+            context("유효한 토큰이면서, 장소명이 길이 제한을 넘은경우") {
                 it("400 응답한다.") {
-                    every { imageService.setLifeShot(TEST_USER_ID, TEST_IMAGE_ID, request) } throws InvalidRequestException("구글맵에 존재하지 않는 장소입니다.")
+                    val request = createLifeShotRequest(placeName = TEST_TOO_LONG_PHRASE)
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
                             .post(targetUri, TEST_IMAGE_ID)
@@ -298,11 +298,11 @@ class ImageControllerTest(
                         .andExpect(MockMvcResultMatchers.status().isBadRequest)
                         .andDo(
                             createPathDocument(
-                                "set-life-shot-fail-not-exist-place-id",
+                                "set-life-shot-fail-too-long-place-id",
                                 pathParameters(
                                     "imageId" pathDescription "인생샷 설정할 사진 id" example TEST_IMAGE_ID,
                                 ),
-                                requestBody("placeId" type JsonFieldType.STRING description "구글맵에 존재하지 않는 장소 id" example "notExist" isOptional true),
+                                requestBody("placeName" type JsonFieldType.STRING description "30자를 넘는 장소명" example request.placeName isOptional true),
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                                 ),
@@ -326,7 +326,7 @@ class ImageControllerTest(
                                 pathParameters(
                                     "imageId" pathDescription "인생샷 설정할 사진 id" example TEST_IMAGE_ID,
                                 ),
-                                requestBody("placeId" type JsonFieldType.STRING description "설정할 장소 id" example request.placeId isOptional true),
+                                requestBody("placeName" type JsonFieldType.STRING description "장소명" example request.placeName isOptional true),
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                                 ),
@@ -350,7 +350,7 @@ class ImageControllerTest(
                                 pathParameters(
                                     "imageId" pathDescription "인생샷 설정할 사진 id" example TEST_IMAGE_ID,
                                 ),
-                                requestBody("placeId" type JsonFieldType.STRING description "설정할 장소 id" example request.placeId isOptional true),
+                                requestBody("placeName" type JsonFieldType.STRING description "장소명" example request.placeName isOptional true),
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
                                 ),

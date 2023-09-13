@@ -157,7 +157,7 @@ CREATE TABLE content_image
     user_id      NUMERIC(19, 0) NOT NULL,
     place_id     VARCHAR2(400)  NULL,
     coordinate   GEOMETRY       NULL,
-    place_name   VARCHAR2(45)   NULL,
+    place_name   VARCHAR2(90)   NULL,
     CONSTRAINT pk_content_image PRIMARY KEY (id)
 );
 

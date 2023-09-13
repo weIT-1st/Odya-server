@@ -1,7 +1,7 @@
 alter table CONTENT_IMAGE
     add coordinate SDO_GEOMETRY  NULL
     add place_id   VARCHAR2(400) NULL
-    add place_name VARCHAR2(45)  NULL;
+    add place_name VARCHAR2(90)  NULL;
 
 CREATE INDEX content_image_place_id_index ON CONTENT_IMAGE (place_id);
 

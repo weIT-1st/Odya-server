@@ -9,6 +9,7 @@ import kr.weit.odya.domain.contentimage.getLifeShotByUserId
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.support.TEST_DEFAULT_SIZE
+import kr.weit.odya.support.TEST_PLACE_NAME
 import kr.weit.odya.support.createContentImage
 import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createUser
@@ -22,11 +23,11 @@ class ContentImageRepositoryTest(private val userRepository: UserRepository, pri
         lateinit var user: User
         beforeEach {
             user = userRepository.save(createUser())
-            contentImage1 = contentImageRepository.save(createContentImage(user = user)).apply { setLifeShot() }
-            contentImage2 = contentImageRepository.save(createContentImage(user = user)).apply { setLifeShot() }
-            contentImageRepository.save(createContentImage(user = user)).apply { setLifeShot() }
+            contentImage1 = contentImageRepository.save(createContentImage(user = user)).apply { setLifeShotInfo(TEST_PLACE_NAME) }
+            contentImage2 = contentImageRepository.save(createContentImage(user = user)).apply { setLifeShotInfo(null) }
+            contentImageRepository.save(createContentImage(user = user)).apply { setLifeShotInfo(TEST_PLACE_NAME) }
             contentImageRepository.save(createContentImage(user = user))
-            contentImageRepository.save(createContentImage(user = userRepository.save(createOtherUser()))).apply { setLifeShot() }
+            contentImageRepository.save(createContentImage(user = userRepository.save(createOtherUser()))).apply { setLifeShotInfo(TEST_PLACE_NAME) }
         }
 
         context("contentImage 삭제") {

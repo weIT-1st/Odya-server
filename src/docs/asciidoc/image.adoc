@@ -36,13 +36,13 @@ operation::image-controller-test/set-life-shot-success-place-id-null[snippets='h
 
 operation::image-controller-test/set-life-shot-fail-invalid-image-id[snippets='http-request,request-headers,path-parameters,request-body,http-response']
 
-=== *2-4 실패 - 유효하지 않은 장소 id*
+=== *2-4 실패 - 유효하지 않은 장소명*
 
 operation::image-controller-test/set-life-shot-fail-invalid-place-id[snippets='http-request,request-headers,path-parameters,request-body,http-response']
 
-=== *2-5 실패 - 구글맵에 없는 장소 id*
+=== *2-5 실패 - 길이 제한을 넘은 장소명*
 
-operation::image-controller-test/set-life-shot-fail-not-exist-place-id[snippets='http-request,request-headers,path-parameters,request-body,http-response']
+operation::image-controller-test/set-life-shot-fail-too-long-place-id[snippets='http-request,request-headers,path-parameters,request-body,http-response']
 
 === *2-6 실패 - 가입되지 않은 유저*
 

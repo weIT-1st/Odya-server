@@ -129,6 +129,6 @@ fun createUserStatisticsResponse() = UserStatisticsResponse(
     odyaCount = TEST_ODYA_COUNT,
 )
 
-fun createLifeShotRequest(placeId: String? = TEST_PLACE_ID) = LifeShotRequest(
-    placeId = placeId,
+fun createLifeShotRequest(placeName: String? = TEST_PLACE_NAME) = LifeShotRequest(
+    placeName = placeName,
 )
