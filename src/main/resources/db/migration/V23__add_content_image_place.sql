@@ -14,4 +14,4 @@ values ('CONTENT_IMAGE',
             ),
         4326);
 
-CREATE INDEX CONTENT_IMAGE_coordinate_index ON CONTENT_IMAGE (coordinate) INDEXTYPE IS MDSYS.SPATIAL_INDEX;
+CREATE INDEX content_image_coordinate_index ON CONTENT_IMAGE (coordinate) INDEXTYPE IS MDSYS.SPATIAL_INDEX;

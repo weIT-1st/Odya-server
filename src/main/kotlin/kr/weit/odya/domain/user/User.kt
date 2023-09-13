@@ -10,6 +10,7 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.OneToOne
 import jakarta.persistence.SequenceGenerator
@@ -19,7 +20,13 @@ import kr.weit.odya.support.domain.BaseTimeEntity
 import java.time.LocalDate
 
 @Entity
-@Table(name = "users")
+@Table(
+    name = "users",
+
+    indexes = [
+        Index(name = "profile_id_index", columnList = "profile_id"),
+    ],
+)
 @SequenceGenerator(name = "USERS_SEQ_GENERATOR", sequenceName = "USERS_SEQ", initialValue = 1, allocationSize = 1)
 class User(
     @Id

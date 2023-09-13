@@ -21,7 +21,13 @@ import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory
 import org.locationtech.jts.geom.Point
 
-@Table(indexes = [Index(name = "content_image_place_id_index", columnList = "place_id")])
+@Table(
+    indexes = [
+        Index(name = "content_image_place_id_index", columnList = "place_id"),
+        Index(name = "content_image_user_id_index", columnList = "user_id"),
+        Index(name = "content_image_coordinate_index", columnList = "coordinate"),
+    ],
+)
 @Entity
 @SequenceGenerator(
     name = "CONTENT_IMAGE_SEQ_GENERATOR",

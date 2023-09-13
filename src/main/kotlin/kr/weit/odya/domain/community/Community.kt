@@ -9,15 +9,25 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
 import jakarta.persistence.SequenceGenerator
+import jakarta.persistence.Table
 import kr.weit.odya.domain.topic.Topic
 import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.support.domain.BaseModifiableEntity
 
+@Table(
+    indexes = [
+        Index(name = "community_topic_id_index", columnList = "topic_id"),
+        Index(name = "community_travel_journal_id_index", columnList = "travel_journal_id"),
+        Index(name = "community_user_id_index", columnList = "user_id"),
+        Index(name = "community_place_id_index", columnList = "placeId"),
+    ],
+)
 @Entity
 @SequenceGenerator(
     name = "COMMUNITY_SEQ_GENERATOR",
