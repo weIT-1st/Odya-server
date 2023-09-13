@@ -51,7 +51,7 @@ class ImageController(
         request: LifeShotRequest,
     ): ResponseEntity<Void> {
         imageService.setLifeShot(userId, imageId, request)
-        return ResponseEntity.ok().build()
+        return ResponseEntity.noContent().build()
     }
 
     @DeleteMapping("/{imageId}/life-shot")
@@ -63,6 +63,6 @@ class ImageController(
         imageId: Long,
     ): ResponseEntity<Void> {
         imageService.cancelLifeShot(userId, imageId)
-        return ResponseEntity.ok().build()
+        return ResponseEntity.noContent().build()
     }
 }

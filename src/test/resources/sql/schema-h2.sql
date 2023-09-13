@@ -157,6 +157,7 @@ CREATE TABLE content_image
     user_id      NUMERIC(19, 0) NOT NULL,
     place_id     VARCHAR2(400)  NULL,
     coordinate   GEOMETRY       NULL,
+    place_name   VARCHAR2(45)   NULL,
     CONSTRAINT pk_content_image PRIMARY KEY (id)
 );
 
@@ -168,6 +169,8 @@ CREATE TABLE travel_journal_content_image
     travel_journal_content_id NUMERIC(19, 0) NOT NULL,
     CONSTRAINT pk_travel_journal_content_image PRIMARY KEY (id)
 );
+
+CREATE INDEX content_image_place_id_index ON CONTENT_IMAGE (place_id);
 
 CREATE SEQUENCE travel_journal_seq START WITH 1 INCREMENT BY 1;
 

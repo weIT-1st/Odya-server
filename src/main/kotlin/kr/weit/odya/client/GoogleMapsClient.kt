@@ -2,7 +2,7 @@ package kr.weit.odya.client
 
 import com.google.maps.GeoApiContext
 import com.google.maps.PlacesApi
-import com.google.maps.model.LatLng
+import com.google.maps.model.PlaceDetails
 import kr.weit.odya.config.properties.GoogleMapsProperties
 import org.springframework.stereotype.Component
 
@@ -14,7 +14,7 @@ class GoogleMapsClient(
         .apiKey(googleMapsProperties.apiKey)
         .build()
 
-    fun findCoordinateByPlaceId(placeId: String): LatLng {
-        return PlacesApi.placeDetails(apiContext, placeId).await().geometry.location
+    fun findPlaceDetailsByPlaceId(placeId: String): PlaceDetails {
+        return PlacesApi.placeDetails(apiContext, placeId).await()
     }
 }

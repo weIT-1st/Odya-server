@@ -11,6 +11,7 @@ import kr.weit.odya.service.dto.LifeShotRequest
 import kr.weit.odya.service.dto.SliceResponse
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory
+import org.locationtech.jts.geom.Point
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -41,13 +42,15 @@ class ImageService(
         }
         image.setLifeShot()
         val placeId = lifeShotRequest.placeId
-        val coordinate = if (placeId != null) {
-            val latlng = googleMapsClient.findCoordinateByPlaceId(placeId)
-            GeometryFactory().createPoint(Coordinate(latlng.lng, latlng.lat))
-        } else {
-            null
+        var coordinate: Point? = null
+        var placeName: String? = null
+        if (placeId != null) {
+            val placeDetail = googleMapsClient.findPlaceDetailsByPlaceId(placeId)
+            val location = placeDetail.geometry.location
+            coordinate = GeometryFactory().createPoint(Coordinate(location.lng, location.lat))
+            placeName = placeDetail.name
         }
-        image.setPlace(placeId, coordinate)
+        image.setPlace(placeId, coordinate, placeName)
     }
 
     @Transactional

@@ -7,7 +7,9 @@ import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRole
 import kr.weit.odya.domain.user.UsersDocument
 import kr.weit.odya.service.dto.FCMTokenRequest
+import kr.weit.odya.service.dto.ImageResponse
 import kr.weit.odya.service.dto.InformationRequest
+import kr.weit.odya.service.dto.LifeShotRequest
 import kr.weit.odya.service.dto.SliceResponse
 import kr.weit.odya.service.dto.UserResponse
 import kr.weit.odya.service.dto.UserSimpleResponse
@@ -37,8 +39,8 @@ val TEST_SOCIAL_TYPE: SocialType = SocialType.KAKAO
 val TEST_USER_ROLE = UserRole.ROLE_USER
 val TEST_USER = createUser()
 
-fun createUser(profileName: String = TEST_DEFAULT_PROFILE_PNG): User = User(
-    id = TEST_USER_ID,
+fun createUser(profileName: String = TEST_DEFAULT_PROFILE_PNG, id: Long = TEST_USER_ID): User = User(
+    id = id,
     username = TEST_USERNAME,
     email = TEST_EMAIL,
     nickname = TEST_NICKNAME,
@@ -103,10 +105,30 @@ fun createSliceSimpleUserResponse() = SliceResponse(
     ),
 )
 
+fun createLifeShotImageResponse() = ImageResponse(
+    imageId = TEST_IMAGE_ID,
+    imageUrl = TEST_IMAGE_URL,
+    placeId = TEST_PLACE_ID,
+    isLifeShot = true,
+    journalId = TEST_TRAVEL_JOURNAL_ID,
+    communityId = null,
+)
+
+fun createSliceLifeShotImageResponse() = SliceResponse(
+    hasNext = false,
+    content = listOf(
+        createLifeShotImageResponse(),
+    ),
+)
+
 fun createUserStatisticsResponse() = UserStatisticsResponse(
     travelJournalCount = TEST_TRAVEL_JOURNAL_COUNT,
     travelPlaceCount = TEST_TRAVEL_PLACE_COUNT,
     followingsCount = TEST_FOLLOWING_COUNT,
     followersCount = TEST_FOLLOWER_COUNT,
     odyaCount = TEST_ODYA_COUNT,
+)
+
+fun createLifeShotRequest(placeId: String? = TEST_PLACE_ID) = LifeShotRequest(
+    placeId = placeId,
 )
