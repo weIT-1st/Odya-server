@@ -1076,6 +1076,7 @@ class UserControllerTest(
                                     "content[].imageUrl" type JsonFieldType.STRING description "사진 URL" example content.imageUrl,
                                     "content[].placeId" type JsonFieldType.STRING description "장소 id" example content.placeId isOptional true,
                                     "content[].isLifeShot" type JsonFieldType.BOOLEAN description "인생샷 여부" example content.isLifeShot,
+                                    "content[].placeName" type JsonFieldType.STRING description "장소명" example content.placeName isOptional true,
                                     "content[].journalId" type JsonFieldType.NUMBER description "여행일지 id" example content.journalId isOptional true,
                                     "content[].communityId" type JsonFieldType.NUMBER description "피드 id" example content.communityId isOptional true,
                                 ),
