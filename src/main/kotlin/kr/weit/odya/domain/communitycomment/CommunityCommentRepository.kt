@@ -25,6 +25,12 @@ fun CommunityCommentRepository.getSliceCommunityCommentBy(
 interface CommunityCommentRepository : JpaRepository<CommunityComment, Long>, CustomCommunityCommentRepository {
     @EntityGraph(attributePaths = ["user"])
     fun findByIdAndCommunityId(communityCommentId: Long, communityId: Long): CommunityComment?
+
+    fun deleteAllByUserId(userId: Long)
+
+    fun deleteAllByCommunityId(communityId: Long)
+
+    fun deleteAllByCommunityIdIn(communityIds: List<Long>)
 }
 
 interface CustomCommunityCommentRepository {

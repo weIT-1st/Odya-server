@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Positive
 import kr.weit.odya.domain.community.Community
 import kr.weit.odya.domain.placeReview.PlaceReview
+import kr.weit.odya.domain.report.CommonReportInformation
+import kr.weit.odya.domain.report.ReportCommunity
 import kr.weit.odya.domain.report.ReportPlaceReview
 import kr.weit.odya.domain.report.ReportReason
 import kr.weit.odya.domain.report.ReportTravelJournal
@@ -56,9 +58,6 @@ data class ReportCommunityRequest(
 ) {
     fun toEntity(user: User, community: Community) = ReportCommunity(
         community = community,
-        commonReportInformation = CommonReportInformation(
-            user,
-            reportReason,
-            otherReason = if (reportReason != ReportReason.OTHER) null else otherReason,
-        ),)
+        commonReportInformation = CommonReportInformation.of(user, reportReason, otherReason),
+    )
 }

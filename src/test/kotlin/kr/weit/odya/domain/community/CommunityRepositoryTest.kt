@@ -30,18 +30,19 @@ class CommunityRepositoryTest(
     {
         lateinit var user1: User
         lateinit var user2: User
-        lateinit var user3: User
         lateinit var community1: Community
         lateinit var community2: Community
         lateinit var travelJournal1: TravelJournal
         lateinit var travelJournal2: TravelJournal
         lateinit var contentImage1: ContentImage
         lateinit var contentImage2: ContentImage
+        lateinit var contentImage3: ContentImage
         beforeEach {
             user1 = userRepository.save(createUser())
             user2 = userRepository.save(createOtherUser())
             contentImage1 = contentImageRepository.save(createContentImage(user = user1))
             contentImage2 = contentImageRepository.save(createContentImage(user = user2))
+            contentImage3 = contentImageRepository.save(createContentImage(user = user1))
             travelJournal1 = travelJournalRepository.save(
                 travelJournalRepository.save(
                     createTravelJournal(
@@ -74,7 +75,7 @@ class CommunityRepositoryTest(
                     user = user1,
                     travelJournal = travelJournal1,
                     communityContentImages =
-                    listOf(createCommunityContentImage(contentImage1)),
+                    listOf(createCommunityContentImage(contentImage1), createCommunityContentImage(contentImage3)),
                 ),
             )
             community2 = communityRepository.save(
@@ -87,10 +88,38 @@ class CommunityRepositoryTest(
             )
         }
 
-        context("커뮤니티 아이디") {
+        context("커뮤니티 조회") {
             expect("커뮤니티 ID와 일치하는 커뮤니티를 조회한다") {
                 val result = communityRepository.getByCommunityId(community1.id)
                 result.content shouldBe TEST_COMMUNITY_CONTENT
+            }
+
+            expect("여행일지 ID와 일치하는 커뮤니티의 Id을 조회한다") {
+                val result = communityRepository.findIdsByTravelJournalId(travelJournal1.id)
+                result shouldBe listOf(community1.id)
+            }
+        }
+
+        context("커뮤니티 이미지") {
+            expect("커뮤니티 ID와 일치하는 커뮤니티의 이미지 이름을 조회한다") {
+                val result = communityRepository.getImageNamesById(community1.id)
+                result shouldBe listOf(contentImage1.name, contentImage3.name)
+            }
+
+            expect("여행일지 ID와 일치하는 커뮤니티의 이미지 이름을 조회한다") {
+                val result = communityRepository.getImageNamesByJournalId(travelJournal2.id)
+                result shouldBe listOf(contentImage2.name)
+            }
+        }
+
+        context("커뮤니티 삭제") {
+            expect("유저 ID와 일치하는 커뮤니티를 삭제한다") {
+                communityRepository.deleteAllByUserId(user1.id)
+                communityRepository.findAll().size shouldBe 1
+            }
+            expect("커뮤니티 ID 리스트에 포함된 커뮤니티 모두 삭제한다") {
+                communityRepository.deleteAllByIdIn(listOf(community1.id, community2.id))
+                communityRepository.findAll().size shouldBe 0
             }
         }
     },

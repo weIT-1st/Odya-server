@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository
 fun ReportPlaceReviewRepository.existsByReviewAndUserId(placeReviewId: Long, userId: Long) =
     existsByPlaceReviewIdAndCommonReportInformationUserId(placeReviewId, userId)
 
+fun ReportPlaceReviewRepository.deleteAllByUserId(userId: Long) =
+    deleteAllByCommonReportInformationUserId(userId)
+
 @Repository
 interface ReportPlaceReviewRepository : JpaRepository<ReportPlaceReview, Long> {
     fun countAllByPlaceReviewId(placeReviewId: Long): Int

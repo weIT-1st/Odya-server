@@ -6,6 +6,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.SequenceGenerator
@@ -20,6 +21,10 @@ import kr.weit.odya.support.domain.BaseTimeEntity
             name = "report_place_review_unique",
             columnNames = ["user_id", "place_review_id"],
         ),
+    ],
+    indexes = [
+        Index(name = "report_place_review_place_review_id_index", columnList = "place_review_id"),
+        Index(name = "report_place_review_user_id_index", columnList = "user_id"),
     ],
 )
 @Entity

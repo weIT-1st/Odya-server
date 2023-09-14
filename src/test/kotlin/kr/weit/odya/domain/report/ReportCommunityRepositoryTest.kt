@@ -13,6 +13,7 @@ import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.support.createCommunity
 import kr.weit.odya.support.createCommunityContentImage
 import kr.weit.odya.support.createContentImage
+import kr.weit.odya.support.createCustomUser
 import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createReportCommunity
 import kr.weit.odya.support.createTravelCompanionById
@@ -46,6 +47,7 @@ class ReportCommunityRepositoryTest(
         beforeEach {
             user1 = userRepository.save(createUser())
             user2 = userRepository.save(createOtherUser())
+            user3 = userRepository.save(createCustomUser("test3", "test3"))
             contentImage1 = contentImageRepository.save(createContentImage(user = user1))
             contentImage2 = contentImageRepository.save(createContentImage(user = user2))
             travelJournal1 = travelJournalRepository.save(
@@ -65,7 +67,6 @@ class ReportCommunityRepositoryTest(
             )
             travelJournal2 = travelJournalRepository.save(
                 createTravelJournal(
-                    id = 2L,
                     user = user2,
                     travelCompanions = listOf(createTravelCompanionById(user = user1)),
                     travelJournalContents = listOf(
@@ -117,8 +118,13 @@ class ReportCommunityRepositoryTest(
 
         context("커뮤니티 신고 삭제") {
             expect("COMMUNITY_ID와 일치하는 커뮤니티의 신고 모두 삭제한다") {
-                reportCommunityRepository.deleteAllByCommunityId(community1.id)
-                reportCommunityRepository.count() shouldBe 1
+                reportCommunityRepository.deleteAllByCommunityId(community2.id)
+                reportCommunityRepository.count() shouldBe 1L
+            }
+
+            expect("USER_ID와 일치하는 커뮤니티의 신고 모두 삭제한다") {
+                reportCommunityRepository.deleteAllByUserId(user1.id)
+                reportCommunityRepository.count() shouldBe 2
             }
         }
     },

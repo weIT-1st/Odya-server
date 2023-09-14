@@ -11,6 +11,8 @@ import kr.weit.odya.service.ExistResourceException
 import kr.weit.odya.service.ReportService
 import kr.weit.odya.support.ALREADY_REPORT_POST
 import kr.weit.odya.support.CAN_NOT_REPORT_OWN_POST
+import kr.weit.odya.support.DELETE_NOT_EXIST_CONTENT_IMAGE_ERROR_MESSAGE
+import kr.weit.odya.support.NOT_EXIST_COMMUNITY_ERROR_MESSAGE
 import kr.weit.odya.support.NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE
 import kr.weit.odya.support.NOT_EXIST_TRAVEL_JOURNAL_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
@@ -472,6 +474,30 @@ class ReportControllerTest(
                 }
             }
 
+            context("OBJECT STORAGE에 해당 여행 일지의 사진이 없는 경우") {
+                every { reportService.reportTravelJournal(TEST_USER_ID, any()) } throws IllegalArgumentException(DELETE_NOT_EXIST_CONTENT_IMAGE_ERROR_MESSAGE)
+                it("400을 반환한다.") {
+                    restDocMockMvc.post(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        jsonContent(request)
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "report-travel-journal-fail-not-exist-content-image",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            requestBody(
+                                "travelJournalId" type JsonFieldType.NUMBER description "여행 일지 ID" example request.travelJournalId,
+                                "reportReason" type JsonFieldType.STRING description "신고 사유" example request.reportReason,
+                                "otherReason" type JsonFieldType.STRING description "기타 사유" example request.otherReason isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
             context("유효하지 않은 토큰이 전달되면") {
                 it("401을 반환한다.") {
                     restDocMockMvc.post(targetUri) {
@@ -622,7 +648,7 @@ class ReportControllerTest(
 
             context("존재하지 않는 커뮤니티ID가 전달되면") {
                 val otherRequest = request.copy(communityId = TEST_NOT_EXIST_TRAVEL_JOURNAL_ID)
-                every { reportService.reportCommunity(TEST_USER_ID, any()) } throws NoSuchElementException(NOT_EXIST_TRAVEL_JOURNAL_ERROR_MESSAGE)
+                every { reportService.reportCommunity(TEST_USER_ID, any()) } throws NoSuchElementException(NOT_EXIST_COMMUNITY_ERROR_MESSAGE)
                 it("404을 반환한다.") {
                     restDocMockMvc.post(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -685,6 +711,30 @@ class ReportControllerTest(
                             ),
                             requestBody(
                                 "communityId" type JsonFieldType.NUMBER description "이미 신고한 커뮤니티 ID" example request.communityId,
+                                "reportReason" type JsonFieldType.STRING description "신고 사유" example request.reportReason,
+                                "otherReason" type JsonFieldType.STRING description "기타 사유" example request.otherReason isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("OBJECT STORAGE에 해당 커뮤니티의 사진이 없는 경우") {
+                every { reportService.reportCommunity(TEST_USER_ID, any()) } throws IllegalArgumentException(DELETE_NOT_EXIST_CONTENT_IMAGE_ERROR_MESSAGE)
+                it("400을 반환한다.") {
+                    restDocMockMvc.post(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        jsonContent(request)
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "report-community-fail-not-exist-content-image",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            requestBody(
+                                "communityId" type JsonFieldType.NUMBER description "커뮤니티 ID" example request.communityId,
                                 "reportReason" type JsonFieldType.STRING description "신고 사유" example request.reportReason,
                                 "otherReason" type JsonFieldType.STRING description "기타 사유" example request.otherReason isOptional true,
                             ),

@@ -11,6 +11,7 @@ import kr.weit.odya.client.push.PushNotificationEvent
 import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.report.ReportTravelJournalRepository
+import kr.weit.odya.domain.report.deleteAllByUserId
 import kr.weit.odya.domain.traveljournal.TravelCompanionRepository
 import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
@@ -392,7 +393,7 @@ class TravelJournalServiceTest : DescribeSpec(
                     every { contentImageRepository.findAllByUserId(TEST_USER_ID) } returns TEST_CONTENT_IMAGES
                     every { fileService.deleteFile(any()) } just runs
                     every { contentImageRepository.deleteAllByUserId(TEST_USER_ID) } just runs
-                    every { reportTravelJournalRepository.deleteAllByCommonReportInformationUserId(TEST_USER_ID) } just runs
+                    every { reportTravelJournalRepository.deleteAllByUserId(TEST_USER_ID) } just runs
                     every { travelCompanionRepository.deleteAllByUserId(TEST_USER_ID) } just runs
                     every { travelJournalRepository.deleteAllByUserId(TEST_USER_ID) } just runs
                     shouldNotThrowAny {
