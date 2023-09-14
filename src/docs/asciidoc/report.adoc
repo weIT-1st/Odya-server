@@ -110,7 +110,11 @@ operation::report-controller-test/report-travel-journal-fail-can-not-report-own-
 
 operation::report-controller-test/report-travel-journal-fail-already-report-post[snippets='http-request,request-headers,request-fields,http-response']
 
-=== *3-9 실패 - 유효하지 않은 토큰*
+=== *3-9 실패 - Object Storage에 존재하지 않는 여행 일지 이미지 파일*
+
+operation::report-controller-test/report-travel-journal-fail-not-exist-content-image[snippets='http-request,request-headers,http-response']
+
+=== *3-10 실패 - 유효하지 않은 토큰*
 
 operation::report-controller-test/report-travel-journal-fail-invalid-token[snippets='http-request,request-headers,http-response']
 
@@ -149,6 +153,10 @@ operation::report-controller-test/report-community-fail-can-not-report-own-post[
 
 operation::report-controller-test/report-community-fail-already-report-post[snippets='http-request,request-headers,request-fields,http-response']
 
-=== *4-9 실패 - 유효하지 않은 토큰*
+=== *4-9 실패 - Object Storage에 존재하지 않는 커뮤니티 이미지 파일*
+
+operation::report-controller-test/report-community-fail-not-exist-content-image[snippets='http-request,request-headers,http-response']
+
+=== *4-10 실패 - 유효하지 않은 토큰*
 
 operation::report-controller-test/report-community-fail-invalid-token[snippets='http-request,request-headers,http-response']

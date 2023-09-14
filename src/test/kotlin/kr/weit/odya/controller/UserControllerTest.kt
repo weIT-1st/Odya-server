@@ -11,6 +11,7 @@ import kr.weit.odya.service.NotFoundDefaultResourceException
 import kr.weit.odya.service.ObjectStorageException
 import kr.weit.odya.service.UserService
 import kr.weit.odya.service.WithdrawService
+import kr.weit.odya.support.DELETE_NOT_EXIST_CONTENT_IMAGE_ERROR_MESSAGE
 import kr.weit.odya.support.DELETE_NOT_EXIST_PROFILE_ERROR_MESSAGE
 import kr.weit.odya.support.EXIST_EMAIL_ERROR_MESSAGE
 import kr.weit.odya.support.EXIST_NICKNAME_ERROR_MESSAGE
@@ -747,6 +748,24 @@ class UserControllerTest(
                 }
             }
 
+            context("Object Storage에 이미지(프로필,커뮤니티, 여행일지)가 존재하지 않는 경우,") {
+                every { withdrawService.withdrawUser(TEST_USER_ID) } throws IllegalArgumentException(DELETE_NOT_EXIST_CONTENT_IMAGE_ERROR_MESSAGE)
+                it("400 응답한다.") {
+                    restDocMockMvc.delete(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "withdraw-user-fail-not-exist-content-image",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                        )
+                    }
+                }
+            }
+
             context("유효하지 않은 토큰이면,") {
                 it("401 응답한다.") {
                     restDocMockMvc.delete(targetUri) {
@@ -976,6 +995,7 @@ class UserControllerTest(
                         )
                 }
             }
+
             context("유효한 토큰이면서, 가입되지 않은 사용자인 경우") {
                 it("401 응답한다.") {
                     restDocMockMvc.perform(

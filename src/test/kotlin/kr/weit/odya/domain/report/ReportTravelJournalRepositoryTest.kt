@@ -2,7 +2,6 @@ package kr.weit.odya.domain.report
 
 import io.kotest.core.spec.style.ExpectSpec
 import io.kotest.matchers.shouldBe
-import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.user.User
@@ -23,7 +22,6 @@ class ReportTravelJournalRepositoryTest(
     private val reportTravelJournalRepository: ReportTravelJournalRepository,
     private val travelJournalRepository: TravelJournalRepository,
     private val userRepository: UserRepository,
-    private val contentImageRepository: ContentImageRepository,
 ) : ExpectSpec(
     {
         lateinit var user1: User

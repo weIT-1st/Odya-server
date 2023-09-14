@@ -139,7 +139,11 @@ operation::user-controller-test/update-fcm-token-fail-invalid-token[snippets='ht
 
 operation::user-controller-test/withdraw-user-success[snippets='http-request,request-headers,http-response']
 
-=== *7-2 실패 - 유효하지 않은 토큰*
+=== *7-2 실패 - Object Storage에 이미지(프로필,커뮤니티, 여행일지)가 존재하지 않는 경우*
+
+operation::user-controller-test/withdraw-user-fail-not-exist-content-image[snippets='http-request,request-headers,http-response']
+
+=== *7-3 실패 - 유효하지 않은 토큰*
 
 operation::user-controller-test/withdraw-user-fail-unauthorized[snippets='http-request,request-headers,http-response']
 
