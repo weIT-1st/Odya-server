@@ -5,9 +5,14 @@ import kr.weit.odya.client.push.PushNotificationEvent
 import kr.weit.odya.domain.community.Community
 import kr.weit.odya.domain.community.CommunityContentImage
 import kr.weit.odya.domain.community.CommunityRepository
+import kr.weit.odya.domain.community.getImageNamesByJournalId
+import kr.weit.odya.domain.communitycomment.CommunityCommentRepository
+import kr.weit.odya.domain.communitycomment.deleteCommunityComment
 import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowerFcmTokens
+import kr.weit.odya.domain.report.ReportCommunityRepository
+import kr.weit.odya.domain.report.deleteAllByUserId
 import kr.weit.odya.domain.topic.TopicRepository
 import kr.weit.odya.domain.topic.getByTopicId
 import kr.weit.odya.domain.traveljournal.TravelJournal
@@ -33,6 +38,8 @@ class CommunityService(
     private val eventPublisher: ApplicationEventPublisher,
     private val followRepository: FollowRepository,
     private val googleMapsClient: GoogleMapsClient,
+    private val reportCommunityRepository: ReportCommunityRepository,
+    private val communityCommentRepository: CommunityCommentRepository,
 ) {
     @Transactional
     fun createCommunity(
@@ -49,27 +56,28 @@ class CommunityService(
         publishFeedPushEvent(user, community)
     }
 
-    private fun publishFeedPushEvent(
-        user: User,
-        community: Community,
-    ) {
-        val fcmTokens = followRepository.getFollowerFcmTokens(user.id)
-        eventPublisher.publishEvent(
-            PushNotificationEvent(
-                title = "피드 알림",
-                body = "${user.nickname}님이 피드를 작성했어요!",
-                tokens = fcmTokens,
-                data = mapOf("communityId" to community.id.toString()),
-            ),
-        )
-    }
-
     fun uploadContentImages(contentImages: List<MultipartFile>): List<Pair<String, String>> {
         return contentImages.map {
             require(it.originalFilename != null) { "파일 원본 이름은 필수 값입니다." }
             val fileName = fileService.saveFile(it)
             fileName to it.originalFilename!!
         }
+    }
+
+    @Transactional
+    fun deleteCommunityByUserId(userId: Long) {
+        reportCommunityRepository.deleteAllByUserId(userId)
+        communityCommentRepository.deleteCommunityComment(userId)
+        communityRepository.deleteAllByUserId(userId)
+    }
+
+    @Transactional
+    fun deleteCommunityByTravelJournalId(travelJournalId: Long) {
+        val communityIds = communityRepository.findIdsByTravelJournalId(travelJournalId)
+        reportCommunityRepository.deleteAllByCommunityIdIn(communityIds)
+        communityCommentRepository.deleteAllByCommunityIdIn(communityIds)
+        communityRepository.getImageNamesByJournalId(travelJournalId).map { fileService.deleteFile(it) }
+        communityRepository.deleteAllByIdIn(communityIds)
     }
 
     private fun getNonPrivateTravelJournal(travelJournalId: Long?): TravelJournal? =
@@ -89,4 +97,19 @@ class CommunityService(
                     .setPlace(googleMapsClient.findPlaceDetailsByPlaceId(placeId))
             }
         }
+
+    private fun publishFeedPushEvent(
+        user: User,
+        community: Community,
+    ) {
+        val fcmTokens = followRepository.getFollowerFcmTokens(user.id)
+        eventPublisher.publishEvent(
+            PushNotificationEvent(
+                title = "피드 알림",
+                body = "${user.nickname}님이 피드를 작성했어요!",
+                tokens = fcmTokens,
+                data = mapOf("communityId" to community.id.toString()),
+            ),
+        )
+    }
 }

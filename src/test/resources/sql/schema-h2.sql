@@ -50,7 +50,7 @@ CREATE INDEX place_id_index ON place_review (place_id);
 ALTER TABLE place_review
     ADD CONSTRAINT FK_PLACE_REVIEW_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
-CREATE INDEX place_review_foreign_index ON place_review (user_id);
+CREATE INDEX place_review_user_id_index ON place_review (user_id);
 
 CREATE TABLE follow
 (
@@ -401,8 +401,9 @@ ALTER TABLE report_place_review
 ALTER TABLE report_place_review
     ADD CONSTRAINT FK_REPORT_PLACE_REVIEW_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
-CREATE INDEX report_place_review_foreign_index ON REPORT_PLACE_REVIEW (place_review_id);
-CREATE INDEX report_place_review_foreign_index_2 ON REPORT_PLACE_REVIEW (user_id);
+CREATE INDEX report_place_review_place_review_id_index ON report_place_review (place_review_id);
+
+CREATE INDEX report_place_review_user_id_index ON report_place_review (user_id);
 
 CREATE SEQUENCE report_travel_journal_seq START WITH 1 INCREMENT BY 1;
 
@@ -426,5 +427,32 @@ ALTER TABLE report_travel_journal
 ALTER TABLE report_travel_journal
     ADD CONSTRAINT FK_REPORT_TRAVEL_JOURNAL_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
-CREATE INDEX report_travel_journal_foreign_index ON REPORT_TRAVEL_JOURNAL (travel_journal_id);
-CREATE INDEX report_travel_journal_foreign_index_2 ON REPORT_TRAVEL_JOURNAL (user_id);
+CREATE INDEX report_travel_journal_travel_journal_id_index ON report_travel_journal (travel_journal_id);
+
+CREATE INDEX report_travel_journal_user_id_index ON report_travel_journal (user_id);
+
+CREATE SEQUENCE report_community_seq START WITH 1 INCREMENT BY 1;
+
+CREATE TABLE report_community
+(
+    id            NUMBER(19, 0) NOT NULL,
+    created_date  TIMESTAMP     NOT NULL,
+    community_id  NUMBER(19, 0) NOT NULL,
+    user_id       NUMBER(19, 0) NOT NULL,
+    report_reason VARCHAR2(20)  NOT NULL,
+    other_reason  VARCHAR2(60),
+    CONSTRAINT pk_report_community PRIMARY KEY (id)
+);
+
+ALTER TABLE report_community
+    ADD CONSTRAINT report_community_unique UNIQUE (community_id, user_id);
+
+ALTER TABLE report_community
+    ADD CONSTRAINT FK_REPORT_COMMUNITY_ON_COMMUNITY FOREIGN KEY (community_id) REFERENCES community (id);
+
+CREATE INDEX report_community_community_id_index ON report_community (community_id);
+
+ALTER TABLE report_community
+    ADD CONSTRAINT FK_REPORT_COMMUNITY_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
+CREATE INDEX report_community_user_id_index ON report_community (user_id);

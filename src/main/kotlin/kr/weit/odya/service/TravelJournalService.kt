@@ -8,6 +8,7 @@ import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowerFcmTokens
 import kr.weit.odya.domain.report.ReportTravelJournalRepository
+import kr.weit.odya.domain.report.deleteAllByUserId
 import kr.weit.odya.domain.traveljournal.TravelCompanion
 import kr.weit.odya.domain.traveljournal.TravelCompanionRepository
 import kr.weit.odya.domain.traveljournal.TravelJournal
@@ -156,10 +157,10 @@ class TravelJournalService(
     @Transactional
     fun deleteTravelJournalByUserId(userId: Long) {
         contentImageRepository.findAllByUserId(userId).map { fileService.deleteFile(it.name) }
-        contentImageRepository.deleteAllByUserId(userId)
-        reportTravelJournalRepository.deleteAllByCommonReportInformationUserId(userId)
+        reportTravelJournalRepository.deleteAllByUserId(userId)
         travelCompanionRepository.deleteAllByUserId(userId)
         travelJournalRepository.deleteAllByUserId(userId)
+        contentImageRepository.deleteAllByUserId(userId)
     }
 
     fun getPlaceDetailsMap(placeIdList: Set<String>): Map<String, PlaceDetails> =

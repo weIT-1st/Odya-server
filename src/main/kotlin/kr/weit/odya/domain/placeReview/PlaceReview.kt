@@ -22,7 +22,7 @@ import kr.weit.odya.support.domain.BaseModifiableEntity
         ),
     ],
     indexes = [
-        Index(name = "place_id_index", columnList = "place_id"),
+        Index(name = "place_review_user_id_index", columnList = "user_id"),
     ],
 )
 @SequenceGenerator(

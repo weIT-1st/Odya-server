@@ -11,6 +11,8 @@ import kr.weit.odya.service.ExistResourceException
 import kr.weit.odya.service.ReportService
 import kr.weit.odya.support.ALREADY_REPORT_POST
 import kr.weit.odya.support.CAN_NOT_REPORT_OWN_POST
+import kr.weit.odya.support.DELETE_NOT_EXIST_CONTENT_IMAGE_ERROR_MESSAGE
+import kr.weit.odya.support.NOT_EXIST_COMMUNITY_ERROR_MESSAGE
 import kr.weit.odya.support.NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE
 import kr.weit.odya.support.NOT_EXIST_TRAVEL_JOURNAL_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
@@ -21,6 +23,7 @@ import kr.weit.odya.support.TEST_NOT_EXIST_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_NOT_EXIST_TRAVEL_JOURNAL_ID
 import kr.weit.odya.support.TEST_TOO_LONG_PHRASE
 import kr.weit.odya.support.TEST_USER_ID
+import kr.weit.odya.support.createReportCommunityRequest
 import kr.weit.odya.support.createReportPlaceReviewRequest
 import kr.weit.odya.support.createReportTravelJournalRequest
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
@@ -471,6 +474,30 @@ class ReportControllerTest(
                 }
             }
 
+            context("OBJECT STORAGE에 해당 여행 일지의 사진이 없는 경우") {
+                every { reportService.reportTravelJournal(TEST_USER_ID, any()) } throws IllegalArgumentException(DELETE_NOT_EXIST_CONTENT_IMAGE_ERROR_MESSAGE)
+                it("400을 반환한다.") {
+                    restDocMockMvc.post(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        jsonContent(request)
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "report-travel-journal-fail-not-exist-content-image",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            requestBody(
+                                "travelJournalId" type JsonFieldType.NUMBER description "여행 일지 ID" example request.travelJournalId,
+                                "reportReason" type JsonFieldType.STRING description "신고 사유" example request.reportReason,
+                                "otherReason" type JsonFieldType.STRING description "기타 사유" example request.otherReason isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
             context("유효하지 않은 토큰이 전달되면") {
                 it("401을 반환한다.") {
                     restDocMockMvc.post(targetUri) {
@@ -486,6 +513,251 @@ class ReportControllerTest(
                             ),
                             requestBody(
                                 "travelJournalId" type JsonFieldType.NUMBER description "여행 일지 ID" example request.travelJournalId,
+                                "reportReason" type JsonFieldType.STRING description "신고 사유" example request.reportReason,
+                                "otherReason" type JsonFieldType.STRING description "기타 사유" example request.otherReason isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+        }
+
+        describe("POST /api/v1/reports/community") {
+            val targetUri = "/api/v1/reports/community"
+            val request = createReportCommunityRequest()
+            context("유효한 유저와 등록된 신고 사유가 전달되면") {
+                every { reportService.reportCommunity(TEST_USER_ID, any()) } just Runs
+                it("신고 등록 및 신고 횟수 따른 삭제 후 204을 반환한다.") {
+                    restDocMockMvc.post(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        jsonContent(request)
+                    }.andExpect {
+                        status { isNoContent() }
+                    }.andDo {
+                        createDocument(
+                            "report-community-success",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            requestBody(
+                                "communityId" type JsonFieldType.NUMBER description "커뮤니티 ID" example request.communityId,
+                                "reportReason" type JsonFieldType.STRING description "신고 사유" example request.reportReason,
+                                "otherReason" type JsonFieldType.STRING description "기타 사유" example request.otherReason isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 유저와 기타 신고 사유가 전달되면") {
+                val otherRequest = createReportCommunityRequest().copy(reportReason = ReportReason.OTHER, otherReason = "기타 사유")
+                every { reportService.reportCommunity(TEST_USER_ID, any()) } just Runs
+                it("기타 신고 사유 등록 및 신고 횟수 따른 삭제 후 204을 반환한다.") {
+                    restDocMockMvc.post(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        jsonContent(otherRequest)
+                    }.andExpect {
+                        status { isNoContent() }
+                    }.andDo {
+                        createDocument(
+                            "report-community-other-reason-success",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            requestBody(
+                                "communityId" type JsonFieldType.NUMBER description "커뮤니티 ID" example otherRequest.communityId,
+                                "reportReason" type JsonFieldType.STRING description "신고 사유" example otherRequest.reportReason,
+                                "otherReason" type JsonFieldType.STRING description "기타 사유" example otherRequest.otherReason isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("양수가 아닌 커뮤니티ID가 전달되면") {
+                val otherRequest = createReportCommunityRequest().copy(communityId = TEST_INVALID_TRAVEL_JOURNAL_ID)
+                it("400을 반환한다.") {
+                    restDocMockMvc.post(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        jsonContent(otherRequest)
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "report-community-fail-invalid-community-id",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            requestBody(
+                                "communityId" type JsonFieldType.NUMBER description "양수가 아닌 커뮤니티 ID" example otherRequest.communityId,
+                                "reportReason" type JsonFieldType.STRING description "신고 사유" example otherRequest.reportReason,
+                                "otherReason" type JsonFieldType.STRING description "기타 사유" example otherRequest.otherReason isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("공백인 기타 신고 사유가 전달되면") {
+                val otherRequest = createReportCommunityRequest().copy(otherReason = "")
+                it("400을 반환한다.") {
+                    restDocMockMvc.post(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        jsonContent(otherRequest)
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "report-community-fail-empty-other-reason",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            requestBody(
+                                "communityId" type JsonFieldType.NUMBER description "커뮤니티 ID" example otherRequest.communityId,
+                                "reportReason" type JsonFieldType.STRING description "신고 사유" example otherRequest.reportReason,
+                                "otherReason" type JsonFieldType.STRING description "공백인 기타 사유" example otherRequest.otherReason isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("20자를 초과한 기타 신고 사유가 전달되면") {
+                val otherRequest = createReportCommunityRequest().copy(otherReason = TEST_TOO_LONG_PHRASE)
+                it("400을 반환한다.") {
+                    restDocMockMvc.post(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        jsonContent(otherRequest)
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "report-community-fail-too-long-other-reason",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            requestBody(
+                                "communityId" type JsonFieldType.NUMBER description "커뮤니티 ID" example otherRequest.communityId,
+                                "reportReason" type JsonFieldType.STRING description "신고 사유" example otherRequest.reportReason,
+                                "otherReason" type JsonFieldType.STRING description "20자를 초과한 기타 사유" example otherRequest.otherReason isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("존재하지 않는 커뮤니티ID가 전달되면") {
+                val otherRequest = request.copy(communityId = TEST_NOT_EXIST_TRAVEL_JOURNAL_ID)
+                every { reportService.reportCommunity(TEST_USER_ID, any()) } throws NoSuchElementException(NOT_EXIST_COMMUNITY_ERROR_MESSAGE)
+                it("404을 반환한다.") {
+                    restDocMockMvc.post(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        jsonContent(otherRequest)
+                    }.andExpect {
+                        status { isNotFound() }
+                    }.andDo {
+                        createDocument(
+                            "report-community-fail-not-exist-community-id",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            requestBody(
+                                "communityId" type JsonFieldType.NUMBER description "존재하지 않는 커뮤니티 ID" example otherRequest.communityId,
+                                "reportReason" type JsonFieldType.STRING description "신고 사유" example otherRequest.reportReason,
+                                "otherReason" type JsonFieldType.STRING description "기타 사유" example otherRequest.otherReason isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("작성자가 자신의 글을 신고 등록 요청 시") {
+                every { reportService.reportCommunity(TEST_USER_ID, any()) } throws IllegalArgumentException(CAN_NOT_REPORT_OWN_POST)
+                it("400을 반환한다.") {
+                    restDocMockMvc.post(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        jsonContent(request)
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "report-community-fail-can-not-report-own-post",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            requestBody(
+                                "communityId" type JsonFieldType.NUMBER description "신고한 유저가 쓴 커뮤니티 ID" example request.communityId,
+                                "reportReason" type JsonFieldType.STRING description "신고 사유" example request.reportReason,
+                                "otherReason" type JsonFieldType.STRING description "기타 사유" example request.otherReason isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("이미 신고한 커뮤니티인 경우") {
+                every { reportService.reportCommunity(TEST_USER_ID, any()) } throws ExistResourceException(ALREADY_REPORT_POST)
+                it("409을 반환한다.") {
+                    restDocMockMvc.post(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        jsonContent(request)
+                    }.andExpect {
+                        status { isConflict() }
+                    }.andDo {
+                        createDocument(
+                            "report-community-fail-already-report-post",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            requestBody(
+                                "communityId" type JsonFieldType.NUMBER description "이미 신고한 커뮤니티 ID" example request.communityId,
+                                "reportReason" type JsonFieldType.STRING description "신고 사유" example request.reportReason,
+                                "otherReason" type JsonFieldType.STRING description "기타 사유" example request.otherReason isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("OBJECT STORAGE에 해당 커뮤니티의 사진이 없는 경우") {
+                every { reportService.reportCommunity(TEST_USER_ID, any()) } throws IllegalArgumentException(DELETE_NOT_EXIST_CONTENT_IMAGE_ERROR_MESSAGE)
+                it("400을 반환한다.") {
+                    restDocMockMvc.post(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        jsonContent(request)
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "report-community-fail-not-exist-content-image",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            requestBody(
+                                "communityId" type JsonFieldType.NUMBER description "커뮤니티 ID" example request.communityId,
+                                "reportReason" type JsonFieldType.STRING description "신고 사유" example request.reportReason,
+                                "otherReason" type JsonFieldType.STRING description "기타 사유" example request.otherReason isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효하지 않은 토큰이 전달되면") {
+                it("401을 반환한다.") {
+                    restDocMockMvc.post(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                        jsonContent(request)
+                    }.andExpect {
+                        status { isUnauthorized() }
+                    }.andDo {
+                        createDocument(
+                            "report-community-fail-invalid-token",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                            ),
+                            requestBody(
+                                "communityId" type JsonFieldType.NUMBER description "커뮤니티 ID" example request.communityId,
                                 "reportReason" type JsonFieldType.STRING description "신고 사유" example request.reportReason,
                                 "otherReason" type JsonFieldType.STRING description "기타 사유" example request.otherReason isOptional true,
                             ),

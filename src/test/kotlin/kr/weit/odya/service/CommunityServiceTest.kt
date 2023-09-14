@@ -12,14 +12,21 @@ import kr.weit.odya.client.GoogleMapsClient
 import kr.weit.odya.client.push.PushNotificationEvent
 import kr.weit.odya.domain.community.Community
 import kr.weit.odya.domain.community.CommunityRepository
+import kr.weit.odya.domain.community.getImageNamesByJournalId
+import kr.weit.odya.domain.communitycomment.CommunityCommentRepository
+import kr.weit.odya.domain.communitycomment.deleteCommunityComment
 import kr.weit.odya.domain.follow.FollowRepository
+import kr.weit.odya.domain.report.ReportCommunityRepository
+import kr.weit.odya.domain.report.deleteAllByUserId
 import kr.weit.odya.domain.topic.TopicRepository
 import kr.weit.odya.domain.topic.getByTopicId
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.traveljournal.getByTravelJournalId
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
+import kr.weit.odya.support.DELETE_NOT_EXIST_CONTENT_IMAGE_ERROR_MESSAGE
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
+import kr.weit.odya.support.TEST_COMMUNITY_ID
 import kr.weit.odya.support.TEST_COMMUNITY_MOCK_FILE_NAME
 import kr.weit.odya.support.TEST_GENERATED_FILE_NAME
 import kr.weit.odya.support.TEST_PLACE_ID
@@ -50,6 +57,8 @@ class CommunityServiceTest : DescribeSpec(
         val applicationEventPublisher = mockk<ApplicationEventPublisher>()
         val followRepository = mockk<FollowRepository>()
         val googleMapsClient = mockk<GoogleMapsClient>()
+        val reportCommunityRepository = mockk<ReportCommunityRepository>()
+        val communityCommentRepository = mockk<CommunityCommentRepository>()
         val communityService =
             CommunityService(
                 communityRepository,
@@ -60,6 +69,8 @@ class CommunityServiceTest : DescribeSpec(
                 applicationEventPublisher,
                 followRepository,
                 googleMapsClient,
+                reportCommunityRepository,
+                communityCommentRepository,
             )
 
         describe("createCommunity") {
@@ -179,6 +190,42 @@ class CommunityServiceTest : DescribeSpec(
                     shouldThrow<ObjectStorageException> {
                         communityService.uploadContentImages(mockImageFiles)
                     }
+                }
+            }
+        }
+
+        describe("deleteCommunityByUserId") {
+            context("유효한 유저 ID가 들어오는 경우") {
+                every { reportCommunityRepository.deleteAllByUserId(TEST_USER_ID) } just runs
+                every { communityCommentRepository.deleteCommunityComment(TEST_USER_ID) } just runs
+                every { communityRepository.deleteAllByUserId(TEST_USER_ID) } just runs
+                it("정상적으로 종료한다") {
+                    shouldNotThrowAny { communityService.deleteCommunityByUserId(TEST_USER_ID) }
+                }
+            }
+        }
+
+        describe("deleteCommunityByTravelJournalId") {
+            context("유효한 여행 일지 ID가 들어오는 경우") {
+                every { communityRepository.findIdsByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns listOf(TEST_COMMUNITY_ID)
+                every { reportCommunityRepository.deleteAllByCommunityIdIn(listOf(TEST_COMMUNITY_ID)) } just runs
+                every { communityCommentRepository.deleteAllByCommunityIdIn(listOf(TEST_COMMUNITY_ID)) } just runs
+                every { communityRepository.getImageNamesByJournalId(TEST_TRAVEL_JOURNAL_ID) } returns listOf(TEST_GENERATED_FILE_NAME)
+                every { fileService.deleteFile(TEST_GENERATED_FILE_NAME) } just runs
+                every { communityRepository.deleteAllByIdIn(listOf(TEST_COMMUNITY_ID)) } just runs
+                it("정상적으로 종료한다") {
+                    shouldNotThrowAny { communityService.deleteCommunityByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) }
+                }
+            }
+
+            context("OBJECT STORAGE에 해당 사진이 없는 경우") {
+                every { communityRepository.findIdsByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns listOf(TEST_COMMUNITY_ID)
+                every { reportCommunityRepository.deleteAllByCommunityIdIn(listOf(TEST_COMMUNITY_ID)) } just runs
+                every { communityCommentRepository.deleteAllByCommunityIdIn(listOf(TEST_COMMUNITY_ID)) } just runs
+                every { communityRepository.getImageNamesByJournalId(TEST_TRAVEL_JOURNAL_ID) } returns listOf(TEST_GENERATED_FILE_NAME)
+                every { fileService.deleteFile(TEST_GENERATED_FILE_NAME) } throws IllegalArgumentException(DELETE_NOT_EXIST_CONTENT_IMAGE_ERROR_MESSAGE)
+                it("[IllegalArgumentException] 반환한다") {
+                    shouldThrow<IllegalArgumentException> { communityService.deleteCommunityByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) }
                 }
             }
         }
