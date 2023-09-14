@@ -23,6 +23,7 @@ import kr.weit.odya.support.domain.BaseTimeEntity
     ],
     indexes = [
         Index(name = "favorite_place_id_index", columnList = "place_id"),
+        Index(name = "favorite_place_user_id_index", columnList = "user_id"),
     ],
 )
 @SequenceGenerator(
