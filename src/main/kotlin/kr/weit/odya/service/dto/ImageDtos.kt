@@ -9,6 +9,7 @@ data class ImageResponse(
     val imageUrl: String,
     val placeId: String?,
     val isLifeShot: Boolean,
+    val placeName: String?,
     val journalId: Long?,
     val communityId: Long?,
 ) {
@@ -18,6 +19,7 @@ data class ImageResponse(
             url,
             image.placeId,
             image.isLifeShot,
+            image.placeName,
             image.travelJournalContentImage?.id,
             image.communityContentImage?.id,
         )

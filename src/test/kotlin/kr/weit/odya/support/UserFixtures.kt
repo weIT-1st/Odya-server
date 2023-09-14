@@ -110,6 +110,7 @@ fun createLifeShotImageResponse() = ImageResponse(
     imageUrl = TEST_IMAGE_URL,
     placeId = TEST_PLACE_ID,
     isLifeShot = true,
+    placeName = TEST_PLACE_NAME,
     journalId = TEST_TRAVEL_JOURNAL_ID,
     communityId = null,
 )
