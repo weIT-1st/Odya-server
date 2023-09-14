@@ -8,6 +8,8 @@ import com.linecorp.kotlinjdsl.querydsl.expression.col
 import kr.weit.odya.domain.community.Community
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
+import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 
 fun CommunityCommentRepository.getCommunityCommentBy(communityCommentId: Long, communityId: Long): CommunityComment =
@@ -21,6 +23,11 @@ fun CommunityCommentRepository.getSliceCommunityCommentBy(
 ): List<CommunityComment> =
     findSliceByCommunityIdAndSizeAndLastId(communityId, size, lastId)
 
+fun CommunityCommentRepository.deleteCommunityComment(userId: Long) {
+    deleteAllByUserId(userId)
+    deleteCommunityCommentByUserId(userId)
+}
+
 @Repository
 interface CommunityCommentRepository : JpaRepository<CommunityComment, Long>, CustomCommunityCommentRepository {
     @EntityGraph(attributePaths = ["user"])
@@ -31,6 +38,10 @@ interface CommunityCommentRepository : JpaRepository<CommunityComment, Long>, Cu
     fun deleteAllByCommunityId(communityId: Long)
 
     fun deleteAllByCommunityIdIn(communityIds: List<Long>)
+
+    @Modifying
+    @Query("delete from CommunityComment cc where cc.community.id in (select c.id from Community c where c.user.id = :userId)")
+    fun deleteCommunityCommentByUserId(userId: Long)
 }
 
 interface CustomCommunityCommentRepository {

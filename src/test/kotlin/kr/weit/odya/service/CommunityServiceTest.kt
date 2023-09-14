@@ -12,6 +12,7 @@ import kr.weit.odya.domain.community.Community
 import kr.weit.odya.domain.community.CommunityRepository
 import kr.weit.odya.domain.community.getImageNamesByJournalId
 import kr.weit.odya.domain.communitycomment.CommunityCommentRepository
+import kr.weit.odya.domain.communitycomment.deleteCommunityComment
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.report.ReportCommunityRepository
 import kr.weit.odya.domain.report.deleteAllByUserId
@@ -168,7 +169,7 @@ class CommunityServiceTest : DescribeSpec(
         describe("deleteCommunityByUserId") {
             context("유효한 유저 ID가 들어오는 경우") {
                 every { reportCommunityRepository.deleteAllByUserId(TEST_USER_ID) } just runs
-                every { communityCommentRepository.deleteAllByUserId(TEST_USER_ID) } just runs
+                every { communityCommentRepository.deleteCommunityComment(TEST_USER_ID) } just runs
                 every { communityRepository.deleteAllByUserId(TEST_USER_ID) } just runs
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny { communityService.deleteCommunityByUserId(TEST_USER_ID) }
@@ -179,7 +180,7 @@ class CommunityServiceTest : DescribeSpec(
         describe("deleteCommunityByTravelJournalId") {
             context("유효한 여행 일지 ID가 들어오는 경우") {
                 every { communityRepository.findIdsByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns listOf(TEST_COMMUNITY_ID)
-                every { reportCommunityRepository.deleteAllByCommunityIn(listOf(TEST_COMMUNITY_ID)) } just runs
+                every { reportCommunityRepository.deleteAllByCommunityIdIn(listOf(TEST_COMMUNITY_ID)) } just runs
                 every { communityCommentRepository.deleteAllByCommunityIdIn(listOf(TEST_COMMUNITY_ID)) } just runs
                 every { communityRepository.getImageNamesByJournalId(TEST_TRAVEL_JOURNAL_ID) } returns listOf(TEST_GENERATED_FILE_NAME)
                 every { fileService.deleteFile(TEST_GENERATED_FILE_NAME) } just runs
@@ -191,7 +192,7 @@ class CommunityServiceTest : DescribeSpec(
 
             context("OBJECT STORAGE에 해당 사진이 없는 경우") {
                 every { communityRepository.findIdsByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns listOf(TEST_COMMUNITY_ID)
-                every { reportCommunityRepository.deleteAllByCommunityIn(listOf(TEST_COMMUNITY_ID)) } just runs
+                every { reportCommunityRepository.deleteAllByCommunityIdIn(listOf(TEST_COMMUNITY_ID)) } just runs
                 every { communityCommentRepository.deleteAllByCommunityIdIn(listOf(TEST_COMMUNITY_ID)) } just runs
                 every { communityRepository.getImageNamesByJournalId(TEST_TRAVEL_JOURNAL_ID) } returns listOf(TEST_GENERATED_FILE_NAME)
                 every { fileService.deleteFile(TEST_GENERATED_FILE_NAME) } throws IllegalArgumentException(DELETE_NOT_EXIST_CONTENT_IMAGE_ERROR_MESSAGE)

@@ -153,10 +153,10 @@ class TravelJournalService(
     @Transactional
     fun deleteTravelJournalByUserId(userId: Long) {
         contentImageRepository.findAllByUserId(userId).map { fileService.deleteFile(it.name) }
-        contentImageRepository.deleteAllByUserId(userId)
         reportTravelJournalRepository.deleteAllByUserId(userId)
         travelCompanionRepository.deleteAllByUserId(userId)
         travelJournalRepository.deleteAllByUserId(userId)
+        contentImageRepository.deleteAllByUserId(userId)
     }
 
     private fun getTravelJournalContent(

@@ -6,6 +6,7 @@ import kr.weit.odya.domain.community.CommunityContentImage
 import kr.weit.odya.domain.community.CommunityRepository
 import kr.weit.odya.domain.community.getImageNamesByJournalId
 import kr.weit.odya.domain.communitycomment.CommunityCommentRepository
+import kr.weit.odya.domain.communitycomment.deleteCommunityComment
 import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowerFcmTokens
@@ -64,14 +65,14 @@ class CommunityService(
     @Transactional
     fun deleteCommunityByUserId(userId: Long) {
         reportCommunityRepository.deleteAllByUserId(userId)
-        communityCommentRepository.deleteAllByUserId(userId)
+        communityCommentRepository.deleteCommunityComment(userId)
         communityRepository.deleteAllByUserId(userId)
     }
 
     @Transactional
     fun deleteCommunityByTravelJournalId(travelJournalId: Long) {
         val communityIds = communityRepository.findIdsByTravelJournalId(travelJournalId)
-        reportCommunityRepository.deleteAllByCommunityIn(communityIds)
+        reportCommunityRepository.deleteAllByCommunityIdIn(communityIds)
         communityCommentRepository.deleteAllByCommunityIdIn(communityIds)
         communityRepository.getImageNamesByJournalId(travelJournalId).map { fileService.deleteFile(it) }
         communityRepository.deleteAllByIdIn(communityIds)

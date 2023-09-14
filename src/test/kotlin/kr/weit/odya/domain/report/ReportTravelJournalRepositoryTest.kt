@@ -76,9 +76,9 @@ class ReportTravelJournalRepositoryTest(
                 reportTravelJournalRepository.existsById(travelJournal.id) shouldBe false
             }
 
-            expect("USER_ID와 일치하는 여행 일지의 신고 모두 삭제한다") {
+            expect("USER_ID와 일치하는 신고한 내역과 해당 유저의 여행일지 신고 내역 모두 삭제한다") {
                 reportTravelJournalRepository.deleteAllByUserId(user1.id)
-                reportTravelJournalRepository.count() shouldBe 1
+                reportTravelJournalRepository.count() shouldBe 0
             }
         }
     },

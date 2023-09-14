@@ -124,7 +124,7 @@ class ReportCommunityRepositoryTest(
 
             expect("USER_ID와 일치하는 커뮤니티의 신고 모두 삭제한다") {
                 reportCommunityRepository.deleteAllByUserId(user1.id)
-                reportCommunityRepository.count() shouldBe 2
+                reportCommunityRepository.count() shouldBe 1
             }
         }
     },
