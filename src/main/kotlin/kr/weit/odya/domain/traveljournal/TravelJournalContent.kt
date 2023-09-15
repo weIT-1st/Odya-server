@@ -1,9 +1,7 @@
 package kr.weit.odya.domain.traveljournal
 
-import jakarta.persistence.AttributeOverride
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
-import jakarta.persistence.Embedded
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -27,18 +25,12 @@ class TravelJournalContent(
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "TRAVEL_JOURNAL_CONTENT_SEQ_GENERATOR")
     val id: Long = 0L,
 
-    @Column(length = 600)
-    val content: String?,
+    travelJournalContentInformation: TravelJournalContentInformation,
 
-    @Column(length = 400)
-    val placeId: String?,
-
-    @Embedded
-    @AttributeOverride(name = "value", column = Column(name = "coordinates", nullable = false))
-    val coordinates: Coordinates?,
-
-    @Column(nullable = false)
-    val travelDate: LocalDate,
+    travelJournalContentImages: List<TravelJournalContentImage>,
+) : BaseModifiableEntity() {
+    var travelJournalContentInformation: TravelJournalContentInformation = travelJournalContentInformation
+        protected set
 
     @OneToMany(cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE], orphanRemoval = true)
     @JoinColumn(
@@ -47,5 +39,45 @@ class TravelJournalContent(
         updatable = false,
         columnDefinition = "NUMERIC(19, 0)",
     )
-    val travelJournalContentImages: List<TravelJournalContentImage>,
-) : BaseModifiableEntity()
+    private val mutableTravelJournalContentImages: MutableList<TravelJournalContentImage> =
+        travelJournalContentImages.toMutableList()
+    val travelJournalContentImages: List<TravelJournalContentImage>
+        get() = mutableTravelJournalContentImages
+
+    val content: String?
+        get() = travelJournalContentInformation.content
+
+    val placeId: String?
+        get() = travelJournalContentInformation.placeId
+
+    val coordinates: Coordinates?
+        get() = travelJournalContentInformation.coordinates
+
+    val travelDate: LocalDate
+        get() = travelJournalContentInformation.travelDate
+
+    fun changeTravelJournalContent(travelJournalContentInformation: TravelJournalContentInformation) {
+        this.travelJournalContentInformation = travelJournalContentInformation
+    }
+
+    fun deleteTravelJournalContentImages(travelJournalContentImages: List<TravelJournalContentImage>) {
+        mutableTravelJournalContentImages.removeAll(travelJournalContentImages)
+    }
+
+    fun addTravelJournalContentImages(travelJournalContentImages: List<TravelJournalContentImage>) {
+        mutableTravelJournalContentImages.addAll(travelJournalContentImages)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as TravelJournalContent
+
+        return id == other.id
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+}

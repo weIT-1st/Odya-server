@@ -28,4 +28,17 @@ class TravelJournalContentImage(
     @OneToOne(cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE])
     @JoinColumn(name = "content_image_id", nullable = false, updatable = false, columnDefinition = "NUMERIC(19, 0)")
     val contentImage: ContentImage,
-) : BaseTimeEntity()
+) : BaseTimeEntity() {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as TravelJournalContentImage
+
+        return id == other.id
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+}
