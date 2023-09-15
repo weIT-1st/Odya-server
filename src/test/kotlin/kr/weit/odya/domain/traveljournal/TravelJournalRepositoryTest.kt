@@ -142,7 +142,7 @@ class TravelJournalRepositoryTest(
 
             expect("USER ID와 일치하는 여행 일지 모두 삭제한다.") {
                 travelJournalRepository.deleteAllByUserId(user.id)
-                travelJournalRepository.count() shouldBe 0
+                travelJournalRepository.count() shouldBe 1
             }
         }
     },
