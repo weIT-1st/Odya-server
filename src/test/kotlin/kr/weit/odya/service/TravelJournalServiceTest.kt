@@ -10,7 +10,9 @@ import io.mockk.runs
 import jakarta.ws.rs.ForbiddenException
 import kr.weit.odya.client.push.PushNotificationEvent
 import kr.weit.odya.domain.community.CommunityRepository
+import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.follow.FollowRepository
+import kr.weit.odya.domain.report.ReportTravelJournalRepository
 import kr.weit.odya.domain.traveljournal.TravelCompanionRepository
 import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.traveljournal.TravelJournalContentUpdateEvent
@@ -27,6 +29,7 @@ import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.domain.user.getByUserIds
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_ANOTHER_USER_ID
+import kr.weit.odya.support.TEST_CONTENT_IMAGES
 import kr.weit.odya.support.TEST_FILE_AUTHENTICATED_URL
 import kr.weit.odya.support.TEST_GENERATED_FILE_NAME
 import kr.weit.odya.support.TEST_IMAGE_FILE_WEBP
@@ -42,7 +45,7 @@ import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_NOT_EXIST_CONTENT_ID
 import kr.weit.odya.support.TEST_USER
 import kr.weit.odya.support.TEST_USER_ID
-import kr.weit.odya.support.createAnotherUser
+import kr.weit.odya.support.createCustomUser
 import kr.weit.odya.support.createFollowerFcmTokenList
 import kr.weit.odya.support.createImageMap
 import kr.weit.odya.support.createImageNamePairs
@@ -69,20 +72,23 @@ class TravelJournalServiceTest : DescribeSpec(
         val userRepository = mockk<UserRepository>()
         val travelJournalRepository = mockk<TravelJournalRepository>()
         val fileService = mockk<FileService>()
+        val reportTravelJournalRepository = mockk<ReportTravelJournalRepository>()
+        val contentImageRepository = mockk<ContentImageRepository>()
         val travelCompanionRepository = mockk<TravelCompanionRepository>()
         val applicationEventPublisher = mockk<ApplicationEventPublisher>()
         val followRepository = mockk<FollowRepository>()
         val communityRepository = mockk<CommunityRepository>()
-        val travelJournalService =
-            TravelJournalService(
-                userRepository,
-                travelJournalRepository,
-                followRepository,
-                travelCompanionRepository,
-                communityRepository,
-                fileService,
-                applicationEventPublisher,
-            )
+        val travelJournalService = TravelJournalService(
+            userRepository,
+            travelJournalRepository,
+            followRepository,
+            communityRepository,
+            fileService,
+            applicationEventPublisher,
+            reportTravelJournalRepository,
+            contentImageRepository,
+            travelCompanionRepository,
+        )
 
         describe("createTravelJournal") {
             context("유효한 데이터가 주어지는 경우") {
@@ -571,7 +577,7 @@ class TravelJournalServiceTest : DescribeSpec(
                 val travelJournal = createTravelJournal()
                 every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns travelJournal
                 every { travelCompanionRepository.deleteAllByIdInBatch(any<List<Long>>()) } just runs
-                every { userRepository.getByUserIds(any<List<Long>>()) } returns listOf(createAnotherUser())
+                every { userRepository.getByUserIds(any<List<Long>>()) } returns listOf(createCustomUser())
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalService.updateTravelJournal(
@@ -928,6 +934,22 @@ class TravelJournalServiceTest : DescribeSpec(
                             TEST_TRAVEL_JOURNAL_NOT_EXIST_CONTENT_ID,
                             TEST_USER_ID,
                         )
+                    }
+                }
+            }
+        }
+
+        describe("deleteTravelJournalByUserId") {
+            context("유효한 UserId가 주어지는 경우") {
+                it("정상적으로 종료한다") {
+                    every { contentImageRepository.findAllByUserId(TEST_USER_ID) } returns TEST_CONTENT_IMAGES
+                    every { fileService.deleteFile(any()) } just runs
+                    every { contentImageRepository.deleteAllByUserId(TEST_USER_ID) } just runs
+                    every { reportTravelJournalRepository.deleteAllByCommonReportInformationUserId(TEST_USER_ID) } just runs
+                    every { travelCompanionRepository.deleteAllByUserId(TEST_USER_ID) } just runs
+                    every { travelJournalRepository.deleteAllByUserId(TEST_USER_ID) } just runs
+                    shouldNotThrowAny {
+                        travelJournalService.deleteTravelJournalByUserId(TEST_USER_ID)
                     }
                 }
             }

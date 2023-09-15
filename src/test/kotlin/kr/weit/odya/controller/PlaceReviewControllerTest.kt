@@ -19,13 +19,13 @@ import kr.weit.odya.support.SORT_TYPE_PARAM
 import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_NOT_EXIST_USER_ID_TOKEN
-import kr.weit.odya.support.TEST_EXIST_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_HIGHEST_RATING
 import kr.weit.odya.support.TEST_INVALID_LAST_ID
 import kr.weit.odya.support.TEST_INVALID_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_INVALID_SIZE
 import kr.weit.odya.support.TEST_INVALID_USER_ID
 import kr.weit.odya.support.TEST_LAST_ID
+import kr.weit.odya.support.TEST_NOT_EXIST_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_NOT_EXIST_USER_ID
 import kr.weit.odya.support.TEST_OTHER_PLACE_ID
 import kr.weit.odya.support.TEST_PLACE_ID
@@ -35,7 +35,7 @@ import kr.weit.odya.support.TEST_PLACE_SORT_TYPE
 import kr.weit.odya.support.TEST_REVIEW
 import kr.weit.odya.support.TEST_SIZE
 import kr.weit.odya.support.TEST_TOO_HIGH_RATING
-import kr.weit.odya.support.TEST_TOO_LONG_REVIEW
+import kr.weit.odya.support.TEST_TOO_LONG_PHRASE
 import kr.weit.odya.support.TEST_TOO_LOW_RATING
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.creatSlicePlaceReviewResponse
@@ -183,7 +183,7 @@ class PlaceReviewControllerTest(
             }
 
             context("유효한 토큰이지만 리뷰가 최대 길이를 초과한 경우") {
-                val request = createPlaceReviewRequest().copy(review = TEST_TOO_LONG_REVIEW)
+                val request = createPlaceReviewRequest().copy(review = TEST_TOO_LONG_PHRASE)
                 it("400을 반환한다.") {
                     restDocMockMvc.post(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -199,7 +199,7 @@ class PlaceReviewControllerTest(
                             requestBody(
                                 "placeId" type JsonFieldType.STRING description "장소 ID" example TEST_PLACE_ID,
                                 "rating" type JsonFieldType.NUMBER description "별점" example TEST_HIGHEST_RATING,
-                                "review" type JsonFieldType.STRING description "최대 길이를 초과한 리뷰" example TEST_TOO_LONG_REVIEW,
+                                "review" type JsonFieldType.STRING description "최대 길이를 초과한 리뷰" example TEST_TOO_LONG_PHRASE,
                             ),
                         )
                     }
@@ -406,7 +406,7 @@ class PlaceReviewControllerTest(
             }
 
             context("유효한 토큰이지만 리뷰가 최대 길이를 초과한 경우") {
-                val request = updatePlaceReviewRequest().copy(review = TEST_TOO_LONG_REVIEW)
+                val request = updatePlaceReviewRequest().copy(review = TEST_TOO_LONG_PHRASE)
                 it("400을 반환한다.") {
                     restDocMockMvc.patch(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -422,7 +422,7 @@ class PlaceReviewControllerTest(
                             requestBody(
                                 "id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example TEST_PLACE_REVIEW_ID,
                                 "rating" type JsonFieldType.NUMBER description "별점" example TEST_HIGHEST_RATING isOptional true,
-                                "review" type JsonFieldType.STRING description "최대 길이를 초과한 리뷰" example TEST_TOO_LONG_REVIEW isOptional true,
+                                "review" type JsonFieldType.STRING description "최대 길이를 초과한 리뷰" example TEST_TOO_LONG_PHRASE isOptional true,
                             ),
                         )
                     }
@@ -454,7 +454,7 @@ class PlaceReviewControllerTest(
             }
 
             context("유효한 토큰이지만, 존재하지 않는 장소리뷰ID인 경우") {
-                val request = updatePlaceReviewRequest().copy(id = TEST_EXIST_PLACE_REVIEW_ID)
+                val request = updatePlaceReviewRequest().copy(id = TEST_NOT_EXIST_PLACE_REVIEW_ID)
                 every { placeReviewService.updateReview(request, TEST_USER_ID) } throws NoSuchElementException(NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE)
                 it("404를 반환한다.") {
                     restDocMockMvc.patch(targetUri) {
@@ -469,7 +469,7 @@ class PlaceReviewControllerTest(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
                             requestBody(
-                                "id" type JsonFieldType.NUMBER description "잘못된 장소 리뷰 ID" example TEST_EXIST_PLACE_REVIEW_ID,
+                                "id" type JsonFieldType.NUMBER description "잘못된 장소 리뷰 ID" example TEST_NOT_EXIST_PLACE_REVIEW_ID,
                                 "rating" type JsonFieldType.NUMBER description "별점" example TEST_HIGHEST_RATING isOptional true,
                                 "review" type JsonFieldType.STRING description "리뷰" example TEST_REVIEW isOptional true,
                             ),
@@ -598,11 +598,11 @@ class PlaceReviewControllerTest(
             }
 
             context("유효한 토큰이지만 존재하지 않는 장소리뷰ID인 경우") {
-                every { placeReviewService.deleteReview(TEST_EXIST_PLACE_REVIEW_ID, TEST_USER_ID) } throws NoSuchElementException(NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE)
+                every { placeReviewService.deleteReview(TEST_NOT_EXIST_PLACE_REVIEW_ID, TEST_USER_ID) } throws NoSuchElementException(NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE)
                 it("404를 반환한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
-                            .delete(targetUri, TEST_EXIST_PLACE_REVIEW_ID)
+                            .delete(targetUri, TEST_NOT_EXIST_PLACE_REVIEW_ID)
                             .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
                     )
                         .andExpect(status().isNotFound)
@@ -610,7 +610,7 @@ class PlaceReviewControllerTest(
                             createPathDocument(
                                 "placeReview-delete-not-found-id",
                                 pathParameters(
-                                    "id" pathDescription "존재하지 않는 장소 리뷰 ID" example TEST_EXIST_PLACE_REVIEW_ID,
+                                    "id" pathDescription "존재하지 않는 장소 리뷰 ID" example TEST_NOT_EXIST_PLACE_REVIEW_ID,
                                 ),
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
@@ -702,8 +702,13 @@ class PlaceReviewControllerTest(
                                     "averageRating" type JsonFieldType.NUMBER description "장소 평균 별점" example response.averageRating,
                                     "content[].id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example content.id,
                                     "content[].placeId" type JsonFieldType.STRING description "장소 ID" example content.placeId,
-                                    "content[].userId" type JsonFieldType.NUMBER description "유저 ID" example content.userId,
-                                    "content[].writerNickname" type JsonFieldType.STRING description "유저 닉네임" example content.writerNickname,
+                                    "content[].userInfo.userId" type JsonFieldType.NUMBER description "사용자 ID" example response.content[0].userInfo.userId,
+                                    "content[].userInfo.nickname" type JsonFieldType.STRING description "사용자 닉네임" example response.content[0].userInfo.nickname,
+                                    "content[].userInfo.profile.profileUrl" type JsonFieldType.STRING description "사용자 프로필 Url" example response.content[0].userInfo.profile.profileUrl,
+                                    "content[].userInfo.profile.profileColor.colorHex" type JsonFieldType.STRING description "색상 Hex" example response.content[0].userInfo.profile.profileColor?.colorHex isOptional true,
+                                    "content[].userInfo.profile.profileColor.red" type JsonFieldType.NUMBER description "RGB RED" example response.content[0].userInfo.profile.profileColor?.red isOptional true,
+                                    "content[].userInfo.profile.profileColor.green" type JsonFieldType.NUMBER description "RGB GREEN" example response.content[0].userInfo.profile.profileColor?.green isOptional true,
+                                    "content[].userInfo.profile.profileColor.blue" type JsonFieldType.NUMBER description "RGB BLUE" example response.content[0].userInfo.profile.profileColor?.blue isOptional true,
                                     "content[].starRating" type JsonFieldType.NUMBER description "별점" example content.starRating,
                                     "content[].review" type JsonFieldType.STRING description "리뷰" example content.review,
                                     "content[].createdAt" type JsonFieldType.STRING description "생성일시" example content.createdAt,
@@ -874,8 +879,13 @@ class PlaceReviewControllerTest(
                                     "averageRating" type JsonFieldType.NUMBER description "장소 평균 별점" example response.averageRating,
                                     "content[].id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example content.id,
                                     "content[].placeId" type JsonFieldType.STRING description "장소 ID" example content.placeId,
-                                    "content[].userId" type JsonFieldType.NUMBER description "유저 ID" example content.userId,
-                                    "content[].writerNickname" type JsonFieldType.STRING description "유저 닉네임" example content.writerNickname,
+                                    "content[].userInfo.userId" type JsonFieldType.NUMBER description "사용자 ID" example response.content[0].userInfo.userId,
+                                    "content[].userInfo.nickname" type JsonFieldType.STRING description "사용자 닉네임" example response.content[0].userInfo.nickname,
+                                    "content[].userInfo.profile.profileUrl" type JsonFieldType.STRING description "사용자 프로필 Url" example response.content[0].userInfo.profile.profileUrl,
+                                    "content[].userInfo.profile.profileColor.colorHex" type JsonFieldType.STRING description "색상 Hex" example response.content[0].userInfo.profile.profileColor?.colorHex isOptional true,
+                                    "content[].userInfo.profile.profileColor.red" type JsonFieldType.NUMBER description "RGB RED" example response.content[0].userInfo.profile.profileColor?.red isOptional true,
+                                    "content[].userInfo.profile.profileColor.green" type JsonFieldType.NUMBER description "RGB GREEN" example response.content[0].userInfo.profile.profileColor?.green isOptional true,
+                                    "content[].userInfo.profile.profileColor.blue" type JsonFieldType.NUMBER description "RGB BLUE" example response.content[0].userInfo.profile.profileColor?.blue isOptional true,
                                     "content[].starRating" type JsonFieldType.NUMBER description "별점" example content.starRating,
                                     "content[].review" type JsonFieldType.STRING description "리뷰" example content.review,
                                     "content[].createdAt" type JsonFieldType.STRING description "생성일시" example content.createdAt,

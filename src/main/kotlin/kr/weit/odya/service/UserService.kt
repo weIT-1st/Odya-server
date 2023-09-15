@@ -106,23 +106,6 @@ class UserService(
         return SliceResponse(size, users)
     }
 
-    private fun getProfileColor(profileName: String?) = if (profileName == null) {
-        profileColorService.getRandomProfileColor()
-    } else {
-        profileColorService.getNoneProfileColor()
-    }
-
-    private fun validateInformationRequest(informationRequest: InformationRequest) {
-        if (userRepository.existsByNickname(informationRequest.nickname)) {
-            throw ExistResourceException("${informationRequest.nickname}: 이미 존재하는 닉네임입니다")
-        }
-    }
-
-    private fun getUserResponse(findUser: User): UserResponse {
-        val profileUrl = fileService.getPreAuthenticatedObjectUrl(findUser.profile.profileName)
-        return UserResponse(findUser, profileUrl)
-    }
-
     @Transactional(readOnly = true)
     fun getStatistics(userId: Long): UserStatisticsResponse {
         val followingsCount = followRepository.countByFollowerId(userId)
@@ -146,5 +129,34 @@ class UserService(
         user.changeFcmToken(fcmTokenRequest.fcmToken)
         // FCM토큰이 충돌나는 경우 기존 유저의 토큰을 무효화 한다
         userRepository.findByFcmToken(fcmTokenRequest.fcmToken)?.changeFcmToken(null)
+    }
+
+    @Transactional
+    fun deleteUserRelatedData(id: Long) {
+        val profileName = userRepository.getByUserIdWithProfile(id).profile.profileName
+        followRepository.deleteByFollowingId(id)
+        followRepository.deleteByFollowerId(id)
+        userRepository.deleteById(id)
+        usersDocumentRepository.deleteById(id)
+        if (profileName != DEFAULT_PROFILE_PNG) {
+            fileService.deleteFile(profileName)
+        }
+    }
+
+    private fun getProfileColor(profileName: String?) = if (profileName == null) {
+        profileColorService.getRandomProfileColor()
+    } else {
+        profileColorService.getNoneProfileColor()
+    }
+
+    private fun validateInformationRequest(informationRequest: InformationRequest) {
+        if (userRepository.existsByNickname(informationRequest.nickname)) {
+            throw ExistResourceException("${informationRequest.nickname}: 이미 존재하는 닉네임입니다")
+        }
+    }
+
+    private fun getUserResponse(findUser: User): UserResponse {
+        val profileUrl = fileService.getPreAuthenticatedObjectUrl(findUser.profile.profileName)
+        return UserResponse(findUser, profileUrl)
     }
 }

@@ -50,6 +50,8 @@ CREATE INDEX place_id_index ON place_review (place_id);
 ALTER TABLE place_review
     ADD CONSTRAINT FK_PLACE_REVIEW_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
+CREATE INDEX place_review_foreign_index ON place_review (user_id);
+
 CREATE TABLE follow
 (
     follower_id  NUMERIC(19, 0) NOT NULL,
@@ -57,6 +59,9 @@ CREATE TABLE follow
     created_date DATE           NOT NULL,
     CONSTRAINT pk_follow PRIMARY KEY (follower_id, following_id)
 );
+
+-- follower_id에는 이미 index가 걸려있어서 생략
+CREATE INDEX follow_following_id_index ON follow (following_id);
 
 CREATE TABLE profile
 (
@@ -87,8 +92,12 @@ create sequence profile_color_seq start with 1 increment by 1;
 alter table profile
     add constraint FK_PROFILE_ON_PROFILE_COLOR foreign key (profile_color_id) references profile_color (id);
 
+CREATE INDEX profile_profile_color_id_index on PROFILE (profile_color_id);
+
 alter table users
     add constraint FK_USERS_ON_PROFILE foreign key (profile_id) references profile (id);
+
+CREATE INDEX users_profile_id_index ON users (profile_id);
 
 CREATE SEQUENCE favorite_place_seq START WITH 1 INCREMENT BY 1;
 
@@ -108,6 +117,8 @@ CREATE INDEX favorite_place_id_index ON favorite_place (place_id);
 
 ALTER TABLE favorite_place
     ADD CONSTRAINT FK_FAVORITE_PLACE_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
+CREATE INDEX favorite_place_user_id_index ON FAVORITE_PLACE (user_id);
 
 CREATE TABLE travel_journal
 (
@@ -175,27 +186,42 @@ CREATE SEQUENCE content_image_seq START WITH 1 INCREMENT BY 1;
 
 CREATE SEQUENCE travel_journal_content_image_seq START WITH 1 INCREMENT BY 1;
 
+CREATE INDEX travel_journal_content_travel_journal_place_id_index ON TRAVEL_JOURNAL_CONTENT (place_id);
+
 alter table travel_journal
     add constraint FK_TRAVEL_JOURNAL_ON_USERS foreign key (user_id) references users (id);
+
+CREATE INDEX travel_journal_travel_journal_user_id_index ON TRAVEL_JOURNAL (user_id);
 
 alter table travel_journal_content_image
     add constraint FK_TRAVEL_IMAGE_ON_TRAVEL_JOURNAL_CONTENT foreign key (travel_journal_content_id) references travel_journal_content (id);
 
+CREATE INDEX travel_journal_content_image_travel_journal_content_id_index ON TRAVEL_JOURNAL_CONTENT_IMAGE (travel_journal_content_id);
+
 alter table travel_journal_content_image
     add constraint FK_TRAVEL_IMAGE_ON_CONTENT_IMAGE foreign key (content_image_id) references content_image (id);
+
+CREATE INDEX travel_journal_content_image_content_image_id_index ON TRAVEL_JOURNAL_CONTENT_IMAGE (content_image_id);
 
 alter table content_image
     add constraint FK_CONTENT_IMAGE_ON_USERS foreign key (user_id) references users (id);
 
+CREATE INDEX content_image_user_id_index ON CONTENT_IMAGE (user_id);
+
 alter table travel_journal_content
     add constraint FK_TRAVEL_JOURNAL_CONTENT_ON_TRAVEL_JOURNAL foreign key (travel_journal_id) references travel_journal (id);
+
+CREATE INDEX travel_journal_content_travel_journal_id_index ON TRAVEL_JOURNAL_CONTENT (travel_journal_id);
 
 alter table travel_companion
     add constraint FK_TRAVEL_COMPANION_ON_TRAVEL_JOURNAL foreign key (travel_journal_id) references travel_journal (id);
 
+CREATE INDEX travel_companion_travel_journal_id_index ON TRAVEL_COMPANION (travel_journal_id);
+
 alter table travel_companion
     add constraint FK_TRAVEL_COMPANION_ON_USERS foreign key (user_id) references users (id);
 
+CREATE INDEX travel_companion_user_id_index ON TRAVEL_COMPANION (user_id);
 
 CREATE SEQUENCE topic_seq START WITH 1 INCREMENT BY 1;
 
@@ -225,6 +251,8 @@ ALTER TABLE favorite_topic
 
 ALTER TABLE favorite_topic
     ADD CONSTRAINT FK_FAVORITE_TOPIC_ON_TOPIC FOREIGN KEY (topic_id) REFERENCES topic (id);
+
+CREATE INDEX favorite_topic_topic_id_index ON FAVORITE_TOPIC (topic_id);
 
 ALTER TABLE favorite_topic
     ADD CONSTRAINT FK_FAVORITE_TOPIC_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
@@ -262,6 +290,8 @@ ALTER TABLE agreed_terms
 ALTER TABLE agreed_terms
     ADD CONSTRAINT FK_AGREED_TERMS_ON_TERMS FOREIGN KEY (terms_id) REFERENCES terms (id);
 
+CREATE INDEX agreed_terms_terms_id_index ON AGREED_TERMS (terms_id);
+
 ALTER TABLE agreed_terms
     ADD CONSTRAINT FK_AGREED_TERMS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
@@ -292,29 +322,41 @@ CREATE TABLE community_content_image
 
 CREATE SEQUENCE community_content_image_seq START WITH 1 INCREMENT BY 1;
 
+CREATE INDEX community_place_id_index ON COMMUNITY (place_id);
+
 alter table community
     add constraint FK_COMMUNITY_ON_TOPIC foreign key (topic_id) references topic (id);
+
+CREATE INDEX community_topic_id_index ON COMMUNITY (topic_id);
 
 alter table community
     add constraint FK_COMMUNITY_ON_TRAVEL_JOURNAL foreign key (travel_journal_id) references travel_journal (id);
 
+CREATE INDEX community_travel_journal_id_index ON COMMUNITY (travel_journal_id);
+
 alter table community
     add constraint FK_COMMUNITY_ON_USER foreign key (user_id) references users (id);
+
+CREATE INDEX community_user_id_index ON COMMUNITY (user_id);
 
 alter table community_content_image
     add constraint FK_COMMUNITY_CONTENT_IMAGE_ON_COMMUNITY foreign key (community_id) references community (id);
 
+CREATE INDEX community_content_image_community_id_index ON COMMUNITY_CONTENT_IMAGE (community_id);
+
 alter table community_content_image
     add constraint FK_COMMUNITY_CONTENT_IMAGE_ON_CONTENT_IMAGE foreign key (content_image_id) references content_image (id);
 
+CREATE INDEX community_content_image_content_image_id_index ON COMMUNITY_CONTENT_IMAGE (content_image_id);
+
 CREATE TABLE community_comment
 (
-    id              NUMBER(19, 0) NOT NULL,
-    content         VARCHAR2(300) NOT NULL,
-    created_date    TIMESTAMP     NOT NULL,
-    updated_date    TIMESTAMP     NOT NULL,
-    user_id         NUMBER(19, 0) NOT NULL,
-    community_id    NUMBER(19, 0) NOT NULL,
+    id           NUMBER(19, 0) NOT NULL,
+    content      VARCHAR2(300) NOT NULL,
+    created_date TIMESTAMP     NOT NULL,
+    updated_date TIMESTAMP     NOT NULL,
+    user_id      NUMBER(19, 0) NOT NULL,
+    community_id NUMBER(19, 0) NOT NULL,
     CONSTRAINT pk_community_comment PRIMARY KEY (id)
 );
 
@@ -323,7 +365,59 @@ CREATE SEQUENCE community_comment_seq START WITH 1 INCREMENT BY 1;
 ALTER TABLE community_comment
     ADD CONSTRAINT FK_COMMUNITY_COMMENT_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
+CREATE INDEX community_comment_user_id_index ON COMMUNITY_COMMENT (user_id);
+
 ALTER TABLE community_comment
     ADD CONSTRAINT FK_COMMUNITY_COMMENT_ON_COMMUNITY FOREIGN KEY (community_id) REFERENCES community (id);
 
 CREATE INDEX community_index ON community_comment (community_id);
+
+CREATE SEQUENCE report_place_review_seq START WITH 1 INCREMENT BY 1;
+
+CREATE TABLE report_place_review
+(
+    id              NUMBER(19, 0) NOT NULL,
+    created_date    TIMESTAMP     NOT NULL,
+    place_review_id NUMBER(19, 0) NOT NULL,
+    user_id         NUMBER(19, 0) NOT NULL,
+    report_reason   VARCHAR2(20)  NOT NULL,
+    other_reason    VARCHAR2(60),
+    CONSTRAINT pk_report_place_review PRIMARY KEY (id)
+);
+
+ALTER TABLE report_place_review
+    ADD CONSTRAINT report_place_review_unique UNIQUE (user_id, place_review_id);
+
+ALTER TABLE report_place_review
+    ADD CONSTRAINT FK_REPORT_PLACE_REVIEW_ON_PLACE_REVIEW FOREIGN KEY (place_review_id) REFERENCES place_review (id);
+
+ALTER TABLE report_place_review
+    ADD CONSTRAINT FK_REPORT_PLACE_REVIEW_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
+CREATE INDEX report_place_review_foreign_index ON REPORT_PLACE_REVIEW (place_review_id);
+CREATE INDEX report_place_review_foreign_index_2 ON REPORT_PLACE_REVIEW (user_id);
+
+CREATE SEQUENCE report_travel_journal_seq START WITH 1 INCREMENT BY 1;
+
+CREATE TABLE report_travel_journal
+(
+    id                NUMBER(19, 0) NOT NULL,
+    created_date      TIMESTAMP     NOT NULL,
+    travel_journal_id NUMBER(19, 0) NOT NULL,
+    user_id           NUMBER(19, 0) NOT NULL,
+    report_reason     VARCHAR2(20)  NOT NULL,
+    other_reason      VARCHAR2(60),
+    CONSTRAINT pk_report_travel_journal PRIMARY KEY (id)
+);
+
+ALTER TABLE report_travel_journal
+    ADD CONSTRAINT report_travel_journal_unique UNIQUE (travel_journal_id, user_id);
+
+ALTER TABLE report_travel_journal
+    ADD CONSTRAINT FK_REPORT_TRAVEL_JOURNAL_ON_TRAVEL_JOURNAL FOREIGN KEY (travel_journal_id) REFERENCES travel_journal (id);
+
+ALTER TABLE report_travel_journal
+    ADD CONSTRAINT FK_REPORT_TRAVEL_JOURNAL_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
+CREATE INDEX report_travel_journal_foreign_index ON REPORT_TRAVEL_JOURNAL (travel_journal_id);
+CREATE INDEX report_travel_journal_foreign_index_2 ON REPORT_TRAVEL_JOURNAL (user_id);
