@@ -87,6 +87,6 @@ class ContentImage(
     fun setPlace(placeDetails: PlaceDetails) {
         this.placeId = placeDetails.placeId
         val location = placeDetails.geometry.location
-        this.coordinate = GeometryFactory().createPoint(Coordinate(location.lng, location.lat))
+        this.coordinate = GeometryFactory().createPoint(Coordinate(location.lng, location.lat)).also { it.srid = 4326 }
     }
 }
