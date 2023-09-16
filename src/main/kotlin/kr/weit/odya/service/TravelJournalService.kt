@@ -23,6 +23,7 @@ import kr.weit.odya.domain.traveljournal.getByTravelJournalId
 import kr.weit.odya.domain.traveljournal.getFriendTravelJournalSliceBy
 import kr.weit.odya.domain.traveljournal.getMyTravelJournalSliceBy
 import kr.weit.odya.domain.traveljournal.getRecommendTravelJournalSliceBy
+import kr.weit.odya.domain.traveljournal.getTravelJournalSliceBy
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
@@ -148,6 +149,20 @@ class TravelJournalService(
         val travelJournal = travelJournalRepository.getByTravelJournalId(travelJournalId)
         validateUserReadPermission(travelJournal, userId)
         return getTravelJournalResponse(travelJournal)
+    }
+
+    @Transactional(readOnly = true)
+    fun getTravelJournals(
+        userId: Long,
+        size: Int,
+        lastId: Long?,
+        sortType: TravelJournalSortType,
+    ): SliceResponse<TravelJournalSummaryResponse> {
+        val travelJournals = travelJournalRepository.getTravelJournalSliceBy(userId, size, lastId, sortType)
+        return SliceResponse(
+            size,
+            getTravelJournalSimpleResponses(travelJournals),
+        )
     }
 
     @Transactional(readOnly = true)

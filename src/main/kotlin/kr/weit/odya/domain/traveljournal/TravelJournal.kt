@@ -21,6 +21,7 @@ import java.time.LocalDate
 @Table(
     indexes = [
         Index(name = "travel_journal_user_id_index", columnList = "user_id"),
+        Index(name = "travel_journal_visibility_index", columnList = "visibility"),
     ],
 )
 @Entity

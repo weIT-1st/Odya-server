@@ -29,7 +29,7 @@ import java.net.URI
 
 @Validated
 @RestController
-@RequestMapping("api/v1/travel-journals")
+@RequestMapping("/api/v1/travel-journals")
 class TravelJournalController(private val travelJournalService: TravelJournalService) {
     @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun createTravelJournal(
@@ -58,6 +58,22 @@ class TravelJournalController(private val travelJournalService: TravelJournalSer
         @LoginUserId userId: Long,
     ): ResponseEntity<TravelJournalResponse> {
         val response = travelJournalService.getTravelJournal(travelJournalId, userId)
+        return ResponseEntity.ok(response)
+    }
+
+    @GetMapping
+    fun getTravelJournalsTest(
+        @Positive(message = "사이즈는 양수여야 합니다.")
+        @RequestParam(name = "size", required = false, defaultValue = "10")
+        size: Int,
+        @Positive(message = "마지막 Id는 양수여야 합니다.")
+        @RequestParam(name = "lastId", required = false)
+        lastId: Long?,
+        @RequestParam(name = "sortType", required = false, defaultValue = "LATEST")
+        sortType: TravelJournalSortType,
+        @LoginUserId userId: Long,
+    ): ResponseEntity<SliceResponse<TravelJournalSummaryResponse>> {
+        val response = travelJournalService.getTravelJournals(userId, size, lastId, sortType)
         return ResponseEntity.ok(response)
     }
 
