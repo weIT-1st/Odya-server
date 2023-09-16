@@ -207,7 +207,7 @@ data class TravelJournalContentUpdateRequest(
     )
 }
 
-data class TravelJournalSimpleResponse(
+data class TravelJournalSummaryResponse(
     val travelJournalId: Long,
     val title: String,
     val content: String?,

@@ -35,7 +35,7 @@ import kr.weit.odya.service.dto.TravelJournalContentResponse
 import kr.weit.odya.service.dto.TravelJournalContentUpdateRequest
 import kr.weit.odya.service.dto.TravelJournalRequest
 import kr.weit.odya.service.dto.TravelJournalResponse
-import kr.weit.odya.service.dto.TravelJournalSimpleResponse
+import kr.weit.odya.service.dto.TravelJournalSummaryResponse
 import kr.weit.odya.service.dto.TravelJournalUpdateRequest
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
@@ -156,7 +156,7 @@ class TravelJournalService(
         size: Int,
         lastId: Long?,
         sortType: TravelJournalSortType,
-    ): SliceResponse<TravelJournalSimpleResponse> {
+    ): SliceResponse<TravelJournalSummaryResponse> {
         val travelJournals = travelJournalRepository.getMyTravelJournalSliceBy(userId, size, lastId, sortType)
         return SliceResponse(
             size,
@@ -170,7 +170,7 @@ class TravelJournalService(
         size: Int,
         lastId: Long?,
         sortType: TravelJournalSortType,
-    ): SliceResponse<TravelJournalSimpleResponse> {
+    ): SliceResponse<TravelJournalSummaryResponse> {
         val travelJournals = travelJournalRepository.getFriendTravelJournalSliceBy(userId, size, lastId, sortType)
         return SliceResponse(
             size,
@@ -184,7 +184,7 @@ class TravelJournalService(
         size: Int,
         lastId: Long?,
         sortType: TravelJournalSortType,
-    ): SliceResponse<TravelJournalSimpleResponse> {
+    ): SliceResponse<TravelJournalSummaryResponse> {
         val user = userRepository.getByUserId(userId)
         val travelJournals = travelJournalRepository.getRecommendTravelJournalSliceBy(user, size, lastId, sortType)
         return SliceResponse(
@@ -362,7 +362,7 @@ class TravelJournalService(
     private fun getTravelJournalSimpleResponses(travelJournals: List<TravelJournal>) =
         travelJournals.map {
             val companionSimpleResponses = getTravelCompanionSimpleResponses(it)
-            TravelJournalSimpleResponse(
+            TravelJournalSummaryResponse(
                 it,
                 it.travelJournalContents[0].content,
                 fileService.getPreAuthenticatedObjectUrl(it.travelJournalContents[0].travelJournalContentImages[0].contentImage.name),

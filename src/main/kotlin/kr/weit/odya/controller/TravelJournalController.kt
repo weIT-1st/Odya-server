@@ -10,7 +10,7 @@ import kr.weit.odya.service.dto.SliceResponse
 import kr.weit.odya.service.dto.TravelJournalContentUpdateRequest
 import kr.weit.odya.service.dto.TravelJournalRequest
 import kr.weit.odya.service.dto.TravelJournalResponse
-import kr.weit.odya.service.dto.TravelJournalSimpleResponse
+import kr.weit.odya.service.dto.TravelJournalSummaryResponse
 import kr.weit.odya.service.dto.TravelJournalUpdateRequest
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -72,7 +72,7 @@ class TravelJournalController(private val travelJournalService: TravelJournalSer
         @RequestParam(name = "sortType", required = false, defaultValue = "LATEST")
         sortType: TravelJournalSortType,
         @LoginUserId userId: Long,
-    ): ResponseEntity<SliceResponse<TravelJournalSimpleResponse>> {
+    ): ResponseEntity<SliceResponse<TravelJournalSummaryResponse>> {
         val response = travelJournalService.getMyTravelJournals(userId, size, lastId, sortType)
         return ResponseEntity.ok(response)
     }
@@ -88,7 +88,7 @@ class TravelJournalController(private val travelJournalService: TravelJournalSer
         @RequestParam(name = "sortType", required = false, defaultValue = "LATEST")
         sortType: TravelJournalSortType,
         @LoginUserId userId: Long,
-    ): ResponseEntity<SliceResponse<TravelJournalSimpleResponse>> {
+    ): ResponseEntity<SliceResponse<TravelJournalSummaryResponse>> {
         val response = travelJournalService.getFriendTravelJournals(userId, size, lastId, sortType)
         return ResponseEntity.ok(response)
     }
@@ -104,7 +104,7 @@ class TravelJournalController(private val travelJournalService: TravelJournalSer
         @RequestParam(name = "sortType", required = false, defaultValue = "LATEST")
         sortType: TravelJournalSortType,
         @LoginUserId userId: Long,
-    ): ResponseEntity<SliceResponse<TravelJournalSimpleResponse>> {
+    ): ResponseEntity<SliceResponse<TravelJournalSummaryResponse>> {
         val response = travelJournalService.getRecommendTravelJournals(userId, size, lastId, sortType)
         return ResponseEntity.ok(response)
     }

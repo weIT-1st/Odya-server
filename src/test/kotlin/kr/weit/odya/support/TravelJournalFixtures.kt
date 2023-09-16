@@ -19,7 +19,7 @@ import kr.weit.odya.service.dto.TravelJournalContentResponse
 import kr.weit.odya.service.dto.TravelJournalContentUpdateRequest
 import kr.weit.odya.service.dto.TravelJournalRequest
 import kr.weit.odya.service.dto.TravelJournalResponse
-import kr.weit.odya.service.dto.TravelJournalSimpleResponse
+import kr.weit.odya.service.dto.TravelJournalSummaryResponse
 import kr.weit.odya.service.dto.TravelJournalUpdateRequest
 import kr.weit.odya.service.dto.UserSimpleResponse
 import org.springframework.mock.web.MockMultipartFile
@@ -272,13 +272,19 @@ fun createTravelJournalContentUpdateRequest(
     deleteContentImageIds = deleteContentImageIds,
 )
 
-fun createSliceTravelJournalResponse(user: User = createUser(), travelCompanion: TravelCompanion = createTravelCompanionById()): SliceResponse<TravelJournalSimpleResponse> =
+fun createSliceTravelJournalResponse(
+    user: User = createUser(),
+    travelCompanion: TravelCompanion = createTravelCompanionById(),
+): SliceResponse<TravelJournalSummaryResponse> =
     SliceResponse(
         size = TEST_DEFAULT_SIZE,
         content = listOf(createTravelJournalSimpleResponse(user = user, travelCompanion = travelCompanion)),
     )
 
-fun createTravelJournalSimpleResponse(user: User = createUser(), travelCompanion: TravelCompanion): TravelJournalSimpleResponse = TravelJournalSimpleResponse(
+fun createTravelJournalSimpleResponse(
+    user: User = createUser(),
+    travelCompanion: TravelCompanion,
+): TravelJournalSummaryResponse = TravelJournalSummaryResponse(
     TEST_TRAVEL_JOURNAL_ID,
     TEST_TRAVEL_JOURNAL_TITLE,
     TEST_TRAVEL_JOURNAL_CONTENT,
