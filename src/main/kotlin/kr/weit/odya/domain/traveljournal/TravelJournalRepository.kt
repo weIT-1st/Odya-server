@@ -3,7 +3,6 @@ package kr.weit.odya.domain.traveljournal
 import com.linecorp.kotlinjdsl.QueryFactory
 import com.linecorp.kotlinjdsl.listQuery
 import com.linecorp.kotlinjdsl.query.spec.OrderSpec
-import com.linecorp.kotlinjdsl.query.spec.expression.EntitySpec
 import com.linecorp.kotlinjdsl.query.spec.expression.SubqueryExpressionSpec
 import com.linecorp.kotlinjdsl.query.spec.predicate.PredicateSpec
 import com.linecorp.kotlinjdsl.querydsl.CriteriaQueryDsl
@@ -222,7 +221,7 @@ class CustomTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) 
             on(TravelJournal::travelJournalInformation),
         )
         where(dynamicPredicateByLastId(lastId, sortType))
-        orderBy(dynamicOrderingSortType(entity(TravelJournal::class), sortType))
+        orderBy(dynamicOrderingSortType(sortType))
         limit(size + 1)
     }
 
@@ -249,13 +248,9 @@ class CustomTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) 
         PredicateSpec.empty
     }
 
-    private fun CriteriaQueryDsl<TravelJournal>.dynamicOrderingSortType(
-        entity: EntitySpec<TravelJournal>,
-        sortType: TravelJournalSortType,
-    ): List<OrderSpec> =
-        when (sortType) {
-            TravelJournalSortType.LATEST -> listOf(col(entity, TravelJournal::id).desc())
-        }
+    private fun CriteriaQueryDsl<TravelJournal>.dynamicOrderingSortType(sortType: TravelJournalSortType): List<OrderSpec> = when (sortType) {
+        TravelJournalSortType.LATEST -> listOf(col(TravelJournal::id).desc())
+    }
 }
 
 enum class TravelJournalSortType(private val description: String) {
