@@ -43,10 +43,9 @@ class CustomContentImageRepositoryImpl(private val queryFactory: QueryFactory) :
     private fun CriteriaQueryDsl<ContentImage>.getImagesSliceBaseQuery(userId: Long, size: Int, lastId: Long?) {
         select(entity(ContentImage::class))
         from(entity(ContentImage::class))
-        associate(ContentImage::class, entity(User::class), on(ContentImage::user))
         where(
             and(
-                col(User::id).equal(userId),
+                nestedCol(col(ContentImage::user), User::id).equal(userId),
                 if (lastId != null) {
                     col(ContentImage::id).lessThan(lastId)
                 } else {
