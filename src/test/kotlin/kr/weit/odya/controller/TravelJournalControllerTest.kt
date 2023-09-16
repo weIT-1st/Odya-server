@@ -922,7 +922,7 @@ class TravelJournalControllerTest(
                         .andExpect(status().isOk)
                         .andDo(
                             RestDocsHelper.createPathDocument(
-                                "get-travel-journals-success",
+                                "get-travel-journal-success",
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                                 ),
@@ -972,7 +972,7 @@ class TravelJournalControllerTest(
                         .andExpect(status().isForbidden)
                         .andDo(
                             RestDocsHelper.createPathDocument(
-                                "get-travel-journals-fail-not-writer",
+                                "get-travel-journal-fail-not-writer",
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "작성자가 아닌 사용자",
                                 ),
@@ -995,7 +995,7 @@ class TravelJournalControllerTest(
                         .andExpect(status().isForbidden)
                         .andDo(
                             RestDocsHelper.createPathDocument(
-                                "get-travel-journals-fail-not-friend",
+                                "get-travel-journal-fail-not-friend",
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "친구가 아닌 사용자",
                                 ),
@@ -1017,7 +1017,7 @@ class TravelJournalControllerTest(
                         .andExpect(status().isUnauthorized)
                         .andDo(
                             RestDocsHelper.createPathDocument(
-                                "get-travel-journals-fail-invalid-token",
+                                "get-travel-journal-fail-invalid-token",
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "Invalid ID Token",
                                 ),
@@ -1026,6 +1026,71 @@ class TravelJournalControllerTest(
                                 ),
                             ),
                         )
+                }
+            }
+        }
+
+        describe("GET /api/v1/travel-journals") {
+            val targetUri = "/api/v1/travel-journals"
+            context("유효한 요청이 왔을 경우") {
+                val response = createSliceTravelJournalResponse()
+                every { travelJournalService.getTravelJournals(TEST_USER_ID, TEST_DEFAULT_SIZE, null, any<TravelJournalSortType>()) } returns response
+                it("200 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                    }.andExpect {
+                        status { isOk() }
+                    }.andDo {
+                        createDocument(
+                            "get-travel-journals-success",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_DEFAULT_SIZE isOptional true,
+                                LAST_ID_PARAM parameterDescription "마지막 여행 일지 ID" example TEST_TRAVEL_JOURNAL_ID isOptional true,
+                            ),
+                            responseBody(
+                                "hasNext" type JsonFieldType.BOOLEAN description "다음 페이지 여부" example response.hasNext,
+                                "content[].travelJournalId" type JsonFieldType.NUMBER description "여행 일지 아이디" example response.content[0].travelJournalId,
+                                "content[].title" type JsonFieldType.STRING description "여행 일지 제목" example response.content[0].title,
+                                "content[].content" type JsonFieldType.STRING description "여행 일지 콘텐츠" example response.content[0].content,
+                                "content[].contentImageUrl" type JsonFieldType.STRING description "여행 일지 콘텐츠의 이미지 URL" example response.content[0].contentImageUrl,
+                                "content[].travelStartDate" type JsonFieldType.STRING description "여행 시작일" example response.content[0].travelStartDate,
+                                "content[].travelEndDate" type JsonFieldType.STRING description "여행 종료일" example response.content[0].travelEndDate,
+                                "content[].writer.userId" type JsonFieldType.NUMBER description "여행 일지 작성자의 아이디" example response.content[0].writer.userId,
+                                "content[].writer.nickname" type JsonFieldType.STRING description "여행 일지 작성자의 닉네임" example response.content[0].writer.nickname,
+                                "content[].writer.profile.profileUrl" type JsonFieldType.STRING description "여행 일지 작성자의 프로필 사진" example response.content[0].writer.profile.profileUrl,
+                                "content[].writer.profile.profileColor.colorHex" type JsonFieldType.STRING description "여행 일지 작성자의 프로필 색상" example response.content[0].writer.profile.profileColor?.colorHex isOptional true,
+                                "content[].writer.profile.profileColor.red" type JsonFieldType.NUMBER description "여행 일지 작성자의 프로필 색상의 빨간색 값" example response.content[0].writer.profile.profileColor?.red isOptional true,
+                                "content[].writer.profile.profileColor.green" type JsonFieldType.NUMBER description "여행 일지 작성자의 프로필 색상의 초록색 값" example response.content[0].writer.profile.profileColor?.green isOptional true,
+                                "content[].writer.profile.profileColor.blue" type JsonFieldType.NUMBER description "여행 일지 작성자의 프로필 색상의 파란색 값" example response.content[0].writer.profile.profileColor?.blue isOptional true,
+                                "content[].travelCompanionSimpleResponses[].username" type JsonFieldType.STRING description "여행 친구의 아이디" example (response.content[0].travelCompanionSimpleResponses?.get(0)?.username) isOptional true,
+                                "content[].travelCompanionSimpleResponses[].profileUrl" type JsonFieldType.STRING description "여행 친구의 프로필 사진" example (response.content[0].travelCompanionSimpleResponses?.get(0)?.profileUrl) isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효하지 않은 토큰일 경우") {
+                it("401 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                    }.andExpect {
+                        status { isUnauthorized() }
+                    }.andDo {
+                        createDocument(
+                            "get-travel-journals-fail-invalid-token",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_DEFAULT_SIZE isOptional true,
+                                LAST_ID_PARAM parameterDescription "마지막 여행 일지 ID" example TEST_TRAVEL_JOURNAL_ID isOptional true,
+                            ),
+                        )
+                    }
                 }
             }
         }

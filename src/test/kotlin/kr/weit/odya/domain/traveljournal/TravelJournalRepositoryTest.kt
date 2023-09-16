@@ -32,6 +32,7 @@ class TravelJournalRepositoryTest(
             user = userRepository.save(createUser())
             otherUser = userRepository.save(createOtherUser())
             followRepository.save(Follow(user, otherUser))
+            followRepository.save(Follow(otherUser, user))
             val travelJournals = listOf(
                 createTravelJournal(
                     id = 1L,
@@ -50,6 +51,7 @@ class TravelJournalRepositoryTest(
                     id = 2L,
                     user = user,
                     title = "otherTravelJournal",
+                    visibility = TravelJournalVisibility.FRIEND_ONLY,
                     travelCompanions = listOf(createTravelCompanionById(user = otherUser)),
                     travelJournalContents = listOf(
                         createTravelJournalContent(
@@ -94,6 +96,16 @@ class TravelJournalRepositoryTest(
         }
 
         context("여행 일지 목록 조회") {
+            expect("여행 일지 목록을 조회한다.") {
+                val result = travelJournalRepository.getTravelJournalSliceBy(
+                    userId = otherUser.id,
+                    size = 10,
+                    lastId = null,
+                    sortType = TravelJournalSortType.LATEST,
+                )
+                result.size shouldBe 3
+            }
+
             expect("나의 여행 일지 목록을 조회한다.") {
                 val result = travelJournalRepository.getMyTravelJournalSliceBy(
                     userId = user.id,

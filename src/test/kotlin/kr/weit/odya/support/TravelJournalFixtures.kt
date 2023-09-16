@@ -278,10 +278,10 @@ fun createSliceTravelJournalResponse(
 ): SliceResponse<TravelJournalSummaryResponse> =
     SliceResponse(
         size = TEST_DEFAULT_SIZE,
-        content = listOf(createTravelJournalSimpleResponse(user = user, travelCompanion = travelCompanion)),
+        content = listOf(createTravelJournalSummaryResponse(user = user, travelCompanion = travelCompanion)),
     )
 
-fun createTravelJournalSimpleResponse(
+fun createTravelJournalSummaryResponse(
     user: User = createUser(),
     travelCompanion: TravelCompanion,
 ): TravelJournalSummaryResponse = TravelJournalSummaryResponse(
