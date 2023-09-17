@@ -6,8 +6,12 @@ import kr.weit.odya.domain.contentimage.getImageById
 import kr.weit.odya.domain.contentimage.getImageByRectangle
 import kr.weit.odya.domain.contentimage.getImageByUserId
 import kr.weit.odya.domain.contentimage.getLifeShotByUserId
+import kr.weit.odya.domain.follow.FollowRepository
+import kr.weit.odya.domain.follow.getFollowingIds
+import kr.weit.odya.service.dto.CoordinateImageRequest
 import kr.weit.odya.service.dto.CoordinateImageResponse
 import kr.weit.odya.service.dto.ImageResponse
+import kr.weit.odya.service.dto.ImageUserType
 import kr.weit.odya.service.dto.LifeShotRequest
 import kr.weit.odya.service.dto.SliceResponse
 import org.springframework.stereotype.Service
@@ -17,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional
 class ImageService(
     private val contentImageRepository: ContentImageRepository,
     private val fileService: FileService,
+    private val followRepository: FollowRepository,
 ) {
 
     @Transactional(readOnly = true)
@@ -58,13 +63,19 @@ class ImageService(
 
     @Transactional(readOnly = true)
     fun getImagesWithCoordinate(
-        leftLongitude: Double,
-        bottomLatitude: Double,
-        rightLongitude: Double,
-        topLatitude: Double,
-        size: Int,
+        userId: Long,
+        coordinateImageRequest: CoordinateImageRequest,
     ): List<CoordinateImageResponse> {
-        return contentImageRepository.getImageByRectangle(leftLongitude, bottomLatitude, rightLongitude, topLatitude, size)
-            .map { CoordinateImageResponse.of(it, fileService.getPreAuthenticatedObjectUrl(it.name)) }
+        val friendIdList = followRepository.getFollowingIds(userId)
+        return contentImageRepository.getImageByRectangle(coordinateImageRequest)
+            .map { CoordinateImageResponse.of(it, getImageUserType(userId, it.user.id, friendIdList), fileService.getPreAuthenticatedObjectUrl(it.name)) }
+    }
+
+    private fun getImageUserType(userId: Long, imageOwnerId: Long, friendIdList: List<Long>): ImageUserType {
+        return when {
+            userId == imageOwnerId -> ImageUserType.USER
+            friendIdList.contains(imageOwnerId) -> ImageUserType.FIEND
+            else -> ImageUserType.OTHER
+        }
     }
 }

@@ -1,6 +1,9 @@
 package kr.weit.odya.service.dto
 
+import jakarta.validation.constraints.Positive
 import kr.weit.odya.domain.contentimage.ContentImage
+import kr.weit.odya.support.validator.Latitude
+import kr.weit.odya.support.validator.Longitude
 import kr.weit.odya.support.validator.NullOrNotBlank
 import org.hibernate.validator.constraints.Length
 
@@ -39,19 +42,40 @@ data class CoordinateImageResponse(
     val placeId: String,
     val latitude: Double,
     val longitude: Double,
+    val imageUserType: ImageUserType,
     val journalId: Long?,
     val communityId: Long?,
 ) {
     companion object {
-        fun of(image: ContentImage, url: String) = CoordinateImageResponse(
+        fun of(image: ContentImage, imageUserType: ImageUserType, url: String) = CoordinateImageResponse(
             image.id,
             image.user.id,
             url,
             image.placeId!!,
             image.coordinate!!.y,
             image.coordinate!!.x,
+            imageUserType,
             image.travelJournalContentImage?.id,
             image.communityContentImage?.id,
         )
     }
 }
+
+enum class ImageUserType {
+    USER, // 요청한 사용자 본인의 사진
+    FIEND, // 요청한 사용자의 친구의 사진
+    OTHER, // 요청한 사용자의 친구가 아닌 사람의 사진
+}
+
+data class CoordinateImageRequest(
+    @field:Longitude
+    val leftLongitude: Double,
+    @field:Latitude
+    val bottomLatitude: Double,
+    @field:Longitude
+    val rightLongitude: Double,
+    @field:Latitude
+    val topLatitude: Double,
+    @field:Positive(message = "사이즈는 양수여야 합니다.")
+    val size: Int = 10,
+)
