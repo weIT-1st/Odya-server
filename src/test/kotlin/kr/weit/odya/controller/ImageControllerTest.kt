@@ -6,19 +6,28 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.runs
 import kr.weit.odya.service.ImageService
+import kr.weit.odya.support.BOTTOM_LATITUDE_PARAM
 import kr.weit.odya.support.LAST_ID_PARAM
+import kr.weit.odya.support.LEFT_LONGITUDE_PARAM
+import kr.weit.odya.support.RIGHT_LONGITUDE_PARAM
 import kr.weit.odya.support.SIZE_PARAM
 import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_NOT_EXIST_USER_ID_TOKEN
+import kr.weit.odya.support.TEST_BOTTOM_LATITUDE
 import kr.weit.odya.support.TEST_IMAGE_ID
 import kr.weit.odya.support.TEST_INVALID_IMAGE_ID
 import kr.weit.odya.support.TEST_INVALID_LAST_ID
 import kr.weit.odya.support.TEST_INVALID_SIZE
 import kr.weit.odya.support.TEST_LAST_ID
+import kr.weit.odya.support.TEST_LEFT_LONGITUDE
+import kr.weit.odya.support.TEST_RIGHT_LONGITUDE
 import kr.weit.odya.support.TEST_SIZE
 import kr.weit.odya.support.TEST_TOO_LONG_PHRASE
+import kr.weit.odya.support.TEST_TOP_LATITUDE
 import kr.weit.odya.support.TEST_USER_ID
+import kr.weit.odya.support.TOP_LATITUDE_PARAM
+import kr.weit.odya.support.createCoordinateImageResponseList
 import kr.weit.odya.support.createLifeShotRequest
 import kr.weit.odya.support.createSliceImageResponse
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
@@ -449,6 +458,241 @@ class ImageControllerTest(
                                 ),
                             ),
                         )
+                }
+            }
+        }
+
+        describe("GET /api/v1/images/coordinate") {
+            val targetUri = "/api/v1/images/coordinate"
+            context("유효한 토큰이면서, 가입된 사용자인 경우") {
+                val response = createCoordinateImageResponseList()
+                val content = response[0]
+                every { imageService.getImagesWithCoordinate(TEST_USER_ID, any()) } returns response
+                it("200 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(LEFT_LONGITUDE_PARAM, TEST_LEFT_LONGITUDE.toString())
+                        param(BOTTOM_LATITUDE_PARAM, TEST_BOTTOM_LATITUDE.toString())
+                        param(RIGHT_LONGITUDE_PARAM, TEST_RIGHT_LONGITUDE.toString())
+                        param(TOP_LATITUDE_PARAM, TEST_TOP_LATITUDE.toString())
+                        param(SIZE_PARAM, TEST_SIZE.toString())
+                    }.andExpect {
+                        status { isOk() }
+                    }.andDo {
+                        createDocument(
+                            "get-coordinate-images-success",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                LEFT_LONGITUDE_PARAM parameterDescription "좌측 경도" example TEST_LEFT_LONGITUDE,
+                                BOTTOM_LATITUDE_PARAM parameterDescription "하단 위도" example TEST_BOTTOM_LATITUDE,
+                                RIGHT_LONGITUDE_PARAM parameterDescription "우측 경도" example TEST_RIGHT_LONGITUDE,
+                                TOP_LATITUDE_PARAM parameterDescription "상단 위도" example TEST_TOP_LATITUDE,
+                                SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_SIZE isOptional true,
+                            ),
+                            responseBody(
+                                "[].imageId" type JsonFieldType.NUMBER description "이미지 id" example content.imageId,
+                                "[].userId" type JsonFieldType.NUMBER description "사용자 id" example content.userId,
+                                "[].imageUrl" type JsonFieldType.STRING description "사진 URL" example content.imageUrl,
+                                "[].placeId" type JsonFieldType.STRING description "장소 id" example content.placeId,
+                                "[].latitude" type JsonFieldType.NUMBER description "위도" example content.latitude,
+                                "[].longitude" type JsonFieldType.NUMBER description "경도" example content.longitude,
+                                "[].imageUserType" type JsonFieldType.STRING description "사진 사용자 타입" example content.imageUserType,
+                                "[].journalId" type JsonFieldType.NUMBER description "여행일지 id" example content.journalId isOptional true,
+                                "[].communityId" type JsonFieldType.NUMBER description "피드 id" example content.communityId isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이지만 size가 양수가 아닌 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(LEFT_LONGITUDE_PARAM, TEST_LEFT_LONGITUDE.toString())
+                        param(BOTTOM_LATITUDE_PARAM, TEST_BOTTOM_LATITUDE.toString())
+                        param(RIGHT_LONGITUDE_PARAM, TEST_RIGHT_LONGITUDE.toString())
+                        param(TOP_LATITUDE_PARAM, TEST_TOP_LATITUDE.toString())
+                        param(SIZE_PARAM, TEST_INVALID_SIZE.toString())
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "get-coordinate-images-fail-invalid-size",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                LEFT_LONGITUDE_PARAM parameterDescription "좌측 경도" example TEST_LEFT_LONGITUDE,
+                                BOTTOM_LATITUDE_PARAM parameterDescription "하단 위도" example TEST_BOTTOM_LATITUDE,
+                                RIGHT_LONGITUDE_PARAM parameterDescription "우측 경도" example TEST_RIGHT_LONGITUDE,
+                                TOP_LATITUDE_PARAM parameterDescription "상단 위도" example TEST_TOP_LATITUDE,
+                                SIZE_PARAM parameterDescription "양수가 아닌 데이터 개수" example TEST_INVALID_SIZE isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이지만 좌측 경도가 경도의 한계를 넘는 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(LEFT_LONGITUDE_PARAM, "999")
+                        param(BOTTOM_LATITUDE_PARAM, TEST_BOTTOM_LATITUDE.toString())
+                        param(RIGHT_LONGITUDE_PARAM, TEST_RIGHT_LONGITUDE.toString())
+                        param(TOP_LATITUDE_PARAM, TEST_TOP_LATITUDE.toString())
+                        param(SIZE_PARAM, TEST_SIZE.toString())
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "get-coordinate-images-fail-invalid-left-longitude",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                LEFT_LONGITUDE_PARAM parameterDescription "잘못된 좌측 경도" example "999",
+                                BOTTOM_LATITUDE_PARAM parameterDescription "하단 위도" example TEST_BOTTOM_LATITUDE,
+                                RIGHT_LONGITUDE_PARAM parameterDescription "우측 경도" example TEST_RIGHT_LONGITUDE,
+                                TOP_LATITUDE_PARAM parameterDescription "상단 위도" example TEST_TOP_LATITUDE,
+                                SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_SIZE isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이지만 하단 위도가 위도의 한계를 넘는 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(LEFT_LONGITUDE_PARAM, TEST_LEFT_LONGITUDE.toString())
+                        param(BOTTOM_LATITUDE_PARAM, "999")
+                        param(RIGHT_LONGITUDE_PARAM, TEST_RIGHT_LONGITUDE.toString())
+                        param(TOP_LATITUDE_PARAM, TEST_TOP_LATITUDE.toString())
+                        param(SIZE_PARAM, TEST_SIZE.toString())
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "get-coordinate-images-fail-invalid-bottom-latitude",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                LEFT_LONGITUDE_PARAM parameterDescription "좌측 경도" example TEST_LEFT_LONGITUDE,
+                                BOTTOM_LATITUDE_PARAM parameterDescription "잘못된 하단 위도" example "999",
+                                RIGHT_LONGITUDE_PARAM parameterDescription "우측 경도" example TEST_RIGHT_LONGITUDE,
+                                TOP_LATITUDE_PARAM parameterDescription "상단 위도" example TEST_TOP_LATITUDE,
+                                SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_SIZE isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이지만 우측 경도가 경도의 한계를 넘는 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(LEFT_LONGITUDE_PARAM, TEST_LEFT_LONGITUDE.toString())
+                        param(BOTTOM_LATITUDE_PARAM, TEST_BOTTOM_LATITUDE.toString())
+                        param(RIGHT_LONGITUDE_PARAM, "999")
+                        param(TOP_LATITUDE_PARAM, TEST_TOP_LATITUDE.toString())
+                        param(SIZE_PARAM, TEST_SIZE.toString())
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "get-coordinate-images-fail-invalid-right-longitude",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                LEFT_LONGITUDE_PARAM parameterDescription "좌측 경도" example TEST_LEFT_LONGITUDE,
+                                BOTTOM_LATITUDE_PARAM parameterDescription "하단 위도" example BOTTOM_LATITUDE_PARAM,
+                                RIGHT_LONGITUDE_PARAM parameterDescription "잘못된 우측 경도" example "999",
+                                TOP_LATITUDE_PARAM parameterDescription "상단 위도" example TEST_TOP_LATITUDE,
+                                SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_SIZE isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이지만 상단 위도가 위도의 한계를 넘는 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(LEFT_LONGITUDE_PARAM, TEST_LEFT_LONGITUDE.toString())
+                        param(BOTTOM_LATITUDE_PARAM, TEST_BOTTOM_LATITUDE.toString())
+                        param(RIGHT_LONGITUDE_PARAM, TEST_RIGHT_LONGITUDE.toString())
+                        param(TOP_LATITUDE_PARAM, "999")
+                        param(SIZE_PARAM, TEST_SIZE.toString())
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "get-coordinate-images-fail-invalid-top-latitude",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                LEFT_LONGITUDE_PARAM parameterDescription "좌측 경도" example TEST_LEFT_LONGITUDE,
+                                BOTTOM_LATITUDE_PARAM parameterDescription "잘못된 하단 위도" example TEST_BOTTOM_LATITUDE,
+                                RIGHT_LONGITUDE_PARAM parameterDescription "우측 경도" example TEST_RIGHT_LONGITUDE,
+                                TOP_LATITUDE_PARAM parameterDescription "상단 위도" example "999",
+                                SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_SIZE isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이면서, 가입되지 않은 사용자인 경우") {
+                it("401 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_NOT_EXIST_USER_ID_TOKEN)
+                        param(LEFT_LONGITUDE_PARAM, TEST_LEFT_LONGITUDE.toString())
+                        param(BOTTOM_LATITUDE_PARAM, TEST_BOTTOM_LATITUDE.toString())
+                        param(RIGHT_LONGITUDE_PARAM, TEST_RIGHT_LONGITUDE.toString())
+                        param(TOP_LATITUDE_PARAM, TEST_TOP_LATITUDE.toString())
+                        param(SIZE_PARAM, TEST_SIZE.toString())
+                    }.andExpect {
+                        status { isUnauthorized() }
+                    }.andDo {
+                        createDocument(
+                            "get-coordinate-images-fail-not-registered-user",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효하지 않은 토큰이면") {
+                it("401 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_NOT_EXIST_USER_ID_TOKEN)
+                        param(LEFT_LONGITUDE_PARAM, TEST_LEFT_LONGITUDE.toString())
+                        param(BOTTOM_LATITUDE_PARAM, TEST_BOTTOM_LATITUDE.toString())
+                        param(RIGHT_LONGITUDE_PARAM, TEST_RIGHT_LONGITUDE.toString())
+                        param(TOP_LATITUDE_PARAM, TEST_TOP_LATITUDE.toString())
+                        param(SIZE_PARAM, TEST_SIZE.toString())
+                    }.andExpect {
+                        status { isUnauthorized() }
+                    }.andDo {
+                        createDocument(
+                            "get-coordinate-images-fail-invalid-token",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                            ),
+                        )
+                    }
                 }
             }
         }

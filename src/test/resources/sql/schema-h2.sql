@@ -1,3 +1,10 @@
+CREATE ALIAS IF NOT EXISTS H2GIS_SPATIAL FOR "org.h2gis.functions.factory.H2GISFunctions.load";
+CALL H2GIS_SPATIAL();
+
+DROP ALIAS ST_WITHIN;
+CREATE ALIAS ST_WITHIN FOR "kr.weit.odya.support.SQLSupport.within";
+CREATE ALIAS rectangle FOR "org.h2gis.functions.spatial.create.ST_MakeEnvelope.makeEnvelope";
+
 CREATE TABLE users
 (
     id           NUMERIC(19, 0) NOT NULL,

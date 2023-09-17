@@ -9,22 +9,28 @@ import io.mockk.mockk
 import jakarta.ws.rs.ForbiddenException
 import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.contentimage.getImageById
+import kr.weit.odya.domain.contentimage.getImageByRectangle
 import kr.weit.odya.domain.contentimage.getImageByUserId
 import kr.weit.odya.domain.contentimage.getLifeShotByUserId
+import kr.weit.odya.domain.follow.FollowRepository
+import kr.weit.odya.domain.follow.getFollowingIds
 import kr.weit.odya.support.TEST_FILE_AUTHENTICATED_URL
 import kr.weit.odya.support.TEST_IMAGE_ID
 import kr.weit.odya.support.TEST_OTHER_USER_ID
 import kr.weit.odya.support.TEST_SIZE
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createContentImage
+import kr.weit.odya.support.createCoordinateImageRequest
 import kr.weit.odya.support.createLifeShotRequest
+import kr.weit.odya.support.createPlaceDetails
 import kr.weit.odya.support.createUser
 
 class ImageServiceTest : DescribeSpec(
     {
         val contentImageRepository = mockk<ContentImageRepository>()
         val fileService = mockk<FileService>()
-        val imageService = ImageService(contentImageRepository, fileService)
+        val followRepository = mockk<FollowRepository>()
+        val imageService = ImageService(contentImageRepository, fileService, followRepository)
         every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
 
         describe("getImages") {
@@ -110,6 +116,22 @@ class ImageServiceTest : DescribeSpec(
                         imageService.cancelLifeShot(
                             TEST_USER_ID,
                             TEST_IMAGE_ID,
+                        )
+                    }
+                }
+            }
+        }
+
+        describe("getImagesWithCoordinate") {
+            context("유효한 유저 id와 좌표가 주어지는 경우") {
+                every { followRepository.getFollowingIds(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
+                every { contentImageRepository.getImageByRectangle(any()) } returns listOf(createContentImage(placeDetails = createPlaceDetails()))
+                every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
+                it("정상적으로 종료한다.") {
+                    shouldNotThrowAny {
+                        imageService.getImagesWithCoordinate(
+                            TEST_USER_ID,
+                            createCoordinateImageRequest(),
                         )
                     }
                 }
