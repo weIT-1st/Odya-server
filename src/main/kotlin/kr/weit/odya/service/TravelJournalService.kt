@@ -234,12 +234,6 @@ class TravelJournalService(
         // 내용 변경
         travelJournalContent.changeTravelJournalContent(travelJournalContentUpdateRequest.toTravelJournalContentInformation())
 
-        // 이미지 삭제
-        val deleteTravelJournalContentImages = travelJournalContent.travelJournalContentImages.filter {
-            travelJournalContentUpdateRequest.deleteContentImageIds?.contains(it.id) == true
-        }
-        travelJournalContent.deleteTravelJournalContentImages(deleteTravelJournalContentImages)
-
         // 이미지 추가
         val register = userRepository.getByUserId(userId)
         val contentImageMap = getContentImageMap(register, imageNamePairs)
@@ -249,7 +243,13 @@ class TravelJournalService(
         ).map { TravelJournalContentImage(contentImage = it) }
         travelJournalContent.addTravelJournalContentImages(newTravelJournalContentImages)
 
-        // 이미지 s3 삭제
+        // 이미지 삭제
+        val deleteTravelJournalContentImages = travelJournalContent.travelJournalContentImages.filter {
+            travelJournalContentUpdateRequest.deleteContentImageIds?.contains(it.id) == true
+        }
+        travelJournalContent.deleteTravelJournalContentImages(deleteTravelJournalContentImages)
+
+        // 이미지 Object Storage 삭제
         eventPublisher.publishEvent(TravelJournalContentUpdateEvent(deleteTravelJournalContentImages.map { it.contentImage.name }))
     }
 
@@ -444,7 +444,9 @@ class TravelJournalService(
         if (travelJournal.visibility == TravelJournalVisibility.PRIVATE && travelJournal.user.id != userId) {
             throw ForbiddenException("비공개 여행 일지는 작성자만 조회할 수 있습니다.")
         }
-        if (travelJournal.visibility == TravelJournalVisibility.FRIEND_ONLY && !(followRepository.existsByFollowerIdAndFollowingId(travelJournal.user.id, userId))) {
+        if (travelJournal.visibility == TravelJournalVisibility.FRIEND_ONLY && travelJournal.user.id != userId &&
+            !(followRepository.existsByFollowerIdAndFollowingId(travelJournal.user.id, userId))
+        ) {
             throw ForbiddenException("친구가 아닌 사용자는 친구에게만 공개하는 여행 일지를 조회할 수 없습니다.")
         }
     }

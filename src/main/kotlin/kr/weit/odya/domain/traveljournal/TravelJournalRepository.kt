@@ -123,10 +123,12 @@ class CustomTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) 
         val followingIds = getFollowingIdsSubQuery(userId)
         val publicTravelJournalIds = getPublicTravelJournalIdsSubQuery()
         val friendOnlyTravelJournalIds = getFriendOnlyTravelJournalIdsSubQuery(followingIds)
+        val myFriendOnlyTravelJournalIds = getMyFriendOnlyTravelJournalIdsSubQuery(userId)
         where(
             or(
                 col(TravelJournal::id).`in`(publicTravelJournalIds),
                 col(TravelJournal::id).`in`(friendOnlyTravelJournalIds),
+                col(TravelJournal::id).`in`(myFriendOnlyTravelJournalIds),
             ),
         )
     }
@@ -174,6 +176,25 @@ class CustomTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) 
         )
     }
 
+    private fun getMyFriendOnlyTravelJournalIdsSubQuery(userId: Long) =
+        queryFactory.subquery<Long> {
+            val tj3Entity = entity(TravelJournal::class, "tj3")
+            val tji3Entity = entity(TravelJournalInformation::class, "tji3")
+            associate(
+                tj3Entity,
+                tji3Entity,
+                on(TravelJournal::travelJournalInformation),
+            )
+            select(col(tj3Entity, TravelJournal::id))
+            from(tj3Entity)
+            where(
+                and(
+                    col(tji3Entity, TravelJournalInformation::visibility).equal(TravelJournalVisibility.FRIEND_ONLY),
+                    nestedCol(col(tj3Entity, TravelJournal::user), User::id).equal(userId),
+                ),
+            )
+        }
+
     private fun getFriendOnlyTravelJournalIdsSubQuery(followingIds: SubqueryExpressionSpec<Long>) =
         queryFactory.subquery<Long> {
             val tj2Entity = entity(TravelJournal::class, "tj2")
@@ -212,7 +233,11 @@ class CustomTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) 
         where(nestedCol(col(Follow::follower), User::id).equal(userId))
     }
 
-    private fun CriteriaQueryDsl<TravelJournal>.getTravelJournalSliceBaseQuery(lastId: Long?, sortType: TravelJournalSortType, size: Int) {
+    private fun CriteriaQueryDsl<TravelJournal>.getTravelJournalSliceBaseQuery(
+        lastId: Long?,
+        sortType: TravelJournalSortType,
+        size: Int,
+    ) {
         select(entity(TravelJournal::class))
         from(entity(TravelJournal::class))
         associate(
@@ -248,9 +273,10 @@ class CustomTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) 
         PredicateSpec.empty
     }
 
-    private fun CriteriaQueryDsl<TravelJournal>.dynamicOrderingSortType(sortType: TravelJournalSortType): List<OrderSpec> = when (sortType) {
-        TravelJournalSortType.LATEST -> listOf(col(TravelJournal::id).desc())
-    }
+    private fun CriteriaQueryDsl<TravelJournal>.dynamicOrderingSortType(sortType: TravelJournalSortType): List<OrderSpec> =
+        when (sortType) {
+            TravelJournalSortType.LATEST -> listOf(col(TravelJournal::id).desc())
+        }
 }
 
 enum class TravelJournalSortType(private val description: String) {
