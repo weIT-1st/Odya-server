@@ -31,3 +31,27 @@ data class LifeShotRequest(
     @field:Length(max = 30, message = "장소명의 최대 길이를 초과했습니다.")
     val placeName: String?, // 이때 받은 내용으로 검색을 하거나 통계를 내지 않기 때문에 장소 id가 아니라 장소 명을 받는다
 )
+
+data class CoordinateImageResponse(
+    val imageId: Long,
+    val userId: Long,
+    val imageUrl: String,
+    val placeId: String,
+    val latitude: Double,
+    val longitude: Double,
+    val journalId: Long?,
+    val communityId: Long?,
+) {
+    companion object {
+        fun of(image: ContentImage, url: String) = CoordinateImageResponse(
+            image.id,
+            image.user.id,
+            url,
+            image.placeId!!,
+            image.coordinate!!.y,
+            image.coordinate!!.x,
+            image.travelJournalContentImage?.id,
+            image.communityContentImage?.id,
+        )
+    }
+}

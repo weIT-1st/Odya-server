@@ -4,9 +4,12 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.Positive
 import kr.weit.odya.security.LoginUserId
 import kr.weit.odya.service.ImageService
+import kr.weit.odya.service.dto.CoordinateImageResponse
 import kr.weit.odya.service.dto.ImageResponse
 import kr.weit.odya.service.dto.LifeShotRequest
 import kr.weit.odya.service.dto.SliceResponse
+import kr.weit.odya.support.validator.Latitude
+import kr.weit.odya.support.validator.Longitude
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -64,5 +67,26 @@ class ImageController(
     ): ResponseEntity<Void> {
         imageService.cancelLifeShot(userId, imageId)
         return ResponseEntity.noContent().build()
+    }
+
+    @GetMapping("/map")
+    fun getCoordinateImages(
+        @Longitude
+        @RequestParam
+        leftLongitude: Double,
+        @Latitude
+        @RequestParam
+        bottomLatitude: Double,
+        @Longitude
+        @RequestParam
+        rightLongitude: Double,
+        @Latitude
+        @RequestParam
+        topLatitude: Double,
+        @Positive(message = "사이즈는 양수여야 합니다.")
+        @RequestParam(name = "size", required = false, defaultValue = "100")
+        size: Int,
+    ): ResponseEntity<List<CoordinateImageResponse>> {
+        return ResponseEntity.ok(imageService.getImagesWithCoordinate(leftLongitude, bottomLatitude, rightLongitude, topLatitude, size))
     }
 }

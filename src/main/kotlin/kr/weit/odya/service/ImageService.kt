@@ -3,8 +3,10 @@ package kr.weit.odya.service
 import jakarta.ws.rs.ForbiddenException
 import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.contentimage.getImageById
+import kr.weit.odya.domain.contentimage.getImageByRectangle
 import kr.weit.odya.domain.contentimage.getImageByUserId
 import kr.weit.odya.domain.contentimage.getLifeShotByUserId
+import kr.weit.odya.service.dto.CoordinateImageResponse
 import kr.weit.odya.service.dto.ImageResponse
 import kr.weit.odya.service.dto.LifeShotRequest
 import kr.weit.odya.service.dto.SliceResponse
@@ -20,13 +22,19 @@ class ImageService(
     @Transactional(readOnly = true)
     fun getImages(userId: Long, size: Int, lastId: Long?): SliceResponse<ImageResponse> {
         val images = contentImageRepository.getImageByUserId(userId, size, lastId)
-        return SliceResponse(size, images.map { ImageResponse.of(it, fileService.getPreAuthenticatedObjectUrl(it.name)) })
+        return SliceResponse(
+            size,
+            images.map { ImageResponse.of(it, fileService.getPreAuthenticatedObjectUrl(it.name)) },
+        )
     }
 
     @Transactional(readOnly = true)
     fun getLifeShots(userId: Long, size: Int, lastId: Long?): SliceResponse<ImageResponse> {
         val images = contentImageRepository.getLifeShotByUserId(userId, size, lastId)
-        return SliceResponse(size, images.map { ImageResponse.of(it, fileService.getPreAuthenticatedObjectUrl(it.name)) })
+        return SliceResponse(
+            size,
+            images.map { ImageResponse.of(it, fileService.getPreAuthenticatedObjectUrl(it.name)) },
+        )
     }
 
     @Transactional
@@ -46,5 +54,17 @@ class ImageService(
         }
         // 인생샷이 아닌 사진을 취소해도 에러를 발생시키지 않도록 한다
         image.unsetLifeShot()
+    }
+
+    @Transactional(readOnly = true)
+    fun getImagesWithCoordinate(
+        leftLongitude: Double,
+        bottomLatitude: Double,
+        rightLongitude: Double,
+        topLatitude: Double,
+        size: Int,
+    ): List<CoordinateImageResponse> {
+        return contentImageRepository.getImageByRectangle(leftLongitude, bottomLatitude, rightLongitude, topLatitude, size)
+            .map { CoordinateImageResponse.of(it, fileService.getPreAuthenticatedObjectUrl(it.name)) }
     }
 }
