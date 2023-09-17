@@ -4,6 +4,8 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.Positive
 import kr.weit.odya.security.LoginUserId
 import kr.weit.odya.service.ImageService
+import kr.weit.odya.service.dto.CoordinateImageRequest
+import kr.weit.odya.service.dto.CoordinateImageResponse
 import kr.weit.odya.service.dto.ImageResponse
 import kr.weit.odya.service.dto.LifeShotRequest
 import kr.weit.odya.service.dto.SliceResponse
@@ -64,5 +66,15 @@ class ImageController(
     ): ResponseEntity<Void> {
         imageService.cancelLifeShot(userId, imageId)
         return ResponseEntity.noContent().build()
+    }
+
+    @GetMapping("/coordinate")
+    fun getCoordinateImages(
+        @LoginUserId
+        userId: Long,
+        @Valid
+        coordinateImageRequest: CoordinateImageRequest,
+    ): ResponseEntity<List<CoordinateImageResponse>> {
+        return ResponseEntity.ok(imageService.getImagesWithCoordinate(userId, coordinateImageRequest))
     }
 }

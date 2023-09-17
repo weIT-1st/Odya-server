@@ -1,3 +1,6 @@
+[[Image-API]]
+= *Image API*
+
 [[유저-사진-조회-API]]
 == *1. 유저 사진 조회 API*
 
@@ -70,3 +73,54 @@ operation::image-controller-test/unset-life-shot-fail-not-registered-user[snippe
 === *3-4 실패 - 유효하지 않은 토큰*
 
 operation::image-controller-test/unset-life-shot-fail-invalid-token[snippets='http-request,request-headers,path-parameters,request-body,http-response']
+
+[[좌표-사진-조회-API]]
+
+== *4. 좌표 사진 조회 API*
+
+== *ImageUserType*
+
+|===
+| type | description
+
+| `USER`
+| 요청한 사용자 본인의 사진
+
+| `FRIEND`
+| 요청한 사용자의 친구의 사진
+
+| `OTHER`
+| 요청한 사용자의 친구가 아닌 사진
+|===
+
+=== *4-1 성공*
+
+operation::image-controller-test/get-coordinate-images-success[snippets='http-request,query-parameters,request-headers,http-response']
+
+=== *4-2 실패 - 유효하지 않은 사이즈*
+
+operation::image-controller-test/get-coordinate-images-fail-invalid-size[snippets='http-request,query-parameters,request-headers,http-response']
+
+=== *4-3 실패 - 유효하지 않은 좌측 경도*
+
+operation::image-controller-test/get-coordinate-images-fail-invalid-left-longitude[snippets='http-request,query-parameters,request-headers,http-response']
+
+=== *4-4 실패 - 유효하지 않은 하단 위도*
+
+operation::image-controller-test/get-coordinate-images-fail-invalid-bottom-latitude[snippets='http-request,query-parameters,request-headers,http-response']
+
+=== *4-5 실패 - 유효하지 않은 우측 경도*
+
+operation::image-controller-test/get-coordinate-images-fail-invalid-right-longitude[snippets='http-request,query-parameters,request-headers,http-response']
+
+=== *4-6 실패 - 유효하지 않은 상단 위도*
+
+operation::image-controller-test/get-coordinate-images-fail-invalid-top-latitude[snippets='http-request,query-parameters,request-headers,http-response']
+
+=== *4-7 실패 - 가입되지 않은 유저*
+
+operation::image-controller-test/get-images-fail-not-registered-user[snippets='http-request,request-headers,http-response']
+
+=== *4-8 실패 - 유효하지 않은 토큰*
+
+operation::image-controller-test/get-images-fail-invalid-token[snippets='http-request,request-headers,http-response']
