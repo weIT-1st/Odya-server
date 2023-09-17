@@ -1,3 +1,6 @@
+[[Image-API]]
+= *Image API*
+
 [[유저-사진-조회-API]]
 == *1. 유저 사진 조회 API*
 
