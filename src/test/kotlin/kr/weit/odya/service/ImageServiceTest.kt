@@ -14,10 +14,15 @@ import kr.weit.odya.domain.contentimage.getImageByUserId
 import kr.weit.odya.domain.contentimage.getLifeShotByUserId
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowingIds
+import kr.weit.odya.support.TEST_BOTTOM_LATITUDE
+import kr.weit.odya.support.TEST_DEFAULT_SIZE
 import kr.weit.odya.support.TEST_FILE_AUTHENTICATED_URL
 import kr.weit.odya.support.TEST_IMAGE_ID
+import kr.weit.odya.support.TEST_LEFT_LONGITUDE
 import kr.weit.odya.support.TEST_OTHER_USER_ID
+import kr.weit.odya.support.TEST_RIGHT_LONGITUDE
 import kr.weit.odya.support.TEST_SIZE
+import kr.weit.odya.support.TEST_TOP_LATITUDE
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createContentImage
 import kr.weit.odya.support.createCoordinateImageRequest
@@ -125,7 +130,15 @@ class ImageServiceTest : DescribeSpec(
         describe("getImagesWithCoordinate") {
             context("유효한 유저 id와 좌표가 주어지는 경우") {
                 every { followRepository.getFollowingIds(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
-                every { contentImageRepository.getImageByRectangle(any()) } returns listOf(createContentImage(placeDetails = createPlaceDetails()))
+                every {
+                    contentImageRepository.getImageByRectangle(
+                        TEST_LEFT_LONGITUDE,
+                        TEST_BOTTOM_LATITUDE,
+                        TEST_RIGHT_LONGITUDE,
+                        TEST_TOP_LATITUDE,
+                        TEST_DEFAULT_SIZE,
+                    )
+                } returns listOf(createContentImage(placeDetails = createPlaceDetails()))
                 every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
                 it("정상적으로 종료한다.") {
                     shouldNotThrowAny {

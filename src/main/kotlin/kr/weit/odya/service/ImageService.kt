@@ -67,14 +67,25 @@ class ImageService(
         coordinateImageRequest: CoordinateImageRequest,
     ): List<CoordinateImageResponse> {
         val friendIdList = followRepository.getFollowingIds(userId)
-        return contentImageRepository.getImageByRectangle(coordinateImageRequest)
-            .map { CoordinateImageResponse.of(it, getImageUserType(userId, it.user.id, friendIdList), fileService.getPreAuthenticatedObjectUrl(it.name)) }
+        return contentImageRepository.getImageByRectangle(
+            coordinateImageRequest.leftLongitude,
+            coordinateImageRequest.bottomLatitude,
+            coordinateImageRequest.rightLongitude,
+            coordinateImageRequest.topLatitude,
+            coordinateImageRequest.size,
+        ).map {
+            CoordinateImageResponse.of(
+                it,
+                getImageUserType(userId, it.user.id, friendIdList),
+                fileService.getPreAuthenticatedObjectUrl(it.name),
+            )
+        }
     }
 
     private fun getImageUserType(userId: Long, imageOwnerId: Long, friendIdList: List<Long>): ImageUserType {
         return when {
             userId == imageOwnerId -> ImageUserType.USER
-            friendIdList.contains(imageOwnerId) -> ImageUserType.FIEND
+            friendIdList.contains(imageOwnerId) -> ImageUserType.FRIEND
             else -> ImageUserType.OTHER
         }
     }

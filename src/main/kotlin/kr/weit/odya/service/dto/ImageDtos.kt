@@ -63,7 +63,7 @@ data class CoordinateImageResponse(
 
 enum class ImageUserType {
     USER, // 요청한 사용자 본인의 사진
-    FIEND, // 요청한 사용자의 친구의 사진
+    FRIEND, // 요청한 사용자의 친구의 사진
     OTHER, // 요청한 사용자의 친구가 아닌 사람의 사진
 }
 
