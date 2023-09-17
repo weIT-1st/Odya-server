@@ -26,7 +26,7 @@ class ContentImageRepositoryTest(private val userRepository: UserRepository, pri
         beforeEach {
             user = userRepository.save(createUser())
             contentImage1 = contentImageRepository.save(createContentImage(user = user, placeDetails = createPlaceDetails(lat = 10.0, lng = 10.0), isLifeShot = true))
-            contentImage2 = contentImageRepository.save(createContentImage(user = user, placeDetails = createPlaceDetails(lat = 1.0, lng = 1.0), isLifeShot = false, placeName = null))
+            contentImage2 = contentImageRepository.save(createContentImage(user = user, placeDetails = createPlaceDetails(lat = 1.0, lng = 1.0), isLifeShot = true, placeName = null))
             contentImageRepository.save(
                 createContentImage(user = user, placeDetails = createPlaceDetails(lat = -1.0, lng = -1.0), isLifeShot = true),
             )
