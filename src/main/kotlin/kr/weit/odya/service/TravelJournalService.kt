@@ -76,7 +76,13 @@ class TravelJournalService(
         val contentImageMap = getContentImageMap(register, imageNamePairs)
         val travelJournalContents =
             travelJournalRequest.travelJournalContentRequests.map { travelJournalContentRequest ->
-                val contentImages = getContentImages(travelJournalContentRequest.contentImageNames, contentImageMap, placeDetailsMap)
+                val contentImages =
+                    getContentImages(
+                        travelJournalContentRequest.contentImageNames,
+                        contentImageMap,
+                        placeDetailsMap,
+                        travelJournalContentRequest.placeId,
+                    )
                 createTravelJournalContent(
                     contentImages,
                     travelJournalContentRequest.toTravelJournalContentInformation(),
@@ -247,6 +253,7 @@ class TravelJournalService(
             travelJournalContentUpdateRequest.updateContentImageNames ?: emptyList(),
             contentImageMap,
             placeDetailsMap,
+            travelJournalContentUpdateRequest.placeId,
         ).map { TravelJournalContentImage(contentImage = it) }
         travelJournalContent.addTravelJournalContentImages(newTravelJournalContentImages)
 
@@ -318,9 +325,6 @@ class TravelJournalService(
         contentImageRepository.deleteAllByUserId(userId)
     }
 
-    fun getPlaceDetailsMap(placeIdList: Set<String>): Map<String, PlaceDetails> =
-        placeIdList.associateWith { googleMapsClient.findPlaceDetailsByPlaceId(it) }
-
     private fun updateTravelCompanions(
         travelJournal: TravelJournal,
         travelJournalUpdateRequest: TravelJournalUpdateRequest,
@@ -341,6 +345,9 @@ class TravelJournalService(
         )
         travelJournal.addTravelCompanions(newTravelCompanions)
     }
+
+    fun getPlaceDetailsMap(placeIdList: Set<String>): Map<String, PlaceDetails> =
+        placeIdList.associateWith { googleMapsClient.findPlaceDetailsByPlaceId(it) }
 
     private fun getTravelJournalContent(
         travelJournal: TravelJournal,
@@ -511,7 +518,7 @@ class TravelJournalService(
         .filter { contentImageMap?.contains(it) ?: false }
         .mapNotNull { contentImageMap?.getValue(it) }
         .apply {
-            if (placeId != null) { // 여행일지 day에 장소가 태그되었다면 썸네일에 장소 정보id와 좌표 저장해서 나중에 지도에 뿌릴수 있도록 한다
+            if (contentImageNames.isNotEmpty() && placeId != null) { // 여행일지 day에 장소가 태그되었다면 썸네일에 장소 정보id와 좌표 저장해서 나중에 지도에 뿌릴수 있도록 한다
                 get(0) // 첫번째 사진이 대표사진, 썸네일로 사용된다
                     .setPlace(placeDetailsMap.getValue(placeId))
             }

@@ -88,19 +88,18 @@ class TravelJournalServiceTest : DescribeSpec(
         val followRepository = mockk<FollowRepository>()
         val communityRepository = mockk<CommunityRepository>()
         val googleMapsClient = mockk<GoogleMapsClient>()
-        val travelJournalService =
-            TravelJournalService(
-                userRepository,
-                travelJournalRepository,
-                followRepository,
-                communityRepository,
-                fileService,
-                applicationEventPublisher,
-                reportTravelJournalRepository,
-                contentImageRepository,
-                travelCompanionRepository,
-                googleMapsClient,
-            )
+        val travelJournalService = TravelJournalService(
+            userRepository,
+            travelJournalRepository,
+            followRepository,
+            communityRepository,
+            fileService,
+            applicationEventPublisher,
+            reportTravelJournalRepository,
+            contentImageRepository,
+            travelCompanionRepository,
+            googleMapsClient,
+        )
 
         describe("createTravelJournal") {
             context("유효한 데이터가 주어지는 경우") {
@@ -1026,6 +1025,34 @@ class TravelJournalServiceTest : DescribeSpec(
                             TEST_TRAVEL_JOURNAL_ID,
                             TEST_TRAVEL_JOURNAL_NOT_EXIST_CONTENT_ID,
                             TEST_USER_ID,
+                        )
+                    }
+                }
+            }
+        }
+
+        describe("getPlaceDetailsMap") {
+            context("유효한 데이터가 주어지는 경우") {
+                val placeIds = setOf(TEST_PLACE_ID)
+                every { googleMapsClient.findPlaceDetailsByPlaceId(TEST_PLACE_ID) } returns createPlaceDetails()
+                it("정상적으로 종료한다") {
+                    shouldNotThrowAny {
+                        travelJournalService.getPlaceDetailsMap(
+                            placeIds,
+                        )
+                    }
+                }
+            }
+
+            context("존재 하지 않는 placeId를 넣은 경우") {
+                val placeIds = setOf(TEST_PLACE_ID)
+                every { googleMapsClient.findPlaceDetailsByPlaceId(TEST_PLACE_ID) } throws InvalidRequestException(
+                    SOMETHING_ERROR_MESSAGE,
+                )
+                it("[InvalidRequestException] 반환한다") {
+                    shouldThrow<InvalidRequestException> {
+                        travelJournalService.getPlaceDetailsMap(
+                            placeIds,
                         )
                     }
                 }
