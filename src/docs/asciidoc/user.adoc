@@ -166,7 +166,7 @@ operation::user-controller-test/search-users-fail-invalid-size[snippets='http-re
 
 operation::user-controller-test/search-users-fail-not-registered-user[snippets='http-request,request-headers,http-response']
 
-=== *8-5 실패 - 유효하지 않은 토큰*
+=== *8-6 실패 - 유효하지 않은 토큰*
 
 operation::user-controller-test/search-users-fail-invalid-token[snippets='http-request,request-headers,http-response']
 
@@ -188,3 +188,31 @@ operation::user-controller-test/get-user-statistics-fail-not-registered-user[sni
 === *9-4 실패 - 유효하지 않은 토큰인 경우*
 
 operation::user-controller-test/get-user-statistics-fail-invalid-token[snippets='http-request,request-headers,path-parameters,http-response']
+
+
+[[유저-인생샷-API]]
+== *10. 유저 인생샷 API*
+
+=== *10-1 성공*
+
+operation::user-controller-test/get-life-shots-success[snippets='http-request,query-parameters,path-parameters,request-headers,http-response']
+
+=== *10-2 실패 - 유효하지 않은 user id*
+
+operation::user-controller-test/get-life-shots-fail-invalid-user-id[snippets='http-request,query-parameters,path-parameters,request-headers,http-response']
+
+=== *10-3 실패 - 유효하지 않은 마지막 id*
+
+operation::user-controller-test/get-life-shots-fail-invalid-last-id[snippets='http-request,query-parameters,path-parameters,request-headers,http-response']
+
+=== *10-4 실패 - 유효하지 않은 사이즈*
+
+operation::user-controller-test/get-life-shots-fail-invalid-size[snippets='http-request,query-parameters,path-parameters,request-headers,http-response']
+
+=== *10-5 실패 - 가입되지 않은 유저*
+
+operation::user-controller-test/get-life-shots-fail-not-registered-user[snippets='http-request,request-headers,http-response']
+
+=== *10-6 실패 - 유효하지 않은 토큰*
+
+operation::user-controller-test/get-life-shots-fail-invalid-token[snippets='http-request,request-headers,http-response']
