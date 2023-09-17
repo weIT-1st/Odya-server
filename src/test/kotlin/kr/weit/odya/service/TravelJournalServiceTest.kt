@@ -44,6 +44,7 @@ import kr.weit.odya.support.TEST_TRAVEL_COMPANION_IDS
 import kr.weit.odya.support.TEST_TRAVEL_COMPANION_USERS
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_CONTENT_ID
+import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_CONTENT_IMAGE_ID
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_ID
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME
@@ -68,6 +69,7 @@ import kr.weit.odya.support.createTravelJournalContentUpdateRequest
 import kr.weit.odya.support.createTravelJournalRequest
 import kr.weit.odya.support.createTravelJournalRequestByContentSize
 import kr.weit.odya.support.createTravelJournalUpdateRequest
+import kr.weit.odya.support.createUpdateImageNamePairs
 import kr.weit.odya.support.createUser
 import org.mockito.ArgumentMatchers.any
 import org.springframework.context.ApplicationEventPublisher
@@ -767,7 +769,7 @@ class TravelJournalServiceTest : DescribeSpec(
                             TEST_TRAVEL_JOURNAL_CONTENT_ID,
                             TEST_USER_ID,
                             travelJournalContentUpdateRequest,
-                            createImageNamePairs(),
+                            createUpdateImageNamePairs(),
                             createPlaceDetailsMap(),
                         )
                     }
@@ -784,7 +786,29 @@ class TravelJournalServiceTest : DescribeSpec(
                             TEST_TRAVEL_JOURNAL_NOT_EXIST_CONTENT_ID,
                             TEST_USER_ID,
                             travelJournalContentUpdateRequest,
-                            createImageNamePairs(),
+                            createUpdateImageNamePairs(),
+                            createPlaceDetailsMap(),
+                        )
+                    }
+                }
+            }
+
+            context("여행 일지 콘텐츠 이미지 수정으로 남아 있는 개수가 1보다 작은 경우") {
+                val travelJournalContentUpdateRequest = createTravelJournalContentUpdateRequest(
+                    updateContentImageNames = emptyList(),
+                    deleteContentImageIds = listOf(
+                        TEST_TRAVEL_JOURNAL_CONTENT_IMAGE_ID,
+                    ),
+                )
+                every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns createTravelJournal()
+                it("[IllegalArgumentException] 반환한다") {
+                    shouldThrow<IllegalArgumentException> {
+                        travelJournalService.updateTravelJournalContent(
+                            TEST_TRAVEL_JOURNAL_ID,
+                            TEST_TRAVEL_JOURNAL_CONTENT_ID,
+                            TEST_USER_ID,
+                            travelJournalContentUpdateRequest,
+                            emptyList(),
                             createPlaceDetailsMap(),
                         )
                     }

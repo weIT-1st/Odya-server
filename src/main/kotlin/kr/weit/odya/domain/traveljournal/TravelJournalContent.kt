@@ -14,6 +14,8 @@ import jakarta.persistence.Table
 import kr.weit.odya.support.domain.BaseModifiableEntity
 import java.time.LocalDate
 
+private const val MIN_TRAVEL_JOURNAL_CONTENT_IMAGE_COUNT = 1
+
 @Table(
     indexes = [
         Index(name = "travel_journal_content_travel_journal_id_index", columnList = "travel_journal_id"),
@@ -69,6 +71,9 @@ class TravelJournalContent(
     }
 
     fun deleteTravelJournalContentImages(travelJournalContentImages: List<TravelJournalContentImage>) {
+        if (mutableTravelJournalContentImages.size - travelJournalContentImages.size < MIN_TRAVEL_JOURNAL_CONTENT_IMAGE_COUNT) {
+            throw IllegalArgumentException("여행 일지 콘텐츠에는 최소 1개 이상의 이미지가 존재해야 합니다.")
+        }
         mutableTravelJournalContentImages.removeAll(travelJournalContentImages)
     }
 
