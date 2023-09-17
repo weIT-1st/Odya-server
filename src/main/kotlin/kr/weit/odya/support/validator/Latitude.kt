@@ -5,14 +5,14 @@ import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import kotlin.reflect.KClass
 
-@Min(-90)
-@Max(90)
-@Target(AnnotationTarget.VALUE_PARAMETER)
+@Min(-90, message = "위도는 -90 이상이어야 합니다.")
+@Max(90, message = "위도는 90 이하여야 합니다.")
+@Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
 @MustBeDocumented
 @Constraint(validatedBy = [])
 annotation class Latitude(
-    val message: String = "위도는 -90 ~ 90 사이의 값이어야 합니다.",
+    val message: String = "",
     val groups: Array<KClass<*>> = [],
     val payload: Array<KClass<Any>> = [],
 )
