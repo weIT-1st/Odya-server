@@ -2,21 +2,40 @@ package kr.weit.odya.support
 
 import kr.weit.odya.domain.community.Community
 import kr.weit.odya.domain.community.CommunityContentImage
+import kr.weit.odya.domain.community.CommunityInformation
 import kr.weit.odya.domain.community.CommunityVisibility
 import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.topic.Topic
 import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.user.User
+import kr.weit.odya.service.dto.CommunityContentImageResponse
 import kr.weit.odya.service.dto.CommunityCreateRequest
+import kr.weit.odya.service.dto.CommunityResponse
+import kr.weit.odya.service.dto.CommunitySummaryResponse
+import kr.weit.odya.service.dto.CommunityUpdateRequest
+import kr.weit.odya.service.dto.SliceResponse
+import kr.weit.odya.service.dto.TopicResponse
+import kr.weit.odya.service.dto.TravelJournalSimpleResponse
 import org.springframework.mock.web.MockMultipartFile
 import java.io.InputStream
 
 const val TEST_COMMUNITY_ID = 1L
-const val TEST_NOT_EXISTS_COMMUNITY_ID = 2L
+const val TEST_OTHER_COMMUNITY_ID = 2L
+const val TEST_NOT_EXISTS_COMMUNITY_ID = 9999L
 const val TEST_COMMUNITY_CONTENT = "테스트 커뮤니티 글입니다."
+const val TEST_COMMUNITY_PLACE_ID = "테스트 장소 아이디"
+const val TEST_UPDATE_COMMUNITY_CONTENT = "테스트 커뮤니티 글 업데이트입니다."
 val TEST_COMMUNITY_VISIBILITY = CommunityVisibility.PUBLIC
+val TEST_UPDATE_COMMUNITY_VISIBILITY = CommunityVisibility.FRIEND_ONLY
 const val TEST_COMMUNITY_REQUEST_NAME = "community"
 const val TEST_COMMUNITY_MOCK_FILE_NAME = "community-content-image"
+const val TEST_COMMUNITY_CONTENT_IMAGE_DELETE_ID = 2L
+const val TEST_COMMUNITY_CONTENT_IMAGE_ID = 1L
+const val TEST_OTHER_COMMUNITY_CONTENT_IMAGE_ID = 1L
+const val TEST_COMMUNITY_UPDATE_REQUEST_NAME = "update-community"
+const val TEST_COMMUNITY_UPDATE_MOCK_FILE_NAME = "update-community-content-image"
+const val MIM_COMMUNITY_CONTENT_IMAGE_COUNT = 1
+const val MAX_COMMUNITY_CONTENT_IMAGE_COUNT = 15
 
 fun createCommunityCreateRequest(
     content: String = TEST_COMMUNITY_CONTENT,
@@ -51,7 +70,13 @@ fun createCommunityContentImagePairs(): List<Pair<String, String>> = listOf(
     TEST_GENERATED_FILE_NAME to TEST_OTHER_IMAGE_FILE_WEBP,
 )
 
+fun createUpdateCommunityContentImagePairs(): List<Pair<String, String>> = listOf(
+    TEST_GENERATED_FILE_NAME to TEST_UPDATE_IMAGE_FILE_WEBP,
+)
+
 fun createCommunity(
+    id: Long = TEST_COMMUNITY_ID,
+    visibility: CommunityVisibility = TEST_COMMUNITY_VISIBILITY,
     topic: Topic? = createTopic(),
     travelJournal: TravelJournal? = createTravelJournal(),
     communityContentImages: List<CommunityContentImage> = listOf(
@@ -63,15 +88,135 @@ fun createCommunity(
     user: User = createUser(),
     placeId: String? = TEST_PLACE_ID,
 ) = Community(
-    content = TEST_COMMUNITY_CONTENT,
-    visibility = TEST_COMMUNITY_VISIBILITY,
+    id = id,
     user = user,
     topic = topic,
     travelJournal = travelJournal,
     communityContentImages = communityContentImages,
-    placeId = placeId,
+    communityInformation = CommunityInformation(
+        content = TEST_COMMUNITY_CONTENT,
+        visibility = visibility,
+        placeId = placeId,
+    ),
 )
 
 fun createCommunityContentImage(contentImage: ContentImage = createContentImage()) = CommunityContentImage(
     contentImage = contentImage,
+)
+
+fun createAllCommunities() =
+    listOf(createCommunity(), createCommunity(id = TEST_OTHER_COMMUNITY_ID, user = createOtherUser()))
+
+fun createMyCommunities() = listOf(createCommunity(), createCommunity(id = TEST_OTHER_COMMUNITY_ID))
+
+fun createFriendCommunities() =
+    listOf(createCommunity(), createCommunity(id = TEST_OTHER_COMMUNITY_ID, user = createOtherUser()))
+
+fun createCommunityUpdateRequest(
+    content: String = TEST_UPDATE_COMMUNITY_CONTENT,
+    visibility: CommunityVisibility = TEST_UPDATE_COMMUNITY_VISIBILITY,
+    placeId: String? = TEST_UPDATE_PLACE_ID,
+    travelJournalId: Long? = TEST_UPDATE_TRAVEL_JOURNAL_ID,
+    topicId: Long? = TEST_UPDATE_TOPIC_ID,
+    deleteCommunityContentImageIds: List<Long>? = listOf(TEST_COMMUNITY_CONTENT_IMAGE_DELETE_ID),
+) = CommunityUpdateRequest(
+    content = content,
+    visibility = visibility,
+    placeId = placeId,
+    travelJournalId = travelJournalId,
+    topicId = topicId,
+    deleteCommunityContentImageIds = deleteCommunityContentImageIds,
+)
+
+fun createCommunityContentImageUpdatePairs(): List<Pair<String, String>> = listOf(
+    TEST_GENERATED_FILE_NAME to TEST_UPDATE_IMAGE_FILE_WEBP,
+)
+
+fun createCommunityResponse(
+    id: Long = TEST_COMMUNITY_ID,
+    content: String = TEST_COMMUNITY_CONTENT,
+    visibility: CommunityVisibility = TEST_COMMUNITY_VISIBILITY,
+    placeId: String? = TEST_COMMUNITY_PLACE_ID,
+    travelJournal: TravelJournalSimpleResponse? = createTravelJournalSimpleResponse(),
+    topic: TopicResponse? = createCommunityTopicResponse(),
+    communityContentImages: List<CommunityContentImageResponse> = listOf(createCommunityContentImageResponse()),
+) = CommunityResponse(
+    communityId = id,
+    content = content,
+    visibility = visibility,
+    placeId = placeId,
+    travelJournal = travelJournal,
+    topic = topic,
+    communityContentImages = communityContentImages,
+)
+
+fun createOtherCommunityResponse(
+    id: Long = TEST_OTHER_COMMUNITY_ID,
+    content: String = TEST_COMMUNITY_CONTENT,
+    visibility: CommunityVisibility = TEST_COMMUNITY_VISIBILITY,
+    placeId: String? = TEST_COMMUNITY_PLACE_ID,
+    travelJournal: TravelJournalSimpleResponse? = createTravelJournalSimpleResponse(id = TEST_OTHER_TRAVEL_JOURNAL_ID),
+    topic: TopicResponse? = createCommunityTopicResponse(id = TEST_OTHER_TOPIC_ID),
+    communityContentImages: List<CommunityContentImageResponse> = listOf(createCommunityContentImageResponse(id = TEST_OTHER_COMMUNITY_CONTENT_IMAGE_ID)),
+) = CommunityResponse(
+    communityId = id,
+    content = content,
+    visibility = visibility,
+    placeId = placeId,
+    travelJournal = travelJournal,
+    topic = topic,
+    communityContentImages = communityContentImages,
+)
+
+fun createTravelJournalSimpleResponse(
+    id: Long = TEST_TRAVEL_JOURNAL_ID,
+    title: String = TEST_TRAVEL_JOURNAL_TITLE,
+    mainImageUrl: String = TEST_FILE_AUTHENTICATED_URL,
+) = TravelJournalSimpleResponse(
+    travelJournalId = id,
+    title = title,
+    mainImageUrl = mainImageUrl,
+)
+
+fun createCommunityTopicResponse(
+    id: Long = TEST_TOPIC_ID,
+    word: String = TEST_TOPIC,
+) = TopicResponse(
+    id = id,
+    topic = word,
+)
+
+fun createCommunityContentImageResponse(
+    id: Long = TEST_COMMUNITY_CONTENT_IMAGE_ID,
+    imageUrl: String = TEST_FILE_AUTHENTICATED_URL,
+) = CommunityContentImageResponse(
+    communityContentImageId = id,
+    imageUrl = imageUrl,
+)
+
+fun createCommunitySummaryResponse(
+    id: Long = TEST_COMMUNITY_ID,
+    mainImageUrl: String = TEST_FILE_AUTHENTICATED_URL,
+) = CommunitySummaryResponse(
+    communityId = id,
+    communityMainImageUrl = mainImageUrl,
+)
+
+fun createOtherCommunitySummaryResponse(
+    id: Long = TEST_OTHER_COMMUNITY_ID,
+    mainImageUrl: String = TEST_FILE_AUTHENTICATED_URL,
+) = CommunitySummaryResponse(
+    communityId = id,
+    communityMainImageUrl = mainImageUrl,
+)
+
+fun createSliceCommunityResponse(
+    hasNext: Boolean = false,
+    content: List<CommunitySummaryResponse> = listOf(
+        createCommunitySummaryResponse(),
+        createOtherCommunitySummaryResponse(),
+    ),
+) = SliceResponse(
+    hasNext = hasNext,
+    content = content,
 )
