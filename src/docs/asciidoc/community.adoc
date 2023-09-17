@@ -41,6 +41,10 @@ operation::community-controller-test/community-create-fail-file-upload[snippets=
 
 operation::community-controller-test/community-create-fail-travel-journal-is-private[snippets='http-request,request-headers,request-parts,http-response']
 
-=== *1-7 실패 - 유효하지 않은 토큰인 경우*
+=== *1-7 실패 - 구글맵에 없는 장소 id*
+
+operation::community-controller-test/community-create-fail-not-exist-place-id[snippets='http-request,request-headers,request-parts,http-response']
+
+=== *1-8 실패 - 유효하지 않은 토큰인 경우*
 
 operation::community-controller-test/community-create-fail-invalid-token[snippets='http-request,request-headers,request-parts,http-response']

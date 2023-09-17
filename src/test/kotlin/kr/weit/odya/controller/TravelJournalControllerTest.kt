@@ -1,5 +1,7 @@
 package kr.weit.odya.controller
 
+import com.google.maps.errors.InvalidRequestException
+import com.google.maps.model.PlaceDetails
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.DescribeSpec
 import io.mockk.every
@@ -25,6 +27,7 @@ import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
 import kr.weit.odya.support.TEST_DEFAULT_SIZE
 import kr.weit.odya.support.TEST_IMAGE_FILE_WEBP
 import kr.weit.odya.support.TEST_OTHER_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE
+import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_TRAVEL_CONTENT_IMAGE_MAP
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_CONTENT_ID
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_CONTENT_INCORRECT_COUNT
@@ -109,6 +112,7 @@ class TravelJournalControllerTest(
                 val travelJournalRequestFile =
                     createTravelJournalRequestFile(contentStream = travelJournalRequestByteInputStream)
                 val imageNamePairs = createImageNamePairs()
+                val placeDetailsMap = createPlaceDetailsMap()
                 every { travelJournalService.getImageMap(any<List<MultipartFile>>()) } returns TEST_TRAVEL_CONTENT_IMAGE_MAP
                 every {
                     travelJournalService.validateTravelJournalRequest(
@@ -122,8 +126,10 @@ class TravelJournalControllerTest(
                         any<Map<String, MultipartFile>>(),
                     )
                 } returns imageNamePairs
+
+                every { travelJournalService.getPlaceDetailsMap(setOf(TEST_PLACE_ID)) } returns placeDetailsMap
                 every {
-                    travelJournalService.createTravelJournal(TEST_USER_ID, any<TravelJournalRequest>(), any<List<Pair<String, String>>>())
+                    travelJournalService.createTravelJournal(TEST_USER_ID, any<TravelJournalRequest>(), any<List<Pair<String, String>>>(), placeDetailsMap)
                 } returns TEST_TRAVEL_JOURNAL_ID
                 it("201 응답한다.") {
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
@@ -177,6 +183,7 @@ class TravelJournalControllerTest(
                 val travelJournalRequestFile =
                     createTravelJournalRequestFile(contentStream = travelJournalRequestByteInputStream)
                 val imageNamePairs = createImageNamePairs()
+                val placeDetailsMap = emptyMap<String, PlaceDetails>()
                 every { travelJournalService.getImageMap(any<List<MultipartFile>>()) } returns TEST_TRAVEL_CONTENT_IMAGE_MAP
                 every {
                     travelJournalService.validateTravelJournalRequest(
@@ -191,8 +198,9 @@ class TravelJournalControllerTest(
                     )
                 } returns imageNamePairs
                 every {
-                    travelJournalService.createTravelJournal(TEST_USER_ID, any<TravelJournalRequest>(), any<List<Pair<String, String>>>())
+                    travelJournalService.createTravelJournal(TEST_USER_ID, any<TravelJournalRequest>(), any<List<Pair<String, String>>>(), placeDetailsMap)
                 } returns TEST_TRAVEL_JOURNAL_ID
+                every { travelJournalService.getPlaceDetailsMap(setOf(TEST_PLACE_ID)) } returns placeDetailsMap
                 it("201 응답한다.") {
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -407,6 +415,7 @@ class TravelJournalControllerTest(
                         any<Map<String, MultipartFile>>(),
                     )
                 } throws IllegalArgumentException(SOMETHING_ERROR_MESSAGE)
+                every { travelJournalService.getPlaceDetailsMap(setOf(TEST_PLACE_ID)) } returns createPlaceDetailsMap()
                 it("400 응답한다.") {
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -445,6 +454,7 @@ class TravelJournalControllerTest(
                         any<Map<String, MultipartFile>>(),
                     )
                 } throws IllegalArgumentException(SOMETHING_ERROR_MESSAGE)
+                every { travelJournalService.getPlaceDetailsMap(setOf(TEST_PLACE_ID)) } returns createPlaceDetailsMap()
                 it("400 응답한다.") {
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -486,6 +496,7 @@ class TravelJournalControllerTest(
                         any<Map<String, MultipartFile>>(),
                     )
                 } throws IllegalArgumentException(SOMETHING_ERROR_MESSAGE)
+                every { travelJournalService.getPlaceDetailsMap(setOf(TEST_PLACE_ID)) } returns createPlaceDetailsMap()
                 it("400 응답한다.") {
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -527,6 +538,7 @@ class TravelJournalControllerTest(
                         any<Map<String, MultipartFile>>(),
                     )
                 } throws IllegalArgumentException(SOMETHING_ERROR_MESSAGE)
+                every { travelJournalService.getPlaceDetailsMap(setOf(TEST_PLACE_ID)) } returns createPlaceDetailsMap()
                 it("400 응답한다.") {
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -563,6 +575,7 @@ class TravelJournalControllerTest(
                         any<Map<String, MultipartFile>>(),
                     )
                 } throws IllegalArgumentException(SOMETHING_ERROR_MESSAGE)
+                every { travelJournalService.getPlaceDetailsMap(setOf(TEST_PLACE_ID)) } returns createPlaceDetailsMap()
                 it("400 응답한다.") {
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -599,6 +612,7 @@ class TravelJournalControllerTest(
                         any<Map<String, MultipartFile>>(),
                     )
                 } throws NoSuchElementException(SOMETHING_ERROR_MESSAGE)
+                every { travelJournalService.getPlaceDetailsMap(setOf(TEST_PLACE_ID)) } returns createPlaceDetailsMap()
                 it("404 응답한다.") {
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -635,6 +649,7 @@ class TravelJournalControllerTest(
                         any<Map<String, MultipartFile>>(),
                     )
                 } throws IllegalArgumentException(SOMETHING_ERROR_MESSAGE)
+                every { travelJournalService.getPlaceDetailsMap(setOf(TEST_PLACE_ID)) } returns createPlaceDetailsMap()
                 it("400 응답한다.") {
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -671,6 +686,7 @@ class TravelJournalControllerTest(
                         any<Map<String, MultipartFile>>(),
                     )
                 } throws IllegalArgumentException(SOMETHING_ERROR_MESSAGE)
+                every { travelJournalService.getPlaceDetailsMap(setOf(TEST_PLACE_ID)) } returns createPlaceDetailsMap()
                 it("400 응답한다.") {
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -719,6 +735,7 @@ class TravelJournalControllerTest(
                         any<Map<String, MultipartFile>>(),
                     )
                 } throws IllegalArgumentException(SOMETHING_ERROR_MESSAGE)
+                every { travelJournalService.getPlaceDetailsMap(setOf(TEST_PLACE_ID)) } returns createPlaceDetailsMap()
                 it("400 응답한다.") {
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -761,6 +778,7 @@ class TravelJournalControllerTest(
                         any<Map<String, MultipartFile>>(),
                     )
                 } throws IllegalArgumentException(SOMETHING_ERROR_MESSAGE)
+                every { travelJournalService.getPlaceDetailsMap(setOf(TEST_PLACE_ID)) } returns createPlaceDetailsMap()
                 it("400 응답한다.") {
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -776,6 +794,35 @@ class TravelJournalControllerTest(
                             ),
                             requestParts(
                                 "travel-journal" requestPartDescription "위도와 경도의 개수가 일치하지 않은 컨텐츠를 가진 여행 일지",
+                                "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진",
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효하지 않은 장소 Id인 경우") {
+                val travelJournalRequest = createTravelJournalRequest()
+                val travelJournalRequestByteInputStream =
+                    ControllerTestHelper.jsonContent(travelJournalRequest).byteInputStream()
+                val travelJournalRequestFile =
+                    createTravelJournalRequestFile(contentStream = travelJournalRequestByteInputStream)
+                every { travelJournalService.getPlaceDetailsMap(setOf(TEST_PLACE_ID)) } throws InvalidRequestException(SOMETHING_ERROR_MESSAGE)
+                it("400 응답한다.") {
+                    restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        file(travelJournalRequestFile)
+                        file(createMockImageFile(mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME))
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "travel-journals-fail-invalid-place-id",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            requestParts(
+                                "travel-journal" requestPartDescription "유효하지 않은 장소id를 가진 여행 일지",
                                 "travel-journal-content-image" requestPartDescription "여행 일지 콘텐츠 사진",
                             ),
                         )
@@ -851,10 +898,12 @@ class TravelJournalControllerTest(
                         any<Long>(),
                         any<TravelJournalRequest>(),
                         any<List<Pair<String, String>>>(),
+                        any<Map<String, PlaceDetails>>(),
                     )
                 } throws NoSuchElementException(
                     NOT_EXIST_USER_ERROR_MESSAGE,
                 )
+                every { travelJournalService.getPlaceDetailsMap(setOf(TEST_PLACE_ID)) } returns createPlaceDetailsMap()
                 it("404 응답한다.") {
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)

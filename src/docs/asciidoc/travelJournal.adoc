@@ -101,15 +101,19 @@ operation::travel-journal-controller-test/travel-journals-fail-latitude-longitud
 
 operation::travel-journal-controller-test/travel-journals-fail-latitude-longitude-size-not-equal[snippets='http-request,request-headers,request-parts,http-response']
 
-=== *1-19 실패 - 여행 일지 콘텐츠 이미지 저장에 실패하는 경우*
+=== *1-19 실패 - 유효하지 않은 장소 id인 경우*
+
+operation::travel-journal-controller-test/travel-journals-fail-invalid-place-id[snippets='http-request,request-headers,request-parts,http-response']
+
+=== *1-20 실패 - 여행 일지 콘텐츠 이미지 저장에 실패하는 경우*
 
 operation::travel-journal-controller-test/travel-journals-fail-travel-journal-content-image-upload-fail[snippets='http-request,request-headers,request-parts,http-response']
 
-=== *1-20 실패 - 여행 일지를 등록하려는 사용자가 없는 경우*
+=== *1-21 실패 - 여행 일지를 등록하려는 사용자가 없는 경우*
 
 operation::travel-journal-controller-test/travel-journals-fail-user-not-found[snippets='http-request,request-headers,request-parts,http-response']
 
-=== *1-21 실패 - 유효하지 않은 토큰일 경우*
+=== *1-22 실패 - 유효하지 않은 토큰일 경우*
 
 operation::travel-journal-controller-test/travel-journals-fail-invalid-token[snippets='http-request,request-headers,request-parts,http-response']
 

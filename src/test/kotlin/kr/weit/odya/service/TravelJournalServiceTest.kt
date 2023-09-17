@@ -1,5 +1,6 @@
 package kr.weit.odya.service
 
+import com.google.maps.errors.InvalidRequestException
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
@@ -81,6 +82,7 @@ class TravelJournalServiceTest : DescribeSpec(
         val applicationEventPublisher = mockk<ApplicationEventPublisher>()
         val followRepository = mockk<FollowRepository>()
         val communityRepository = mockk<CommunityRepository>()
+        val googleMapsClient = mockk<GoogleMapsClient>()
         val travelJournalService = TravelJournalService(
             userRepository,
             travelJournalRepository,
@@ -91,6 +93,7 @@ class TravelJournalServiceTest : DescribeSpec(
             reportTravelJournalRepository,
             contentImageRepository,
             travelCompanionRepository,
+            googleMapsClient,
         )
 
         describe("createTravelJournal") {
@@ -98,6 +101,7 @@ class TravelJournalServiceTest : DescribeSpec(
                 val travelJournalRequest = createTravelJournalRequest()
                 val register = createUser()
                 val imageNamePairs = createImageNamePairs()
+                val placeDetailsMap = createPlaceDetailsMap()
                 every { userRepository.getByUserId(TEST_USER_ID) } returns register
                 every { userRepository.getByUserIds(TEST_TRAVEL_COMPANION_IDS) } returns TEST_TRAVEL_COMPANION_USERS
                 every { travelJournalRepository.save(any<TravelJournal>()) } returns TEST_TRAVEL_JOURNAL
@@ -109,6 +113,7 @@ class TravelJournalServiceTest : DescribeSpec(
                             TEST_USER_ID,
                             travelJournalRequest,
                             imageNamePairs,
+                            placeDetailsMap,
                         )
                     }
                 }
@@ -121,6 +126,7 @@ class TravelJournalServiceTest : DescribeSpec(
                         createTravelJournalContentRequest(),
                     ),
                 )
+                val placeDetailsMap = createPlaceDetailsMap()
                 every { userRepository.getByUserId(TEST_USER_ID) } returns TEST_USER
                 every { travelJournalRepository.save(any<TravelJournal>()) } returns TEST_TRAVEL_JOURNAL
                 every { followRepository.findFollowerFcmTokenByFollowingId(TEST_USER_ID) } returns createFollowerFcmTokenList()
@@ -131,6 +137,7 @@ class TravelJournalServiceTest : DescribeSpec(
                             TEST_USER_ID,
                             travelJournalRequest,
                             emptyList(),
+                            placeDetailsMap,
                         )
                     }
                 }
@@ -139,6 +146,7 @@ class TravelJournalServiceTest : DescribeSpec(
             context("등록하려는 사용자가 없는 경우") {
                 val travelJournalRequest = createTravelJournalRequest()
                 val imageNamePairs = createImageNamePairs()
+                val placeDetailsMap = createPlaceDetailsMap()
                 every { userRepository.getByUserId(TEST_USER_ID) } throws NoSuchElementException("$TEST_USER_ID: 사용자가 존재하지 않습니다")
                 it("[NoSuchElementException] 반환한다") {
                     shouldThrow<NoSuchElementException> {
@@ -146,6 +154,7 @@ class TravelJournalServiceTest : DescribeSpec(
                             TEST_USER_ID,
                             travelJournalRequest,
                             imageNamePairs,
+                            placeDetailsMap,
                         )
                     }
                 }
@@ -981,6 +990,32 @@ class TravelJournalServiceTest : DescribeSpec(
                             TEST_TRAVEL_JOURNAL_ID,
                             TEST_TRAVEL_JOURNAL_NOT_EXIST_CONTENT_ID,
                             TEST_USER_ID,
+                        )
+                    }
+                }
+            }
+        }
+
+        describe("getPlaceDetailsMap") {
+            context("유효한 데이터가 주어지는 경우") {
+                val placeIds = setOf(TEST_PLACE_ID)
+                every { googleMapsClient.findPlaceDetailsByPlaceId(TEST_PLACE_ID) } returns createPlaceDetails()
+                it("정상적으로 종료한다") {
+                    shouldNotThrowAny {
+                        travelJournalService.getPlaceDetailsMap(
+                            placeIds,
+                        )
+                    }
+                }
+            }
+
+            context("존재 하지 않는 placeId를 넣은 경우") {
+                val placeIds = setOf(TEST_PLACE_ID)
+                every { googleMapsClient.findPlaceDetailsByPlaceId(TEST_PLACE_ID) } throws InvalidRequestException(SOMETHING_ERROR_MESSAGE)
+                it("[InvalidRequestException] 반환한다") {
+                    shouldThrow<InvalidRequestException> {
+                        travelJournalService.getPlaceDetailsMap(
+                            placeIds,
                         )
                     }
                 }

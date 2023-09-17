@@ -41,6 +41,8 @@ class TravelJournalController(private val travelJournalService: TravelJournalSer
         @RequestPart("travel-journal-content-image")
         images: List<MultipartFile>,
     ): ResponseEntity<Void> {
+        val placeDetailsMap =
+            travelJournalService.getPlaceDetailsMap(travelJournalRequest.travelJournalContentRequests.mapNotNull { it.placeId }.toSet())
         val imageMap = travelJournalService.getImageMap(images)
         travelJournalService.validateTravelJournalRequest(travelJournalRequest, imageMap)
         val imageNamePairs = travelJournalRequest.travelJournalContentRequests.flatMap { travelJournalContentRequest ->
