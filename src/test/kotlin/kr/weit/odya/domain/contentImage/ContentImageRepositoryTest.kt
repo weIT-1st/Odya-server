@@ -9,9 +9,12 @@ import kr.weit.odya.domain.contentimage.getImageByUserId
 import kr.weit.odya.domain.contentimage.getLifeShotByUserId
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
+import kr.weit.odya.support.TEST_BOTTOM_LATITUDE
 import kr.weit.odya.support.TEST_DEFAULT_SIZE
+import kr.weit.odya.support.TEST_LEFT_LONGITUDE
+import kr.weit.odya.support.TEST_RIGHT_LONGITUDE
+import kr.weit.odya.support.TEST_TOP_LATITUDE
 import kr.weit.odya.support.createContentImage
-import kr.weit.odya.support.createCoordinateImageRequest
 import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createPlaceDetails
 import kr.weit.odya.support.createUser
@@ -77,7 +80,13 @@ class ContentImageRepositoryTest(private val userRepository: UserRepository, pri
 
         context("좌표로 contentImage 조회") {
             expect("좌표에 해당하는 contentImage를 조회한다") {
-                val images = contentImageRepository.getImageByRectangle(createCoordinateImageRequest())
+                val images = contentImageRepository.getImageByRectangle(
+                    TEST_LEFT_LONGITUDE,
+                    TEST_BOTTOM_LATITUDE,
+                    TEST_RIGHT_LONGITUDE,
+                    TEST_TOP_LATITUDE,
+                    TEST_DEFAULT_SIZE,
+                )
                 images.size shouldBe 1
                 images[0].id shouldBe contentImage2.id
             }

@@ -86,7 +86,7 @@ operation::image-controller-test/unset-life-shot-fail-invalid-token[snippets='ht
 | `USER`
 | 요청한 사용자 본인의 사진
 
-| `FIEND`
+| `FRIEND`
 | 요청한 사용자의 친구의 사진
 
 | `OTHER`
