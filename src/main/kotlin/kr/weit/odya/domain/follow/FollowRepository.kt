@@ -6,6 +6,7 @@ import com.linecorp.kotlinjdsl.query.spec.OrderSpec
 import com.linecorp.kotlinjdsl.querydsl.CriteriaQueryDsl
 import com.linecorp.kotlinjdsl.querydsl.expression.col
 import kr.weit.odya.domain.community.Community
+import kr.weit.odya.domain.community.CommunityInformation
 import kr.weit.odya.domain.placeReview.PlaceReview
 import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.traveljournal.TravelJournalContent
@@ -198,7 +199,11 @@ open class FollowRepositoryImpl(private val queryFactory: QueryFactory) : Custom
         val travelJournalWriter = queryFactory.listQuery {
             select(col(User::id))
             from(entity(TravelJournal::class))
-            associate(TravelJournal::class, entity(TravelJournalContent::class), on(TravelJournal::travelJournalContents))
+            associate(
+                TravelJournal::class,
+                entity(TravelJournalContent::class),
+                on(TravelJournal::travelJournalContents),
+            )
             associate(TravelJournal::class, entity(User::class), on(TravelJournal::user))
             where(col(TravelJournalContent::placeId).equal(placeID))
         }
@@ -206,7 +211,8 @@ open class FollowRepositoryImpl(private val queryFactory: QueryFactory) : Custom
             select(col(User::id))
             from(entity(Community::class))
             associate(Community::class, entity(User::class), on(Community::user))
-            where(col(Community::placeId).equal(placeID))
+            associate(Community::class, entity(CommunityInformation::class), on(Community::communityInformation))
+            where(col(CommunityInformation::placeId).equal(placeID))
         }
 
         // JPA는 유니온을 지원하지 않기 때문에 아래와 같이 작업을 했다

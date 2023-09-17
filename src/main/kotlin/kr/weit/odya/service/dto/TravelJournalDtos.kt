@@ -70,3 +70,9 @@ data class TravelJournalContentRequest(
         travelJournalContentImages = travelJournalContentImages,
     )
 }
+
+data class TravelJournalSimpleResponse(
+    val travelJournalId: Long,
+    val title: String,
+    val mainImageUrl: String,
+)
