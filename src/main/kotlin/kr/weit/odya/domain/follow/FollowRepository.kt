@@ -12,7 +12,6 @@ import kr.weit.odya.domain.traveljournal.TravelJournalContent
 import kr.weit.odya.domain.user.User
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.jpa.repository.Query
 import org.springframework.transaction.annotation.Transactional
 
 fun FollowRepository.getFollowingListBySearchCond(
@@ -50,9 +49,6 @@ fun FollowRepository.getFollowerFcmTokens(followingId: Long): List<String> =
 fun FollowRepository.getVisitedFollowingIds(placeID: String, followerId: Long): List<Long> =
     findVisitedFollowingIdsByPlaceIdAndFollowerId(placeID, followerId)
 
-fun FollowRepository.getFollowingIds(followerId: Long): List<Long> =
-    findFollowingIdsByFollowerId(followerId)
-
 interface FollowRepository : JpaRepository<Follow, Long>, CustomFollowRepository {
     fun existsByFollowerIdAndFollowingId(followerId: Long, followingId: Long): Boolean
 
@@ -65,9 +61,6 @@ interface FollowRepository : JpaRepository<Follow, Long>, CustomFollowRepository
     fun deleteByFollowingId(followingId: Long)
 
     fun deleteByFollowerId(follower: Long)
-
-    @Query("select f.following.id from Follow f where f.follower.id = :followerId")
-    fun findFollowingIdsByFollowerId(followerId: Long): List<Long>
 }
 
 interface CustomFollowRepository {
