@@ -6,6 +6,7 @@ import com.linecorp.kotlinjdsl.querydsl.expression.col
 import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.traveljournal.TravelJournal
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
@@ -21,6 +22,10 @@ fun CommunityRepository.getImageNamesByJournalId(travelJournalId: Long): List<St
 
 @Repository
 interface CommunityRepository : JpaRepository<Community, Long>, CustomCommunityRepository {
+    @Modifying
+    @Query("update Community c set c.travelJournal.id = null where c.travelJournal.id = :travelJournalId")
+    fun updateTravelJournalIdToNull(travelJournalId: Long)
+
     fun deleteAllByUserId(userId: Long)
 
     @Query("select c.id from Community c where c.travelJournal.id = :travelJournalId")

@@ -19,12 +19,15 @@ import kr.weit.odya.support.createTravelJournalContent
 import kr.weit.odya.support.createTravelJournalContentImage
 import kr.weit.odya.support.createUser
 import kr.weit.odya.support.test.BaseTests.RepositoryTest
+import kr.weit.odya.support.test.flushAndClear
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 
 @RepositoryTest
 class CommunityRepositoryTest(
     private val communityRepository: CommunityRepository,
     private val userRepository: UserRepository,
     private val travelJournalRepository: TravelJournalRepository,
+    private val tem: TestEntityManager,
     private val contentImageRepository: ContentImageRepository,
 ) : ExpectSpec(
     {
@@ -120,6 +123,15 @@ class CommunityRepositoryTest(
             expect("커뮤니티 ID 리스트에 포함된 커뮤니티 모두 삭제한다") {
                 communityRepository.deleteAllByIdIn(listOf(community1.id, community2.id))
                 communityRepository.findAll().size shouldBe 0
+            }
+        }
+
+        context("커뮤니티 수정") {
+            expect("커뮤니티의 여행일지 ID 컬럼을 null로 수정한다") {
+                communityRepository.updateTravelJournalIdToNull(travelJournal1.id)
+                tem.flushAndClear()
+                val result = communityRepository.getByCommunityId(community1.id)
+                result.travelJournal shouldBe null
             }
         }
     },
