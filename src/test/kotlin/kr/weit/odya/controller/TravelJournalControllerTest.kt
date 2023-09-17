@@ -47,6 +47,7 @@ import kr.weit.odya.support.createMockImageFile
 import kr.weit.odya.support.createMockOtherImageFile
 import kr.weit.odya.support.createOtherTravelJournalContentRequest
 import kr.weit.odya.support.createOtherUser
+import kr.weit.odya.support.createPlaceDetailsMap
 import kr.weit.odya.support.createSliceTravelJournalResponse
 import kr.weit.odya.support.createTravelCompanionById
 import kr.weit.odya.support.createTravelJournalByTravelCompanionIdSize
@@ -126,10 +127,14 @@ class TravelJournalControllerTest(
                         any<Map<String, MultipartFile>>(),
                     )
                 } returns imageNamePairs
-
                 every { travelJournalService.getPlaceDetailsMap(setOf(TEST_PLACE_ID)) } returns placeDetailsMap
                 every {
-                    travelJournalService.createTravelJournal(TEST_USER_ID, any<TravelJournalRequest>(), any<List<Pair<String, String>>>(), placeDetailsMap)
+                    travelJournalService.createTravelJournal(
+                        TEST_USER_ID,
+                        any<TravelJournalRequest>(),
+                        any<List<Pair<String, String>>>(),
+                        placeDetailsMap,
+                    )
                 } returns TEST_TRAVEL_JOURNAL_ID
                 it("201 응답한다.") {
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
@@ -198,7 +203,12 @@ class TravelJournalControllerTest(
                     )
                 } returns imageNamePairs
                 every {
-                    travelJournalService.createTravelJournal(TEST_USER_ID, any<TravelJournalRequest>(), any<List<Pair<String, String>>>(), placeDetailsMap)
+                    travelJournalService.createTravelJournal(
+                        TEST_USER_ID,
+                        any<TravelJournalRequest>(),
+                        any<List<Pair<String, String>>>(),
+                        placeDetailsMap,
+                    )
                 } returns TEST_TRAVEL_JOURNAL_ID
                 every { travelJournalService.getPlaceDetailsMap(setOf(TEST_PLACE_ID)) } returns placeDetailsMap
                 it("201 응답한다.") {
@@ -807,7 +817,9 @@ class TravelJournalControllerTest(
                     ControllerTestHelper.jsonContent(travelJournalRequest).byteInputStream()
                 val travelJournalRequestFile =
                     createTravelJournalRequestFile(contentStream = travelJournalRequestByteInputStream)
-                every { travelJournalService.getPlaceDetailsMap(setOf(TEST_PLACE_ID)) } throws InvalidRequestException(SOMETHING_ERROR_MESSAGE)
+                every { travelJournalService.getPlaceDetailsMap(setOf(TEST_PLACE_ID)) } throws InvalidRequestException(
+                    SOMETHING_ERROR_MESSAGE,
+                )
                 it("400 응답한다.") {
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -1011,7 +1023,12 @@ class TravelJournalControllerTest(
             }
 
             context("비공개 여행 일지이지만, 작성자가 요청하지 않은 경우") {
-                every { travelJournalService.getTravelJournal(TEST_TRAVEL_JOURNAL_ID, TEST_USER_ID) } throws ForbiddenException("비공개 여행 일지는 작성자만 조회할 수 있습니다.")
+                every {
+                    travelJournalService.getTravelJournal(
+                        TEST_TRAVEL_JOURNAL_ID,
+                        TEST_USER_ID,
+                    )
+                } throws ForbiddenException("비공개 여행 일지는 작성자만 조회할 수 있습니다.")
                 it("403 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -1034,7 +1051,12 @@ class TravelJournalControllerTest(
             }
 
             context("친구 공개 여행 일지이지만, 친구가 아닌 사용자가 요청한 경우") {
-                every { travelJournalService.getTravelJournal(TEST_TRAVEL_JOURNAL_ID, TEST_USER_ID) } throws ForbiddenException("친구가 아닌 사용자는 친구에게만 공개하는 여행 일지를 조회할 수 없습니다.")
+                every {
+                    travelJournalService.getTravelJournal(
+                        TEST_TRAVEL_JOURNAL_ID,
+                        TEST_USER_ID,
+                    )
+                } throws ForbiddenException("친구가 아닌 사용자는 친구에게만 공개하는 여행 일지를 조회할 수 없습니다.")
                 it("403 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -1083,7 +1105,14 @@ class TravelJournalControllerTest(
             val targetUri = "/api/v1/travel-journals"
             context("유효한 요청이 왔을 경우") {
                 val response = createSliceTravelJournalResponse()
-                every { travelJournalService.getTravelJournals(TEST_USER_ID, TEST_DEFAULT_SIZE, null, any<TravelJournalSortType>()) } returns response
+                every {
+                    travelJournalService.getTravelJournals(
+                        TEST_USER_ID,
+                        TEST_DEFAULT_SIZE,
+                        null,
+                        any<TravelJournalSortType>(),
+                    )
+                } returns response
                 it("200 응답한다.") {
                     restDocMockMvc.get(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -1114,8 +1143,12 @@ class TravelJournalControllerTest(
                                 "content[].writer.profile.profileColor.red" type JsonFieldType.NUMBER description "여행 일지 작성자의 프로필 색상의 빨간색 값" example response.content[0].writer.profile.profileColor?.red isOptional true,
                                 "content[].writer.profile.profileColor.green" type JsonFieldType.NUMBER description "여행 일지 작성자의 프로필 색상의 초록색 값" example response.content[0].writer.profile.profileColor?.green isOptional true,
                                 "content[].writer.profile.profileColor.blue" type JsonFieldType.NUMBER description "여행 일지 작성자의 프로필 색상의 파란색 값" example response.content[0].writer.profile.profileColor?.blue isOptional true,
-                                "content[].travelCompanionSimpleResponses[].username" type JsonFieldType.STRING description "여행 친구의 아이디" example (response.content[0].travelCompanionSimpleResponses?.get(0)?.username) isOptional true,
-                                "content[].travelCompanionSimpleResponses[].profileUrl" type JsonFieldType.STRING description "여행 친구의 프로필 사진" example (response.content[0].travelCompanionSimpleResponses?.get(0)?.profileUrl) isOptional true,
+                                "content[].travelCompanionSimpleResponses[].username" type JsonFieldType.STRING description "여행 친구의 아이디" example (
+                                    response.content[0].travelCompanionSimpleResponses?.get(0)?.username
+                                    ) isOptional true,
+                                "content[].travelCompanionSimpleResponses[].profileUrl" type JsonFieldType.STRING description "여행 친구의 프로필 사진" example (
+                                    response.content[0].travelCompanionSimpleResponses?.get(0)?.profileUrl
+                                    ) isOptional true,
                             ),
                         )
                     }
@@ -1148,7 +1181,14 @@ class TravelJournalControllerTest(
             val targetUri = "/api/v1/travel-journals/me"
             context("유효한 요청이 왔을 경우") {
                 val response = createSliceTravelJournalResponse()
-                every { travelJournalService.getMyTravelJournals(TEST_USER_ID, TEST_DEFAULT_SIZE, null, any<TravelJournalSortType>()) } returns response
+                every {
+                    travelJournalService.getMyTravelJournals(
+                        TEST_USER_ID,
+                        TEST_DEFAULT_SIZE,
+                        null,
+                        any<TravelJournalSortType>(),
+                    )
+                } returns response
                 it("200 응답한다.") {
                     restDocMockMvc.get(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -1179,8 +1219,12 @@ class TravelJournalControllerTest(
                                 "content[].writer.profile.profileColor.red" type JsonFieldType.NUMBER description "여행 일지 작성자의 프로필 색상의 빨간색 값" example response.content[0].writer.profile.profileColor?.red isOptional true,
                                 "content[].writer.profile.profileColor.green" type JsonFieldType.NUMBER description "여행 일지 작성자의 프로필 색상의 초록색 값" example response.content[0].writer.profile.profileColor?.green isOptional true,
                                 "content[].writer.profile.profileColor.blue" type JsonFieldType.NUMBER description "여행 일지 작성자의 프로필 색상의 파란색 값" example response.content[0].writer.profile.profileColor?.blue isOptional true,
-                                "content[].travelCompanionSimpleResponses[].username" type JsonFieldType.STRING description "여행 친구의 아이디" example (response.content[0].travelCompanionSimpleResponses?.get(0)?.username) isOptional true,
-                                "content[].travelCompanionSimpleResponses[].profileUrl" type JsonFieldType.STRING description "여행 친구의 프로필 사진" example (response.content[0].travelCompanionSimpleResponses?.get(0)?.profileUrl) isOptional true,
+                                "content[].travelCompanionSimpleResponses[].username" type JsonFieldType.STRING description "여행 친구의 아이디" example (
+                                    response.content[0].travelCompanionSimpleResponses?.get(0)?.username
+                                    ) isOptional true,
+                                "content[].travelCompanionSimpleResponses[].profileUrl" type JsonFieldType.STRING description "여행 친구의 프로필 사진" example (
+                                    response.content[0].travelCompanionSimpleResponses?.get(0)?.profileUrl
+                                    ) isOptional true,
                             ),
                         )
                     }
@@ -1212,8 +1256,18 @@ class TravelJournalControllerTest(
         describe("GET /api/v1/travel-journals/friends") {
             val targetUri = "/api/v1/travel-journals/friends"
             context("유효한 요청이 왔을 경우") {
-                val response = createSliceTravelJournalResponse(user = createOtherUser(), travelCompanion = createTravelCompanionById(user = createUser()))
-                every { travelJournalService.getFriendTravelJournals(TEST_USER_ID, TEST_DEFAULT_SIZE, null, any<TravelJournalSortType>()) } returns response
+                val response = createSliceTravelJournalResponse(
+                    user = createOtherUser(),
+                    travelCompanion = createTravelCompanionById(user = createUser()),
+                )
+                every {
+                    travelJournalService.getFriendTravelJournals(
+                        TEST_USER_ID,
+                        TEST_DEFAULT_SIZE,
+                        null,
+                        any<TravelJournalSortType>(),
+                    )
+                } returns response
                 it("200 응답한다.") {
                     restDocMockMvc.get(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -1244,8 +1298,12 @@ class TravelJournalControllerTest(
                                 "content[].writer.profile.profileColor.red" type JsonFieldType.NUMBER description "여행 일지 작성자의 프로필 색상의 빨간색 값" example response.content[0].writer.profile.profileColor?.red isOptional true,
                                 "content[].writer.profile.profileColor.green" type JsonFieldType.NUMBER description "여행 일지 작성자의 프로필 색상의 초록색 값" example response.content[0].writer.profile.profileColor?.green isOptional true,
                                 "content[].writer.profile.profileColor.blue" type JsonFieldType.NUMBER description "여행 일지 작성자의 프로필 색상의 파란색 값" example response.content[0].writer.profile.profileColor?.blue isOptional true,
-                                "content[].travelCompanionSimpleResponses[].username" type JsonFieldType.STRING description "여행 친구의 아이디" example (response.content[0].travelCompanionSimpleResponses?.get(0)?.username) isOptional true,
-                                "content[].travelCompanionSimpleResponses[].profileUrl" type JsonFieldType.STRING description "여행 친구의 프로필 사진" example (response.content[0].travelCompanionSimpleResponses?.get(0)?.profileUrl) isOptional true,
+                                "content[].travelCompanionSimpleResponses[].username" type JsonFieldType.STRING description "여행 친구의 아이디" example (
+                                    response.content[0].travelCompanionSimpleResponses?.get(0)?.username
+                                    ) isOptional true,
+                                "content[].travelCompanionSimpleResponses[].profileUrl" type JsonFieldType.STRING description "여행 친구의 프로필 사진" example (
+                                    response.content[0].travelCompanionSimpleResponses?.get(0)?.profileUrl
+                                    ) isOptional true,
                             ),
                         )
                     }
@@ -1277,8 +1335,18 @@ class TravelJournalControllerTest(
         describe("GET /api/v1/travel-journals/recommends") {
             val targetUri = "/api/v1/travel-journals/recommends"
             context("유효한 요청이 왔을 경우") {
-                val response = createSliceTravelJournalResponse(user = createOtherUser(), travelCompanion = createTravelCompanionById(user = createUser()))
-                every { travelJournalService.getRecommendTravelJournals(TEST_USER_ID, TEST_DEFAULT_SIZE, null, any<TravelJournalSortType>()) } returns response
+                val response = createSliceTravelJournalResponse(
+                    user = createOtherUser(),
+                    travelCompanion = createTravelCompanionById(user = createUser()),
+                )
+                every {
+                    travelJournalService.getRecommendTravelJournals(
+                        TEST_USER_ID,
+                        TEST_DEFAULT_SIZE,
+                        null,
+                        any<TravelJournalSortType>(),
+                    )
+                } returns response
                 it("200 응답한다.") {
                     restDocMockMvc.get(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -1309,8 +1377,12 @@ class TravelJournalControllerTest(
                                 "content[].writer.profile.profileColor.red" type JsonFieldType.NUMBER description "여행 일지 작성자의 프로필 색상의 빨간색 값" example response.content[0].writer.profile.profileColor?.red isOptional true,
                                 "content[].writer.profile.profileColor.green" type JsonFieldType.NUMBER description "여행 일지 작성자의 프로필 색상의 초록색 값" example response.content[0].writer.profile.profileColor?.green isOptional true,
                                 "content[].writer.profile.profileColor.blue" type JsonFieldType.NUMBER description "여행 일지 작성자의 프로필 색상의 파란색 값" example response.content[0].writer.profile.profileColor?.blue isOptional true,
-                                "content[].travelCompanionSimpleResponses[].username" type JsonFieldType.STRING description "여행 친구의 아이디" example (response.content[0].travelCompanionSimpleResponses?.get(0)?.username) isOptional true,
-                                "content[].travelCompanionSimpleResponses[].profileUrl" type JsonFieldType.STRING description "여행 친구의 프로필 사진" example (response.content[0].travelCompanionSimpleResponses?.get(0)?.profileUrl) isOptional true,
+                                "content[].travelCompanionSimpleResponses[].username" type JsonFieldType.STRING description "여행 친구의 아이디" example (
+                                    response.content[0].travelCompanionSimpleResponses?.get(0)?.username
+                                    ) isOptional true,
+                                "content[].travelCompanionSimpleResponses[].profileUrl" type JsonFieldType.STRING description "여행 친구의 프로필 사진" example (
+                                    response.content[0].travelCompanionSimpleResponses?.get(0)?.profileUrl
+                                    ) isOptional true,
                             ),
                         )
                     }
@@ -1346,8 +1418,17 @@ class TravelJournalControllerTest(
                 val travelJournalUpdateRequestByteInputStream =
                     ControllerTestHelper.jsonContent(travelJournalUpdateRequest).byteInputStream()
                 val travelJournalUpdateRequestFile =
-                    createTravelJournalRequestFile(name = TEST_TRAVEL_JOURNAL_UPDATE_REQUEST_NAME, contentStream = travelJournalUpdateRequestByteInputStream)
-                every { travelJournalService.updateTravelJournal(TEST_TRAVEL_JOURNAL_ID, TEST_USER_ID, any<TravelJournalUpdateRequest>()) } just runs
+                    createTravelJournalRequestFile(
+                        name = TEST_TRAVEL_JOURNAL_UPDATE_REQUEST_NAME,
+                        contentStream = travelJournalUpdateRequestByteInputStream,
+                    )
+                every {
+                    travelJournalService.updateTravelJournal(
+                        TEST_TRAVEL_JOURNAL_ID,
+                        TEST_USER_ID,
+                        any<TravelJournalUpdateRequest>(),
+                    )
+                } just runs
                 it("204 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -1388,8 +1469,17 @@ class TravelJournalControllerTest(
                 val travelJournalUpdateRequestByteInputStream =
                     ControllerTestHelper.jsonContent(travelJournalUpdateRequest).byteInputStream()
                 val travelJournalUpdateRequestFile =
-                    createTravelJournalRequestFile(name = TEST_TRAVEL_JOURNAL_UPDATE_REQUEST_NAME, contentStream = travelJournalUpdateRequestByteInputStream)
-                every { travelJournalService.updateTravelJournal(TEST_TRAVEL_JOURNAL_ID, TEST_USER_ID, any<TravelJournalUpdateRequest>()) } throws ForbiddenException("요청 사용자($TEST_USER_ID)는 해당 요청을 처리할 권한이 없습니다.")
+                    createTravelJournalRequestFile(
+                        name = TEST_TRAVEL_JOURNAL_UPDATE_REQUEST_NAME,
+                        contentStream = travelJournalUpdateRequestByteInputStream,
+                    )
+                every {
+                    travelJournalService.updateTravelJournal(
+                        TEST_TRAVEL_JOURNAL_ID,
+                        TEST_USER_ID,
+                        any<TravelJournalUpdateRequest>(),
+                    )
+                } throws ForbiddenException("요청 사용자($TEST_USER_ID)는 해당 요청을 처리할 권한이 없습니다.")
                 it("403 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -1426,12 +1516,22 @@ class TravelJournalControllerTest(
             }
 
             context("여행 시작일이 여행 종료일보다 늦는 경우") {
-                val travelJournalUpdateRequest = createTravelJournalUpdateRequest(travelStartDate = LocalDate.of(2022, 1, 11))
+                val travelJournalUpdateRequest =
+                    createTravelJournalUpdateRequest(travelStartDate = LocalDate.of(2022, 1, 11))
                 val travelJournalUpdateRequestByteInputStream =
                     ControllerTestHelper.jsonContent(travelJournalUpdateRequest).byteInputStream()
                 val travelJournalUpdateRequestFile =
-                    createTravelJournalRequestFile(name = TEST_TRAVEL_JOURNAL_UPDATE_REQUEST_NAME, contentStream = travelJournalUpdateRequestByteInputStream)
-                every { travelJournalService.updateTravelJournal(TEST_TRAVEL_JOURNAL_ID, TEST_USER_ID, any<TravelJournalUpdateRequest>()) } throws IllegalArgumentException("여행 일지의 시작일(${travelJournalUpdateRequest.travelStartDate})은 종료일(${travelJournalUpdateRequest.travelEndDate})보다 이전이거나 같아야 합니다.")
+                    createTravelJournalRequestFile(
+                        name = TEST_TRAVEL_JOURNAL_UPDATE_REQUEST_NAME,
+                        contentStream = travelJournalUpdateRequestByteInputStream,
+                    )
+                every {
+                    travelJournalService.updateTravelJournal(
+                        TEST_TRAVEL_JOURNAL_ID,
+                        TEST_USER_ID,
+                        any<TravelJournalUpdateRequest>(),
+                    )
+                } throws IllegalArgumentException("여행 일지의 시작일(${travelJournalUpdateRequest.travelStartDate})은 종료일(${travelJournalUpdateRequest.travelEndDate})보다 이전이거나 같아야 합니다.")
                 it("400 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -1468,12 +1568,22 @@ class TravelJournalControllerTest(
             }
 
             context("여행 기간이 제한 기간보다 긴 경우") {
-                val travelJournalUpdateRequest = createTravelJournalUpdateRequest(travelEndDate = LocalDate.of(2022, 1, 16))
+                val travelJournalUpdateRequest =
+                    createTravelJournalUpdateRequest(travelEndDate = LocalDate.of(2022, 1, 16))
                 val travelJournalUpdateRequestByteInputStream =
                     ControllerTestHelper.jsonContent(travelJournalUpdateRequest).byteInputStream()
                 val travelJournalUpdateRequestFile =
-                    createTravelJournalRequestFile(name = TEST_TRAVEL_JOURNAL_UPDATE_REQUEST_NAME, contentStream = travelJournalUpdateRequestByteInputStream)
-                every { travelJournalService.updateTravelJournal(TEST_TRAVEL_JOURNAL_ID, TEST_USER_ID, any<TravelJournalUpdateRequest>()) } throws IllegalArgumentException("여행 일지의 여행 기간(${travelJournalUpdateRequest.travelDurationDays})은 ${MAX_TRAVEL_DAYS}일 이하이어야 합니다.")
+                    createTravelJournalRequestFile(
+                        name = TEST_TRAVEL_JOURNAL_UPDATE_REQUEST_NAME,
+                        contentStream = travelJournalUpdateRequestByteInputStream,
+                    )
+                every {
+                    travelJournalService.updateTravelJournal(
+                        TEST_TRAVEL_JOURNAL_ID,
+                        TEST_USER_ID,
+                        any<TravelJournalUpdateRequest>(),
+                    )
+                } throws IllegalArgumentException("여행 일지의 여행 기간(${travelJournalUpdateRequest.travelDurationDays})은 ${MAX_TRAVEL_DAYS}일 이하이어야 합니다.")
                 it("400 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -1510,12 +1620,22 @@ class TravelJournalControllerTest(
             }
 
             context("여행 일지 기간과 여행 일지 콘텐츠 개수가 다른 경우") {
-                val travelJournalUpdateRequest = createTravelJournalUpdateRequest(travelEndDate = LocalDate.of(2022, 1, 1))
+                val travelJournalUpdateRequest =
+                    createTravelJournalUpdateRequest(travelEndDate = LocalDate.of(2022, 1, 1))
                 val travelJournalUpdateRequestByteInputStream =
                     ControllerTestHelper.jsonContent(travelJournalUpdateRequest).byteInputStream()
                 val travelJournalUpdateRequestFile =
-                    createTravelJournalRequestFile(name = TEST_TRAVEL_JOURNAL_UPDATE_REQUEST_NAME, contentStream = travelJournalUpdateRequestByteInputStream)
-                every { travelJournalService.updateTravelJournal(TEST_TRAVEL_JOURNAL_ID, TEST_USER_ID, any<TravelJournalUpdateRequest>()) } throws IllegalArgumentException("여행 일지의 여행 기간(${travelJournalUpdateRequest.travelDurationDays})은 여행 일지 콘텐츠의 개수($TEST_TRAVEL_JOURNAL_CONTENT_INCORRECT_COUNT)보다 크거나 같아야 합니다.")
+                    createTravelJournalRequestFile(
+                        name = TEST_TRAVEL_JOURNAL_UPDATE_REQUEST_NAME,
+                        contentStream = travelJournalUpdateRequestByteInputStream,
+                    )
+                every {
+                    travelJournalService.updateTravelJournal(
+                        TEST_TRAVEL_JOURNAL_ID,
+                        TEST_USER_ID,
+                        any<TravelJournalUpdateRequest>(),
+                    )
+                } throws IllegalArgumentException("여행 일지의 여행 기간(${travelJournalUpdateRequest.travelDurationDays})은 여행 일지 콘텐츠의 개수($TEST_TRAVEL_JOURNAL_CONTENT_INCORRECT_COUNT)보다 크거나 같아야 합니다.")
                 it("400 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -1552,12 +1672,24 @@ class TravelJournalControllerTest(
             }
 
             context("여행 일지 콘텐츠의 날짜와 여행 시작일, 종료일 사이에 없는 경우") {
-                val travelJournalUpdateRequest = createTravelJournalUpdateRequest(travelStartDate = LocalDate.of(2022, 2, 1), travelEndDate = LocalDate.of(2022, 2, 1))
+                val travelJournalUpdateRequest = createTravelJournalUpdateRequest(
+                    travelStartDate = LocalDate.of(2022, 2, 1),
+                    travelEndDate = LocalDate.of(2022, 2, 1),
+                )
                 val travelJournalUpdateRequestByteInputStream =
                     ControllerTestHelper.jsonContent(travelJournalUpdateRequest).byteInputStream()
                 val travelJournalUpdateRequestFile =
-                    createTravelJournalRequestFile(name = TEST_TRAVEL_JOURNAL_UPDATE_REQUEST_NAME, contentStream = travelJournalUpdateRequestByteInputStream)
-                every { travelJournalService.updateTravelJournal(TEST_TRAVEL_JOURNAL_ID, TEST_USER_ID, any<TravelJournalUpdateRequest>()) } throws IllegalArgumentException("여행 일지 콘텐츠의 여행 일자($TEST_TRAVEL_JOURNAL_INCORRECT_DATE)는 여행 일지의 시작일(${travelJournalUpdateRequest.travelStartDate})과 종료일(${travelJournalUpdateRequest.travelEndDate}) 사이여야 합니다.")
+                    createTravelJournalRequestFile(
+                        name = TEST_TRAVEL_JOURNAL_UPDATE_REQUEST_NAME,
+                        contentStream = travelJournalUpdateRequestByteInputStream,
+                    )
+                every {
+                    travelJournalService.updateTravelJournal(
+                        TEST_TRAVEL_JOURNAL_ID,
+                        TEST_USER_ID,
+                        any<TravelJournalUpdateRequest>(),
+                    )
+                } throws IllegalArgumentException("여행 일지 콘텐츠의 여행 일자($TEST_TRAVEL_JOURNAL_INCORRECT_DATE)는 여행 일지의 시작일(${travelJournalUpdateRequest.travelStartDate})과 종료일(${travelJournalUpdateRequest.travelEndDate}) 사이여야 합니다.")
                 it("400 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -1594,12 +1726,22 @@ class TravelJournalControllerTest(
             }
 
             context("여행 친구 수가 제한 친구 수보다 많은 경우") {
-                val travelJournalUpdateRequest = createTravelJournalUpdateRequest(travelCompanionIds = (0..10).map { it.toLong() })
+                val travelJournalUpdateRequest =
+                    createTravelJournalUpdateRequest(travelCompanionIds = (0..10).map { it.toLong() })
                 val travelJournalUpdateRequestByteInputStream =
                     ControllerTestHelper.jsonContent(travelJournalUpdateRequest).byteInputStream()
                 val travelJournalUpdateRequestFile =
-                    createTravelJournalRequestFile(name = TEST_TRAVEL_JOURNAL_UPDATE_REQUEST_NAME, contentStream = travelJournalUpdateRequestByteInputStream)
-                every { travelJournalService.updateTravelJournal(TEST_TRAVEL_JOURNAL_ID, TEST_USER_ID, any<TravelJournalUpdateRequest>()) } throws IllegalArgumentException("여행 일지 친구는 최대 ${MAX_TRAVEL_COMPANION_COUNT}명까지 등록 가능합니다.")
+                    createTravelJournalRequestFile(
+                        name = TEST_TRAVEL_JOURNAL_UPDATE_REQUEST_NAME,
+                        contentStream = travelJournalUpdateRequestByteInputStream,
+                    )
+                every {
+                    travelJournalService.updateTravelJournal(
+                        TEST_TRAVEL_JOURNAL_ID,
+                        TEST_USER_ID,
+                        any<TravelJournalUpdateRequest>(),
+                    )
+                } throws IllegalArgumentException("여행 일지 친구는 최대 ${MAX_TRAVEL_COMPANION_COUNT}명까지 등록 가능합니다.")
                 it("400 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -1641,7 +1783,10 @@ class TravelJournalControllerTest(
                     val travelJournalUpdateRequestByteInputStream =
                         ControllerTestHelper.jsonContent(travelJournalUpdateRequest).byteInputStream()
                     val travelJournalUpdateRequestFile =
-                        createTravelJournalRequestFile(name = TEST_TRAVEL_JOURNAL_UPDATE_REQUEST_NAME, contentStream = travelJournalUpdateRequestByteInputStream)
+                        createTravelJournalRequestFile(
+                            name = TEST_TRAVEL_JOURNAL_UPDATE_REQUEST_NAME,
+                            contentStream = travelJournalUpdateRequestByteInputStream,
+                        )
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
                             .multipart(targetUri, TEST_TRAVEL_JOURNAL_ID)
@@ -1684,18 +1829,55 @@ class TravelJournalControllerTest(
                 val travelJournalContentUpdateRequestByteInputStream =
                     ControllerTestHelper.jsonContent(travelJournalContentUpdateRequest).byteInputStream()
                 val travelJournalUpdateRequestFile =
-                    createTravelJournalRequestFile(name = TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_REQUEST_NAME, contentStream = travelJournalContentUpdateRequestByteInputStream)
+                    createTravelJournalRequestFile(
+                        name = TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_REQUEST_NAME,
+                        contentStream = travelJournalContentUpdateRequestByteInputStream,
+                    )
+                val placeDetailsMap = createPlaceDetailsMap()
+                every { travelJournalService.getPlaceDetailsMap(any()) } returns placeDetailsMap
                 every { travelJournalService.getImageMap(any<List<MultipartFile>>()) } returns mockk<Map<String, MultipartFile>>()
-                every { travelJournalService.validateTravelJournalContentUpdateRequest(TEST_TRAVEL_JOURNAL_ID, TEST_TRAVEL_JOURNAL_CONTENT_ID, TEST_USER_ID, any<Map<String, MultipartFile>>(), any<TravelJournalContentUpdateRequest>()) } just runs
-                every { travelJournalService.uploadTravelContentImages(any<List<String>>(), any<Map<String, MultipartFile>>()) } returns mockk<List<Pair<String, String>>>()
-                every { travelJournalService.updateTravelJournalContent(TEST_TRAVEL_JOURNAL_ID, TEST_TRAVEL_JOURNAL_CONTENT_ID, TEST_USER_ID, any<TravelJournalContentUpdateRequest>(), any<List<Pair<String, String>>>()) } just runs
+                every {
+                    travelJournalService.validateTravelJournalContentUpdateRequest(
+                        TEST_TRAVEL_JOURNAL_ID,
+                        TEST_TRAVEL_JOURNAL_CONTENT_ID,
+                        TEST_USER_ID,
+                        any<Map<String, MultipartFile>>(),
+                        any<TravelJournalContentUpdateRequest>(),
+                    )
+                } just runs
+                every {
+                    travelJournalService.uploadTravelContentImages(
+                        any<List<String>>(),
+                        any<Map<String, MultipartFile>>(),
+                    )
+                } returns mockk<List<Pair<String, String>>>()
+                every {
+                    travelJournalService.updateTravelJournalContent(
+                        TEST_TRAVEL_JOURNAL_ID,
+                        TEST_TRAVEL_JOURNAL_CONTENT_ID,
+                        TEST_USER_ID,
+                        any<TravelJournalContentUpdateRequest>(),
+                        any<List<Pair<String, String>>>(),
+                        any<Map<String, PlaceDetails>>(),
+                    )
+                } just runs
                 it("204 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
                             .multipart(targetUri, TEST_TRAVEL_JOURNAL_ID, TEST_TRAVEL_JOURNAL_CONTENT_ID)
                             .file(travelJournalUpdateRequestFile)
-                            .file(createMockImageFile(TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME, originalFileName = TEST_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE))
-                            .file(createMockImageFile(TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME, originalFileName = TEST_OTHER_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE))
+                            .file(
+                                createMockImageFile(
+                                    TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME,
+                                    originalFileName = TEST_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE,
+                                ),
+                            )
+                            .file(
+                                createMockImageFile(
+                                    TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME,
+                                    originalFileName = TEST_OTHER_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE,
+                                ),
+                            )
                             .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                             .with {
                                 it.method = "PUT"
@@ -1734,16 +1916,39 @@ class TravelJournalControllerTest(
                 val travelJournalContentUpdateRequestByteInputStream =
                     ControllerTestHelper.jsonContent(travelJournalContentUpdateRequest).byteInputStream()
                 val travelJournalUpdateRequestFile =
-                    createTravelJournalRequestFile(name = TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_REQUEST_NAME, contentStream = travelJournalContentUpdateRequestByteInputStream)
+                    createTravelJournalRequestFile(
+                        name = TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_REQUEST_NAME,
+                        contentStream = travelJournalContentUpdateRequestByteInputStream,
+                    )
+                val placeDetailsMap = createPlaceDetailsMap()
+                every { travelJournalService.getPlaceDetailsMap(any()) } returns placeDetailsMap
                 every { travelJournalService.getImageMap(any<List<MultipartFile>>()) } returns mockk<Map<String, MultipartFile>>()
-                every { travelJournalService.validateTravelJournalContentUpdateRequest(TEST_TRAVEL_JOURNAL_ID, TEST_TRAVEL_JOURNAL_CONTENT_ID, TEST_USER_ID, any<Map<String, MultipartFile>>(), any<TravelJournalContentUpdateRequest>()) } throws NoSuchElementException("해당 여행 일지 콘텐츠($TEST_TRAVEL_JOURNAL_CONTENT_ID)가 존재하지 않습니다.")
+                every {
+                    travelJournalService.validateTravelJournalContentUpdateRequest(
+                        TEST_TRAVEL_JOURNAL_ID,
+                        TEST_TRAVEL_JOURNAL_CONTENT_ID,
+                        TEST_USER_ID,
+                        any<Map<String, MultipartFile>>(),
+                        any<TravelJournalContentUpdateRequest>(),
+                    )
+                } throws NoSuchElementException("해당 여행 일지 콘텐츠($TEST_TRAVEL_JOURNAL_CONTENT_ID)가 존재하지 않습니다.")
                 it("404 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
                             .multipart(targetUri, TEST_TRAVEL_JOURNAL_ID, TEST_TRAVEL_JOURNAL_CONTENT_ID)
                             .file(travelJournalUpdateRequestFile)
-                            .file(createMockImageFile(TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME, originalFileName = TEST_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE))
-                            .file(createMockImageFile(TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME, originalFileName = TEST_OTHER_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE))
+                            .file(
+                                createMockImageFile(
+                                    TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME,
+                                    originalFileName = TEST_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE,
+                                ),
+                            )
+                            .file(
+                                createMockImageFile(
+                                    TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME,
+                                    originalFileName = TEST_OTHER_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE,
+                                ),
+                            )
                             .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                             .with {
                                 it.method = "PUT"
@@ -1782,16 +1987,39 @@ class TravelJournalControllerTest(
                 val travelJournalContentUpdateRequestByteInputStream =
                     ControllerTestHelper.jsonContent(travelJournalContentUpdateRequest).byteInputStream()
                 val travelJournalUpdateRequestFile =
-                    createTravelJournalRequestFile(name = TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_REQUEST_NAME, contentStream = travelJournalContentUpdateRequestByteInputStream)
+                    createTravelJournalRequestFile(
+                        name = TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_REQUEST_NAME,
+                        contentStream = travelJournalContentUpdateRequestByteInputStream,
+                    )
+                val placeDetailsMap = createPlaceDetailsMap()
+                every { travelJournalService.getPlaceDetailsMap(any()) } returns placeDetailsMap
                 every { travelJournalService.getImageMap(any<List<MultipartFile>>()) } returns mockk<Map<String, MultipartFile>>()
-                every { travelJournalService.validateTravelJournalContentUpdateRequest(TEST_TRAVEL_JOURNAL_ID, TEST_TRAVEL_JOURNAL_CONTENT_ID, TEST_USER_ID, any<Map<String, MultipartFile>>(), any<TravelJournalContentUpdateRequest>()) } throws ForbiddenException("요청 사용자($TEST_USER_ID)는 해당 요청을 처리할 권한이 없습니다.")
+                every {
+                    travelJournalService.validateTravelJournalContentUpdateRequest(
+                        TEST_TRAVEL_JOURNAL_ID,
+                        TEST_TRAVEL_JOURNAL_CONTENT_ID,
+                        TEST_USER_ID,
+                        any<Map<String, MultipartFile>>(),
+                        any<TravelJournalContentUpdateRequest>(),
+                    )
+                } throws ForbiddenException("요청 사용자($TEST_USER_ID)는 해당 요청을 처리할 권한이 없습니다.")
                 it("403 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
                             .multipart(targetUri, TEST_TRAVEL_JOURNAL_ID, TEST_TRAVEL_JOURNAL_CONTENT_ID)
                             .file(travelJournalUpdateRequestFile)
-                            .file(createMockImageFile(TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME, originalFileName = TEST_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE))
-                            .file(createMockImageFile(TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME, originalFileName = TEST_OTHER_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE))
+                            .file(
+                                createMockImageFile(
+                                    TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME,
+                                    originalFileName = TEST_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE,
+                                ),
+                            )
+                            .file(
+                                createMockImageFile(
+                                    TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME,
+                                    originalFileName = TEST_OTHER_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE,
+                                ),
+                            )
                             .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                             .with {
                                 it.method = "PUT"
@@ -1826,20 +2054,44 @@ class TravelJournalControllerTest(
             }
 
             context("여행 일지 콘텐츠의 이미지 개수가 제한 개수보다 많은 경우") {
-                val travelJournalContentUpdateRequest = createTravelJournalContentUpdateRequest(updateContentImageNames = (0..16).map { "$it.webp" })
+                val travelJournalContentUpdateRequest =
+                    createTravelJournalContentUpdateRequest(updateContentImageNames = (0..16).map { "$it.webp" })
                 val travelJournalContentUpdateRequestByteInputStream =
                     ControllerTestHelper.jsonContent(travelJournalContentUpdateRequest).byteInputStream()
                 val travelJournalUpdateRequestFile =
-                    createTravelJournalRequestFile(name = TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_REQUEST_NAME, contentStream = travelJournalContentUpdateRequestByteInputStream)
+                    createTravelJournalRequestFile(
+                        name = TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_REQUEST_NAME,
+                        contentStream = travelJournalContentUpdateRequestByteInputStream,
+                    )
+                val placeDetailsMap = createPlaceDetailsMap()
+                every { travelJournalService.getPlaceDetailsMap(any()) } returns placeDetailsMap
                 every { travelJournalService.getImageMap(any<List<MultipartFile>>()) } returns mockk<Map<String, MultipartFile>>()
-                every { travelJournalService.validateTravelJournalContentUpdateRequest(TEST_TRAVEL_JOURNAL_ID, TEST_TRAVEL_JOURNAL_CONTENT_ID, TEST_USER_ID, any<Map<String, MultipartFile>>(), any<TravelJournalContentUpdateRequest>()) } throws IllegalArgumentException("여행 일지 콘텐츠의 이미지 개수(0)와 추가 이미지 개수(${travelJournalContentUpdateRequest.updateImageTotalCount})의 합은 최대 $MAX_TRAVEL_JOURNAL_CONTENT_IMAGE_COUNT 개까지 등록 가능합니다.")
+                every {
+                    travelJournalService.validateTravelJournalContentUpdateRequest(
+                        TEST_TRAVEL_JOURNAL_ID,
+                        TEST_TRAVEL_JOURNAL_CONTENT_ID,
+                        TEST_USER_ID,
+                        any<Map<String, MultipartFile>>(),
+                        any<TravelJournalContentUpdateRequest>(),
+                    )
+                } throws IllegalArgumentException("여행 일지 콘텐츠의 이미지 개수(0)와 추가 이미지 개수(${travelJournalContentUpdateRequest.updateImageTotalCount})의 합은 최대 $MAX_TRAVEL_JOURNAL_CONTENT_IMAGE_COUNT 개까지 등록 가능합니다.")
                 it("400 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
                             .multipart(targetUri, TEST_TRAVEL_JOURNAL_ID, TEST_TRAVEL_JOURNAL_CONTENT_ID)
                             .file(travelJournalUpdateRequestFile)
-                            .file(createMockImageFile(TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME, originalFileName = TEST_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE))
-                            .file(createMockImageFile(TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME, originalFileName = TEST_OTHER_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE))
+                            .file(
+                                createMockImageFile(
+                                    TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME,
+                                    originalFileName = TEST_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE,
+                                ),
+                            )
+                            .file(
+                                createMockImageFile(
+                                    TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME,
+                                    originalFileName = TEST_OTHER_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE,
+                                ),
+                            )
                             .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                             .with {
                                 it.method = "PUT"
@@ -1874,19 +2126,39 @@ class TravelJournalControllerTest(
             }
 
             context("추가할 여행 일지 콘텐츠의 이름과 이미지 파일의 이름이 다른 경우") {
-                val travelJournalContentUpdateRequest = createTravelJournalContentUpdateRequest(updateContentImageNames = listOf(TEST_TRAVEL_JOURNAL_CONTENT_INCORRECT_IMAGE_NAME))
+                val travelJournalContentUpdateRequest = createTravelJournalContentUpdateRequest(
+                    updateContentImageNames = listOf(TEST_TRAVEL_JOURNAL_CONTENT_INCORRECT_IMAGE_NAME),
+                )
                 val travelJournalContentUpdateRequestByteInputStream =
                     ControllerTestHelper.jsonContent(travelJournalContentUpdateRequest).byteInputStream()
                 val travelJournalUpdateRequestFile =
-                    createTravelJournalRequestFile(name = TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_REQUEST_NAME, contentStream = travelJournalContentUpdateRequestByteInputStream)
+                    createTravelJournalRequestFile(
+                        name = TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_REQUEST_NAME,
+                        contentStream = travelJournalContentUpdateRequestByteInputStream,
+                    )
+                val placeDetailsMap = createPlaceDetailsMap()
+                every { travelJournalService.getPlaceDetailsMap(any()) } returns placeDetailsMap
                 every { travelJournalService.getImageMap(any<List<MultipartFile>>()) } returns mockk<Map<String, MultipartFile>>()
-                every { travelJournalService.validateTravelJournalContentUpdateRequest(TEST_TRAVEL_JOURNAL_ID, TEST_TRAVEL_JOURNAL_CONTENT_ID, TEST_USER_ID, any<Map<String, MultipartFile>>(), any<TravelJournalContentUpdateRequest>()) } throws IllegalArgumentException("추가할 여행 일지 콘텐츠의 이미지 이름($TEST_TRAVEL_JOURNAL_CONTENT_INCORRECT_IMAGE_NAME)은 여행 이미지 파일 이름과 일치해야 합니다.")
+                every {
+                    travelJournalService.validateTravelJournalContentUpdateRequest(
+                        TEST_TRAVEL_JOURNAL_ID,
+                        TEST_TRAVEL_JOURNAL_CONTENT_ID,
+                        TEST_USER_ID,
+                        any<Map<String, MultipartFile>>(),
+                        any<TravelJournalContentUpdateRequest>(),
+                    )
+                } throws IllegalArgumentException("추가할 여행 일지 콘텐츠의 이미지 이름($TEST_TRAVEL_JOURNAL_CONTENT_INCORRECT_IMAGE_NAME)은 여행 이미지 파일 이름과 일치해야 합니다.")
                 it("400 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
                             .multipart(targetUri, TEST_TRAVEL_JOURNAL_ID, TEST_TRAVEL_JOURNAL_CONTENT_ID)
                             .file(travelJournalUpdateRequestFile)
-                            .file(createMockImageFile(TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME, originalFileName = TEST_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE))
+                            .file(
+                                createMockImageFile(
+                                    TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME,
+                                    originalFileName = TEST_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE,
+                                ),
+                            )
                             .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                             .with {
                                 it.method = "PUT"
@@ -1921,19 +2193,38 @@ class TravelJournalControllerTest(
             }
 
             context("여행 일지 콘텐츠 여행 일자가 여행 시작일과 종료일 사이에 없는 경우") {
-                val travelJournalContentUpdateRequest = createTravelJournalContentUpdateRequest(travelDate = LocalDate.of(2023, 1, 1))
+                val travelJournalContentUpdateRequest =
+                    createTravelJournalContentUpdateRequest(travelDate = LocalDate.of(2023, 1, 1))
                 val travelJournalContentUpdateRequestByteInputStream =
                     ControllerTestHelper.jsonContent(travelJournalContentUpdateRequest).byteInputStream()
                 val travelJournalUpdateRequestFile =
-                    createTravelJournalRequestFile(name = TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_REQUEST_NAME, contentStream = travelJournalContentUpdateRequestByteInputStream)
+                    createTravelJournalRequestFile(
+                        name = TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_REQUEST_NAME,
+                        contentStream = travelJournalContentUpdateRequestByteInputStream,
+                    )
+                val placeDetailsMap = createPlaceDetailsMap()
+                every { travelJournalService.getPlaceDetailsMap(any()) } returns placeDetailsMap
                 every { travelJournalService.getImageMap(any<List<MultipartFile>>()) } returns mockk<Map<String, MultipartFile>>()
-                every { travelJournalService.validateTravelJournalContentUpdateRequest(TEST_TRAVEL_JOURNAL_ID, TEST_TRAVEL_JOURNAL_CONTENT_ID, TEST_USER_ID, any<Map<String, MultipartFile>>(), any<TravelJournalContentUpdateRequest>()) } throws IllegalArgumentException("여행 일지 콘텐츠의 여행 일자(${travelJournalContentUpdateRequest.travelDate})는 여행 일지의 시작일($TEST_TRAVEL_JOURNAL_START_DATE)과 종료일($TEST_TRAVEL_JOURNAL_END_DATE) 사이여야 합니다.")
+                every {
+                    travelJournalService.validateTravelJournalContentUpdateRequest(
+                        TEST_TRAVEL_JOURNAL_ID,
+                        TEST_TRAVEL_JOURNAL_CONTENT_ID,
+                        TEST_USER_ID,
+                        any<Map<String, MultipartFile>>(),
+                        any<TravelJournalContentUpdateRequest>(),
+                    )
+                } throws IllegalArgumentException("여행 일지 콘텐츠의 여행 일자(${travelJournalContentUpdateRequest.travelDate})는 여행 일지의 시작일($TEST_TRAVEL_JOURNAL_START_DATE)과 종료일($TEST_TRAVEL_JOURNAL_END_DATE) 사이여야 합니다.")
                 it("400 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
                             .multipart(targetUri, TEST_TRAVEL_JOURNAL_ID, TEST_TRAVEL_JOURNAL_CONTENT_ID)
                             .file(travelJournalUpdateRequestFile)
-                            .file(createMockImageFile(TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME, originalFileName = TEST_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE))
+                            .file(
+                                createMockImageFile(
+                                    TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME,
+                                    originalFileName = TEST_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE,
+                                ),
+                            )
                             .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                             .with {
                                 it.method = "PUT"
@@ -1968,19 +2259,40 @@ class TravelJournalControllerTest(
             }
 
             context("위도와 경도의 개수가 다른 경우") {
-                val travelJournalContentUpdateRequest = createTravelJournalContentUpdateRequest(latitudes = listOf(37.1234, 37.1234), longitudes = listOf(127.1234))
+                val travelJournalContentUpdateRequest = createTravelJournalContentUpdateRequest(
+                    latitudes = listOf(37.1234, 37.1234),
+                    longitudes = listOf(127.1234),
+                )
                 val travelJournalContentUpdateRequestByteInputStream =
                     ControllerTestHelper.jsonContent(travelJournalContentUpdateRequest).byteInputStream()
                 val travelJournalUpdateRequestFile =
-                    createTravelJournalRequestFile(name = TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_REQUEST_NAME, contentStream = travelJournalContentUpdateRequestByteInputStream)
+                    createTravelJournalRequestFile(
+                        name = TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_REQUEST_NAME,
+                        contentStream = travelJournalContentUpdateRequestByteInputStream,
+                    )
+                val placeDetailsMap = createPlaceDetailsMap()
+                every { travelJournalService.getPlaceDetailsMap(any()) } returns placeDetailsMap
                 every { travelJournalService.getImageMap(any<List<MultipartFile>>()) } returns mockk<Map<String, MultipartFile>>()
-                every { travelJournalService.validateTravelJournalContentUpdateRequest(TEST_TRAVEL_JOURNAL_ID, TEST_TRAVEL_JOURNAL_CONTENT_ID, TEST_USER_ID, any<Map<String, MultipartFile>>(), any<TravelJournalContentUpdateRequest>()) } throws IllegalArgumentException("여행 일지 콘텐츠의 위도 개수(${travelJournalContentUpdateRequest.latitudes?.size})와 경도 개수(${travelJournalContentUpdateRequest.longitudes?.size})는 같아야 합니다.")
+                every {
+                    travelJournalService.validateTravelJournalContentUpdateRequest(
+                        TEST_TRAVEL_JOURNAL_ID,
+                        TEST_TRAVEL_JOURNAL_CONTENT_ID,
+                        TEST_USER_ID,
+                        any<Map<String, MultipartFile>>(),
+                        any<TravelJournalContentUpdateRequest>(),
+                    )
+                } throws IllegalArgumentException("여행 일지 콘텐츠의 위도 개수(${travelJournalContentUpdateRequest.latitudes?.size})와 경도 개수(${travelJournalContentUpdateRequest.longitudes?.size})는 같아야 합니다.")
                 it("400 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
                             .multipart(targetUri, TEST_TRAVEL_JOURNAL_ID, TEST_TRAVEL_JOURNAL_CONTENT_ID)
                             .file(travelJournalUpdateRequestFile)
-                            .file(createMockImageFile(TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME, originalFileName = TEST_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE))
+                            .file(
+                                createMockImageFile(
+                                    TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME,
+                                    originalFileName = TEST_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE,
+                                ),
+                            )
                             .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                             .with {
                                 it.method = "PUT"
@@ -2020,13 +2332,26 @@ class TravelJournalControllerTest(
                     val travelJournalContentUpdateRequestByteInputStream =
                         ControllerTestHelper.jsonContent(travelJournalContentUpdateRequest).byteInputStream()
                     val travelJournalUpdateRequestFile =
-                        createTravelJournalRequestFile(name = TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_REQUEST_NAME, contentStream = travelJournalContentUpdateRequestByteInputStream)
+                        createTravelJournalRequestFile(
+                            name = TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_REQUEST_NAME,
+                            contentStream = travelJournalContentUpdateRequestByteInputStream,
+                        )
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
                             .multipart(targetUri, TEST_TRAVEL_JOURNAL_ID, TEST_TRAVEL_JOURNAL_CONTENT_ID)
                             .file(travelJournalUpdateRequestFile)
-                            .file(createMockImageFile(TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME, originalFileName = TEST_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE))
-                            .file(createMockImageFile(TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME, originalFileName = TEST_OTHER_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE))
+                            .file(
+                                createMockImageFile(
+                                    TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME,
+                                    originalFileName = TEST_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE,
+                                ),
+                            )
+                            .file(
+                                createMockImageFile(
+                                    TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME,
+                                    originalFileName = TEST_OTHER_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE,
+                                ),
+                            )
                             .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
                             .with {
                                 it.method = "PUT"
@@ -2087,7 +2412,12 @@ class TravelJournalControllerTest(
             }
 
             context("작성자와 요청자가 다른 경우") {
-                every { travelJournalService.deleteTravelJournal(TEST_TRAVEL_JOURNAL_ID, TEST_USER_ID) } throws ForbiddenException("요청 사용자($TEST_USER_ID)는 해당 요청을 처리할 권한이 없습니다.")
+                every {
+                    travelJournalService.deleteTravelJournal(
+                        TEST_TRAVEL_JOURNAL_ID,
+                        TEST_USER_ID,
+                    )
+                } throws ForbiddenException("요청 사용자($TEST_USER_ID)는 해당 요청을 처리할 권한이 없습니다.")
                 it("403 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -2135,7 +2465,13 @@ class TravelJournalControllerTest(
         describe("DELETE /api/v1/travel-journals/{travelJournalId}/{travelJournalContentId}") {
             val targetUri = "/api/v1/travel-journals/{travelJournalId}/{travelJournalContentId}"
             context("유효한 요청이 왔을 경우") {
-                every { travelJournalService.deleteTravelJournalContent(TEST_TRAVEL_JOURNAL_ID, TEST_TRAVEL_JOURNAL_CONTENT_ID, TEST_USER_ID) } just runs
+                every {
+                    travelJournalService.deleteTravelJournalContent(
+                        TEST_TRAVEL_JOURNAL_ID,
+                        TEST_TRAVEL_JOURNAL_CONTENT_ID,
+                        TEST_USER_ID,
+                    )
+                } just runs
                 it("204 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -2159,7 +2495,13 @@ class TravelJournalControllerTest(
             }
 
             context("작성자와 요청자가 다른 경우") {
-                every { travelJournalService.deleteTravelJournalContent(TEST_TRAVEL_JOURNAL_ID, TEST_TRAVEL_JOURNAL_CONTENT_ID, TEST_USER_ID) } throws ForbiddenException("요청 사용자($TEST_USER_ID)는 해당 요청을 처리할 권한이 없습니다.")
+                every {
+                    travelJournalService.deleteTravelJournalContent(
+                        TEST_TRAVEL_JOURNAL_ID,
+                        TEST_TRAVEL_JOURNAL_CONTENT_ID,
+                        TEST_USER_ID,
+                    )
+                } throws ForbiddenException("요청 사용자($TEST_USER_ID)는 해당 요청을 처리할 권한이 없습니다.")
                 it("403 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -2183,7 +2525,13 @@ class TravelJournalControllerTest(
             }
 
             context("여행 일지 콘텐츠 아이디와 일치하는 여행 일지 콘텐츠가 없는 경우") {
-                every { travelJournalService.deleteTravelJournalContent(TEST_TRAVEL_JOURNAL_ID, TEST_TRAVEL_JOURNAL_CONTENT_ID, TEST_USER_ID) } throws NoSuchElementException("해당 여행 일지 콘텐츠($TEST_TRAVEL_JOURNAL_CONTENT_ID)가 존재하지 않습니다.")
+                every {
+                    travelJournalService.deleteTravelJournalContent(
+                        TEST_TRAVEL_JOURNAL_ID,
+                        TEST_TRAVEL_JOURNAL_CONTENT_ID,
+                        TEST_USER_ID,
+                    )
+                } throws NoSuchElementException("해당 여행 일지 콘텐츠($TEST_TRAVEL_JOURNAL_CONTENT_ID)가 존재하지 않습니다.")
                 it("404 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders

@@ -222,13 +222,13 @@ class ImageControllerTest(
             }
 
             context("유효한 토큰이면서, 장소명이 null인 장소 설정 취소 요청인 경우") {
-                val request = createLifeShotRequest(placeName = null)
-                every { imageService.setLifeShot(TEST_USER_ID, TEST_IMAGE_ID, request) } just runs
+                val inCorrectRequest = createLifeShotRequest(placeName = null)
+                every { imageService.setLifeShot(TEST_USER_ID, TEST_IMAGE_ID, inCorrectRequest) } just runs
                 it("200 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
                             .post(targetUri, TEST_IMAGE_ID)
-                            .jsonContent(request)
+                            .jsonContent(inCorrectRequest)
                             .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
                     )
                         .andExpect(MockMvcResultMatchers.status().isNoContent)
@@ -238,7 +238,7 @@ class ImageControllerTest(
                                 pathParameters(
                                     "imageId" pathDescription "인생샷 설정할 사진 id" example TEST_IMAGE_ID,
                                 ),
-                                requestBody("placeName" type JsonFieldType.STRING description "장소명" example request.placeName isOptional true),
+                                requestBody("placeName" type JsonFieldType.STRING description "장소명" example inCorrectRequest.placeName isOptional true),
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                                 ),
@@ -273,11 +273,11 @@ class ImageControllerTest(
 
             context("유효한 토큰이면서, 장소명이 공백인 경우") {
                 it("400 응답한다.") {
-                    val request = createLifeShotRequest(placeName = " ")
+                    val inCorrectRequest = createLifeShotRequest(placeName = " ")
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
                             .post(targetUri, TEST_IMAGE_ID)
-                            .jsonContent(request)
+                            .jsonContent(inCorrectRequest)
                             .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
                     )
                         .andExpect(MockMvcResultMatchers.status().isBadRequest)
@@ -287,7 +287,7 @@ class ImageControllerTest(
                                 pathParameters(
                                     "imageId" pathDescription "인생샷 설정할 사진 id" example TEST_IMAGE_ID,
                                 ),
-                                requestBody("placeName" type JsonFieldType.STRING description "공백인 장소명" example request.placeName isOptional true),
+                                requestBody("placeName" type JsonFieldType.STRING description "공백인 장소명" example inCorrectRequest.placeName isOptional true),
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                                 ),

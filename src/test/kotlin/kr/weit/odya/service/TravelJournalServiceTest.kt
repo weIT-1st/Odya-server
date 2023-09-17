@@ -9,6 +9,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import jakarta.ws.rs.ForbiddenException
+import kr.weit.odya.client.GoogleMapsClient
 import kr.weit.odya.client.push.PushNotificationEvent
 import kr.weit.odya.domain.community.CommunityRepository
 import kr.weit.odya.domain.contentimage.ContentImageRepository
@@ -37,6 +38,7 @@ import kr.weit.odya.support.TEST_GENERATED_FILE_NAME
 import kr.weit.odya.support.TEST_IMAGE_FILE_WEBP
 import kr.weit.odya.support.TEST_OTHER_IMAGE_FILE_WEBP
 import kr.weit.odya.support.TEST_OTHER_USER_ID
+import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_TRAVEL_COMPANION_IDS
 import kr.weit.odya.support.TEST_TRAVEL_COMPANION_USERS
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL
@@ -57,6 +59,8 @@ import kr.weit.odya.support.createMockImageFiles
 import kr.weit.odya.support.createMockOtherImageFile
 import kr.weit.odya.support.createOtherTravelJournalContentRequest
 import kr.weit.odya.support.createOtherUser
+import kr.weit.odya.support.createPlaceDetails
+import kr.weit.odya.support.createPlaceDetailsMap
 import kr.weit.odya.support.createTravelJournal
 import kr.weit.odya.support.createTravelJournalByTravelCompanionIdSize
 import kr.weit.odya.support.createTravelJournalContentRequest
@@ -126,6 +130,7 @@ class TravelJournalServiceTest : DescribeSpec(
                         createTravelJournalContentRequest(),
                     ),
                 )
+                val imageNamePairs = createImageNamePairs()
                 val placeDetailsMap = createPlaceDetailsMap()
                 every { userRepository.getByUserId(TEST_USER_ID) } returns TEST_USER
                 every { travelJournalRepository.save(any<TravelJournal>()) } returns TEST_TRAVEL_JOURNAL
@@ -136,7 +141,7 @@ class TravelJournalServiceTest : DescribeSpec(
                         travelJournalService.createTravelJournal(
                             TEST_USER_ID,
                             travelJournalRequest,
-                            emptyList(),
+                            imageNamePairs,
                             placeDetailsMap,
                         )
                     }
@@ -737,6 +742,7 @@ class TravelJournalServiceTest : DescribeSpec(
                             TEST_USER_ID,
                             travelJournalContentUpdateRequest,
                             createUpdateImageNamePairs(),
+                            createPlaceDetailsMap(),
                         )
                     }
                 }
@@ -753,6 +759,7 @@ class TravelJournalServiceTest : DescribeSpec(
                             TEST_USER_ID,
                             travelJournalContentUpdateRequest,
                             createUpdateImageNamePairs(),
+                            createPlaceDetailsMap(),
                         )
                     }
                 }
@@ -774,6 +781,7 @@ class TravelJournalServiceTest : DescribeSpec(
                             TEST_USER_ID,
                             travelJournalContentUpdateRequest,
                             emptyList(),
+                            createPlaceDetailsMap(),
                         )
                     }
                 }
@@ -1011,7 +1019,9 @@ class TravelJournalServiceTest : DescribeSpec(
 
             context("존재 하지 않는 placeId를 넣은 경우") {
                 val placeIds = setOf(TEST_PLACE_ID)
-                every { googleMapsClient.findPlaceDetailsByPlaceId(TEST_PLACE_ID) } throws InvalidRequestException(SOMETHING_ERROR_MESSAGE)
+                every { googleMapsClient.findPlaceDetailsByPlaceId(TEST_PLACE_ID) } throws InvalidRequestException(
+                    SOMETHING_ERROR_MESSAGE,
+                )
                 it("[InvalidRequestException] 반환한다") {
                     shouldThrow<InvalidRequestException> {
                         travelJournalService.getPlaceDetailsMap(

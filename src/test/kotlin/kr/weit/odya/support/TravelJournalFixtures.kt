@@ -272,7 +272,7 @@ fun createTravelJournalUpdateRequest(
 
 fun createTravelJournalContentUpdateRequest(
     content: String = "updateTestContent",
-    placeId: String = "updateTestPlaceId",
+    placeId: String = TEST_PLACE_ID,
     latitudes: List<Double> = listOf(1.1111, 2.2222, 3.3333),
     longitudes: List<Double> = listOf(1.1111, 2.2222, 3.3333),
     travelDate: LocalDate = LocalDate.of(2021, 1, 1),

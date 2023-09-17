@@ -42,14 +42,17 @@ class TravelJournalController(private val travelJournalService: TravelJournalSer
         images: List<MultipartFile>,
     ): ResponseEntity<Void> {
         val placeDetailsMap =
-            travelJournalService.getPlaceDetailsMap(travelJournalRequest.travelJournalContentRequests.mapNotNull { it.placeId }.toSet())
+            travelJournalService.getPlaceDetailsMap(
+                travelJournalRequest.travelJournalContentRequests.mapNotNull { it.placeId }
+                    .toSet(),
+            )
         val imageMap = travelJournalService.getImageMap(images)
         travelJournalService.validateTravelJournalRequest(travelJournalRequest, imageMap)
         val imageNamePairs = travelJournalRequest.travelJournalContentRequests.flatMap { travelJournalContentRequest ->
             travelJournalService.uploadTravelContentImages(travelJournalContentRequest.contentImageNames, imageMap)
         }
         val createdTravelJournalId =
-            travelJournalService.createTravelJournal(userId, travelJournalRequest, imageNamePairs)
+            travelJournalService.createTravelJournal(userId, travelJournalRequest, imageNamePairs, placeDetailsMap)
         return ResponseEntity.created(URI.create("/api/v1/travel-journals/$createdTravelJournalId")).build()
     }
 
@@ -156,6 +159,11 @@ class TravelJournalController(private val travelJournalService: TravelJournalSer
         @RequestPart("travel-journal-content-image-update", required = false)
         images: List<MultipartFile>?,
     ): ResponseEntity<Void> {
+        val placeDetailsMap =
+            travelJournalService.getPlaceDetailsMap(
+                travelJournalContentUpdateRequest.placeId?.let { setOf(it) }
+                    ?: emptySet(),
+            )
         val imageMap = travelJournalService.getImageMap(images)
         travelJournalService.validateTravelJournalContentUpdateRequest(
             travelJournalId,
@@ -175,6 +183,7 @@ class TravelJournalController(private val travelJournalService: TravelJournalSer
             userId,
             travelJournalContentUpdateRequest,
             imageNamePairs,
+            placeDetailsMap,
         )
         return ResponseEntity.noContent().build()
     }
