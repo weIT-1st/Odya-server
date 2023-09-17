@@ -5,10 +5,12 @@ import com.linecorp.kotlinjdsl.listQuery
 import com.linecorp.kotlinjdsl.query.spec.OrderSpec
 import com.linecorp.kotlinjdsl.querydsl.CriteriaQueryDsl
 import com.linecorp.kotlinjdsl.querydsl.expression.col
+import com.linecorp.kotlinjdsl.querydsl.from.Relation
 import kr.weit.odya.domain.community.Community
 import kr.weit.odya.domain.placeReview.PlaceReview
 import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.traveljournal.TravelJournalContent
+import kr.weit.odya.domain.traveljournal.TravelJournalContentInformation
 import kr.weit.odya.domain.user.User
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
@@ -205,9 +207,18 @@ open class FollowRepositoryImpl(private val queryFactory: QueryFactory) : Custom
         val travelJournalWriter = queryFactory.listQuery {
             select(col(User::id))
             from(entity(TravelJournal::class))
-            associate(TravelJournal::class, entity(TravelJournalContent::class), on(TravelJournal::travelJournalContents))
+            associate(
+                TravelJournal::class,
+                entity(TravelJournalContent::class),
+                Relation<TravelJournal, TravelJournalContent>("mutableTravelJournalContents"),
+            )
+            associate(
+                TravelJournalContent::class,
+                entity(TravelJournalContentInformation::class),
+                on(TravelJournalContent::travelJournalContentInformation),
+            )
             associate(TravelJournal::class, entity(User::class), on(TravelJournal::user))
-            where(col(TravelJournalContent::placeId).equal(placeID))
+            where(col(TravelJournalContentInformation::placeId).equal(placeID))
         }
         val communityWriter = queryFactory.listQuery {
             select(col(User::id))
