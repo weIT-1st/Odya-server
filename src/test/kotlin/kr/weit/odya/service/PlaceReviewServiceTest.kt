@@ -17,12 +17,14 @@ import kr.weit.odya.domain.report.deleteAllByUserId
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.support.TEST_AVERAGE_RATING
+import kr.weit.odya.support.TEST_DEFAULT_PROFILE_PNG
 import kr.weit.odya.support.TEST_LAST_ID
 import kr.weit.odya.support.TEST_NOT_EXIST_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_PLACE_REVIEW_COUNT
 import kr.weit.odya.support.TEST_PLACE_REVIEW_ID
 import kr.weit.odya.support.TEST_PLACE_SORT_TYPE
+import kr.weit.odya.support.TEST_PROFILE_URL
 import kr.weit.odya.support.TEST_SIZE
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.creatSlicePlaceReviewResponse
@@ -40,7 +42,8 @@ class PlaceReviewServiceTest : DescribeSpec(
         val userRepository = mockk<UserRepository>()
         val placeReviewRepository = mockk<PlaceReviewRepository>()
         val reportPlaceReviewRepository = mockk<ReportPlaceReviewRepository>()
-        val sut = PlaceReviewService(placeReviewRepository, userRepository, reportPlaceReviewRepository)
+        val fileService = mockk<FileService>()
+        val sut = PlaceReviewService(placeReviewRepository, userRepository, reportPlaceReviewRepository, fileService)
         val user = createUser()
 
         describe("createPlaceReview 메소드") {
@@ -129,6 +132,7 @@ class PlaceReviewServiceTest : DescribeSpec(
             context("유효한 placeId가 전달되면") {
                 every { placeReviewRepository.findSliceByPlaceIdOrderBySortType(TEST_PLACE_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) } returns listOf(createMockPlaceReview(user))
                 every { placeReviewRepository.getAverageRatingByPlaceId(TEST_PLACE_ID) } returns TEST_AVERAGE_RATING
+                every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
                 it("리뷰를 조회한다.") {
                     sut.getByPlaceReviewList(TEST_PLACE_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) shouldBe creatSlicePlaceReviewResponse()
                 }
@@ -140,6 +144,7 @@ class PlaceReviewServiceTest : DescribeSpec(
                 every { userRepository.getByUserId(TEST_USER_ID) } returns user
                 every { placeReviewRepository.findSliceByUserOrderBySortType(any(), TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) } returns listOf(createMockPlaceReview(user))
                 every { placeReviewRepository.getAverageRatingByUser(user) } returns TEST_AVERAGE_RATING
+                every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
                 it("리뷰를 조회한다.") {
                     sut.getByUserReviewList(TEST_USER_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) shouldBe creatSlicePlaceReviewResponse()
                 }

@@ -1,0 +1,126 @@
+[[Image-API]]
+= *Image API*
+
+[[유저-사진-조회-API]]
+== *1. 유저 사진 조회 API*
+
+=== *1-1 성공*
+
+operation::image-controller-test/get-images-success[snippets='http-request,query-parameters,path-parameters,request-headers,http-response']
+
+=== *1-2 실패 - 유효하지 않은 마지막 id*
+
+operation::image-controller-test/get-images-fail-invalid-last-id[snippets='http-request,query-parameters,path-parameters,request-headers,http-response']
+
+=== *1-3 실패 - 유효하지 않은 사이즈*
+
+operation::image-controller-test/get-images-fail-invalid-size[snippets='http-request,query-parameters,path-parameters,request-headers,http-response']
+
+=== *1-4 실패 - 가입되지 않은 유저*
+
+operation::image-controller-test/get-images-fail-not-registered-user[snippets='http-request,request-headers,http-response']
+
+=== *1-5 실패 - 유효하지 않은 토큰*
+
+operation::image-controller-test/get-images-fail-invalid-token[snippets='http-request,request-headers,http-response']
+
+[[인생샷-설정-API]]
+== *2. 인생샷 설정 API*
+
+=== *2-1 성공*
+
+operation::image-controller-test/set-life-shot-success[snippets='http-request,request-headers,path-parameters,request-body,http-response']
+
+=== *2-2 성공 - 장소 id가 null (장소 지정 취소)*
+
+operation::image-controller-test/set-life-shot-success-place-id-null[snippets='http-request,request-headers,path-parameters,request-body,http-response']
+
+=== *2-3 실패 - 유효하지 않은 사진 id*
+
+operation::image-controller-test/set-life-shot-fail-invalid-image-id[snippets='http-request,request-headers,path-parameters,request-body,http-response']
+
+=== *2-4 실패 - 유효하지 않은 장소명*
+
+operation::image-controller-test/set-life-shot-fail-invalid-place-id[snippets='http-request,request-headers,path-parameters,request-body,http-response']
+
+=== *2-5 실패 - 길이 제한을 넘은 장소명*
+
+operation::image-controller-test/set-life-shot-fail-too-long-place-id[snippets='http-request,request-headers,path-parameters,request-body,http-response']
+
+=== *2-6 실패 - 가입되지 않은 유저*
+
+operation::image-controller-test/set-life-shot-fail-not-registered-user[snippets='http-request,request-headers,path-parameters,request-body,http-response']
+
+=== *2-7 실패 - 유효하지 않은 토큰*
+
+operation::image-controller-test/set-life-shot-fail-invalid-token[snippets='http-request,request-headers,path-parameters,request-body,http-response']
+
+[[인생샷-취소-API]]
+== *3. 인생샷 취소 API*
+
+=== *3-1 성공*
+
+operation::image-controller-test/unset-life-shot-success[snippets='http-request,request-headers,path-parameters,request-body,http-response']
+
+=== *3-2 실패 - 유효하지 않은 사진 id*
+
+operation::image-controller-test/unset-life-shot-fail-invalid-image-id[snippets='http-request,request-headers,path-parameters,request-body,http-response']
+
+=== *3-3 실패 - 가입되지 않은 유저*
+
+operation::image-controller-test/unset-life-shot-fail-not-registered-user[snippets='http-request,request-headers,path-parameters,request-body,http-response']
+
+=== *3-4 실패 - 유효하지 않은 토큰*
+
+operation::image-controller-test/unset-life-shot-fail-invalid-token[snippets='http-request,request-headers,path-parameters,request-body,http-response']
+
+[[좌표-사진-조회-API]]
+
+== *4. 좌표 사진 조회 API*
+
+== *ImageUserType*
+
+|===
+| type | description
+
+| `USER`
+| 요청한 사용자 본인의 사진
+
+| `FRIEND`
+| 요청한 사용자의 친구의 사진
+
+| `OTHER`
+| 요청한 사용자의 친구가 아닌 사진
+|===
+
+=== *4-1 성공*
+
+operation::image-controller-test/get-coordinate-images-success[snippets='http-request,query-parameters,request-headers,http-response']
+
+=== *4-2 실패 - 유효하지 않은 사이즈*
+
+operation::image-controller-test/get-coordinate-images-fail-invalid-size[snippets='http-request,query-parameters,request-headers,http-response']
+
+=== *4-3 실패 - 유효하지 않은 좌측 경도*
+
+operation::image-controller-test/get-coordinate-images-fail-invalid-left-longitude[snippets='http-request,query-parameters,request-headers,http-response']
+
+=== *4-4 실패 - 유효하지 않은 하단 위도*
+
+operation::image-controller-test/get-coordinate-images-fail-invalid-bottom-latitude[snippets='http-request,query-parameters,request-headers,http-response']
+
+=== *4-5 실패 - 유효하지 않은 우측 경도*
+
+operation::image-controller-test/get-coordinate-images-fail-invalid-right-longitude[snippets='http-request,query-parameters,request-headers,http-response']
+
+=== *4-6 실패 - 유효하지 않은 상단 위도*
+
+operation::image-controller-test/get-coordinate-images-fail-invalid-top-latitude[snippets='http-request,query-parameters,request-headers,http-response']
+
+=== *4-7 실패 - 가입되지 않은 유저*
+
+operation::image-controller-test/get-images-fail-not-registered-user[snippets='http-request,request-headers,http-response']
+
+=== *4-8 실패 - 유효하지 않은 토큰*
+
+operation::image-controller-test/get-images-fail-invalid-token[snippets='http-request,request-headers,http-response']

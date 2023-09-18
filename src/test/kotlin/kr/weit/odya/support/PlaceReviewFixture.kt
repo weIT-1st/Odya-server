@@ -5,6 +5,7 @@ import kr.weit.odya.domain.placeReview.PlaceReviewSortType
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.service.dto.ExistReviewResponse
 import kr.weit.odya.service.dto.PlaceReviewCreateRequest
+import kr.weit.odya.service.dto.PlaceReviewListResponse
 import kr.weit.odya.service.dto.PlaceReviewUpdateRequest
 import kr.weit.odya.service.dto.ReviewCountResponse
 import kr.weit.odya.service.dto.SlicePlaceReviewResponse
@@ -64,7 +65,16 @@ fun createLatestReview(user: User = createUser()): PlaceReview {
 }
 
 fun creatSlicePlaceReviewResponse(): SlicePlaceReviewResponse {
-    return SlicePlaceReviewResponse.of(TEST_SIZE, listOf(createMockPlaceReview(createUser())), TEST_AVERAGE_RATING)
+    return SlicePlaceReviewResponse.of(
+        TEST_SIZE,
+        listOf(createMockPlaceReview(createUser())).map {
+            PlaceReviewListResponse(
+                it,
+                TEST_PROFILE_URL,
+            )
+        },
+        TEST_AVERAGE_RATING,
+    )
 }
 
 fun createExistReviewResponse(exist: Boolean = true) = ExistReviewResponse(exist)

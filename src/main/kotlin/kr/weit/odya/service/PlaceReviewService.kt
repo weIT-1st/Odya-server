@@ -14,6 +14,7 @@ import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.service.dto.ExistReviewResponse
 import kr.weit.odya.service.dto.PlaceReviewCreateRequest
+import kr.weit.odya.service.dto.PlaceReviewListResponse
 import kr.weit.odya.service.dto.PlaceReviewUpdateRequest
 import kr.weit.odya.service.dto.ReviewCountResponse
 import kr.weit.odya.service.dto.SlicePlaceReviewResponse
@@ -26,6 +27,7 @@ class PlaceReviewService(
     private val placeReviewRepository: PlaceReviewRepository,
     private val userRepository: UserRepository,
     private val reportPlaceReviewRepository: ReportPlaceReviewRepository,
+    private val fileService: FileService,
 ) {
     @Transactional
     fun createReview(request: PlaceReviewCreateRequest, userId: Long) {
@@ -56,14 +58,38 @@ class PlaceReviewService(
     }
 
     @Transactional
-    fun getByPlaceReviewList(placeId: String, size: Int, sortType: PlaceReviewSortType, lastId: Long?): SlicePlaceReviewResponse {
-        return SlicePlaceReviewResponse.of(size, placeReviewRepository.getPlaceReviewListByPlaceId(placeId, size, sortType, lastId), getAverage(placeReviewRepository.getAverageRatingByPlaceId(placeId)))
+    fun getByPlaceReviewList(
+        placeId: String,
+        size: Int,
+        sortType: PlaceReviewSortType,
+        lastId: Long?,
+    ): SlicePlaceReviewResponse {
+        val placeReviewListResponses = placeReviewRepository.getPlaceReviewListByPlaceId(placeId, size, sortType, lastId).map { placeReview ->
+            PlaceReviewListResponse(placeReview, fileService.getPreAuthenticatedObjectUrl(placeReview.user.profile.profileName))
+        }
+        return SlicePlaceReviewResponse.of(
+            size,
+            placeReviewListResponses,
+            getAverage(placeReviewRepository.getAverageRatingByPlaceId(placeId)),
+        )
     }
 
     @Transactional
-    fun getByUserReviewList(userId: Long, size: Int, sortType: PlaceReviewSortType, lastId: Long?): SlicePlaceReviewResponse {
+    fun getByUserReviewList(
+        userId: Long,
+        size: Int,
+        sortType: PlaceReviewSortType,
+        lastId: Long?,
+    ): SlicePlaceReviewResponse {
         val user: User = userRepository.getByUserId(userId)
-        return SlicePlaceReviewResponse.of(size, placeReviewRepository.getPlaceReviewListByUser(user, size, sortType, lastId), getAverage(placeReviewRepository.getAverageRatingByUser(user)))
+        val placeReviewListResponses = placeReviewRepository.getPlaceReviewListByUser(user, size, sortType, lastId).map { placeReview ->
+            PlaceReviewListResponse(placeReview, fileService.getPreAuthenticatedObjectUrl(placeReview.user.profile.profileName))
+        }
+        return SlicePlaceReviewResponse.of(
+            size,
+            placeReviewListResponses,
+            getAverage(placeReviewRepository.getAverageRatingByUser(user)),
+        )
     }
 
     fun getExistReview(userId: Long, placeId: String): ExistReviewResponse {

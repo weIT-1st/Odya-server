@@ -4,9 +4,11 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Positive
 import kr.weit.odya.security.LoginUserId
+import kr.weit.odya.service.ImageService
 import kr.weit.odya.service.UserService
 import kr.weit.odya.service.WithdrawService
 import kr.weit.odya.service.dto.FCMTokenRequest
+import kr.weit.odya.service.dto.ImageResponse
 import kr.weit.odya.service.dto.InformationRequest
 import kr.weit.odya.service.dto.SliceResponse
 import kr.weit.odya.service.dto.UserResponse
@@ -33,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile
 class UserController(
     private val userService: UserService,
     private val withdrawService: WithdrawService,
+    private val imageService: ImageService,
 ) {
     @GetMapping("/me")
     fun getMyInfo(@LoginUserId userId: Long): ResponseEntity<UserResponse> {
@@ -122,6 +125,21 @@ class UserController(
     ): ResponseEntity<UserStatisticsResponse> {
         val response = userService.getStatistics(userId)
         return ResponseEntity.ok(response)
+    }
+
+    @GetMapping("/{userId}/life-shots")
+    fun getLifeShots(
+        @Positive(message = "USER ID는 양수여야 합니다.")
+        @PathVariable("userId")
+        userId: Long,
+        @Positive(message = "사이즈는 양수여야 합니다.")
+        @RequestParam(name = "size", required = false, defaultValue = "10")
+        size: Int,
+        @Positive(message = "마지막 Id는 양수여야 합니다.")
+        @RequestParam(name = "lastId", required = false)
+        lastId: Long?,
+    ): ResponseEntity<SliceResponse<ImageResponse>> {
+        return ResponseEntity.ok(imageService.getLifeShots(userId, size, lastId))
     }
 
     @DeleteMapping

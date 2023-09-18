@@ -7,6 +7,7 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.runs
 import kr.weit.odya.service.ExistResourceException
+import kr.weit.odya.service.ImageService
 import kr.weit.odya.service.NotFoundDefaultResourceException
 import kr.weit.odya.service.ObjectStorageException
 import kr.weit.odya.service.UserService
@@ -46,6 +47,7 @@ import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createFcmTokenRequest
 import kr.weit.odya.support.createInformationRequest
 import kr.weit.odya.support.createMockProfile
+import kr.weit.odya.support.createSliceLifeShotImageResponse
 import kr.weit.odya.support.createSliceSimpleUserResponse
 import kr.weit.odya.support.createUserResponse
 import kr.weit.odya.support.createUserStatisticsResponse
@@ -87,6 +89,7 @@ class UserControllerTest(
     private val context: WebApplicationContext,
     @MockkBean private val userService: UserService,
     @MockkBean private val withdrawService: WithdrawService,
+    @MockkBean private val imageService: ImageService,
 ) : DescribeSpec(
     {
         val restDocumentation = ManualRestDocumentation()
@@ -1032,6 +1035,166 @@ class UserControllerTest(
                                 pathParameters(
                                     "userId" pathDescription "유저 통계를 조회할 USER ID" example TEST_USER_ID,
                                 ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                                ),
+                            ),
+                        )
+                }
+            }
+        }
+
+        describe("GET /api/v1/users/{userId}/life-shots") {
+            val targetUri = "/api/v1/users/{userId}/life-shots"
+            context("유효한 토큰이면서, 가입된 사용자인 경우") {
+                val response = createSliceLifeShotImageResponse()
+                val content = response.content[0]
+                every { imageService.getLifeShots(TEST_USER_ID, TEST_SIZE, TEST_LAST_ID) } returns response
+                it("200 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders.get(targetUri, TEST_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_SIZE.toString())
+                            .param(LAST_ID_PARAM, TEST_LAST_ID.toString()),
+                    ).andExpect(MockMvcResultMatchers.status().isOk)
+                        .andDo(
+                            createPathDocument(
+                                "get-life-shots-success",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example "null" isOptional true,
+                                    LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example "null" isOptional true,
+                                ),
+                                pathParameters(
+                                    "userId" pathDescription "USER ID" example TEST_USER_ID,
+                                ),
+                                responseBody(
+                                    "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
+                                    "content[].imageId" type JsonFieldType.NUMBER description "이미지 id" example content.imageId,
+                                    "content[].imageUrl" type JsonFieldType.STRING description "사진 URL" example content.imageUrl,
+                                    "content[].placeId" type JsonFieldType.STRING description "장소 id" example content.placeId isOptional true,
+                                    "content[].isLifeShot" type JsonFieldType.BOOLEAN description "인생샷 여부" example content.isLifeShot,
+                                    "content[].placeName" type JsonFieldType.STRING description "장소명" example content.placeName isOptional true,
+                                    "content[].journalId" type JsonFieldType.NUMBER description "여행일지 id" example content.journalId isOptional true,
+                                    "content[].communityId" type JsonFieldType.NUMBER description "피드 id" example content.communityId isOptional true,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효한 토큰이면서, userId가 음수인 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders.get(targetUri, TEST_INVALID_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_SIZE.toString())
+                            .param(LAST_ID_PARAM, TEST_LAST_ID.toString()),
+                    ).andExpect(MockMvcResultMatchers.status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "get-life-shots-fail-invalid-user-id",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_SIZE isOptional true,
+                                    LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example TEST_LAST_ID isOptional true,
+                                ),
+                                pathParameters(
+                                    "userId" pathDescription "음수인 USER ID" example TEST_INVALID_USER_ID,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효한 토큰이지만 조회할 마지막 ID가 양수가 아닌 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders.get(targetUri, TEST_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_SIZE.toString())
+                            .param(LAST_ID_PARAM, TEST_INVALID_LAST_ID.toString()),
+                    ).andExpect(MockMvcResultMatchers.status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "get-life-shots-fail-invalid-last-id",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_SIZE isOptional true,
+                                    LAST_ID_PARAM parameterDescription "양수가 아닌 마지막 데이터의 ID" example TEST_INVALID_LAST_ID isOptional true,
+                                ),
+                                pathParameters(
+                                    "userId" pathDescription "USER ID" example TEST_USER_ID,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효한 토큰이지만 size가 양수가 아닌 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders.get(targetUri, TEST_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_INVALID_SIZE.toString())
+                            .param(LAST_ID_PARAM, TEST_LAST_ID.toString()),
+                    ).andExpect(MockMvcResultMatchers.status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "get-life-shots-fail-invalid-size",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "양수가 아닌 데이터 개수" example TEST_INVALID_SIZE isOptional true,
+                                    LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example TEST_LAST_ID isOptional true,
+                                ),
+                                pathParameters(
+                                    "userId" pathDescription "USER ID" example TEST_USER_ID,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효한 토큰이면서, 가입되지 않은 사용자인 경우") {
+                it("401 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders.get(targetUri, TEST_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_NOT_EXIST_USER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_SIZE.toString())
+                            .param(LAST_ID_PARAM, TEST_LAST_ID.toString()),
+                    )
+                        .andExpect(MockMvcResultMatchers.status().isUnauthorized)
+                        .andDo(
+                            createPathDocument(
+                                "get-life-shots-fail-not-registered-user",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효하지 않은 토큰이면") {
+                it("401 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders.get(targetUri, TEST_BEARER_INVALID_ID_TOKEN)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_NOT_EXIST_USER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_SIZE.toString())
+                            .param(LAST_ID_PARAM, TEST_LAST_ID.toString()),
+                    )
+                        .andExpect(MockMvcResultMatchers.status().isUnauthorized)
+                        .andDo(
+                            createPathDocument(
+                                "get-life-shots-fail-invalid-token",
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
                                 ),
