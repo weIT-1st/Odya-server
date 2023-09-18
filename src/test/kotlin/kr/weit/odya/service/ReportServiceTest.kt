@@ -72,13 +72,13 @@ class ReportServiceTest : DescribeSpec(
         describe("reportPlaceReview 메소드") {
             val placeReview = createPlaceReview()
             val request = createReportPlaceReviewRequest()
-            val id = request.placeReviewId
+            val placeReviewId = request.placeReviewId
             context("신고한 유저와 신고 사유가 전달될 경우") {
                 every { reportPlaceReviewRepository.existsByReviewAndUserId(any(), user.id) } returns false
                 every { userRepository.getByUserId(user.id) } returns user
-                every { placeReviewRepository.getByPlaceReviewId(id) } returns placeReview
+                every { placeReviewRepository.getByPlaceReviewId(placeReviewId) } returns placeReview
                 every { reportPlaceReviewRepository.save(any()) } returns createReportPlaceReview(placeReview, user, TEST_REPORT_ID, request.reportReason)
-                every { reportPlaceReviewRepository.countAllByPlaceReviewId(id) } returns 4
+                every { reportPlaceReviewRepository.countAllByPlaceReviewId(placeReviewId) } returns 4
                 it("신고가 정상적으로 등록된다.(신고 5회 미만)") {
                     shouldNotThrowAny { reportService.reportPlaceReview(user.id, request) }
                 }
@@ -89,9 +89,9 @@ class ReportServiceTest : DescribeSpec(
                 val otherId = otherRequest.placeReviewId
                 every { reportPlaceReviewRepository.existsByReviewAndUserId(any(), user.id) } returns false
                 every { userRepository.getByUserId(user.id) } returns user
-                every { placeReviewRepository.getByPlaceReviewId(id) } returns placeReview
+                every { placeReviewRepository.getByPlaceReviewId(otherId) } returns placeReview
                 every { reportPlaceReviewRepository.save(any()) } returns createReportPlaceReview(placeReview, user, TEST_REPORT_ID, otherRequest.reportReason, otherRequest.otherReason)
-                every { reportPlaceReviewRepository.countAllByPlaceReviewId(id) } returns 4
+                every { reportPlaceReviewRepository.countAllByPlaceReviewId(otherId) } returns 4
                 it("신고가 기타 신고 사유와 함께 정상적으로 등록된다.(신고 5회 미만)") {
                     shouldNotThrowAny { reportService.reportPlaceReview(user.id, otherRequest) }
                 }
@@ -100,11 +100,11 @@ class ReportServiceTest : DescribeSpec(
             context("신고 등록 후 한줄 리뷰의 신고가 5회 이상일 경우") {
                 every { reportPlaceReviewRepository.existsByReviewAndUserId(any(), user.id) } returns false
                 every { userRepository.getByUserId(user.id) } returns user
-                every { placeReviewRepository.getByPlaceReviewId(id) } returns placeReview
+                every { placeReviewRepository.getByPlaceReviewId(placeReviewId) } returns placeReview
                 every { reportPlaceReviewRepository.save(any()) } returns createReportPlaceReview(placeReview, user, TEST_REPORT_ID, request.reportReason, request.otherReason)
-                every { reportPlaceReviewRepository.countAllByPlaceReviewId(id) } returns 5
-                every { reportPlaceReviewRepository.deleteAllByPlaceReviewId(id) } just runs
-                every { placeReviewRepository.deleteById(id) } just runs
+                every { reportPlaceReviewRepository.countAllByPlaceReviewId(placeReviewId) } returns 5
+                every { reportPlaceReviewRepository.deleteAllByPlaceReviewId(placeReviewId) } just runs
+                every { placeReviewRepository.deleteById(placeReviewId) } just runs
                 it("해당 한 줄 리뷰를 삭제한다.") {
                     shouldNotThrowAny { reportService.reportPlaceReview(user.id, request) }
                 }
@@ -113,7 +113,7 @@ class ReportServiceTest : DescribeSpec(
             context("작성자가 자신의 리뷰를 신고 등록을 요청한 경우") {
                 val otherPlaceReview = createPlaceReview(user)
                 every { reportPlaceReviewRepository.existsByReviewAndUserId(any(), user.id) } returns false
-                every { placeReviewRepository.getByPlaceReviewId(id) } returns otherPlaceReview
+                every { placeReviewRepository.getByPlaceReviewId(placeReviewId) } returns otherPlaceReview
                 it("[IllegalArgumentException]을 반환한다.") {
                     shouldThrow<IllegalArgumentException> { reportService.reportPlaceReview(user.id, request) }
                 }
@@ -121,7 +121,7 @@ class ReportServiceTest : DescribeSpec(
 
             context("이미 신고한 리뷰를 신고 등록을 요청한 경우") {
                 every { reportPlaceReviewRepository.existsByReviewAndUserId(any(), user.id) } returns true
-                every { placeReviewRepository.getByPlaceReviewId(id) } returns placeReview
+                every { placeReviewRepository.getByPlaceReviewId(placeReviewId) } returns placeReview
                 it("[ExistResourceException]을 반환한다.") {
                     shouldThrow<ExistResourceException> { reportService.reportPlaceReview(user.id, request) }
                 }
@@ -138,7 +138,7 @@ class ReportServiceTest : DescribeSpec(
             context("존재하지 않는 한줄 리뷰 ID가 전달될 경우") {
                 every { reportPlaceReviewRepository.existsByReviewAndUserId(any(), user.id) } returns false
                 every { userRepository.getByUserId(user.id) } returns user
-                every { placeReviewRepository.getByPlaceReviewId(id) } throws NoSuchElementException(NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE)
+                every { placeReviewRepository.getByPlaceReviewId(placeReviewId) } throws NoSuchElementException(NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE)
                 it("[NoSuchElementException]을 반환한다.") {
                     shouldThrow<NoSuchElementException> { reportService.reportPlaceReview(user.id, request) }
                 }
@@ -148,13 +148,13 @@ class ReportServiceTest : DescribeSpec(
         describe("reportTravelJournal 메소드") {
             val travelJournal = createTravelJournal()
             val request = createReportTravelJournalRequest()
-            val id = request.travelJournalId
+            val travelJournalId = request.travelJournalId
             context("신고한 유저와 신고 사유가 전달될 경우") {
-                every { reportTravelJournalRepository.existsByJournalIdAndUserId(id, user.id) } returns false
+                every { reportTravelJournalRepository.existsByJournalIdAndUserId(travelJournalId, user.id) } returns false
                 every { userRepository.getByUserId(user.id) } returns user
-                every { travelJournalRepository.getByTravelJournalId(id) } returns travelJournal
+                every { travelJournalRepository.getByTravelJournalId(travelJournalId) } returns travelJournal
                 every { reportTravelJournalRepository.save(any()) } returns createReportTravelJournal(travelJournal, user)
-                every { reportTravelJournalRepository.countAllByTravelJournalId(id) } returns 4
+                every { reportTravelJournalRepository.countAllByTravelJournalId(travelJournalId) } returns 4
                 it("신고가 정상적으로 등록된다") {
                     shouldNotThrowAny { reportService.reportTravelJournal(user.id, request) }
                 }
@@ -166,23 +166,23 @@ class ReportServiceTest : DescribeSpec(
                 every { userRepository.getByUserId(user.id) } returns user
                 every { travelJournalRepository.getByTravelJournalId(otherId) } returns travelJournal
                 every { reportTravelJournalRepository.save(any()) } returns createReportTravelJournal(travelJournal, user, TEST_REPORT_ID, otherRequest.reportReason, otherRequest.otherReason)
-                every { reportTravelJournalRepository.countAllByTravelJournalId(id) } returns 4
+                every { reportTravelJournalRepository.countAllByTravelJournalId(otherId) } returns 4
                 it("신고가 기타 신고 사유와 함께 정상적으로 등록된다.(신고 5회 미만)") {
                     shouldNotThrowAny { reportService.reportTravelJournal(user.id, request) }
                 }
             }
 
             context("신고 등록 후 여행 일지의 신고가 5회 이상일 경우") {
-                every { reportTravelJournalRepository.existsByJournalIdAndUserId(id, user.id) } returns false
+                every { reportTravelJournalRepository.existsByJournalIdAndUserId(travelJournalId, user.id) } returns false
                 every { userRepository.getByUserId(user.id) } returns user
-                every { travelJournalRepository.getByTravelJournalId(id) } returns travelJournal
+                every { travelJournalRepository.getByTravelJournalId(travelJournalId) } returns travelJournal
                 every { reportTravelJournalRepository.save(any()) } returns createReportTravelJournal(travelJournal, user, TEST_REPORT_ID, request.reportReason, request.otherReason)
-                every { reportTravelJournalRepository.countAllByTravelJournalId(id) } returns 5
-                every { reportTravelJournalRepository.deleteAllByTravelJournalId(id) } just runs
-                every { travelJournalRepository.deleteById(id) } just runs
-                every { travelJournalRepository.getByContentImageNames(id) } returns TEST_CONTENT_IMAGES.map { it.name }
+                every { reportTravelJournalRepository.countAllByTravelJournalId(travelJournalId) } returns 5
+                every { reportTravelJournalRepository.deleteAllByTravelJournalId(travelJournalId) } just runs
+                every { travelJournalRepository.deleteById(travelJournalId) } just runs
+                every { travelJournalRepository.getByContentImageNames(travelJournalId) } returns TEST_CONTENT_IMAGES.map { it.name }
                 every { fileService.deleteFile(any()) } just runs
-                every { communityService.deleteCommunityByTravelJournalId(id) } just runs
+                every { communityService.deleteCommunityByTravelJournalId(travelJournalId) } just runs
                 it("해당 여행 일지를 삭제한다.") {
                     shouldNotThrowAny { reportService.reportTravelJournal(user.id, request) }
                 }
@@ -190,23 +190,23 @@ class ReportServiceTest : DescribeSpec(
 
             context("작성자가 자신의 여행 일지를 신고 등록을 요청한 경우") {
                 val travelJournal2 = createTravelJournal(user = user)
-                every { reportTravelJournalRepository.existsByJournalIdAndUserId(id, user.id) } returns false
-                every { travelJournalRepository.getByTravelJournalId(id) } returns travelJournal2
+                every { reportTravelJournalRepository.existsByJournalIdAndUserId(travelJournalId, user.id) } returns false
+                every { travelJournalRepository.getByTravelJournalId(travelJournalId) } returns travelJournal2
                 it("[IllegalArgumentException]을 반환한다.") {
                     shouldThrow<IllegalArgumentException> { reportService.reportTravelJournal(user.id, request) }
                 }
             }
 
             context("이미 신고한 여행 일지를 신고 등록을 요청한 경우") {
-                every { travelJournalRepository.getByTravelJournalId(id) } returns travelJournal
-                every { reportTravelJournalRepository.existsByJournalIdAndUserId(id, user.id) } returns true
+                every { travelJournalRepository.getByTravelJournalId(travelJournalId) } returns travelJournal
+                every { reportTravelJournalRepository.existsByJournalIdAndUserId(travelJournalId, user.id) } returns true
                 it("[ExistResourceException]을 반환한다.") {
                     shouldThrow<ExistResourceException> { reportService.reportTravelJournal(user.id, request) }
                 }
             }
 
             context("존재하지 않는 유저ID가 전달될 경우") {
-                every { reportTravelJournalRepository.existsByJournalIdAndUserId(id, user.id) } returns false
+                every { reportTravelJournalRepository.existsByJournalIdAndUserId(travelJournalId, user.id) } returns false
                 every { userRepository.getByUserId(user.id) } throws NoSuchElementException(NOT_EXIST_USER_ERROR_MESSAGE)
                 it("[NoSuchElementException]을 반환한다.") {
                     shouldThrow<NoSuchElementException> { reportService.reportTravelJournal(user.id, request) }
@@ -214,23 +214,23 @@ class ReportServiceTest : DescribeSpec(
             }
 
             context("존재하지 않는 여행 일지 ID가 전달될 경우") {
-                every { reportTravelJournalRepository.existsByJournalIdAndUserId(id, user.id) } returns false
+                every { reportTravelJournalRepository.existsByJournalIdAndUserId(travelJournalId, user.id) } returns false
                 every { userRepository.getByUserId(user.id) } returns user
-                every { travelJournalRepository.getByTravelJournalId(id) } throws NoSuchElementException(NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE)
+                every { travelJournalRepository.getByTravelJournalId(travelJournalId) } throws NoSuchElementException(NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE)
                 it("[NoSuchElementException]을 반환한다.") {
                     shouldThrow<NoSuchElementException> { reportService.reportTravelJournal(user.id, request) }
                 }
             }
 
             context("OBJECT STORAGE에 해당 여행일지의 사진이 없는 경우") {
-                every { reportTravelJournalRepository.existsByJournalIdAndUserId(id, user.id) } returns false
+                every { reportTravelJournalRepository.existsByJournalIdAndUserId(travelJournalId, user.id) } returns false
                 every { userRepository.getByUserId(user.id) } returns user
-                every { travelJournalRepository.getByTravelJournalId(id) } returns travelJournal
+                every { travelJournalRepository.getByTravelJournalId(travelJournalId) } returns travelJournal
                 every { reportTravelJournalRepository.save(any()) } returns createReportTravelJournal(travelJournal, user, TEST_REPORT_ID, request.reportReason, request.otherReason)
-                every { reportTravelJournalRepository.countAllByTravelJournalId(id) } returns 5
-                every { reportTravelJournalRepository.deleteAllByTravelJournalId(id) } just runs
-                every { travelJournalRepository.deleteById(id) } just runs
-                every { travelJournalRepository.getByContentImageNames(id) } returns listOf(TEST_GENERATED_FILE_NAME)
+                every { reportTravelJournalRepository.countAllByTravelJournalId(travelJournalId) } returns 5
+                every { reportTravelJournalRepository.deleteAllByTravelJournalId(travelJournalId) } just runs
+                every { travelJournalRepository.deleteById(travelJournalId) } just runs
+                every { travelJournalRepository.getByContentImageNames(travelJournalId) } returns listOf(TEST_GENERATED_FILE_NAME)
                 every { fileService.deleteFile(TEST_GENERATED_FILE_NAME) } throws IllegalArgumentException(DELETE_NOT_EXIST_CONTENT_IMAGE_ERROR_MESSAGE)
                 it("[IllegalArgumentException]을 반환한다.") {
                     shouldThrow<IllegalArgumentException> { reportService.reportTravelJournal(user.id, request) }
@@ -241,13 +241,13 @@ class ReportServiceTest : DescribeSpec(
         describe("reportCommunity 메소드") {
             val community = createCommunity()
             val request = createReportCommunityRequest()
-            val id = request.communityId
+            val communityId = request.communityId
             context("신고한 유저와 신고 사유가 전달될 경우") {
-                every { communityRepository.getByCommunityId(id) } returns community
+                every { communityRepository.getByCommunityId(communityId) } returns community
                 every { reportCommunityRepository.existsByCommunityIdAndUserId(any(), user.id) } returns false
                 every { userRepository.getByUserId(user.id) } returns user
                 every { reportCommunityRepository.save(any()) } returns createReportCommunity(community, user)
-                every { reportCommunityRepository.countAllByCommunityId(id) } returns 4
+                every { reportCommunityRepository.countAllByCommunityId(communityId) } returns 4
                 it("신고가 정상적으로 등록된다") {
                     shouldNotThrowAny { reportService.reportCommunity(user.id, request) }
                 }
@@ -259,24 +259,24 @@ class ReportServiceTest : DescribeSpec(
                 every { userRepository.getByUserId(user.id) } returns user
                 every { communityRepository.getByCommunityId(otherId) } returns community
                 every { reportCommunityRepository.save(any()) } returns createReportCommunity(community, user, TEST_REPORT_ID, otherRequest.reportReason, otherRequest.otherReason)
-                every { reportCommunityRepository.countAllByCommunityId(id) } returns 4
+                every { reportCommunityRepository.countAllByCommunityId(otherId) } returns 4
                 it("신고가 기타 신고 사유와 함께 정상적으로 등록된다.(신고 5회 미만)") {
                     shouldNotThrowAny { reportService.reportCommunity(user.id, request) }
                 }
             }
 
             context("신고 등록 후 커뮤니티 글의 신고가 5회 이상일 경우") {
-                every { reportCommunityRepository.existsByCommunityIdAndUserId(id, user.id) } returns false
+                every { reportCommunityRepository.existsByCommunityIdAndUserId(communityId, user.id) } returns false
                 every { userRepository.getByUserId(user.id) } returns user
-                every { communityRepository.getByCommunityId(id) } returns community
+                every { communityRepository.getByCommunityId(communityId) } returns community
                 every { reportCommunityRepository.save(any()) } returns createReportCommunity(community, user, TEST_REPORT_ID, request.reportReason, request.otherReason)
-                every { reportCommunityRepository.countAllByCommunityId(id) } returns 5
-                every { reportCommunityRepository.deleteAllByCommunityId(id) } just runs
-                every { reportCommunityRepository.deleteAllByCommunityId(id) } just runs
-                every { communityCommentRepository.deleteAllByCommunityId(id) } just runs
-                every { communityRepository.getImageNamesById(id) } returns listOf(TEST_GENERATED_FILE_NAME)
+                every { reportCommunityRepository.countAllByCommunityId(communityId) } returns 5
+                every { reportCommunityRepository.deleteAllByCommunityId(communityId) } just runs
+                every { reportCommunityRepository.deleteAllByCommunityId(communityId) } just runs
+                every { communityCommentRepository.deleteAllByCommunityId(communityId) } just runs
+                every { communityRepository.getImageNamesById(communityId) } returns listOf(TEST_GENERATED_FILE_NAME)
                 every { fileService.deleteFile(TEST_GENERATED_FILE_NAME) } just runs
-                every { communityRepository.deleteById(id) } just runs
+                every { communityRepository.deleteById(communityId) } just runs
                 it("해당 커뮤니티 글을 삭제한다.") {
                     shouldNotThrowAny { reportService.reportCommunity(user.id, request) }
                 }
@@ -284,15 +284,15 @@ class ReportServiceTest : DescribeSpec(
 
             context("작성자가 자신의 커뮤니티 글을 신고 등록을 요청한 경우") {
                 val community2 = createCommunity(user = user)
-                every { reportCommunityRepository.existsByCommunityIdAndUserId(id, user.id) } returns false
-                every { communityRepository.getByCommunityId(id) } returns community2
+                every { reportCommunityRepository.existsByCommunityIdAndUserId(communityId, user.id) } returns false
+                every { communityRepository.getByCommunityId(communityId) } returns community2
                 it("[IllegalArgumentException]을 반환한다.") {
                     shouldThrow<IllegalArgumentException> { reportService.reportCommunity(user.id, request) }
                 }
             }
 
             context("이미 신고한 커뮤니티 글을 신고 등록을 요청한 경우") {
-                every { communityRepository.getByCommunityId(id) } returns community
+                every { communityRepository.getByCommunityId(communityId) } returns community
                 every { reportCommunityRepository.existsByCommunityIdAndUserId(any(), user.id) } returns true
                 it("[ExistResourceException]을 반환한다.") {
                     shouldThrow<ExistResourceException> { reportService.reportCommunity(user.id, request) }
@@ -300,7 +300,7 @@ class ReportServiceTest : DescribeSpec(
             }
 
             context("존재하지 않는 유저ID가 전달될 경우") {
-                every { communityRepository.getByCommunityId(id) } returns community
+                every { communityRepository.getByCommunityId(communityId) } returns community
                 every { reportCommunityRepository.existsByCommunityIdAndUserId(any(), user.id) } returns false
                 every { userRepository.getByUserId(user.id) } throws NoSuchElementException(NOT_EXIST_USER_ERROR_MESSAGE)
                 it("[NoSuchElementException]을 반환한다.") {
@@ -309,24 +309,24 @@ class ReportServiceTest : DescribeSpec(
             }
 
             context("존재하지 않는 커뮤니티 ID가 전달될 경우") {
-                every { reportCommunityRepository.existsByCommunityIdAndUserId(id, user.id) } returns false
+                every { reportCommunityRepository.existsByCommunityIdAndUserId(communityId, user.id) } returns false
                 every { userRepository.getByUserId(user.id) } returns user
-                every { communityRepository.getByCommunityId(id) } throws NoSuchElementException(NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE)
+                every { communityRepository.getByCommunityId(communityId) } throws NoSuchElementException(NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE)
                 it("[NoSuchElementException]을 반환한다.") {
                     shouldThrow<NoSuchElementException> { reportService.reportCommunity(user.id, request) }
                 }
             }
 
             context("OBJECT STORAGE에 해당 커뮤니티 글의 사진이 없는 경우") {
-                every { reportCommunityRepository.existsByCommunityIdAndUserId(id, user.id) } returns false
+                every { reportCommunityRepository.existsByCommunityIdAndUserId(communityId, user.id) } returns false
                 every { userRepository.getByUserId(user.id) } returns user
-                every { communityRepository.getByCommunityId(id) } returns community
+                every { communityRepository.getByCommunityId(communityId) } returns community
                 every { reportCommunityRepository.save(any()) } returns createReportCommunity(community, user, TEST_REPORT_ID, request.reportReason, request.otherReason)
-                every { reportCommunityRepository.countAllByCommunityId(id) } returns 5
-                every { reportCommunityRepository.deleteAllByCommunityId(id) } just runs
-                every { reportCommunityRepository.deleteAllByCommunityId(id) } just runs
-                every { communityCommentRepository.deleteAllByCommunityId(id) } just runs
-                every { communityRepository.getImageNamesById(id) } returns listOf(TEST_GENERATED_FILE_NAME)
+                every { reportCommunityRepository.countAllByCommunityId(communityId) } returns 5
+                every { reportCommunityRepository.deleteAllByCommunityId(communityId) } just runs
+                every { reportCommunityRepository.deleteAllByCommunityId(communityId) } just runs
+                every { communityCommentRepository.deleteAllByCommunityId(communityId) } just runs
+                every { communityRepository.getImageNamesById(communityId) } returns listOf(TEST_GENERATED_FILE_NAME)
                 every { fileService.deleteFile(TEST_GENERATED_FILE_NAME) } throws IllegalArgumentException(DELETE_NOT_EXIST_CONTENT_IMAGE_ERROR_MESSAGE)
                 it("[IllegalArgumentException]을 반환한다.") {
                     shouldThrow<IllegalArgumentException> { reportService.reportCommunity(user.id, request) }

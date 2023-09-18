@@ -38,17 +38,22 @@ class CommunityRepositoryImpl(private val queryFactory: QueryFactory) : CustomCo
     override fun findContentImageNameListById(communityId: Long): List<String> = queryFactory.listQuery {
         select(col(ContentImage::name))
         from(entity(Community::class))
-        associate(Community::class, CommunityContentImage::class, on(Community::communityContentImages))
-        associate(CommunityContentImage::class, ContentImage::class, on(CommunityContentImage::contentImage))
         where(col(Community::id).equal(communityId))
     }
 
     override fun findCommunityByTravelJournalId(travelJournalId: Long): List<String> = queryFactory.listQuery {
         select(col(ContentImage::name))
         from(entity(Community::class))
-        associate(Community::class, CommunityContentImage::class, on(Community::communityContentImages))
-        associate(CommunityContentImage::class, ContentImage::class, on(CommunityContentImage::contentImage))
-        associate(Community::class, TravelJournal::class, on(Community::travelJournal))
+        associate(Community::class, TravelJournal::class, on(Community::travelJournal)) // travelJournalId가 nullable이라서 nested join이 안됨
         where(col(TravelJournal::id).equal(travelJournalId))
     }
+    /*companion object {
+        fun communityByUserIdSubQuery(userId: Long): List<Community> {
+            queryFactory.listQuery {
+                select(entity(Community::class))
+                from(entity(Community::class))
+                where(nestedCol(col(Community::user), User::id).equal(userId))
+            }
+        }
+    }*/
 }

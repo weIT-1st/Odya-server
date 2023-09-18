@@ -22,7 +22,6 @@ import kr.weit.odya.support.domain.BaseTimeEntity
         ),
     ],
     indexes = [
-        Index(name = "report_community_community_id_index", columnList = "community_id"),
         Index(name = "report_community_user_id_index", columnList = "user_id"),
     ],
 )
