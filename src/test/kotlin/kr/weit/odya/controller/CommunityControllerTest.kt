@@ -294,8 +294,7 @@ class CommunityControllerTest(
 
             context("태그된 장소id가 유효하지 않은 경우") {
                 val request = createCommunityCreateRequest(travelJournalId = 1L)
-                val requestByteInputStream =
-                    ControllerTestHelper.jsonContent(request).byteInputStream()
+                val requestByteInputStream = jsonContent(request).byteInputStream()
                 val communityRequestFile = createCommunityRequestFile(contentStream = requestByteInputStream)
                 val communityContentImagePairs = createCommunityContentImagePairs()
                 every { communityService.uploadContentImages(any<List<MultipartFile>>()) } returns communityContentImagePairs
@@ -317,10 +316,10 @@ class CommunityControllerTest(
                     }.andDo {
                         createDocument(
                             "community-create-fail-not-exist-place-id",
-                            HeaderDocumentation.requestHeaders(
+                            requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
-                            RequestDocumentation.requestParts(
+                            requestParts(
                                 "community" requestPartDescription "유효하지 않은 장소id가 포함된 커뮤니티 요청 데이터",
                                 "community-content-image" requestPartDescription "커뮤니티 콘텐츠 사진",
                             ),

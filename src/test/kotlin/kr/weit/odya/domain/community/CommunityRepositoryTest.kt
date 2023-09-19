@@ -126,9 +126,9 @@ class CommunityRepositoryTest(
 
         context("커뮤니티 수정") {
             expect("커뮤니티의 여행일지 ID 컬럼을 null로 수정한다") {
-                communityRepository.updateTravelJournalIdToNull(travelJournal.id)
+                communityRepository.updateTravelJournalIdToNull(travelJournal1.id)
                 tem.flushAndClear()
-                val result = communityRepository.getByCommunityId(community.id)
+                val result = communityRepository.getByCommunityId(community1.id)
                 result.travelJournal shouldBe null
             }
         }

@@ -41,7 +41,7 @@ fun CommunityRepository.getFriendCommunitySliceBy(
 ): List<Community> = findFriendCommunitySliceBy(userId, size, lastId, sortType)
 
 @Repository
-interface CommunityRepository : JpaRepository<Community, Long> {
+interface CommunityRepository : JpaRepository<Community, Long>, CustomCommunityRepository {
     @Modifying
     @Query("update Community c set c.travelJournal.id = null where c.travelJournal.id = :travelJournalId")
     fun updateTravelJournalIdToNull(travelJournalId: Long)
