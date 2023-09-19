@@ -33,9 +33,6 @@ import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.domain.user.getByUserIds
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_ANOTHER_USER_ID
-import kr.weit.odya.support.TEST_CONTENT_IMAGES
-import kr.weit.odya.support.TEST_FILE_AUTHENTICATED_URL
-import kr.weit.odya.support.TEST_ANOTHER_USER_ID
 import kr.weit.odya.support.TEST_FILE_AUTHENTICATED_URL
 import kr.weit.odya.support.TEST_GENERATED_FILE_NAME
 import kr.weit.odya.support.TEST_IMAGE_FILE_WEBP

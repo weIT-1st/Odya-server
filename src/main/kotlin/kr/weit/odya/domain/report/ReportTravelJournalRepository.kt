@@ -32,9 +32,11 @@ interface CustomReportTravelJournalRepository {
 }
 
 class CustomReportTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) : CustomReportTravelJournalRepository {
-    override fun deleteReportTravelJournalByUserId(userId: Long) { queryFactory.deleteQuery<ReportTravelJournal> {
-        where(col(ReportTravelJournal::travelJournal).`in`(travelJournalByUserIdSubQuery(userId)))
-    }.executeUpdate() }
+    override fun deleteReportTravelJournalByUserId(userId: Long) {
+        queryFactory.deleteQuery<ReportTravelJournal> {
+            where(col(ReportTravelJournal::travelJournal).`in`(travelJournalByUserIdSubQuery(userId)))
+        }.executeUpdate()
+    }
 
     private fun travelJournalByUserIdSubQuery(userId: Long): List<TravelJournal> = queryFactory.listQuery {
         select(entity(TravelJournal::class))

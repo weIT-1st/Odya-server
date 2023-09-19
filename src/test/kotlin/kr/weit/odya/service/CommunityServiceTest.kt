@@ -19,7 +19,6 @@ import kr.weit.odya.domain.community.CommunityUpdateEvent
 import kr.weit.odya.domain.community.CommunityVisibility
 import kr.weit.odya.domain.community.getByCommunityId
 import kr.weit.odya.domain.community.getCommunitySliceBy
-import kr.weit.odya.domain.community.getImageNamesByJournalId
 import kr.weit.odya.domain.community.getMyCommunitySliceBy
 import kr.weit.odya.domain.communitycomment.CommunityCommentRepository
 import kr.weit.odya.domain.communitycomment.deleteCommunityComment

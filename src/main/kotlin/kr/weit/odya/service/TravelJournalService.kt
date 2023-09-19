@@ -347,27 +347,6 @@ class TravelJournalService(
         travelJournal.addTravelCompanions(newTravelCompanions)
     }
 
-    private fun updateTravelCompanions(
-        travelJournal: TravelJournal,
-        travelJournalUpdateRequest: TravelJournalUpdateRequest,
-    ) {
-        val deleteTravelCompanionIds = travelJournal.travelCompanions
-            .filter {
-                !(travelJournalUpdateRequest.travelCompanionIds?.contains(it.user?.id) ?: false) || it.user == null
-            }
-            .map { it.id }
-        travelCompanionRepository.deleteAllByIdInBatch(deleteTravelCompanionIds)
-
-        val updateTravelCompanionIds = travelJournalUpdateRequest.travelCompanionIds.orEmpty().filter {
-            travelJournal.travelCompanions.none { travelCompanion -> travelCompanion.user?.id == it }
-        }
-        val newTravelCompanions = getTravelCompanions(
-            updateTravelCompanionIds,
-            travelJournalUpdateRequest.travelCompanionNames,
-        )
-        travelJournal.addTravelCompanions(newTravelCompanions)
-    }
-
     fun getPlaceDetailsMap(placeIdList: Set<String>): Map<String, PlaceDetails> =
         placeIdList.associateWith { googleMapsClient.findPlaceDetailsByPlaceId(it) }
 

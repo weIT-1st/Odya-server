@@ -1,5 +1,6 @@
 package kr.weit.odya.listener
 
+import kr.weit.odya.domain.community.CommunityDeleteEvent
 import kr.weit.odya.domain.community.CommunityUpdateEvent
 import kr.weit.odya.service.FileService
 import kr.weit.odya.service.ObjectStorageException
