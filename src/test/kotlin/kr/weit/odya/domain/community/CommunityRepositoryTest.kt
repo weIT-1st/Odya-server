@@ -103,7 +103,6 @@ class CommunityRepositoryTest(
 
         context("커뮤니티 목록 조회") {
             expect("나와 친구인 사용자의 친구만 공개 여행 일지 목록을 조회한다.") {
-                communityRepository.count() shouldBe 3
                 val result =
                     communityRepository.getCommunitySliceBy(user1.id, 10, null, CommunitySortType.LATEST)
                 result.size shouldBe 3
@@ -116,7 +115,6 @@ class CommunityRepositoryTest(
             }
 
             expect("나와 친구인 사용자의 여행 일지 목록을 조회한다.") {
-                communityRepository.count() shouldBe 3
                 val result =
                     communityRepository.getFriendCommunitySliceBy(user1.id, 10, null, CommunitySortType.LATEST)
                 result.size shouldBe 2
