@@ -235,7 +235,8 @@ data class TravelJournalSummaryResponse(
     )
 }
 
-data class TravelCompanionSimpleResponse(
-    val username: String?,
-    val profileUrl: String?,
+data class TravelJournalSimpleResponse(
+    val travelJournalId: Long,
+    val title: String,
+    val mainImageUrl: String,
 )

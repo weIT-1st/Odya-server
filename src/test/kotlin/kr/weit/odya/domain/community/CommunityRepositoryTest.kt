@@ -4,6 +4,8 @@ import io.kotest.core.spec.style.ExpectSpec
 import io.kotest.matchers.shouldBe
 import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.contentimage.ContentImageRepository
+import kr.weit.odya.domain.follow.Follow
+import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.user.User
@@ -25,6 +27,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 @RepositoryTest
 class CommunityRepositoryTest(
     private val communityRepository: CommunityRepository,
+    private val followRepository: FollowRepository,
     private val userRepository: UserRepository,
     private val travelJournalRepository: TravelJournalRepository,
     private val tem: TestEntityManager,
@@ -35,17 +38,15 @@ class CommunityRepositoryTest(
         lateinit var user2: User
         lateinit var community1: Community
         lateinit var community2: Community
+        lateinit var community3: Community
         lateinit var travelJournal1: TravelJournal
         lateinit var travelJournal2: TravelJournal
-        lateinit var contentImage1: ContentImage
-        lateinit var contentImage2: ContentImage
-        lateinit var contentImage3: ContentImage
         beforeEach {
             user1 = userRepository.save(createUser())
             user2 = userRepository.save(createOtherUser())
-            contentImage1 = contentImageRepository.save(createContentImage(user = user1))
-            contentImage2 = contentImageRepository.save(createContentImage(user = user2))
-            contentImage3 = contentImageRepository.save(createContentImage(user = user1))
+            val contentImage1 = createContentImage(user = user1)
+            val contentImage2 = createContentImage(user = user2)
+            val contentImage3 = createContentImage(user = user1)
             travelJournal1 = travelJournalRepository.save(
                 travelJournalRepository.save(
                     createTravelJournal(
@@ -85,8 +86,15 @@ class CommunityRepositoryTest(
                 createCommunity(
                     user = user2,
                     travelJournal = travelJournal2,
-                    communityContentImages =
-                    listOf(createCommunityContentImage(contentImage2)),
+                    communityContentImages = listOf(createCommunityContentImage(contentImage2)),
+                ),
+            )
+            community3 = communityRepository.save(
+                createCommunity(
+                    user = user2,
+                    travelJournal = null,
+                    visibility = CommunityVisibility.FRIEND_ONLY,
+                    communityContentImages = listOf(createCommunityContentImage(contentImage2)),
                 ),
             )
         }
@@ -132,6 +140,28 @@ class CommunityRepositoryTest(
                 tem.flushAndClear()
                 val result = communityRepository.getByCommunityId(community1.id)
                 result.travelJournal shouldBe null
+            }
+        }
+
+        context("커뮤니티 목록 조회") {
+            expect("나와 친구인 사용자의 친구만 공개 여행 일지 목록을 조회한다.") {
+                communityRepository.count() shouldBe 3
+                val result =
+                    communityRepository.getCommunitySliceBy(user1.id, 10, null, CommunitySortType.LATEST)
+                result.size shouldBe 3
+            }
+
+            expect("나의 여행 일지 목록을 조회한다.") {
+                val result =
+                    communityRepository.getMyCommunitySliceBy(user1.id, 10, null, CommunitySortType.LATEST)
+                result.size shouldBe 1
+            }
+
+            expect("나와 친구인 사용자의 여행 일지 목록을 조회한다.") {
+                communityRepository.count() shouldBe 3
+                val result =
+                    communityRepository.getFriendCommunitySliceBy(user1.id, 10, null, CommunitySortType.LATEST)
+                result.size shouldBe 2
             }
         }
     },
