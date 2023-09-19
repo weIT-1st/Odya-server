@@ -2,8 +2,6 @@ package kr.weit.odya.domain.community
 
 import io.kotest.core.spec.style.ExpectSpec
 import io.kotest.matchers.shouldBe
-import kr.weit.odya.domain.contentimage.ContentImage
-import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.follow.Follow
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.traveljournal.TravelJournal
@@ -11,6 +9,7 @@ import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.support.TEST_COMMUNITY_CONTENT
+import kr.weit.odya.support.TEST_GENERATED_FILE_NAME
 import kr.weit.odya.support.createCommunity
 import kr.weit.odya.support.createCommunityContentImage
 import kr.weit.odya.support.createContentImage
@@ -31,7 +30,6 @@ class CommunityRepositoryTest(
     private val userRepository: UserRepository,
     private val travelJournalRepository: TravelJournalRepository,
     private val tem: TestEntityManager,
-    private val contentImageRepository: ContentImageRepository,
 ) : ExpectSpec(
     {
         lateinit var user1: User
@@ -44,6 +42,7 @@ class CommunityRepositoryTest(
         beforeEach {
             user1 = userRepository.save(createUser())
             user2 = userRepository.save(createOtherUser())
+            followRepository.save(Follow(user1, user2))
             val contentImage1 = createContentImage(user = user1)
             val contentImage2 = createContentImage(user = user2)
             val contentImage3 = createContentImage(user = user1)
@@ -114,38 +113,17 @@ class CommunityRepositoryTest(
         context("커뮤니티 이미지") {
             expect("커뮤니티 ID와 일치하는 커뮤니티의 이미지 이름을 조회한다") {
                 val result = communityRepository.getImageNamesById(community1.id)
-                result shouldBe listOf(contentImage1.name, contentImage3.name)
+                result shouldBe listOf(TEST_GENERATED_FILE_NAME, TEST_GENERATED_FILE_NAME)
             }
 
             expect("여행일지 ID와 일치하는 커뮤니티의 이미지 이름을 조회한다") {
                 val result = communityRepository.getImageNamesByJournalId(travelJournal2.id)
-                result shouldBe listOf(contentImage2.name)
-            }
-        }
-
-        context("커뮤니티 삭제") {
-            expect("유저 ID와 일치하는 커뮤니티를 삭제한다") {
-                communityRepository.deleteAllByUserId(user1.id)
-                communityRepository.findAll().size shouldBe 1
-            }
-            expect("커뮤니티 ID 리스트에 포함된 커뮤니티 모두 삭제한다") {
-                communityRepository.deleteAllByIdIn(listOf(community1.id, community2.id))
-                communityRepository.findAll().size shouldBe 0
-            }
-        }
-
-        context("커뮤니티 수정") {
-            expect("커뮤니티의 여행일지 ID 컬럼을 null로 수정한다") {
-                communityRepository.updateTravelJournalIdToNull(travelJournal1.id)
-                tem.flushAndClear()
-                val result = communityRepository.getByCommunityId(community1.id)
-                result.travelJournal shouldBe null
+                result shouldBe listOf(TEST_GENERATED_FILE_NAME)
             }
         }
 
         context("커뮤니티 목록 조회") {
             expect("나와 친구인 사용자의 친구만 공개 여행 일지 목록을 조회한다.") {
-                communityRepository.count() shouldBe 3
                 val result =
                     communityRepository.getCommunitySliceBy(user1.id, 10, null, CommunitySortType.LATEST)
                 result.size shouldBe 3
@@ -158,10 +136,29 @@ class CommunityRepositoryTest(
             }
 
             expect("나와 친구인 사용자의 여행 일지 목록을 조회한다.") {
-                communityRepository.count() shouldBe 3
                 val result =
                     communityRepository.getFriendCommunitySliceBy(user1.id, 10, null, CommunitySortType.LATEST)
                 result.size shouldBe 2
+            }
+        }
+
+        context("커뮤니티 삭제") {
+            expect("유저 ID와 일치하는 커뮤니티를 삭제한다") {
+                communityRepository.deleteAllByUserId(user1.id)
+                communityRepository.findAll().size shouldBe 2
+            }
+            expect("커뮤니티 ID 리스트에 포함된 커뮤니티 모두 삭제한다") {
+                communityRepository.deleteAllByIdIn(listOf(community1.id, community2.id, community3.id))
+                communityRepository.findAll().size shouldBe 0
+            }
+        }
+
+        context("커뮤니티 수정") {
+            expect("커뮤니티의 여행일지 ID 컬럼을 null로 수정한다") {
+                communityRepository.updateTravelJournalIdToNull(travelJournal1.id)
+                tem.flushAndClear()
+                val result = communityRepository.getByCommunityId(community1.id)
+                result.travelJournal shouldBe null
             }
         }
     },

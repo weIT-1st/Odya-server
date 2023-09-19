@@ -7,6 +7,7 @@ import com.linecorp.kotlinjdsl.query.spec.expression.SubqueryExpressionSpec
 import com.linecorp.kotlinjdsl.query.spec.predicate.PredicateSpec
 import com.linecorp.kotlinjdsl.querydsl.CriteriaQueryDsl
 import com.linecorp.kotlinjdsl.querydsl.expression.col
+import com.linecorp.kotlinjdsl.querydsl.from.Relation
 import com.linecorp.kotlinjdsl.subquery
 import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.follow.Follow
@@ -93,7 +94,11 @@ class CommunityRepositoryImpl(private val queryFactory: QueryFactory) : CustomCo
     override fun findContentImageNameListById(communityId: Long): List<String> = queryFactory.listQuery {
         select(col(ContentImage::name))
         from(entity(Community::class))
-        associate(Community::class, CommunityContentImage::class, on(Community::communityContentImages))
+        associate(
+            Community::class,
+            CommunityContentImage::class,
+            Relation<Community, CommunityContentImage>("mutableCommunityContentImages"),
+        )
         associate(CommunityContentImage::class, ContentImage::class, on(CommunityContentImage::contentImage))
         where(col(Community::id).equal(communityId))
     }
@@ -101,7 +106,11 @@ class CommunityRepositoryImpl(private val queryFactory: QueryFactory) : CustomCo
     override fun findCommunityByTravelJournalId(travelJournalId: Long): List<String> = queryFactory.listQuery {
         select(col(ContentImage::name))
         from(entity(Community::class))
-        associate(Community::class, CommunityContentImage::class, on(Community::communityContentImages))
+        associate(
+            Community::class,
+            CommunityContentImage::class,
+            Relation<Community, CommunityContentImage>("mutableCommunityContentImages"),
+        )
         associate(CommunityContentImage::class, ContentImage::class, on(CommunityContentImage::contentImage))
         associate(Community::class, TravelJournal::class, on(Community::travelJournal))
         where(col(TravelJournal::id).equal(travelJournalId))
@@ -245,4 +254,3 @@ enum class CommunitySortType(val description: String) {
     LATEST("최신순"),
     // TODO: LIKE("좋아요순")
 }
-

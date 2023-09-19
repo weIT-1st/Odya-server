@@ -1,22 +1,22 @@
 package kr.weit.odya.service
 
-import kr.weit.odya.client.GoogleMapsClient
 import jakarta.ws.rs.ForbiddenException
+import kr.weit.odya.client.GoogleMapsClient
 import kr.weit.odya.client.push.PushNotificationEvent
 import kr.weit.odya.domain.community.Community
 import kr.weit.odya.domain.community.CommunityContentImage
 import kr.weit.odya.domain.community.CommunityDeleteEvent
 import kr.weit.odya.domain.community.CommunityRepository
-import kr.weit.odya.domain.community.getImageNamesByJournalId
-import kr.weit.odya.domain.communitycomment.deleteCommunityComment
 import kr.weit.odya.domain.community.CommunitySortType
 import kr.weit.odya.domain.community.CommunityUpdateEvent
 import kr.weit.odya.domain.community.CommunityVisibility
 import kr.weit.odya.domain.community.getByCommunityId
 import kr.weit.odya.domain.community.getCommunitySliceBy
 import kr.weit.odya.domain.community.getFriendCommunitySliceBy
+import kr.weit.odya.domain.community.getImageNamesByJournalId
 import kr.weit.odya.domain.community.getMyCommunitySliceBy
 import kr.weit.odya.domain.communitycomment.CommunityCommentRepository
+import kr.weit.odya.domain.communitycomment.deleteCommunityComment
 import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowerFcmTokens
@@ -49,7 +49,6 @@ private const val MIM_COMMUNITY_CONTENT_IMAGE_COUNT = 1
 @Service
 class CommunityService(
     private val communityRepository: CommunityRepository,
-    private val communityCommentRepository: CommunityCommentRepository,
     private val topicRepository: TopicRepository,
     private val travelJournalRepository: TravelJournalRepository,
     private val userRepository: UserRepository,
@@ -142,6 +141,22 @@ class CommunityService(
         require(communityContentImageTotalCount in MIM_COMMUNITY_CONTENT_IMAGE_COUNT..MAX_COMMUNITY_CONTENT_IMAGE_COUNT) {
             "커뮤니티 사진은 최소 $MIM_COMMUNITY_CONTENT_IMAGE_COUNT 개 이상, 최대 $MAX_COMMUNITY_CONTENT_IMAGE_COUNT 개 이하로 업로드할 수 있습니다."
         }
+    }
+
+    @Transactional
+    fun deleteCommunityByUserId(userId: Long) {
+        reportCommunityRepository.deleteAllByUserId(userId)
+        communityCommentRepository.deleteCommunityComment(userId)
+        communityRepository.deleteAllByUserId(userId)
+    }
+
+    @Transactional
+    fun deleteCommunityByTravelJournalId(travelJournalId: Long) {
+        val communityIds = communityRepository.findIdsByTravelJournalId(travelJournalId)
+        reportCommunityRepository.deleteAllByCommunityIdIn(communityIds)
+        communityCommentRepository.deleteAllByCommunityIdIn(communityIds)
+        communityRepository.getImageNamesByJournalId(travelJournalId).map { fileService.deleteFile(it) }
+        communityRepository.deleteAllByIdIn(communityIds)
     }
 
     @Transactional
@@ -259,36 +274,6 @@ class CommunityService(
             throw ForbiddenException("친구가 아닌 사용자($userId)는 친구에게만 공개하는 여행 일지(${community.id})를 조회할 수 없습니다.")
         }
     }
-
-    fun uploadContentImages(contentImages: List<MultipartFile>): List<Pair<String, String>> {
-        return contentImages.map {
-            require(it.originalFilename != null) { "파일 원본 이름은 필수 값입니다." }
-            val fileName = fileService.saveFile(it)
-            fileName to it.originalFilename!!
-        }
-    }
-
-    @Transactional
-    fun deleteCommunityByUserId(userId: Long) {
-        reportCommunityRepository.deleteAllByUserId(userId)
-        communityCommentRepository.deleteCommunityComment(userId)
-        communityRepository.deleteAllByUserId(userId)
-    }
-
-    @Transactional
-    fun deleteCommunityByTravelJournalId(travelJournalId: Long) {
-        val communityIds = communityRepository.findIdsByTravelJournalId(travelJournalId)
-        reportCommunityRepository.deleteAllByCommunityIdIn(communityIds)
-        communityCommentRepository.deleteAllByCommunityIdIn(communityIds)
-        communityRepository.getImageNamesByJournalId(travelJournalId).map { fileService.deleteFile(it) }
-        communityRepository.deleteAllByIdIn(communityIds)
-    }
-
-    private fun getNonPrivateTravelJournal(travelJournalId: Long?): TravelJournal? =
-        travelJournalId?.let { travelJournalRepository.getByTravelJournalId(it) }?.apply {
-            require(visibility != TravelJournalVisibility.PRIVATE) {
-                "비공개 여행일지는 커뮤니티와 연결할 수 없습니다."
-            }
 
     private fun validateTravelJournal(travelJournal: TravelJournal, userId: Long) {
         require(travelJournal.visibility != TravelJournalVisibility.PRIVATE) {

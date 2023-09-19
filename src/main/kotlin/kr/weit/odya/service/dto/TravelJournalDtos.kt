@@ -240,3 +240,8 @@ data class TravelJournalSimpleResponse(
     val title: String,
     val mainImageUrl: String,
 )
+
+data class TravelCompanionSimpleResponse(
+    val username: String?,
+    val profileUrl: String?,
+)
