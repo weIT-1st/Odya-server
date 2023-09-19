@@ -1,5 +1,6 @@
 package kr.weit.odya.controller
 
+import com.google.maps.errors.InvalidRequestException
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.DescribeSpec
 import io.mockk.every
@@ -284,6 +285,43 @@ class CommunityControllerTest(
                             ),
                             requestParts(
                                 "community" requestPartDescription "비공개 여행 일지 아이디가 포함된 커뮤니티 요청 데이터",
+                                "community-content-image" requestPartDescription "커뮤니티 콘텐츠 사진",
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("태그된 장소id가 유효하지 않은 경우") {
+                val request = createCommunityCreateRequest(travelJournalId = 1L)
+                val requestByteInputStream =
+                    ControllerTestHelper.jsonContent(request).byteInputStream()
+                val communityRequestFile = createCommunityRequestFile(contentStream = requestByteInputStream)
+                val communityContentImagePairs = createCommunityContentImagePairs()
+                every { communityService.uploadContentImages(any<List<MultipartFile>>()) } returns communityContentImagePairs
+                every {
+                    communityService.createCommunity(
+                        TEST_USER_ID,
+                        request,
+                        communityContentImagePairs,
+                    )
+                } throws InvalidRequestException(SOMETHING_ERROR_MESSAGE)
+                it("400 응답한다.") {
+                    restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        file(communityRequestFile)
+                        file(createMockImageFile(mockFileName = TEST_COMMUNITY_MOCK_FILE_NAME))
+                        file(createMockOtherImageFile(mockFileName = TEST_COMMUNITY_MOCK_FILE_NAME))
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "community-create-fail-not-exist-place-id",
+                            HeaderDocumentation.requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            RequestDocumentation.requestParts(
+                                "community" requestPartDescription "유효하지 않은 장소id가 포함된 커뮤니티 요청 데이터",
                                 "community-content-image" requestPartDescription "커뮤니티 콘텐츠 사진",
                             ),
                         )

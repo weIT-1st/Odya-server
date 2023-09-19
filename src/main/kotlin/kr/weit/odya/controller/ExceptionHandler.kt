@@ -2,6 +2,7 @@ package kr.weit.odya.controller
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
+import com.google.maps.errors.InvalidRequestException
 import jakarta.validation.ConstraintViolationException
 import jakarta.ws.rs.ForbiddenException
 import kr.weit.odya.client.ClientException
@@ -49,7 +50,6 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
             is MismatchedInputException -> {
                 "${cause.path.joinToString(separator = ".") { it?.fieldName.orEmpty() }}: ${ex.message}"
             }
-
             else -> "유효하지 않은 요청입니다"
         }
         return getInvalidRequestResponse(errorMessage)
@@ -113,6 +113,12 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
     fun invalidRequestException(ex: RuntimeException): ResponseEntity<Any>? {
         logger.error("[InvalidRequestException]", ex)
         return getInvalidRequestResponse(ex.message)
+    }
+
+    @ExceptionHandler(InvalidRequestException::class)
+    fun invalidRequestException(ex: InvalidRequestException): ResponseEntity<Any>? {
+        logger.error("[InvalidRequestException]", ex)
+        return getInvalidRequestResponse("유효하지 않은 placeId입니다.")
     }
 
     @ExceptionHandler(NoSuchElementException::class)

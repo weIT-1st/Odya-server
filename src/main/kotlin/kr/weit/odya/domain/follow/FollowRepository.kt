@@ -5,14 +5,17 @@ import com.linecorp.kotlinjdsl.listQuery
 import com.linecorp.kotlinjdsl.query.spec.OrderSpec
 import com.linecorp.kotlinjdsl.querydsl.CriteriaQueryDsl
 import com.linecorp.kotlinjdsl.querydsl.expression.col
+import com.linecorp.kotlinjdsl.querydsl.from.Relation
 import kr.weit.odya.domain.community.Community
 import kr.weit.odya.domain.community.CommunityInformation
 import kr.weit.odya.domain.placeReview.PlaceReview
 import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.traveljournal.TravelJournalContent
+import kr.weit.odya.domain.traveljournal.TravelJournalContentInformation
 import kr.weit.odya.domain.user.User
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
 import org.springframework.transaction.annotation.Transactional
 
 fun FollowRepository.getFollowingListBySearchCond(
@@ -50,6 +53,9 @@ fun FollowRepository.getFollowerFcmTokens(followingId: Long): List<String> =
 fun FollowRepository.getVisitedFollowingIds(placeID: String, followerId: Long): List<Long> =
     findVisitedFollowingIdsByPlaceIdAndFollowerId(placeID, followerId)
 
+fun FollowRepository.getFollowingIds(followerId: Long): List<Long> =
+    findFollowingIdsByFollowerId(followerId)
+
 interface FollowRepository : JpaRepository<Follow, Long>, CustomFollowRepository {
     fun existsByFollowerIdAndFollowingId(followerId: Long, followingId: Long): Boolean
 
@@ -62,6 +68,9 @@ interface FollowRepository : JpaRepository<Follow, Long>, CustomFollowRepository
     fun deleteByFollowingId(followingId: Long)
 
     fun deleteByFollowerId(follower: Long)
+
+    @Query("select f.following.id from Follow f where f.follower.id = :followerId")
+    fun findFollowingIdsByFollowerId(followerId: Long): List<Long>
 }
 
 interface CustomFollowRepository {
@@ -202,10 +211,15 @@ open class FollowRepositoryImpl(private val queryFactory: QueryFactory) : Custom
             associate(
                 TravelJournal::class,
                 entity(TravelJournalContent::class),
-                on(TravelJournal::travelJournalContents),
+                Relation<TravelJournal, TravelJournalContent>("mutableTravelJournalContents"),
+            )
+            associate(
+                TravelJournalContent::class,
+                entity(TravelJournalContentInformation::class),
+                on(TravelJournalContent::travelJournalContentInformation),
             )
             associate(TravelJournal::class, entity(User::class), on(TravelJournal::user))
-            where(col(TravelJournalContent::placeId).equal(placeID))
+            where(col(TravelJournalContentInformation::placeId).equal(placeID))
         }
         val communityWriter = queryFactory.listQuery {
             select(col(User::id))

@@ -2,9 +2,8 @@ package kr.weit.odya.domain.traveljournal
 
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
+import jakarta.persistence.Embedded
 import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
 import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -22,6 +21,7 @@ import java.time.LocalDate
 @Table(
     indexes = [
         Index(name = "travel_journal_user_id_index", columnList = "user_id"),
+        Index(name = "travel_journal_visibility_index", columnList = "visibility"),
     ],
 )
 @Entity
@@ -37,28 +37,54 @@ class TravelJournal(
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "TRAVEL_JOURNAL_SEQ_GENERATOR")
     val id: Long = 0L,
 
-    @Column(nullable = false, length = 60)
-    val title: String,
-
-    @Column(nullable = false)
-    val travelStartDate: LocalDate,
-
-    @Column(nullable = false)
-    val travelEndDate: LocalDate,
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    val visibility: TravelJournalVisibility,
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, updatable = false)
     val user: User,
 
-    @OneToMany(cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE], orphanRemoval = true)
-    @JoinColumn(name = "travel_journal_id", nullable = false, updatable = false, columnDefinition = "NUMERIC(19, 0)")
-    val travelJournalContents: List<TravelJournalContent> = emptyList(),
+    travelJournalInformation: TravelJournalInformation,
+
+    travelCompanions: List<TravelCompanion>,
+
+    travelJournalContents: List<TravelJournalContent>,
+) : BaseModifiableEntity() {
+    @Embedded
+    var travelJournalInformation: TravelJournalInformation = travelJournalInformation
+        protected set
 
     @OneToMany(cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE], orphanRemoval = true)
     @JoinColumn(name = "travel_journal_id", nullable = false, updatable = false, columnDefinition = "NUMERIC(19, 0)")
-    val travelCompanions: List<TravelCompanion>,
-) : BaseModifiableEntity()
+    private val mutableTravelCompanions: MutableList<TravelCompanion> =
+        travelCompanions.toMutableList() // backing property 사용 시 쿼리 에러 발생 (ORA-00911: 문자가 부적합합니다)
+    val travelCompanions: List<TravelCompanion>
+        get() = mutableTravelCompanions
+
+    @OneToMany(cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE], orphanRemoval = true)
+    @JoinColumn(name = "travel_journal_id", nullable = false, updatable = false, columnDefinition = "NUMERIC(19, 0)")
+    private val mutableTravelJournalContents: MutableList<TravelJournalContent> = travelJournalContents.toMutableList()
+    val travelJournalContents: List<TravelJournalContent>
+        get() = mutableTravelJournalContents
+
+    val title: String
+        get() = travelJournalInformation.title
+
+    val travelStartDate: LocalDate
+        get() = travelJournalInformation.travelStartDate
+
+    val travelEndDate: LocalDate
+        get() = travelJournalInformation.travelEndDate
+
+    val visibility: TravelJournalVisibility
+        get() = travelJournalInformation.visibility
+
+    fun changeTravelJournalInformation(travelJournalInformation: TravelJournalInformation) {
+        this.travelJournalInformation = travelJournalInformation
+    }
+
+    fun deleteTravelJournalContent(travelJournalContent: TravelJournalContent) {
+        mutableTravelJournalContents.remove(travelJournalContent)
+    }
+
+    fun addTravelCompanions(travelCompanions: List<TravelCompanion>) {
+        mutableTravelCompanions.addAll(travelCompanions)
+    }
+}

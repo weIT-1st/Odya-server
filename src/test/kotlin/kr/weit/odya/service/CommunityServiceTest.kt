@@ -1,5 +1,6 @@
 package kr.weit.odya.service
 
+import com.google.maps.errors.InvalidRequestException
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
@@ -8,6 +9,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import jakarta.ws.rs.ForbiddenException
+import kr.weit.odya.client.GoogleMapsClient
 import kr.weit.odya.client.push.PushNotificationEvent
 import kr.weit.odya.domain.community.Community
 import kr.weit.odya.domain.community.CommunityDeleteEvent
@@ -51,6 +53,7 @@ import kr.weit.odya.support.createMockImageFile
 import kr.weit.odya.support.createMockImageFiles
 import kr.weit.odya.support.createMyCommunities
 import kr.weit.odya.support.createOtherUser
+import kr.weit.odya.support.createPlaceDetails
 import kr.weit.odya.support.createPrivateTravelJournal
 import kr.weit.odya.support.createTopic
 import kr.weit.odya.support.createTravelJournal
@@ -68,6 +71,7 @@ class CommunityServiceTest : DescribeSpec(
         val fileService = mockk<FileService>()
         val applicationEventPublisher = mockk<ApplicationEventPublisher>()
         val followRepository = mockk<FollowRepository>()
+        val googleMapsClient = mockk<GoogleMapsClient>()
         val communityService =
             CommunityService(
                 communityRepository,
@@ -78,6 +82,7 @@ class CommunityServiceTest : DescribeSpec(
                 fileService,
                 applicationEventPublisher,
                 followRepository,
+                googleMapsClient,
             )
 
         describe("createCommunity") {
@@ -94,8 +99,31 @@ class CommunityServiceTest : DescribeSpec(
                 every { communityRepository.save(any<Community>()) } returns createCommunity()
                 every { followRepository.findFollowerFcmTokenByFollowingId(TEST_USER_ID) } returns createFollowerFcmTokenList()
                 every { applicationEventPublisher.publishEvent(any<PushNotificationEvent>()) } just runs
+                every { googleMapsClient.findPlaceDetailsByPlaceId(any()) } returns createPlaceDetails()
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
+                        communityService.createCommunity(
+                            TEST_USER_ID,
+                            communityCreateRequest,
+                            imageNamePairs,
+                        )
+                    }
+                }
+            }
+
+            context("구글 맵에 존재하지 않는 장소 id를 요청했을 경우") {
+                val communityCreateRequest = createCommunityCreateRequest(
+                    placeId = TEST_PLACE_ID,
+                    travelJournalId = TEST_TRAVEL_JOURNAL_ID,
+                )
+                val imageNamePairs = createCommunityContentImagePairs()
+                val register = createUser()
+                every { userRepository.getByUserId(TEST_USER_ID) } returns register
+                every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns createTravelJournal()
+                every { topicRepository.getByTopicId(TEST_TOPIC_ID) } returns createTopic()
+                every { googleMapsClient.findPlaceDetailsByPlaceId(TEST_PLACE_ID) } throws InvalidRequestException(SOMETHING_ERROR_MESSAGE)
+                it("[InvalidRequestException] 예외가 발생한다.") {
+                    shouldThrow<InvalidRequestException> {
                         communityService.createCommunity(
                             TEST_USER_ID,
                             communityCreateRequest,

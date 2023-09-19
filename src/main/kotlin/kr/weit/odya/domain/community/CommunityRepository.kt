@@ -11,6 +11,8 @@ import com.linecorp.kotlinjdsl.subquery
 import kr.weit.odya.domain.follow.Follow
 import kr.weit.odya.domain.user.User
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
+import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 
@@ -39,7 +41,11 @@ fun CommunityRepository.getFriendCommunitySliceBy(
 ): List<Community> = findFriendCommunitySliceBy(userId, size, lastId, sortType)
 
 @Repository
-interface CommunityRepository : JpaRepository<Community, Long>, CustomCommunityRepository
+interface CommunityRepository : JpaRepository<Community, Long> {
+    @Modifying
+    @Query("update Community c set c.travelJournal.id = null where c.travelJournal.id = :travelJournalId")
+    fun updateTravelJournalIdToNull(travelJournalId: Long)
+}
 
 interface CustomCommunityRepository {
     fun findCommunitySliceBy(
