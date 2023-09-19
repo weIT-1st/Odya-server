@@ -32,7 +32,6 @@ import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.traveljournal.getByTravelJournalId
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
-import kr.weit.odya.support.DELETE_NOT_EXIST_CONTENT_IMAGE_ERROR_MESSAGE
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_COMMUNITY_CONTENT_IMAGE_DELETE_ID
 import kr.weit.odya.support.TEST_COMMUNITY_ID
@@ -493,45 +492,6 @@ class CommunityServiceTest : DescribeSpec(
                 every { communityRepository.deleteAllByUserId(TEST_USER_ID) } just runs
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny { communityService.deleteCommunityByUserId(TEST_USER_ID) }
-                }
-            }
-        }
-
-        describe("deleteCommunityByTravelJournalId") {
-            context("유효한 여행 일지 ID가 들어오는 경우") {
-                every { communityRepository.findIdsByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns listOf(
-                    TEST_COMMUNITY_ID,
-                )
-                every { reportCommunityRepository.deleteAllByCommunityIdIn(listOf(TEST_COMMUNITY_ID)) } just runs
-                every { communityCommentRepository.deleteAllByCommunityIdIn(listOf(TEST_COMMUNITY_ID)) } just runs
-                every { communityRepository.getImageNamesByJournalId(TEST_TRAVEL_JOURNAL_ID) } returns listOf(
-                    TEST_GENERATED_FILE_NAME,
-                )
-                every { fileService.deleteFile(TEST_GENERATED_FILE_NAME) } just runs
-                every { communityRepository.deleteAllByIdIn(listOf(TEST_COMMUNITY_ID)) } just runs
-                it("정상적으로 종료한다") {
-                    shouldNotThrowAny { communityService.deleteCommunityByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) }
-                }
-            }
-
-            context("OBJECT STORAGE에 해당 사진이 없는 경우") {
-                every { communityRepository.findIdsByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns listOf(
-                    TEST_COMMUNITY_ID,
-                )
-                every { reportCommunityRepository.deleteAllByCommunityIdIn(listOf(TEST_COMMUNITY_ID)) } just runs
-                every { communityCommentRepository.deleteAllByCommunityIdIn(listOf(TEST_COMMUNITY_ID)) } just runs
-                every { communityRepository.getImageNamesByJournalId(TEST_TRAVEL_JOURNAL_ID) } returns listOf(
-                    TEST_GENERATED_FILE_NAME,
-                )
-                every { fileService.deleteFile(TEST_GENERATED_FILE_NAME) } throws IllegalArgumentException(
-                    DELETE_NOT_EXIST_CONTENT_IMAGE_ERROR_MESSAGE,
-                )
-                it("[IllegalArgumentException] 반환한다") {
-                    shouldThrow<IllegalArgumentException> {
-                        communityService.deleteCommunityByTravelJournalId(
-                            TEST_TRAVEL_JOURNAL_ID,
-                        )
-                    }
                 }
             }
         }

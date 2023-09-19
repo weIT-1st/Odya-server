@@ -210,9 +210,7 @@ class TravelJournalControllerTest(
                         placeDetailsMap,
                     )
                 } returns TEST_TRAVEL_JOURNAL_ID
-
                 every { travelJournalService.getPlaceDetailsMap(setOf(TEST_PLACE_ID)) } returns placeDetailsMap
-
                 it("201 응답한다.") {
                     restDocMockMvc.multipart(HttpMethod.POST, targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)

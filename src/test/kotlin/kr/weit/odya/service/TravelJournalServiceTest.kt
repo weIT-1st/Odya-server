@@ -35,6 +35,8 @@ import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_ANOTHER_USER_ID
 import kr.weit.odya.support.TEST_CONTENT_IMAGES
 import kr.weit.odya.support.TEST_FILE_AUTHENTICATED_URL
+import kr.weit.odya.support.TEST_ANOTHER_USER_ID
+import kr.weit.odya.support.TEST_FILE_AUTHENTICATED_URL
 import kr.weit.odya.support.TEST_GENERATED_FILE_NAME
 import kr.weit.odya.support.TEST_IMAGE_FILE_WEBP
 import kr.weit.odya.support.TEST_OTHER_IMAGE_FILE_WEBP
@@ -435,32 +437,6 @@ class TravelJournalServiceTest : DescribeSpec(
                     shouldThrow<IllegalArgumentException> {
                         travelJournalService.getImageMap(
                             mockFiles,
-                        )
-                    }
-                }
-            }
-        }
-
-        describe("getPlaceDetailsMap") {
-            context("유효한 데이터가 주어지는 경우") {
-                val placeIds = setOf(TEST_PLACE_ID)
-                every { googleMapsClient.findPlaceDetailsByPlaceId(TEST_PLACE_ID) } returns createPlaceDetails()
-                it("정상적으로 종료한다") {
-                    shouldNotThrowAny {
-                        travelJournalService.getPlaceDetailsMap(
-                            placeIds,
-                        )
-                    }
-                }
-            }
-
-            context("존재 하지 않는 placeId를 넣은 경우") {
-                val placeIds = setOf(TEST_PLACE_ID)
-                every { googleMapsClient.findPlaceDetailsByPlaceId(TEST_PLACE_ID) } throws InvalidRequestException(SOMETHING_ERROR_MESSAGE)
-                it("[InvalidRequestException] 반환한다") {
-                    shouldThrow<InvalidRequestException> {
-                        travelJournalService.getPlaceDetailsMap(
-                            placeIds,
                         )
                     }
                 }
@@ -1062,8 +1038,7 @@ class TravelJournalServiceTest : DescribeSpec(
         describe("deleteTravelJournalByUserId") {
             context("유효한 UserId가 주어지는 경우") {
                 it("정상적으로 종료한다") {
-                    every { contentImageRepository.findAllByUserId(TEST_USER_ID) } returns TEST_CONTENT_IMAGES
-                    every { fileService.deleteFile(any()) } just runs
+                    every { contentImageRepository.findAllByUserId(TEST_USER_ID) } returns listOf(TEST_IMAGE_FILE_WEBP)
                     every { contentImageRepository.deleteAllByUserId(TEST_USER_ID) } just runs
                     every { reportTravelJournalRepository.deleteAllByUserId(TEST_USER_ID) } just runs
                     every { travelCompanionRepository.deleteAllByUserId(TEST_USER_ID) } just runs

@@ -7,6 +7,8 @@ import com.linecorp.kotlinjdsl.query.spec.expression.SubqueryExpressionSpec
 import com.linecorp.kotlinjdsl.query.spec.predicate.PredicateSpec
 import com.linecorp.kotlinjdsl.querydsl.CriteriaQueryDsl
 import com.linecorp.kotlinjdsl.querydsl.expression.col
+import com.linecorp.kotlinjdsl.subquery
+import com.linecorp.kotlinjdsl.updateQuery
 import com.linecorp.kotlinjdsl.querydsl.from.Relation
 import com.linecorp.kotlinjdsl.subquery
 import kr.weit.odya.domain.contentimage.ContentImage
@@ -46,21 +48,9 @@ fun CommunityRepository.getFriendCommunitySliceBy(
 fun CommunityRepository.getImageNamesById(communityId: Long): List<String> =
     findContentImageNameListById(communityId)
 
-fun CommunityRepository.getImageNamesByJournalId(travelJournalId: Long): List<String> =
-    findCommunityByTravelJournalId(travelJournalId)
-
 @Repository
 interface CommunityRepository : JpaRepository<Community, Long>, CustomCommunityRepository {
-    @Modifying
-    @Query("update Community c set c.travelJournal.id = null where c.travelJournal.id = :travelJournalId")
-    fun updateTravelJournalIdToNull(travelJournalId: Long)
-
     fun deleteAllByUserId(userId: Long)
-
-    @Query("select c.id from Community c where c.travelJournal.id = :travelJournalId")
-    fun findIdsByTravelJournalId(travelJournalId: Long): List<Long>
-
-    fun deleteAllByIdIn(ids: List<Long>)
 }
 
 interface CustomCommunityRepository {
@@ -88,6 +78,8 @@ interface CustomCommunityRepository {
         lastId: Long?,
         sortType: CommunitySortType,
     ): List<Community>
+
+    fun updateTravelJournalIdToNull(travelJournalId: Long)
 }
 
 class CommunityRepositoryImpl(private val queryFactory: QueryFactory) : CustomCommunityRepository {
@@ -155,6 +147,25 @@ class CommunityRepositoryImpl(private val queryFactory: QueryFactory) : CustomCo
         val followingIds = getFollowingIdsSubQuery(userId)
         getCommunitySliceBaseQuery(lastId, sortType, size)
         where(nestedCol(col(Community::user), User::id).`in`(followingIds))
+    }
+
+    override fun updateTravelJournalIdToNull(travelJournalId: Long) {
+        queryFactory.updateQuery<Community> {
+            associate(Community::class, TravelJournal::class, on(Community::travelJournal))
+            where(
+                col(TravelJournal::id).equal(travelJournalId),
+            )
+            set(col(Community::travelJournal), null)
+        }.executeUpdate()
+    }
+
+    companion object {
+        fun QueryFactory.communityByUserIdSubQuery(userId: Long) =
+            subquery {
+                select(col(Community::id))
+                from(entity(Community::class))
+                where(nestedCol(col(Community::user), User::id).equal(userId))
+            }
     }
 
     private fun getMyFriendOnlyCommunityIdsSubQuery(userId: Long) = queryFactory.subquery<Long> {

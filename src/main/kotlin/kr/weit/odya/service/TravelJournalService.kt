@@ -301,6 +301,7 @@ class TravelJournalService(
         val travelJournalContentImageNames = getTravelJournalContentImageNames(travelJournal)
         // Community - TravelJournal FK 위반으로 인한 null 처리
         communityRepository.updateTravelJournalIdToNull(travelJournalId)
+        reportTravelJournalRepository.deleteAllByTravelJournalId(travelJournalId)
         travelJournalRepository.delete(travelJournal)
         eventPublisher.publishEvent(TravelJournalDeleteEvent(travelJournalContentImageNames))
     }
@@ -318,11 +319,32 @@ class TravelJournalService(
 
     @Transactional
     fun deleteTravelJournalByUserId(userId: Long) {
-        contentImageRepository.findAllByUserId(userId).map { fileService.deleteFile(it.name) }
         reportTravelJournalRepository.deleteAllByUserId(userId)
         travelCompanionRepository.deleteAllByUserId(userId)
         travelJournalRepository.deleteAllByUserId(userId)
         contentImageRepository.deleteAllByUserId(userId)
+        eventPublisher.publishEvent(TravelJournalDeleteEvent(contentImageRepository.findAllByUserId(userId)))
+    }
+
+    private fun updateTravelCompanions(
+        travelJournal: TravelJournal,
+        travelJournalUpdateRequest: TravelJournalUpdateRequest,
+    ) {
+        val deleteTravelCompanionIds = travelJournal.travelCompanions
+            .filter {
+                !(travelJournalUpdateRequest.travelCompanionIds?.contains(it.user?.id) ?: false) || it.user == null
+            }
+            .map { it.id }
+        travelCompanionRepository.deleteAllByIdInBatch(deleteTravelCompanionIds)
+
+        val updateTravelCompanionIds = travelJournalUpdateRequest.travelCompanionIds.orEmpty().filter {
+            travelJournal.travelCompanions.none { travelCompanion -> travelCompanion.user?.id == it }
+        }
+        val newTravelCompanions = getTravelCompanions(
+            updateTravelCompanionIds,
+            travelJournalUpdateRequest.travelCompanionNames,
+        )
+        travelJournal.addTravelCompanions(newTravelCompanions)
     }
 
     private fun updateTravelCompanions(

@@ -13,7 +13,7 @@ import kr.weit.odya.domain.favoriteTopic.FavoriteTopicRepository
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.security.FirebaseTokenHelper
-import kr.weit.odya.support.DELETE_NOT_EXIST_CONTENT_IMAGE_ERROR_MESSAGE
+import kr.weit.odya.support.DELETE_NOT_EXIST_PROFILE_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_USERNAME
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createUser
@@ -65,31 +65,6 @@ class WithdrawServiceTest : DescribeSpec(
                 }
             }
 
-            context("Object Storage에 커뮤니티의 이미지가 존재하지 않는 경우") {
-                every { userRepository.getByUserId(TEST_USER_ID) } returns createUser()
-                every { favoritePlaceRepository.deleteByUserId(TEST_USER_ID) } just runs
-                every { placeReviewService.deleteReviewRelatedData(TEST_USER_ID) } just runs
-                every { favoriteTopicRepository.deleteAllByUserId(TEST_USER_ID) } just runs
-                every { agreedTermsRepository.deleteAllByUserId(TEST_USER_ID) } just runs
-                every { communityService.deleteCommunityByUserId(TEST_USER_ID) } throws IllegalArgumentException(DELETE_NOT_EXIST_CONTENT_IMAGE_ERROR_MESSAGE)
-                every { travelJournalService.deleteTravelJournalByUserId(TEST_USER_ID) } just runs
-                it("[IllegalArgumentException] 반환") {
-                    shouldThrow<IllegalArgumentException> { withdrawService.withdrawUser(TEST_USER_ID) }
-                }
-            }
-
-            context("Object Storage에 여행일지의 이미지가 존재하지 않는 경우") {
-                every { userRepository.getByUserId(TEST_USER_ID) } returns createUser()
-                every { favoritePlaceRepository.deleteByUserId(TEST_USER_ID) } just runs
-                every { placeReviewService.deleteReviewRelatedData(TEST_USER_ID) } just runs
-                every { favoriteTopicRepository.deleteAllByUserId(TEST_USER_ID) } just runs
-                every { agreedTermsRepository.deleteAllByUserId(TEST_USER_ID) } just runs
-                every { travelJournalService.deleteTravelJournalByUserId(TEST_USER_ID) } throws IllegalArgumentException(DELETE_NOT_EXIST_CONTENT_IMAGE_ERROR_MESSAGE)
-                it("[IllegalArgumentException] 반환") {
-                    shouldThrow<IllegalArgumentException> { withdrawService.withdrawUser(TEST_USER_ID) }
-                }
-            }
-
             context("프로필이 Object Storage에 존재하지 않는 경우") {
                 every { userRepository.getByUserId(TEST_USER_ID) } returns createUser()
                 every { favoritePlaceRepository.deleteByUserId(TEST_USER_ID) } just runs
@@ -98,7 +73,7 @@ class WithdrawServiceTest : DescribeSpec(
                 every { agreedTermsRepository.deleteAllByUserId(TEST_USER_ID) } just runs
                 every { communityService.deleteCommunityByUserId(TEST_USER_ID) } just runs
                 every { travelJournalService.deleteTravelJournalByUserId(TEST_USER_ID) } just runs
-                every { userService.deleteUserRelatedData(TEST_USER_ID) } throws IllegalArgumentException(DELETE_NOT_EXIST_CONTENT_IMAGE_ERROR_MESSAGE)
+                every { userService.deleteUserRelatedData(TEST_USER_ID) } throws IllegalArgumentException(DELETE_NOT_EXIST_PROFILE_ERROR_MESSAGE)
                 it("[IllegalArgumentException] 반환") {
                     shouldThrow<IllegalArgumentException> { withdrawService.withdrawUser(TEST_USER_ID) }
                 }
