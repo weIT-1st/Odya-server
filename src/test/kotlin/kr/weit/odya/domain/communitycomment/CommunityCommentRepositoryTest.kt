@@ -110,10 +110,6 @@ class CommunityCommentRepositoryTest(
                 communityCommentRepository.deleteAllByCommunityId(community.id)
                 communityCommentRepository.count() shouldBe 1
             }
-            expect("커뮤니티 ID 리스트에 포함된 커뮤니티의 댓글을 삭제한다.") {
-                communityCommentRepository.deleteAllByCommunityIdIn(listOf(community.id, community2.id))
-                communityCommentRepository.count() shouldBe 0
-            }
         }
     },
 )

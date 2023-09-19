@@ -28,13 +28,13 @@ interface ReportTravelJournalRepository : JpaRepository<ReportTravelJournal, Lon
 }
 
 interface CustomReportTravelJournalRepository {
-    fun deleteReportTravelJournalByUserId(userId: Long): Int
+    fun deleteReportTravelJournalByUserId(userId: Long)
 }
 
 class CustomReportTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) : CustomReportTravelJournalRepository {
-    override fun deleteReportTravelJournalByUserId(userId: Long) = queryFactory.deleteQuery<ReportTravelJournal> {
+    override fun deleteReportTravelJournalByUserId(userId: Long) { queryFactory.deleteQuery<ReportTravelJournal> {
         where(col(ReportTravelJournal::travelJournal).`in`(travelJournalByUserIdSubQuery(userId)))
-    }.executeUpdate()
+    }.executeUpdate() }
 
     private fun travelJournalByUserIdSubQuery(userId: Long): List<TravelJournal> = queryFactory.listQuery {
         select(entity(TravelJournal::class))

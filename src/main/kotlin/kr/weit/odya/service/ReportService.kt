@@ -1,6 +1,7 @@
 package kr.weit.odya.service
 
 import kr.weit.odya.domain.community.Community
+import kr.weit.odya.domain.community.CommunityDeleteEvent
 import kr.weit.odya.domain.community.CommunityRepository
 import kr.weit.odya.domain.community.getByCommunityId
 import kr.weit.odya.domain.community.getImageNamesById
@@ -16,6 +17,7 @@ import kr.weit.odya.domain.report.existsByCommunityIdAndUserId
 import kr.weit.odya.domain.report.existsByJournalIdAndUserId
 import kr.weit.odya.domain.report.existsByReviewAndUserId
 import kr.weit.odya.domain.traveljournal.TravelJournal
+import kr.weit.odya.domain.traveljournal.TravelJournalDeleteEvent
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.traveljournal.getByContentImageNames
 import kr.weit.odya.domain.traveljournal.getByTravelJournalId
@@ -24,6 +26,7 @@ import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.service.dto.ReportCommunityRequest
 import kr.weit.odya.service.dto.ReportPlaceReviewRequest
 import kr.weit.odya.service.dto.ReportTravelJournalRequest
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -37,10 +40,9 @@ class ReportService(
     private val travelJournalRepository: TravelJournalRepository,
     private val userRepository: UserRepository,
     private val placeReviewRepository: PlaceReviewRepository,
-    private val fileService: FileService,
     private val reportCommunityRepository: ReportCommunityRepository,
-    private val communityService: CommunityService,
     private val communityCommentRepository: CommunityCommentRepository,
+    private val eventPublisher: ApplicationEventPublisher,
 ) {
     @Transactional
     fun reportPlaceReview(userId: Long, reportPlaceReviewRequest: ReportPlaceReviewRequest) {
@@ -95,9 +97,9 @@ class ReportService(
     private fun checkReportTravelJournalCount(travelJournalId: Long) {
         if (reportTravelJournalRepository.countAllByTravelJournalId(travelJournalId) >= MAX_REPORTED_ACCUMULATION) {
             reportTravelJournalRepository.deleteAllByTravelJournalId(travelJournalId)
-            communityService.deleteCommunityByTravelJournalId(travelJournalId)
-            travelJournalRepository.getByContentImageNames(travelJournalId).map { fileService.deleteFile(it) }
+            communityRepository.updateTravelJournalIdToNull(travelJournalId)
             travelJournalRepository.deleteById(travelJournalId)
+            eventPublisher.publishEvent(TravelJournalDeleteEvent(travelJournalRepository.getByContentImageNames(travelJournalId)))
         }
     }
 
@@ -112,8 +114,8 @@ class ReportService(
         if (reportCommunityRepository.countAllByCommunityId(communityId) >= 5) {
             reportCommunityRepository.deleteAllByCommunityId(communityId)
             communityCommentRepository.deleteAllByCommunityId(communityId)
-            communityRepository.getImageNamesById(communityId).map { fileService.deleteFile(it) }
             communityRepository.deleteById(communityId)
+            eventPublisher.publishEvent(CommunityDeleteEvent(communityRepository.getImageNamesById(communityId)))
         }
     }
 }

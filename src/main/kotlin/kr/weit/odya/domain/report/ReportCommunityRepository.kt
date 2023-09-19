@@ -2,10 +2,9 @@ package kr.weit.odya.domain.report
 
 import com.linecorp.kotlinjdsl.QueryFactory
 import com.linecorp.kotlinjdsl.deleteQuery
-import com.linecorp.kotlinjdsl.listQuery
 import com.linecorp.kotlinjdsl.querydsl.expression.col
 import kr.weit.odya.domain.community.Community
-import kr.weit.odya.domain.user.User
+import kr.weit.odya.domain.community.CommunityRepositoryImpl.Companion.communityByUserIdSubQuery
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
@@ -26,22 +25,16 @@ interface ReportCommunityRepository : JpaRepository<ReportCommunity, Long>, Cust
     fun deleteAllByCommunityId(communityId: Long)
 
     fun deleteAllByCommonReportInformationUserId(userId: Long)
-
-    fun deleteAllByCommunityIdIn(communityIds: List<Long>)
 }
 
 interface CustomReportCommunityRepository {
-    fun deleteReportCommunitiesByUserId(userId: Long): Int
+    fun deleteReportCommunitiesByUserId(userId: Long)
 }
 
 class CustomReportCommunityRepositoryImpl(private val queryFactory: QueryFactory) : CustomReportCommunityRepository {
-    override fun deleteReportCommunitiesByUserId(userId: Long): Int = queryFactory.deleteQuery<ReportCommunity> {
-        where(col(ReportCommunity::community).`in`(reportCommunityByUserIdSubQuery(userId)))
+    override fun deleteReportCommunitiesByUserId(userId: Long) { queryFactory.deleteQuery<ReportCommunity> {
+        val subQuery = queryFactory.communityByUserIdSubQuery(userId)
+        where(nestedCol(col(ReportCommunity::community), Community::id).`in`(subQuery))
     }.executeUpdate()
-
-    private fun reportCommunityByUserIdSubQuery(userId: Long): List<Community> = queryFactory.listQuery {
-        select(entity(Community::class))
-        from(entity(Community::class))
-        where(nestedCol(col(Community::user), User::id).equal(userId))
     }
 }

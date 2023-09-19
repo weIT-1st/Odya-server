@@ -96,18 +96,13 @@ class CommunityRepositoryTest(
                 val result = communityRepository.getByCommunityId(community1.id)
                 result.content shouldBe TEST_COMMUNITY_CONTENT
             }
-
-            expect("여행일지 ID와 일치하는 커뮤니티의 Id을 조회한다") {
-                val result = communityRepository.findIdsByTravelJournalId(travelJournal1.id)
-                result shouldBe listOf(community1.id)
-            }
         }
 
         context("커뮤니티 수정") {
             expect("커뮤니티의 여행일지 ID 컬럼을 null로 수정한다") {
-                communityRepository.updateTravelJournalIdToNull(travelJournal.id)
+                communityRepository.updateTravelJournalIdToNull(travelJournal1.id)
                 tem.flushAndClear()
-                val result = communityRepository.getByCommunityId(community.id)
+                val result = communityRepository.getByCommunityId(community1.id)
                 result.travelJournal shouldBe null
             }
         }
@@ -117,21 +112,12 @@ class CommunityRepositoryTest(
                 val result = communityRepository.getImageNamesById(community1.id)
                 result shouldBe listOf(contentImage1.name, contentImage3.name)
             }
-
-            expect("여행일지 ID와 일치하는 커뮤니티의 이미지 이름을 조회한다") {
-                val result = communityRepository.getImageNamesByJournalId(travelJournal2.id)
-                result shouldBe listOf(contentImage2.name)
-            }
         }
 
         context("커뮤니티 삭제") {
             expect("유저 ID와 일치하는 커뮤니티를 삭제한다") {
                 communityRepository.deleteAllByUserId(user1.id)
                 communityRepository.findAll().size shouldBe 1
-            }
-            expect("커뮤니티 ID 리스트에 포함된 커뮤니티 모두 삭제한다") {
-                communityRepository.deleteAllByIdIn(listOf(community1.id, community2.id))
-                communityRepository.findAll().size shouldBe 0
             }
         }
     },

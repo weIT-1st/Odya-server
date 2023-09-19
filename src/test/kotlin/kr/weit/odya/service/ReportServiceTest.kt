@@ -7,6 +7,7 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
+import kr.weit.odya.domain.community.CommunityDeleteEvent
 import kr.weit.odya.domain.community.CommunityRepository
 import kr.weit.odya.domain.community.getByCommunityId
 import kr.weit.odya.domain.community.getImageNamesById
@@ -20,12 +21,12 @@ import kr.weit.odya.domain.report.ReportTravelJournalRepository
 import kr.weit.odya.domain.report.existsByCommunityIdAndUserId
 import kr.weit.odya.domain.report.existsByJournalIdAndUserId
 import kr.weit.odya.domain.report.existsByReviewAndUserId
+import kr.weit.odya.domain.traveljournal.TravelJournalDeleteEvent
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.traveljournal.getByContentImageNames
 import kr.weit.odya.domain.traveljournal.getByTravelJournalId
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
-import kr.weit.odya.support.DELETE_NOT_EXIST_CONTENT_IMAGE_ERROR_MESSAGE
 import kr.weit.odya.support.NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE
 import kr.weit.odya.support.NOT_EXIST_USER_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_CONTENT_IMAGES
@@ -42,6 +43,7 @@ import kr.weit.odya.support.createReportPlaceReviewRequest
 import kr.weit.odya.support.createReportTravelJournal
 import kr.weit.odya.support.createReportTravelJournalRequest
 import kr.weit.odya.support.createTravelJournal
+import org.springframework.context.ApplicationEventPublisher
 
 class ReportServiceTest : DescribeSpec(
     {
@@ -53,8 +55,8 @@ class ReportServiceTest : DescribeSpec(
         val fileService = mockk<FileService>()
         val reportCommunityRepository = mockk<ReportCommunityRepository>()
         val communityRepository = mockk<CommunityRepository>()
-        val communityService = mockk<CommunityService>()
         val communityCommentRepository = mockk<CommunityCommentRepository>()
+        val eventPublisher = mockk<ApplicationEventPublisher>()
         val reportService = ReportService(
             communityRepository,
             reportPlaceReviewRepository,
@@ -62,10 +64,9 @@ class ReportServiceTest : DescribeSpec(
             travelJournalRepository,
             userRepository,
             placeReviewRepository,
-            fileService,
             reportCommunityRepository,
-            communityService,
             communityCommentRepository,
+            eventPublisher,
         )
         val user = createOtherUser()
 
@@ -181,8 +182,9 @@ class ReportServiceTest : DescribeSpec(
                 every { reportTravelJournalRepository.deleteAllByTravelJournalId(travelJournalId) } just runs
                 every { travelJournalRepository.deleteById(travelJournalId) } just runs
                 every { travelJournalRepository.getByContentImageNames(travelJournalId) } returns TEST_CONTENT_IMAGES.map { it.name }
+                every { communityRepository.updateTravelJournalIdToNull(travelJournalId) } just runs
                 every { fileService.deleteFile(any()) } just runs
-                every { communityService.deleteCommunityByTravelJournalId(travelJournalId) } just runs
+                every { eventPublisher.publishEvent(any<TravelJournalDeleteEvent>()) } just runs
                 it("해당 여행 일지를 삭제한다.") {
                     shouldNotThrowAny { reportService.reportTravelJournal(user.id, request) }
                 }
@@ -219,21 +221,6 @@ class ReportServiceTest : DescribeSpec(
                 every { travelJournalRepository.getByTravelJournalId(travelJournalId) } throws NoSuchElementException(NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE)
                 it("[NoSuchElementException]을 반환한다.") {
                     shouldThrow<NoSuchElementException> { reportService.reportTravelJournal(user.id, request) }
-                }
-            }
-
-            context("OBJECT STORAGE에 해당 여행일지의 사진이 없는 경우") {
-                every { reportTravelJournalRepository.existsByJournalIdAndUserId(travelJournalId, user.id) } returns false
-                every { userRepository.getByUserId(user.id) } returns user
-                every { travelJournalRepository.getByTravelJournalId(travelJournalId) } returns travelJournal
-                every { reportTravelJournalRepository.save(any()) } returns createReportTravelJournal(travelJournal, user, TEST_REPORT_ID, request.reportReason, request.otherReason)
-                every { reportTravelJournalRepository.countAllByTravelJournalId(travelJournalId) } returns 5
-                every { reportTravelJournalRepository.deleteAllByTravelJournalId(travelJournalId) } just runs
-                every { travelJournalRepository.deleteById(travelJournalId) } just runs
-                every { travelJournalRepository.getByContentImageNames(travelJournalId) } returns listOf(TEST_GENERATED_FILE_NAME)
-                every { fileService.deleteFile(TEST_GENERATED_FILE_NAME) } throws IllegalArgumentException(DELETE_NOT_EXIST_CONTENT_IMAGE_ERROR_MESSAGE)
-                it("[IllegalArgumentException]을 반환한다.") {
-                    shouldThrow<IllegalArgumentException> { reportService.reportTravelJournal(user.id, request) }
                 }
             }
         }
@@ -277,6 +264,7 @@ class ReportServiceTest : DescribeSpec(
                 every { communityRepository.getImageNamesById(communityId) } returns listOf(TEST_GENERATED_FILE_NAME)
                 every { fileService.deleteFile(TEST_GENERATED_FILE_NAME) } just runs
                 every { communityRepository.deleteById(communityId) } just runs
+                every { eventPublisher.publishEvent(any<CommunityDeleteEvent>()) } just runs
                 it("해당 커뮤니티 글을 삭제한다.") {
                     shouldNotThrowAny { reportService.reportCommunity(user.id, request) }
                 }
@@ -314,22 +302,6 @@ class ReportServiceTest : DescribeSpec(
                 every { communityRepository.getByCommunityId(communityId) } throws NoSuchElementException(NOT_EXIST_PLACE_REVIEW_ERROR_MESSAGE)
                 it("[NoSuchElementException]을 반환한다.") {
                     shouldThrow<NoSuchElementException> { reportService.reportCommunity(user.id, request) }
-                }
-            }
-
-            context("OBJECT STORAGE에 해당 커뮤니티 글의 사진이 없는 경우") {
-                every { reportCommunityRepository.existsByCommunityIdAndUserId(communityId, user.id) } returns false
-                every { userRepository.getByUserId(user.id) } returns user
-                every { communityRepository.getByCommunityId(communityId) } returns community
-                every { reportCommunityRepository.save(any()) } returns createReportCommunity(community, user, TEST_REPORT_ID, request.reportReason, request.otherReason)
-                every { reportCommunityRepository.countAllByCommunityId(communityId) } returns 5
-                every { reportCommunityRepository.deleteAllByCommunityId(communityId) } just runs
-                every { reportCommunityRepository.deleteAllByCommunityId(communityId) } just runs
-                every { communityCommentRepository.deleteAllByCommunityId(communityId) } just runs
-                every { communityRepository.getImageNamesById(communityId) } returns listOf(TEST_GENERATED_FILE_NAME)
-                every { fileService.deleteFile(TEST_GENERATED_FILE_NAME) } throws IllegalArgumentException(DELETE_NOT_EXIST_CONTENT_IMAGE_ERROR_MESSAGE)
-                it("[IllegalArgumentException]을 반환한다.") {
-                    shouldThrow<IllegalArgumentException> { reportService.reportCommunity(user.id, request) }
                 }
             }
         }

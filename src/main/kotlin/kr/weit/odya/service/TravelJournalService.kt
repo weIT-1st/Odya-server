@@ -301,6 +301,7 @@ class TravelJournalService(
         val travelJournalContentImageNames = getTravelJournalContentImageNames(travelJournal)
         // Community - TravelJournal FK 위반으로 인한 null 처리
         communityRepository.updateTravelJournalIdToNull(travelJournalId)
+        reportTravelJournalRepository.deleteAllByTravelJournalId(travelJournalId)
         travelJournalRepository.delete(travelJournal)
         eventPublisher.publishEvent(TravelJournalDeleteEvent(travelJournalContentImageNames))
     }
@@ -318,11 +319,11 @@ class TravelJournalService(
 
     @Transactional
     fun deleteTravelJournalByUserId(userId: Long) {
-        contentImageRepository.findAllByUserId(userId).map { fileService.deleteFile(it.name) }
         reportTravelJournalRepository.deleteAllByUserId(userId)
         travelCompanionRepository.deleteAllByUserId(userId)
         travelJournalRepository.deleteAllByUserId(userId)
         contentImageRepository.deleteAllByUserId(userId)
+        eventPublisher.publishEvent(TravelJournalDeleteEvent(contentImageRepository.findAllByUserId(userId)))
     }
 
     private fun updateTravelCompanions(

@@ -7,7 +7,7 @@ import com.linecorp.kotlinjdsl.query.spec.predicate.PredicateSpec
 import com.linecorp.kotlinjdsl.querydsl.CriteriaQueryDsl
 import com.linecorp.kotlinjdsl.querydsl.expression.col
 import kr.weit.odya.domain.community.Community
-import kr.weit.odya.domain.user.User
+import kr.weit.odya.domain.community.CommunityRepositoryImpl.Companion.communityByUserIdSubQuery
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
@@ -36,8 +36,6 @@ interface CommunityCommentRepository : JpaRepository<CommunityComment, Long>, Cu
     fun deleteAllByUserId(userId: Long)
 
     fun deleteAllByCommunityId(communityId: Long)
-
-    fun deleteAllByCommunityIdIn(communityIds: List<Long>)
 }
 
 interface CustomCommunityCommentRepository {
@@ -47,7 +45,7 @@ interface CustomCommunityCommentRepository {
         lastId: Long?,
     ): List<CommunityComment>
 
-    fun deleteCommunityCommentByUserId(userId: Long): Int
+    fun deleteCommunityCommentByUserId(userId: Long)
 }
 
 class CustomCommunityCommentRepositoryImpl(private val queryFactory: QueryFactory) : CustomCommunityCommentRepository {
@@ -69,16 +67,12 @@ class CustomCommunityCommentRepositoryImpl(private val queryFactory: QueryFactor
         limit(size + 1)
     }
 
-    override fun deleteCommunityCommentByUserId(userId: Long) = queryFactory.deleteQuery<CommunityComment> {
-        where(col(CommunityComment::community).`in`(communityByUserIdSubQuery(userId)))
-    }.executeUpdate()
-
-    private fun communityByUserIdSubQuery(userId: Long): List<Community> =
-        queryFactory.listQuery {
-            select(entity(Community::class))
-            from(entity(Community::class))
-            where(nestedCol(col(Community::user), User::id).equal(userId))
-        }
+    override fun deleteCommunityCommentByUserId(userId: Long) {
+        queryFactory.deleteQuery<CommunityComment> {
+            val subQuery = queryFactory.communityByUserIdSubQuery(userId)
+            where(nestedCol(col(CommunityComment::community), Community::id).`in`(subQuery))
+        }.executeUpdate()
+    }
 
     private fun CriteriaQueryDsl<CommunityComment>.dynamicPredicateByLastId(
         lastId: Long?,

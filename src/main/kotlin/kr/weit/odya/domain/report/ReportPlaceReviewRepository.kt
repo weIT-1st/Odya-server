@@ -29,13 +29,15 @@ interface ReportPlaceReviewRepository : JpaRepository<ReportPlaceReview, Long>, 
 }
 
 interface CustomReportPlaceReviewRepository {
-    fun deleteReportPlaceReviewByUserId(userId: Long): Int
+    fun deleteReportPlaceReviewByUserId(userId: Long)
 }
 
 class CustomReportPlaceReviewRepositoryImpl(private val queryFactory: QueryFactory) : CustomReportPlaceReviewRepository {
-    override fun deleteReportPlaceReviewByUserId(userId: Long) = queryFactory.deleteQuery<ReportPlaceReview> {
-        where(col(ReportPlaceReview::placeReview).`in`(placeReviewByUserIdSubQuery(userId)))
-    }.executeUpdate()
+    override fun deleteReportPlaceReviewByUserId(userId: Long) {
+        queryFactory.deleteQuery<ReportPlaceReview> {
+            where(col(ReportPlaceReview::placeReview).`in`(placeReviewByUserIdSubQuery(userId)))
+        }.executeUpdate()
+    }
 
     private fun placeReviewByUserIdSubQuery(userId: Long): List<PlaceReview> = queryFactory.listQuery {
         select(entity(PlaceReview::class))
