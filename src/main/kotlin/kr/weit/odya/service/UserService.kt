@@ -1,5 +1,6 @@
 package kr.weit.odya.service
 
+import kr.weit.odya.domain.communitylike.CommunityLikeRepository
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.traveljournal.getByUserId
@@ -35,6 +36,7 @@ class UserService(
     private val usersDocumentRepository: UsersDocumentRepository,
     private val followRepository: FollowRepository,
     private val travelJournalRepository: TravelJournalRepository,
+    private val communityLikeRepository: CommunityLikeRepository,
 ) {
     fun getEmailByIdToken(idToken: String) = firebaseTokenHelper.getEmail(idToken)
 
@@ -114,12 +116,13 @@ class UserService(
         val travelPlaceCount = travelJournals.sumOf { travelJournal ->
             travelJournal.travelJournalContents.count { content -> content.placeId != null }
         }
+        val communityLikeCount = communityLikeRepository.countByUserId(userId)
         return UserStatisticsResponse(
             travelJournalCount = travelJournals.size,
             travelPlaceCount = travelPlaceCount,
             followingsCount = followingsCount,
             followersCount = followersCount,
-            odyaCount = 0, // TODO 오댜가 추가되면 그때 추가
+            odyaCount = communityLikeCount,
         )
     }
 
