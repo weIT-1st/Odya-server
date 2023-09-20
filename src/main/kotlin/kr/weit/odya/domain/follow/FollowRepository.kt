@@ -166,7 +166,7 @@ open class FollowRepositoryImpl(private val queryFactory: QueryFactory) : Custom
             ),
         )
         if (lastId != null) {
-            where(col(followingUser, User::id).lessThan(lastId))
+            where(col(followingUser, User::id).greaterThan(lastId))
         }
         limit(size)
     }
@@ -186,7 +186,7 @@ open class FollowRepositoryImpl(private val queryFactory: QueryFactory) : Custom
             ),
         )
         if (lastId != null) {
-            where(nestedCol(col(Follow::follower), User::id).lessThan(lastId))
+            where(nestedCol(col(Follow::follower), User::id).greaterThan(lastId))
         }
         limit(size)
     }

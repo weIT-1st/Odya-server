@@ -2,7 +2,6 @@ package kr.weit.odya.controller
 
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Positive
 import kr.weit.odya.domain.follow.FollowSortType
 import kr.weit.odya.security.LoginUserId
@@ -84,9 +83,9 @@ class FollowController(
     }
 
     @GetMapping("/followings/search")
-    fun search(
+    fun followingNicknameSearch(
         @LoginUserId userId: Long,
-        @NotNull(message = "검색할 닉네임은 필수입니다.")
+        @NotBlank(message = "검색할 닉네임은 필수입니다.")
         @RequestParam("nickname")
         nickname: String,
         @Positive(message = "사이즈는 양수여야 합니다.")
@@ -100,9 +99,9 @@ class FollowController(
     }
 
     @GetMapping("/followers/search")
-    fun followerSearch(
+    fun followerNickNameSearch(
         @LoginUserId userId: Long,
-        @NotNull(message = "검색할 닉네임은 필수입니다.")
+        @NotBlank(message = "검색할 닉네임은 필수입니다.")
         @RequestParam("nickname")
         nickname: String,
         @Positive(message = "사이즈는 양수여야 합니다.")
