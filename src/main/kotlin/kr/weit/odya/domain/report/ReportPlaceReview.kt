@@ -24,7 +24,6 @@ import kr.weit.odya.support.domain.BaseTimeEntity
     ],
     indexes = [
         Index(name = "report_place_review_place_review_id_index", columnList = "place_review_id"),
-        Index(name = "report_place_review_user_id_index", columnList = "user_id"),
     ],
 )
 @Entity

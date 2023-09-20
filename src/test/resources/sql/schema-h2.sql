@@ -410,8 +410,6 @@ ALTER TABLE report_place_review
 
 CREATE INDEX report_place_review_place_review_id_index ON report_place_review (place_review_id);
 
-CREATE INDEX report_place_review_user_id_index ON report_place_review (user_id);
-
 CREATE SEQUENCE report_travel_journal_seq START WITH 1 INCREMENT BY 1;
 
 CREATE TABLE report_travel_journal
@@ -434,8 +432,6 @@ ALTER TABLE report_travel_journal
 ALTER TABLE report_travel_journal
     ADD CONSTRAINT FK_REPORT_TRAVEL_JOURNAL_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
-CREATE INDEX report_travel_journal_travel_journal_id_index ON report_travel_journal (travel_journal_id);
-
 CREATE INDEX report_travel_journal_user_id_index ON report_travel_journal (user_id);
 
 CREATE SEQUENCE report_community_seq START WITH 1 INCREMENT BY 1;
@@ -456,8 +452,6 @@ ALTER TABLE report_community
 
 ALTER TABLE report_community
     ADD CONSTRAINT FK_REPORT_COMMUNITY_ON_COMMUNITY FOREIGN KEY (community_id) REFERENCES community (id);
-
-CREATE INDEX report_community_community_id_index ON report_community (community_id);
 
 ALTER TABLE report_community
     ADD CONSTRAINT FK_REPORT_COMMUNITY_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
