@@ -24,6 +24,7 @@ import kr.weit.odya.support.NOT_EXIST_AUTHENTICATED_EMAIL_ERROR_MESSAGE
 import kr.weit.odya.support.NOT_EXIST_AUTHENTICATED_PHONE_NUMBER_ERROR_MESSAGE
 import kr.weit.odya.support.NOT_EXIST_ORIGIN_FILE_NAME_ERROR_MESSAGE
 import kr.weit.odya.support.NOT_EXIST_PROFILE_COLOR_ERROR_MESSAGE
+import kr.weit.odya.support.PHONE_NUMBERS_PARAM
 import kr.weit.odya.support.SIZE_PARAM
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
@@ -46,6 +47,8 @@ import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createFcmTokenRequest
 import kr.weit.odya.support.createInformationRequest
 import kr.weit.odya.support.createMockProfile
+import kr.weit.odya.support.createPhoneNumberList
+import kr.weit.odya.support.createSimpleUserResponseList
 import kr.weit.odya.support.createSliceLifeShotImageResponse
 import kr.weit.odya.support.createSliceSimpleUserResponse
 import kr.weit.odya.support.createUserResponse
@@ -1199,6 +1202,140 @@ class UserControllerTest(
                                 ),
                             ),
                         )
+                }
+            }
+        }
+
+        describe("GET /api/v1/users/search/phone-number") {
+            val targetUri = "/api/v1/users/search/phone-number"
+            context("유효한 토큰이면서, 가입된 사용자인 경우") {
+                val response = createSimpleUserResponseList()
+                val phoneNumbers = createPhoneNumberList()
+                every { userService.searchByPhoneNumbers(TEST_USER_ID, phoneNumbers) } returns response
+                it("200 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(PHONE_NUMBERS_PARAM, TEST_PHONE_NUMBER)
+                    }.andExpect {
+                        status { isOk() }
+                    }.andDo {
+                        val content = response[0]
+                        createDocument(
+                            "search-users-by-phone-number-success",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                PHONE_NUMBERS_PARAM parameterDescription "검색할 전화 번호(최소 1개, 최대 10개)" example TEST_PHONE_NUMBER,
+                            ),
+                            responseBody(
+                                "[].userId" type JsonFieldType.NUMBER description "사용자 ID" example content.userId,
+                                "[].nickname" type JsonFieldType.STRING description "사용자 닉네임" example content.nickname,
+                                "[].profile.profileUrl" type JsonFieldType.STRING description "사용자 프로필 Url" example content.profile.profileUrl,
+                                "[].profile.profileColor.colorHex" type JsonFieldType.STRING description "색상 Hex" example content.profile.profileColor?.colorHex isOptional true,
+                                "[].profile.profileColor.red" type JsonFieldType.NUMBER description "RGB RED" example content.profile.profileColor?.red isOptional true,
+                                "[].profile.profileColor.green" type JsonFieldType.NUMBER description "RGB GREEN" example content.profile.profileColor?.green isOptional true,
+                                "[].profile.profileColor.blue" type JsonFieldType.NUMBER description "RGB BLUE" example content.profile.profileColor?.blue isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이면서, 검색할 전화번호를 보내지 않은 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "search-users-by-phone-number-fail-empty-phone-number",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이면서, 검색할 전화번호를 10개를 넘개 보낸 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        repeat(11) {
+                            param(PHONE_NUMBERS_PARAM, TEST_PHONE_NUMBER)
+                        }
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "search-users-by-phone-number-fail-over-10-phone-number",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                PHONE_NUMBERS_PARAM parameterDescription "10개가 넘는 전화번호",
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이면서, 올바르지 않은 전화번호를 보낸 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(PHONE_NUMBERS_PARAM, "1234567890")
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "search-users-by-phone-number-fail-invalid-phone-number",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                PHONE_NUMBERS_PARAM parameterDescription "유효하지 않은 전화 번호" example "1234567890",
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이면서, 가입되지 않은 사용자인 경우") {
+                it("401 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_NOT_EXIST_USER_ID_TOKEN)
+                        param(PHONE_NUMBERS_PARAM, TEST_PHONE_NUMBER)
+                    }.andExpect {
+                        status { isUnauthorized() }
+                    }.andDo {
+                        createDocument(
+                            "search-users-by-phone-number-fail-not-registered-user",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효하지 않은 토큰이면") {
+                it("401 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                        param(PHONE_NUMBERS_PARAM, TEST_PHONE_NUMBER)
+                    }.andExpect {
+                        status { isUnauthorized() }
+                    }.andDo {
+                        createDocument(
+                            "search-users-by-phone-number-fail-invalid-token",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                            ),
+                        )
+                    }
                 }
             }
         }
