@@ -46,15 +46,13 @@ class CommunityRepositoryTest(
             val contentImage2 = createContentImage(user = user2)
             val contentImage3 = createContentImage(user = user1)
             travelJournal1 = travelJournalRepository.save(
-                travelJournalRepository.save(
-                    createTravelJournal(
-                        user = user1,
-                        travelCompanions = listOf(createTravelCompanionById(user = user2)),
-                        travelJournalContents = listOf(
-                            createTravelJournalContent(
-                                travelJournalContentImages = listOf(
-                                    createTravelJournalContentImage(contentImage = contentImage1),
-                                ),
+                createTravelJournal(
+                    user = user1,
+                    travelCompanions = listOf(createTravelCompanionById(user = user2)),
+                    travelJournalContents = listOf(
+                        createTravelJournalContent(
+                            travelJournalContentImages = listOf(
+                                createTravelJournalContentImage(contentImage = contentImage1),
                             ),
                         ),
                     ),
