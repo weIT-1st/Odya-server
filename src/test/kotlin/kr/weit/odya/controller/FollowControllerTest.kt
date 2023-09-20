@@ -571,7 +571,7 @@ class FollowControllerTest(
             val targetUri = "/api/v1/follows/followings/search"
             context("유효한 토큰이면서, 가입된 사용자인 경우") {
                 val response = createFollowSlice()
-                every { followService.searchByNickname(TEST_USER_ID, TEST_NICKNAME, TEST_SIZE, TEST_LAST_ID) } returns response
+                every { followService.searchByFollowingNickname(TEST_USER_ID, TEST_NICKNAME, TEST_SIZE, TEST_LAST_ID) } returns response
                 it("200 응답한다.") {
                     restDocMockMvc.get(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -717,6 +717,145 @@ class FollowControllerTest(
                     }.andDo {
                         createDocument(
                             "search-followings-fail-invalid-token",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example "null" isOptional true,
+                                LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example "null" isOptional true,
+                                NICKNAME_PARAM parameterDescription "검색할 닉네임" example TEST_NICKNAME,
+                            ),
+                        )
+                    }
+                }
+            }
+        }
+
+        describe("GET /api/v1/follows/followers/search") {
+            val targetUri = "/api/v1/follows/followers/search"
+            context("유효한 토큰이면서, 가입된 사용자인 경우") {
+                val response = createFollowSlice()
+                every { followService.searchByFollowerNickname(TEST_USER_ID, TEST_NICKNAME, TEST_SIZE, TEST_LAST_ID) } returns response
+                it("200 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(SIZE_PARAM, TEST_SIZE.toString())
+                        param(NICKNAME_PARAM, TEST_NICKNAME)
+                        param(LAST_ID_PARAM, TEST_LAST_ID.toString())
+                    }.andExpect {
+                        status { isOk() }
+                    }.andDo {
+                        val content = response.content[0]
+                        createDocument(
+                            "search-followers-success",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example "null" isOptional true,
+                                LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example "null" isOptional true,
+                                NICKNAME_PARAM parameterDescription "검색할 닉네임" example TEST_NICKNAME,
+                            ),
+                            responseBody(
+                                "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
+                                "content[].userId" type JsonFieldType.NUMBER description "사용자 ID" example content.userId,
+                                "content[].nickname" type JsonFieldType.STRING description "사용자 닉네임" example content.nickname,
+                                "content[].profile.profileUrl" type JsonFieldType.STRING description "사용자 프로필 Url" example content.profile.profileUrl,
+                                "content[].profile.profileColor.colorHex" type JsonFieldType.STRING description "색상 Hex" example content.profile.profileColor?.colorHex isOptional true,
+                                "content[].profile.profileColor.red" type JsonFieldType.NUMBER description "RGB RED" example content.profile.profileColor?.red isOptional true,
+                                "content[].profile.profileColor.green" type JsonFieldType.NUMBER description "RGB GREEN" example content.profile.profileColor?.green isOptional true,
+                                "content[].profile.profileColor.blue" type JsonFieldType.NUMBER description "RGB BLUE" example content.profile.profileColor?.blue isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이면서, 닉네임이 없는 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(SIZE_PARAM, TEST_SIZE.toString())
+                        param(LAST_ID_PARAM, TEST_LAST_ID.toString())
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "search-followers-fail-nickname-null",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_SIZE isOptional true,
+                                LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example TEST_LAST_ID isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이지만 조회할 마지막 ID가 양수가 아닌 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(SIZE_PARAM, TEST_SIZE.toString())
+                        param(NICKNAME_PARAM, TEST_NICKNAME)
+                        param(LAST_ID_PARAM, TEST_INVALID_LAST_ID.toString())
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "search-followers-fail-invalid-last-id",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_SIZE isOptional true,
+                                LAST_ID_PARAM parameterDescription "양수가 아닌 마지막 데이터의 ID" example TEST_INVALID_LAST_ID isOptional true,
+                                NICKNAME_PARAM parameterDescription "검색할 닉네임" example TEST_NICKNAME,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이지만 size가 양수가 아닌 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(SIZE_PARAM, TEST_INVALID_SIZE.toString())
+                        param(NICKNAME_PARAM, TEST_NICKNAME)
+                        param(LAST_ID_PARAM, TEST_LAST_ID.toString())
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "search-Followers-fail-invalid-size",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                SIZE_PARAM parameterDescription "양수가 아닌 데이터 개수" example TEST_INVALID_SIZE isOptional true,
+                                LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example TEST_LAST_ID isOptional true,
+                                NICKNAME_PARAM parameterDescription "검색할 닉네임" example TEST_NICKNAME,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효하지 않은 토큰이면") {
+                it("401 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                        param(SIZE_PARAM, TEST_SIZE.toString())
+                        param(NICKNAME_PARAM, TEST_NICKNAME)
+                        param(LAST_ID_PARAM, TEST_LAST_ID.toString())
+                    }.andExpect {
+                        status { isUnauthorized() }
+                    }.andDo {
+                        createDocument(
+                            "search-followers-fail-invalid-token",
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
                             ),
