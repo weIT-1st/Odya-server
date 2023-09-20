@@ -1,0 +1,36 @@
+[[Community-Like-API]]
+= *Community Like API*
+
+[[커뮤니티-좋아요-생성-API]]
+== *1. 커뮤니티 좋아요 생성 API*
+
+=== *1-1 성공*
+
+operation::community-like-controller-test/create-community-like-success[snippets='http-request,path-parameters,request-headers,http-response']
+
+=== *1-2 실패 - 존재하지 않는 커뮤니티 아이디가 주어지는 경우*
+
+operation::community-like-controller-test/create-community-like-not-found-community[snippets='http-request,path-parameters,request-headers,http-response']
+
+=== *1-3 실패 - 요청 사용자가 이미 좋아요를 누른 경우*
+
+operation::community-like-controller-test/create-community-like-already-exist[snippets='http-request,path-parameters,request-headers,http-response']
+
+=== *1-4 실패 - 유효하지 않은 토큰이 주어지는 경우*
+
+operation::community-like-controller-test/create-community-like-invalid-token[snippets='http-request,path-parameters,request-headers,http-response']
+
+[[커뮤니티-좋아요-삭제-API]]
+== *2. 커뮤니티 좋아요 삭제 API*
+
+=== *2-1 성공*
+
+operation::community-like-controller-test/delete-community-like-success[snippets='http-request,path-parameters,request-headers,http-response']
+
+=== *2-2 실패 - 존재하지 않는 커뮤니티 아이디가 주어지는 경우*
+
+operation::community-like-controller-test/delete-community-like-not-found-community[snippets='http-request,path-parameters,request-headers,http-response']
+
+=== *2-3 실패 - 유효하지 않은 토큰이 주어지는 경우*
+
+operation::community-like-controller-test/delete-community-like-invalid-token[snippets='http-request,path-parameters,request-headers,http-response']
