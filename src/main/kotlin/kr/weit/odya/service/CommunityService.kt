@@ -84,7 +84,15 @@ class CommunityService(
         validateUserReadPermission(community, userId)
         val travelJournalSimpleResponse = getTravelJournalSimpleResponse(community)
         val communityContentImages = getCommunityContentImageResponses(community)
-        return CommunityResponse.from(community, travelJournalSimpleResponse, communityContentImages)
+        val communityCommentCount = communityCommentRepository.countByCommunityId(communityId)
+        val communityLikeCount = 0 // TODO: 좋아요 기능 추가 시 수정
+        return CommunityResponse.from(
+            community,
+            travelJournalSimpleResponse,
+            communityContentImages,
+            communityCommentCount,
+            communityLikeCount,
+        )
     }
 
     @Transactional(readOnly = true)
@@ -221,13 +229,21 @@ class CommunityService(
 
     private fun getCommunitySliceResponse(
         size: Int,
-        it: List<Community>,
+        contents: List<Community>,
     ) = SliceResponse(
         size = size,
-        content = it.map { community ->
+        content = contents.map { community ->
             val communityMainImageUrl =
                 fileService.getPreAuthenticatedObjectUrl(community.communityContentImages[0].contentImage.name)
-            CommunitySummaryResponse(community.id, communityMainImageUrl)
+            val communityCommentCount = communityCommentRepository.countByCommunityId(community.id)
+            val communityLikeCount = 0 // TODO: 좋아요 기능 추가 시 수정
+            CommunitySummaryResponse(
+                community.id,
+                communityMainImageUrl,
+                community.placeId,
+                communityCommentCount,
+                communityLikeCount,
+            )
         },
     )
 

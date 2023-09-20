@@ -433,6 +433,8 @@ class CommunityControllerTest(
                                     "topic.topic" type JsonFieldType.STRING description "토픽 정보" example response.topic?.topic isOptional true,
                                     "communityContentImages[].communityContentImageId" type JsonFieldType.NUMBER description "커뮤니티 콘텐츠 이미지 아이디" example response.communityContentImages[0].communityContentImageId,
                                     "communityContentImages[].imageUrl" type JsonFieldType.STRING description "커뮤니티 콘텐츠 이미지 URL" example response.communityContentImages[0].imageUrl,
+                                    "communityCommentCount" type JsonFieldType.NUMBER description "커뮤니티 댓글 수" example response.communityCommentCount,
+                                    "communityLikeCount" type JsonFieldType.NUMBER description "커뮤니티 좋아요 수" example response.communityLikeCount,
                                 ),
                             ),
                         )
@@ -552,6 +554,9 @@ class CommunityControllerTest(
                                     "hasNext" type JsonFieldType.BOOLEAN description "다음 페이지 존재 여부" example response.hasNext,
                                     "content[].communityId" type JsonFieldType.NUMBER description "커뮤니티 아이디" example response.content[0].communityId,
                                     "content[].communityMainImageUrl" type JsonFieldType.STRING description "커뮤니티 대표 이미지 URL" example response.content[0].communityMainImageUrl,
+                                    "content[].placeId" type JsonFieldType.STRING description "장소 아이디" example response.content[0].placeId isOptional true,
+                                    "content[].communityCommentCount" type JsonFieldType.NUMBER description "커뮤니티 댓글 수" example response.content[0].communityCommentCount,
+                                    "content[].communityLikeCount" type JsonFieldType.NUMBER description "커뮤니티 좋아요 수" example response.content[0].communityLikeCount,
                                 ),
                             )
                         }
@@ -617,6 +622,9 @@ class CommunityControllerTest(
                                     "hasNext" type JsonFieldType.BOOLEAN description "다음 페이지 존재 여부" example response.hasNext,
                                     "content[].communityId" type JsonFieldType.NUMBER description "커뮤니티 아이디" example response.content[0].communityId,
                                     "content[].communityMainImageUrl" type JsonFieldType.STRING description "커뮤니티 대표 이미지 URL" example response.content[0].communityMainImageUrl,
+                                    "content[].placeId" type JsonFieldType.STRING description "장소 아이디" example response.content[0].placeId isOptional true,
+                                    "content[].communityCommentCount" type JsonFieldType.NUMBER description "커뮤니티 댓글 수" example response.content[0].communityCommentCount,
+                                    "content[].communityLikeCount" type JsonFieldType.NUMBER description "커뮤니티 좋아요 수" example response.content[0].communityLikeCount,
                                 ),
                             )
                         }
@@ -682,6 +690,9 @@ class CommunityControllerTest(
                                     "hasNext" type JsonFieldType.BOOLEAN description "다음 페이지 존재 여부" example response.hasNext,
                                     "content[].communityId" type JsonFieldType.NUMBER description "커뮤니티 아이디" example response.content[0].communityId,
                                     "content[].communityMainImageUrl" type JsonFieldType.STRING description "커뮤니티 대표 이미지 URL" example response.content[0].communityMainImageUrl,
+                                    "content[].placeId" type JsonFieldType.STRING description "장소 아이디" example response.content[0].placeId isOptional true,
+                                    "content[].communityCommentCount" type JsonFieldType.NUMBER description "커뮤니티 댓글 수" example response.content[0].communityCommentCount,
+                                    "content[].communityLikeCount" type JsonFieldType.NUMBER description "커뮤니티 좋아요 수" example response.content[0].communityLikeCount,
                                 ),
                             )
                         }

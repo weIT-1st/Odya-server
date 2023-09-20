@@ -148,6 +148,8 @@ fun createCommunityResponse(
     travelJournal = travelJournal,
     topic = topic,
     communityContentImages = communityContentImages,
+    communityCommentCount = TEST_COMMUNITY_COMMENT_COUNT,
+    communityLikeCount = 0, // TODO: 좋아요 기능 추가 시 수정
 )
 
 fun createOtherCommunityResponse(
@@ -166,6 +168,8 @@ fun createOtherCommunityResponse(
     travelJournal = travelJournal,
     topic = topic,
     communityContentImages = communityContentImages,
+    communityCommentCount = TEST_COMMUNITY_COMMENT_COUNT,
+    communityLikeCount = 0, // TODO: 좋아요 기능 추가 시 수정
 )
 
 fun createTravelJournalSimpleResponse(
@@ -200,6 +204,9 @@ fun createCommunitySummaryResponse(
 ) = CommunitySummaryResponse(
     communityId = id,
     communityMainImageUrl = mainImageUrl,
+    placeId = TEST_PLACE_ID,
+    communityCommentCount = TEST_COMMUNITY_COMMENT_COUNT,
+    communityLikeCount = 0, // TODO: 좋아요 기능 추가 시 수정
 )
 
 fun createOtherCommunitySummaryResponse(
@@ -208,6 +215,9 @@ fun createOtherCommunitySummaryResponse(
 ) = CommunitySummaryResponse(
     communityId = id,
     communityMainImageUrl = mainImageUrl,
+    placeId = TEST_OTHER_PLACE_ID,
+    communityCommentCount = TEST_COMMUNITY_COMMENT_COUNT,
+    communityLikeCount = 0, // TODO: 좋아요 기능 추가 시 수정
 )
 
 fun createSliceCommunityResponse(

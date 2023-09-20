@@ -32,6 +32,8 @@ interface CommunityCommentRepository : JpaRepository<CommunityComment, Long>, Cu
     @Modifying
     @Query("delete from CommunityComment cm where cm.community.id = :communityId")
     fun deleteAllByCommunityId(@Param("communityId") communityId: Long)
+
+    fun countByCommunityId(communityId: Long): Int
 }
 
 interface CustomCommunityCommentRepository {

@@ -50,12 +50,16 @@ data class CommunityResponse(
     val travelJournal: TravelJournalSimpleResponse?,
     val topic: TopicResponse?,
     val communityContentImages: List<CommunityContentImageResponse>,
+    val communityCommentCount: Int,
+    val communityLikeCount: Int, // TODO: 좋아요 기능 추가 시 수정
 ) {
     companion object {
         fun from(
             community: Community,
             travelJournalSimpleResponse: TravelJournalSimpleResponse?,
             communityContentImages: List<CommunityContentImageResponse>,
+            communityCommentCount: Int,
+            communityLikeCount: Int,
         ): CommunityResponse =
             CommunityResponse(
                 communityId = community.id,
@@ -67,6 +71,8 @@ data class CommunityResponse(
                     TopicResponse(it.id, it.word)
                 },
                 communityContentImages = communityContentImages,
+                communityCommentCount = communityCommentCount,
+                communityLikeCount = communityLikeCount,
             )
     }
 }
@@ -79,6 +85,9 @@ data class CommunityContentImageResponse(
 data class CommunitySummaryResponse(
     val communityId: Long,
     val communityMainImageUrl: String,
+    val placeId: String?,
+    val communityCommentCount: Int,
+    val communityLikeCount: Int, // TODO: 좋아요 기능 추가 시 수정
 )
 
 data class CommunityUpdateRequest(

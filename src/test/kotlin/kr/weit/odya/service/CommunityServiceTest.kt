@@ -29,6 +29,7 @@ import kr.weit.odya.domain.traveljournal.getByTravelJournalId
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
+import kr.weit.odya.support.TEST_COMMUNITY_COMMENT_COUNT
 import kr.weit.odya.support.TEST_COMMUNITY_CONTENT_IMAGE_DELETE_ID
 import kr.weit.odya.support.TEST_COMMUNITY_ID
 import kr.weit.odya.support.TEST_COMMUNITY_MOCK_FILE_NAME
@@ -121,7 +122,9 @@ class CommunityServiceTest : DescribeSpec(
                 every { userRepository.getByUserId(TEST_USER_ID) } returns register
                 every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns createTravelJournal()
                 every { topicRepository.getByTopicId(TEST_TOPIC_ID) } returns createTopic()
-                every { googleMapsClient.findPlaceDetailsByPlaceId(TEST_PLACE_ID) } throws InvalidRequestException(SOMETHING_ERROR_MESSAGE)
+                every { googleMapsClient.findPlaceDetailsByPlaceId(TEST_PLACE_ID) } throws InvalidRequestException(
+                    SOMETHING_ERROR_MESSAGE,
+                )
                 it("[InvalidRequestException] 예외가 발생한다.") {
                     shouldThrow<InvalidRequestException> {
                         communityService.createCommunity(
@@ -228,6 +231,7 @@ class CommunityServiceTest : DescribeSpec(
         describe("getCommunity") {
             context("유효한 데이터가 주어지는 경우") {
                 every { communityRepository.getByCommunityId(TEST_COMMUNITY_ID) } returns createCommunity()
+                every { communityCommentRepository.countByCommunityId(TEST_COMMUNITY_ID) } returns TEST_COMMUNITY_COMMENT_COUNT
                 every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
@@ -287,6 +291,7 @@ class CommunityServiceTest : DescribeSpec(
                     )
                 } returns createAllCommunities()
                 every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
+                every { communityCommentRepository.countByCommunityId(any<Long>()) } returns TEST_COMMUNITY_COMMENT_COUNT
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         communityService.getCommunities(TEST_USER_ID, 10, null, CommunitySortType.LATEST)
@@ -306,6 +311,7 @@ class CommunityServiceTest : DescribeSpec(
                     )
                 } returns createMyCommunities()
                 every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
+                every { communityCommentRepository.countByCommunityId(any<Long>()) } returns TEST_COMMUNITY_COMMENT_COUNT
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         communityService.getCommunities(TEST_USER_ID, 10, null, CommunitySortType.LATEST)
@@ -325,6 +331,7 @@ class CommunityServiceTest : DescribeSpec(
                     )
                 } returns createFriendCommunities()
                 every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
+                every { communityCommentRepository.countByCommunityId(any<Long>()) } returns TEST_COMMUNITY_COMMENT_COUNT
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         communityService.getCommunities(TEST_USER_ID, 10, null, CommunitySortType.LATEST)

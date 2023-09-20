@@ -86,5 +86,12 @@ class CommunityCommentRepositoryTest(
                 result.size shouldBe 1
             }
         }
+
+        context("커뮤니티 댓글 개수 조회") {
+            expect("커뮤니티 ID와 조건에 일치하는 커뮤니티 댓글 개수를 조회한다.") {
+                val result = communityCommentRepository.countByCommunityId(community.id)
+                result shouldBe 2
+            }
+        }
     },
 )
