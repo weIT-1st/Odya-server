@@ -216,3 +216,30 @@ operation::user-controller-test/get-life-shots-fail-not-registered-user[snippets
 === *10-6 실패 - 유효하지 않은 토큰*
 
 operation::user-controller-test/get-life-shots-fail-invalid-token[snippets='http-request,request-headers,http-response']
+
+[[전화번호로-유저-검색-API]]
+== *11. 전화번호로 유저 검색 API*
+
+=== *11-1 성공*
+
+operation::user-controller-test/search-users-by-phone-number-success[snippets='http-request,query-parameters,request-headers,http-response']
+
+=== *11-2 실패 - 검색할 전화번호를 보내지 않은 경우*
+
+operation::user-controller-test/search-users-by-phone-number-fail-empty-phone-number[snippets='http-request,request-headers,http-response']
+
+=== *11-3 실패 - 검색할 전화번호를 10개를 넘개 보낸 경우*
+
+operation::user-controller-test/search-users-by-phone-number-fail-over-10-phone-number[snippets='http-request,query-parameters,request-headers,http-response']
+
+=== *11-4 실패 - 올바르지 않은 전화번호를 보낸 경우*
+
+operation::user-controller-test/search-users-by-phone-number-fail-invalid-phone-number[snippets='http-request,query-parameters,request-headers,http-response']
+
+=== *11-5 실패 - 가입되지 않은 사용자인 경우*
+
+operation::user-controller-test/search-users-by-phone-number-fail-not-registered-user[snippets='http-request,request-headers,http-response']
+
+=== *11-6 실패 - 유효하지 않은 토큰*
+
+operation::user-controller-test/search-users-by-phone-number-fail-invalid-token[snippets='http-request,request-headers,http-response']

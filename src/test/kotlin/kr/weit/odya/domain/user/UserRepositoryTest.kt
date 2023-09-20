@@ -104,5 +104,13 @@ class UserRepositoryTest(
                 result?.fcmToken shouldBe TEST_FCM_TOKEN
             }
         }
+
+        context("사용자를 전화번호로 검색") {
+            expect("전화번호가 일치하는 사용자를 조회한다") {
+                val result = userRepository.getByPhoneNumbers(listOf(TEST_PHONE_NUMBER, "010-0000-0000"))
+                result.size shouldBe 1
+                result[0].phoneNumber shouldBe TEST_PHONE_NUMBER
+            }
+        }
     },
 )

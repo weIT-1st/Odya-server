@@ -9,6 +9,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import kr.weit.odya.domain.follow.FollowRepository
+import kr.weit.odya.domain.follow.getFollowingIds
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.traveljournal.getByUserId
 import kr.weit.odya.domain.user.UserRepository
@@ -18,6 +19,7 @@ import kr.weit.odya.domain.user.existsByEmail
 import kr.weit.odya.domain.user.existsByNickname
 import kr.weit.odya.domain.user.existsByPhoneNumber
 import kr.weit.odya.domain.user.getByNickname
+import kr.weit.odya.domain.user.getByPhoneNumbers
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.domain.user.getByUserIdWithProfile
 import kr.weit.odya.domain.user.getByUserIds
@@ -393,6 +395,17 @@ class UserServiceTest : DescribeSpec(
                 every { userRepository.getByUserIdWithProfile(TEST_USER_ID) } throws NoSuchElementException()
                 it("[NosuchElementException]을 반환한다") {
                     shouldThrow<NoSuchElementException> { userService.deleteUserRelatedData(TEST_USER_ID) }
+                }
+            }
+        }
+
+        describe("searchByPhoneNumbers") {
+            context("유효한 USER ID와 PHONE NUMBER가 주어지는 경우") {
+                every { userRepository.getByPhoneNumbers(any()) } returns listOf(createUser())
+                every { followRepository.getFollowingIds(TEST_USER_ID) } returns listOf(TEST_USER_ID)
+                every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
+                it("정상적으로 종료한다") {
+                    shouldNotThrowAny { userService.searchByPhoneNumbers(TEST_USER_ID, listOf()) }
                 }
             }
         }

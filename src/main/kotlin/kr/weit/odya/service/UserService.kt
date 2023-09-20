@@ -1,6 +1,7 @@
 package kr.weit.odya.service
 
 import kr.weit.odya.domain.follow.FollowRepository
+import kr.weit.odya.domain.follow.getFollowingIds
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.traveljournal.getByUserId
 import kr.weit.odya.domain.user.DEFAULT_PROFILE_PNG
@@ -12,12 +13,14 @@ import kr.weit.odya.domain.user.existsByEmail
 import kr.weit.odya.domain.user.existsByNickname
 import kr.weit.odya.domain.user.existsByPhoneNumber
 import kr.weit.odya.domain.user.getByNickname
+import kr.weit.odya.domain.user.getByPhoneNumbers
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.domain.user.getByUserIdWithProfile
 import kr.weit.odya.domain.user.getByUserIds
 import kr.weit.odya.security.FirebaseTokenHelper
 import kr.weit.odya.service.dto.FCMTokenRequest
 import kr.weit.odya.service.dto.InformationRequest
+import kr.weit.odya.service.dto.SearchPhoneNumberRequest
 import kr.weit.odya.service.dto.SliceResponse
 import kr.weit.odya.service.dto.UserResponse
 import kr.weit.odya.service.dto.UserSimpleResponse
@@ -140,6 +143,19 @@ class UserService(
         usersDocumentRepository.deleteById(id)
         if (profileName != DEFAULT_PROFILE_PNG) {
             fileService.deleteFile(profileName)
+        }
+    }
+
+    @Transactional(readOnly = true)
+    fun searchByPhoneNumbers(userId: Long, phoneNumber: List<SearchPhoneNumberRequest>): List<UserSimpleResponse> {
+        val users = userRepository.getByPhoneNumbers(phoneNumber.map { it.phoneNumber })
+        val followings = followRepository.getFollowingIds(userId)
+        return users.map {
+            UserSimpleResponse(
+                it,
+                fileService.getPreAuthenticatedObjectUrl(it.profile.profileName),
+                followings.contains(it.id),
+            )
         }
     }
 

@@ -31,6 +31,9 @@ fun UserRepository.getByUserIds(userIds: Collection<Long>): List<User> = findByI
 fun UserRepository.getByUserIds(userIds: List<Long>, size: Int, lastId: Long?): List<User> =
     findAllByUserIds(userIds, size, lastId)
 
+fun UserRepository.getByPhoneNumbers(phoneNumbers: List<String>): List<User> =
+    findByInformationPhoneNumberIn(phoneNumbers)
+
 interface UserRepository : JpaRepository<User, Long>, CustomUserRepository {
     fun existsByUsername(username: String): Boolean
 
@@ -54,6 +57,8 @@ interface UserRepository : JpaRepository<User, Long>, CustomUserRepository {
     fun findUserWithProfileById(userId: Long): User?
 
     fun findByFcmToken(fcmToken: String): User?
+
+    fun findByInformationPhoneNumberIn(phoneNumbers: List<String>): List<User>
 }
 
 interface CustomUserRepository {
