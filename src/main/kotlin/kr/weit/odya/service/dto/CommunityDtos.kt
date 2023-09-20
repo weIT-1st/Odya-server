@@ -27,12 +27,12 @@ data class CommunityCreateRequest(
         user: User,
         topic: Topic?,
         travelJournal: TravelJournal?,
-        communityContentImages: List<CommunityContentImage>?,
+        communityContentImages: List<CommunityContentImage>,
     ): Community = Community(
         topic = topic,
         travelJournal = travelJournal,
         user = user,
-        communityContentImages = communityContentImages ?: emptyList(),
+        communityContentImages = communityContentImages,
         communityInformation = CommunityInformation(
             content = content,
             visibility = visibility,
