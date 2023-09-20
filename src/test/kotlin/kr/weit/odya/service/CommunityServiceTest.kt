@@ -12,7 +12,11 @@ import kr.weit.odya.client.GoogleMapsClient
 import kr.weit.odya.client.push.PushNotificationEvent
 import kr.weit.odya.domain.community.Community
 import kr.weit.odya.domain.community.CommunityRepository
+import kr.weit.odya.domain.communitycomment.CommunityCommentRepository
+import kr.weit.odya.domain.communitycomment.deleteCommunityComment
 import kr.weit.odya.domain.follow.FollowRepository
+import kr.weit.odya.domain.report.ReportCommunityRepository
+import kr.weit.odya.domain.report.deleteAllByUserId
 import kr.weit.odya.domain.topic.TopicRepository
 import kr.weit.odya.domain.topic.getByTopicId
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
@@ -50,6 +54,8 @@ class CommunityServiceTest : DescribeSpec(
         val applicationEventPublisher = mockk<ApplicationEventPublisher>()
         val followRepository = mockk<FollowRepository>()
         val googleMapsClient = mockk<GoogleMapsClient>()
+        val reportCommunityRepository = mockk<ReportCommunityRepository>()
+        val communityCommentRepository = mockk<CommunityCommentRepository>()
         val communityService =
             CommunityService(
                 communityRepository,
@@ -60,6 +66,8 @@ class CommunityServiceTest : DescribeSpec(
                 applicationEventPublisher,
                 followRepository,
                 googleMapsClient,
+                reportCommunityRepository,
+                communityCommentRepository,
             )
 
         describe("createCommunity") {
@@ -179,6 +187,17 @@ class CommunityServiceTest : DescribeSpec(
                     shouldThrow<ObjectStorageException> {
                         communityService.uploadContentImages(mockImageFiles)
                     }
+                }
+            }
+        }
+
+        describe("deleteCommunityByUserId") {
+            context("유효한 유저 ID가 들어오는 경우") {
+                every { reportCommunityRepository.deleteAllByUserId(TEST_USER_ID) } just runs
+                every { communityCommentRepository.deleteCommunityComment(TEST_USER_ID) } just runs
+                every { communityRepository.deleteAllByUserId(TEST_USER_ID) } just runs
+                it("정상적으로 종료한다") {
+                    shouldNotThrowAny { communityService.deleteCommunityByUserId(TEST_USER_ID) }
                 }
             }
         }

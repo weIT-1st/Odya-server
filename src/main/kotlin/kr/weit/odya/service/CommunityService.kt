@@ -5,9 +5,13 @@ import kr.weit.odya.client.push.PushNotificationEvent
 import kr.weit.odya.domain.community.Community
 import kr.weit.odya.domain.community.CommunityContentImage
 import kr.weit.odya.domain.community.CommunityRepository
+import kr.weit.odya.domain.communitycomment.CommunityCommentRepository
+import kr.weit.odya.domain.communitycomment.deleteCommunityComment
 import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowerFcmTokens
+import kr.weit.odya.domain.report.ReportCommunityRepository
+import kr.weit.odya.domain.report.deleteAllByUserId
 import kr.weit.odya.domain.topic.TopicRepository
 import kr.weit.odya.domain.topic.getByTopicId
 import kr.weit.odya.domain.traveljournal.TravelJournal
@@ -33,6 +37,8 @@ class CommunityService(
     private val eventPublisher: ApplicationEventPublisher,
     private val followRepository: FollowRepository,
     private val googleMapsClient: GoogleMapsClient,
+    private val reportCommunityRepository: ReportCommunityRepository,
+    private val communityCommentRepository: CommunityCommentRepository,
 ) {
     @Transactional
     fun createCommunity(
@@ -70,6 +76,13 @@ class CommunityService(
             val fileName = fileService.saveFile(it)
             fileName to it.originalFilename!!
         }
+    }
+
+    @Transactional
+    fun deleteCommunityByUserId(userId: Long) {
+        reportCommunityRepository.deleteAllByUserId(userId)
+        communityCommentRepository.deleteCommunityComment(userId)
+        communityRepository.deleteAllByUserId(userId)
     }
 
     private fun getNonPrivateTravelJournal(travelJournalId: Long?): TravelJournal? =

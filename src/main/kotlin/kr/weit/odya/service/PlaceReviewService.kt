@@ -8,6 +8,7 @@ import kr.weit.odya.domain.placeReview.getByPlaceReviewId
 import kr.weit.odya.domain.placeReview.getPlaceReviewListByPlaceId
 import kr.weit.odya.domain.placeReview.getPlaceReviewListByUser
 import kr.weit.odya.domain.report.ReportPlaceReviewRepository
+import kr.weit.odya.domain.report.deleteAllByUserId
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
@@ -101,7 +102,7 @@ class PlaceReviewService(
 
     @Transactional
     fun deleteReviewRelatedData(userId: Long) {
-        reportPlaceReviewRepository.deleteAllByCommonReportInformationUserId(userId)
+        reportPlaceReviewRepository.deleteAllByUserId(userId)
         placeReviewRepository.deleteByUserId(userId)
     }
 
