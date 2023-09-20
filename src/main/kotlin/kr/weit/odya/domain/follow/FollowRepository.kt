@@ -32,12 +32,12 @@ fun FollowRepository.getFollowerListBySearchCond(
     findSliceByFollowingIdOrderBySortType(followingId, pageable, sortType)
 
 fun FollowRepository.getByFollowerIdAndFollowingIdIn(
-    follower: Long,
+    followerId: Long,
     followingIds: List<Long>,
     size: Int,
     lastId: Long?,
 ): List<Follow> =
-    findAllByFollowerIdAndFollowingIdInAndLastId(follower, followingIds, size, lastId)
+    findAllByFollowerIdAndFollowingIdInAndLastId(followerId, followingIds, size, lastId)
 
 fun FollowRepository.getByFollowingIdAndFollowerIdIn(
     following: Long,
@@ -166,7 +166,7 @@ open class FollowRepositoryImpl(private val queryFactory: QueryFactory) : Custom
             ),
         )
         if (lastId != null) {
-            where(col(followingUser, User::id).lessThan(lastId))
+            where(col(followingUser, User::id).greaterThan(lastId))
         }
         limit(size)
     }
@@ -186,7 +186,7 @@ open class FollowRepositoryImpl(private val queryFactory: QueryFactory) : Custom
             ),
         )
         if (lastId != null) {
-            where(nestedCol(col(Follow::follower), User::id).lessThan(lastId))
+            where(nestedCol(col(Follow::follower), User::id).greaterThan(lastId))
         }
         limit(size)
     }

@@ -613,6 +613,7 @@ class FollowControllerTest(
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         param(SIZE_PARAM, TEST_SIZE.toString())
                         param(LAST_ID_PARAM, TEST_LAST_ID.toString())
+                        param(NICKNAME_PARAM, " ")
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -624,6 +625,7 @@ class FollowControllerTest(
                             queryParameters(
                                 SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_SIZE isOptional true,
                                 LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example TEST_LAST_ID isOptional true,
+                                NICKNAME_PARAM parameterDescription "공백인 검색할 닉네임" example " ",
                             ),
                         )
                     }
@@ -771,11 +773,12 @@ class FollowControllerTest(
                 }
             }
 
-            context("유효한 토큰이면서, 닉네임이 없는 경우") {
+            context("유효한 토큰이면서, 닉네임이 공백인 경우") {
                 it("400 응답한다.") {
                     restDocMockMvc.get(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         param(SIZE_PARAM, TEST_SIZE.toString())
+                        param(NICKNAME_PARAM, " ")
                         param(LAST_ID_PARAM, TEST_LAST_ID.toString())
                     }.andExpect {
                         status { isBadRequest() }
@@ -788,6 +791,7 @@ class FollowControllerTest(
                             queryParameters(
                                 SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_SIZE isOptional true,
                                 LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example TEST_LAST_ID isOptional true,
+                                NICKNAME_PARAM parameterDescription "공백인 검색할 닉네임" example " ",
                             ),
                         )
                     }
@@ -830,7 +834,7 @@ class FollowControllerTest(
                         status { isBadRequest() }
                     }.andDo {
                         createDocument(
-                            "search-Followers-fail-invalid-size",
+                            "search-followers-fail-invalid-size",
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
