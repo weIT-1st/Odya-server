@@ -435,3 +435,11 @@ ALTER TABLE report_travel_journal
 
 CREATE INDEX report_travel_journal_foreign_index ON REPORT_TRAVEL_JOURNAL (travel_journal_id);
 CREATE INDEX report_travel_journal_foreign_index_2 ON REPORT_TRAVEL_JOURNAL (user_id);
+
+CREATE TABLE community_like
+(
+    community_id NUMERIC(19, 0) NOT NULL,
+    user_id      NUMERIC(19, 0) NOT NULL,
+    created_date DATE           NOT NULL,
+    CONSTRAINT pk_community_like PRIMARY KEY (community_id, user_id)
+);
