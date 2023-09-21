@@ -33,12 +33,12 @@ fun FollowRepository.getFollowerListBySearchCond(
     findSliceByFollowingIdOrderBySortType(followingId, pageable, sortType)
 
 fun FollowRepository.getByFollowerIdAndFollowingIdIn(
-    follower: Long,
+    followerId: Long,
     followingIds: List<Long>,
     size: Int,
     lastId: Long?,
 ): List<Follow> =
-    findAllByFollowerIdAndFollowingIdInAndLastId(follower, followingIds, size, lastId)
+    findAllByFollowerIdAndFollowingIdInAndLastId(followerId, followingIds, size, lastId)
 
 fun FollowRepository.getByFollowingIdAndFollowerIdIn(
     following: Long,
