@@ -40,12 +40,12 @@ fun FollowRepository.getByFollowerIdAndFollowingIdIn(
     findAllByFollowerIdAndFollowingIdInAndLastId(followerId, followingIds, size, lastId)
 
 fun FollowRepository.getByFollowingIdAndFollowerIdIn(
-    following: Long,
+    followingId: Long,
     followerIds: List<Long>,
     size: Int,
     lastId: Long?,
 ): List<Follow> =
-    findAllByFollowingIdAndFollowerIdInAndLastId(following, followerIds, size, lastId)
+    findAllByFollowingIdAndFollowerIdInAndLastId(followingId, followerIds, size, lastId)
 
 fun FollowRepository.getMayKnowFollowings(
     followerId: Long,
