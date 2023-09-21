@@ -288,7 +288,7 @@ class FollowRepositoryTest(
         }
 
         context("getFollowingIds") {
-            expect("팔로워 id list를 조회한다") {
+            expect("팔로잉 id list를 조회한다") {
                 val result = followRepository.getFollowingIds(follower.id)
                 result shouldBe listOf(following.id)
             }
