@@ -1,0 +1,2 @@
+DROP INDEX report_place_review_user_id_index;
+DROP INDEX report_travel_journal_travel_journal_id_index;

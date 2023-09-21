@@ -23,7 +23,6 @@ import kr.weit.odya.support.domain.BaseTimeEntity
         ),
     ],
     indexes = [
-        Index(name = "report_travel_journal_travel_journal_id_index", columnList = "travel_journal_id"),
         Index(name = "report_travel_journal_user_id_index", columnList = "user_id"),
     ],
 )

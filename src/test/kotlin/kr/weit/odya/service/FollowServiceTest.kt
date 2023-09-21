@@ -10,6 +10,7 @@ import io.mockk.mockk
 import io.mockk.runs
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getByFollowerIdAndFollowingIdIn
+import kr.weit.odya.domain.follow.getByFollowingIdAndFollowerIdIn
 import kr.weit.odya.domain.follow.getFollowerListBySearchCond
 import kr.weit.odya.domain.follow.getFollowingListBySearchCond
 import kr.weit.odya.domain.follow.getMayKnowFollowings
@@ -22,6 +23,7 @@ import kr.weit.odya.domain.user.getByUserIds
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_DEFAULT_PAGEABLE
 import kr.weit.odya.support.TEST_DEFAULT_PROFILE_PNG
+import kr.weit.odya.support.TEST_DEFAULT_SIZE
 import kr.weit.odya.support.TEST_DEFAULT_SORT_TYPE
 import kr.weit.odya.support.TEST_FOLLOWER_COUNT
 import kr.weit.odya.support.TEST_FOLLOWING_COUNT
@@ -195,7 +197,7 @@ class FollowServiceTest : DescribeSpec(
             }
         }
 
-        describe("searchByNickname") {
+        describe("searchByFollowingNickname") {
             context("유효한 nickname이 주어지면") {
                 val user = createUser()
                 every { usersDocumentRepository.getByNickname(TEST_NICKNAME) } returns listOf(createUsersDocument(user))
@@ -209,7 +211,19 @@ class FollowServiceTest : DescribeSpec(
                 } returns listOf(createFollow(following = user))
                 every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
                 it("유저를 조회 한다") {
-                    shouldNotThrowAny { followService.searchByNickname(TEST_USER_ID, TEST_NICKNAME, 10, null) }
+                    shouldNotThrowAny { followService.searchByFollowingNickname(TEST_USER_ID, TEST_NICKNAME, 10, null) }
+                }
+            }
+        }
+
+        describe("searchByFollowerNickname") {
+            context("유효한 nickname이 주어지면") {
+                val user = createUser()
+                every { usersDocumentRepository.getByNickname(TEST_NICKNAME) } returns listOf(createUsersDocument(user))
+                every { followRepository.getByFollowingIdAndFollowerIdIn(any(), any(), any(), any()) } returns listOf(createFollow(following = user))
+                every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
+                it("유저를 조회 한다") {
+                    shouldNotThrowAny { followService.searchByFollowerNickname(TEST_USER_ID, TEST_NICKNAME, TEST_DEFAULT_SIZE, null) }
                 }
             }
         }

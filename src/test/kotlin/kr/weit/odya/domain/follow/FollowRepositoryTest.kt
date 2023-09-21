@@ -45,6 +45,7 @@ class FollowRepositoryTest(
             followRepository.save(createFollow(follower, following))
             followRepository.save(createFollow(following, follower))
             followRepository.save(createFollow(following, notFollowing))
+            followRepository.save(createFollow(notFollowing, following))
         }
 
         context("팔로우 목록 조회") {
@@ -63,7 +64,7 @@ class FollowRepositoryTest(
                     TEST_DEFAULT_PAGEABLE,
                     TEST_DEFAULT_SORT_TYPE,
                 )
-                result.size shouldBe 1
+                result.size shouldBe 2
             }
         }
 
@@ -82,7 +83,7 @@ class FollowRepositoryTest(
 
             expect("FOLLOWING을 팔로워하는 사용자의 수를 조회한다") {
                 val result = followRepository.countByFollowingId(following.id)
-                result shouldBe 1
+                result shouldBe 2
             }
         }
 
@@ -126,13 +127,13 @@ class FollowRepositoryTest(
                 result.size shouldBe 1
             }
 
-            expect("팔로잉 id list에 해당하는 lastId보다 작은 팔로잉 유저를 조회한다") {
-                val userIds = listOf(following.id, following.id + 1)
+            expect("팔로잉 id list에 해당하는 lastId보다 큰 팔로잉 유저를 조회한다") {
+                val userIds = listOf(following.id - 1, following.id)
                 var result = followRepository.getByFollowerIdAndFollowingIdIn(
                     follower.id,
                     userIds,
                     TEST_DEFAULT_SIZE,
-                    following.id + 1,
+                    following.id - 1,
                 )
                 result.size shouldBe 1
                 result = followRepository.getByFollowerIdAndFollowingIdIn(
@@ -140,6 +141,49 @@ class FollowRepositoryTest(
                     userIds,
                     TEST_DEFAULT_SIZE,
                     following.id,
+                )
+                result.size shouldBe 0
+            }
+        }
+
+        context("내가 팔로우한 유저 id list 검색") {
+            expect("팔로워 id list에 해당하는 팔로워 유저를 조회한다.") {
+                val userIds = listOf(follower.id, notFollowing.id)
+                val result = followRepository.getByFollowingIdAndFollowerIdIn(
+                    following.id,
+                    userIds,
+                    TEST_DEFAULT_SIZE,
+                    null,
+                )
+                result.size shouldBe 2
+            }
+
+            expect("팔로워 id list에 해당하는 팔로워 유저를 size만큼 조회한다") {
+                val userIds = listOf(follower.id, notFollowing.id)
+                val result =
+                    followRepository.getByFollowingIdAndFollowerIdIn(
+                        following.id,
+                        userIds,
+                        1,
+                        null,
+                    )
+                result.size shouldBe 1
+            }
+
+            expect("팔로워 id list에 해당하는 lastId보다 큰 팔로워 유저를 조회한다") {
+                val userIds = listOf(follower.id, notFollowing.id)
+                var result = followRepository.getByFollowingIdAndFollowerIdIn(
+                    following.id,
+                    userIds,
+                    TEST_DEFAULT_SIZE,
+                    follower.id,
+                )
+                result.size shouldBe 1
+                result = followRepository.getByFollowerIdAndFollowingIdIn(
+                    following.id,
+                    userIds,
+                    TEST_DEFAULT_SIZE,
+                    notFollowing.id,
                 )
                 result.size shouldBe 0
             }
@@ -244,7 +288,7 @@ class FollowRepositoryTest(
         }
 
         context("getFollowingIds") {
-            expect("팔로잉 id list를 조회한다") {
+            expect("팔로워 id list를 조회한다") {
                 val result = followRepository.getFollowingIds(follower.id)
                 result shouldBe listOf(following.id)
             }
