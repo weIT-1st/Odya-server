@@ -34,8 +34,10 @@ class CommunityCommentRepositoryTest(
         lateinit var otherUser: User
         lateinit var travelJournal: TravelJournal
         lateinit var community: Community
+        lateinit var community2: Community
         lateinit var communityComment1: CommunityComment
         lateinit var communityComment2: CommunityComment
+        lateinit var communityComment3: CommunityComment
 
         beforeEach {
             user = userRepository.save(createUser())
@@ -62,10 +64,21 @@ class CommunityCommentRepositoryTest(
                     ),
                 ),
             )
+            community2 = communityRepository.save(
+                createCommunity(
+                    travelJournal = travelJournal,
+                    user = otherUser,
+                    communityContentImages = listOf(
+                        createCommunityContentImage(contentImage = createContentImage(user = otherUser)),
+                    ),
+                ),
+            )
             communityComment1 =
                 communityCommentRepository.save(createCommunityComment(user = user, community = community))
             communityComment2 =
-                communityCommentRepository.save(createCommunityComment(user = user, community = community))
+                communityCommentRepository.save(createCommunityComment(user = otherUser, community = community2))
+            communityComment3 =
+                communityCommentRepository.save(createCommunityComment(user = otherUser, community = community))
         }
 
         context("커뮤니티 댓글 조회") {
@@ -91,6 +104,18 @@ class CommunityCommentRepositoryTest(
             expect("커뮤니티 ID와 조건에 일치하는 커뮤니티 댓글 개수를 조회한다.") {
                 val result = communityCommentRepository.countByCommunityId(community.id)
                 result shouldBe 2
+            }
+        }
+
+        context("커뮤니티 댓글 삭제") {
+            expect("USER ID와 일치하는 커뮤니티 댓글과 해당 유저의 커뮤니티 글의 댓글을 삭제한다.") {
+                communityCommentRepository.deleteCommunityComment(user.id)
+                communityCommentRepository.count() shouldBe 1
+            }
+
+            expect("커뮤니티 ID와 일치하는 커뮤니티의 댓글을 삭제한다.") {
+                communityCommentRepository.deleteAllByCommunityId(community.id)
+                communityCommentRepository.count() shouldBe 1
             }
         }
     },

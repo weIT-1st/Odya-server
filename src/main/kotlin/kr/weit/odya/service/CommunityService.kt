@@ -15,9 +15,12 @@ import kr.weit.odya.domain.community.getCommunitySliceBy
 import kr.weit.odya.domain.community.getFriendCommunitySliceBy
 import kr.weit.odya.domain.community.getMyCommunitySliceBy
 import kr.weit.odya.domain.communitycomment.CommunityCommentRepository
+import kr.weit.odya.domain.communitycomment.deleteCommunityComment
 import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowerFcmTokens
+import kr.weit.odya.domain.report.ReportCommunityRepository
+import kr.weit.odya.domain.report.deleteAllByUserId
 import kr.weit.odya.domain.topic.TopicRepository
 import kr.weit.odya.domain.topic.getByTopicId
 import kr.weit.odya.domain.traveljournal.TravelJournal
@@ -53,6 +56,7 @@ class CommunityService(
     private val eventPublisher: ApplicationEventPublisher,
     private val followRepository: FollowRepository,
     private val googleMapsClient: GoogleMapsClient,
+    private val reportCommunityRepository: ReportCommunityRepository,
 ) {
     @Transactional
     fun createCommunity(
@@ -184,6 +188,13 @@ class CommunityService(
         communityCommentRepository.deleteAllByCommunityId(communityId)
         communityRepository.delete(community)
         eventPublisher.publishEvent(CommunityDeleteEvent(deleteCommunityContentImageNames))
+    }
+
+    @Transactional
+    fun deleteCommunityByUserId(userId: Long) {
+        reportCommunityRepository.deleteAllByUserId(userId)
+        communityCommentRepository.deleteCommunityComment(userId)
+        communityRepository.deleteAllByUserId(userId)
     }
 
     private fun getDeleteCommunityContentImageNames(deleteCommunityContentImages: List<CommunityContentImage>) =

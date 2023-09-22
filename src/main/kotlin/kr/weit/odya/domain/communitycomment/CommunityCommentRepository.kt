@@ -1,11 +1,13 @@
 package kr.weit.odya.domain.communitycomment
 
 import com.linecorp.kotlinjdsl.QueryFactory
+import com.linecorp.kotlinjdsl.deleteQuery
 import com.linecorp.kotlinjdsl.listQuery
 import com.linecorp.kotlinjdsl.query.spec.predicate.PredicateSpec
 import com.linecorp.kotlinjdsl.querydsl.CriteriaQueryDsl
 import com.linecorp.kotlinjdsl.querydsl.expression.col
 import kr.weit.odya.domain.community.Community
+import kr.weit.odya.domain.community.CommunityRepositoryImpl.Companion.communityByUserIdSubQuery
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
@@ -21,10 +23,17 @@ fun CommunityCommentRepository.getSliceCommunityCommentBy(
 ): List<CommunityComment> =
     findSliceByCommunityIdAndSizeAndLastId(communityId, size, lastId)
 
+fun CommunityCommentRepository.deleteCommunityComment(userId: Long) {
+    deleteAllByUserId(userId)
+    deleteCommunityCommentByUserId(userId)
+}
+
 @Repository
 interface CommunityCommentRepository : JpaRepository<CommunityComment, Long>, CustomCommunityCommentRepository {
     @EntityGraph(attributePaths = ["user"])
     fun findByIdAndCommunityId(communityCommentId: Long, communityId: Long): CommunityComment?
+
+    fun deleteAllByUserId(userId: Long)
 
     fun deleteAllByCommunityId(communityId: Long)
 
@@ -37,9 +46,11 @@ interface CustomCommunityCommentRepository {
         size: Int,
         lastId: Long?,
     ): List<CommunityComment>
+
+    fun deleteCommunityCommentByUserId(userId: Long)
 }
 
-class CommunityCommentRepositoryImpl(private val queryFactory: QueryFactory) : CustomCommunityCommentRepository {
+class CustomCommunityCommentRepositoryImpl(private val queryFactory: QueryFactory) : CustomCommunityCommentRepository {
     override fun findSliceByCommunityIdAndSizeAndLastId(
         communityId: Long,
         size: Int,
@@ -56,6 +67,13 @@ class CommunityCommentRepositoryImpl(private val queryFactory: QueryFactory) : C
         )
         orderBy(col(CommunityComment::id).asc())
         limit(size + 1)
+    }
+
+    override fun deleteCommunityCommentByUserId(userId: Long) {
+        queryFactory.deleteQuery<CommunityComment> {
+            val subQuery = queryFactory.communityByUserIdSubQuery(userId)
+            where(nestedCol(col(CommunityComment::community), Community::id).`in`(subQuery))
+        }.executeUpdate()
     }
 
     private fun CriteriaQueryDsl<CommunityComment>.dynamicPredicateByLastId(

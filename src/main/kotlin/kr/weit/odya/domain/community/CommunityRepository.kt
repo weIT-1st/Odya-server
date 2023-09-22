@@ -8,11 +8,16 @@ import com.linecorp.kotlinjdsl.query.spec.predicate.PredicateSpec
 import com.linecorp.kotlinjdsl.querydsl.CriteriaQueryDsl
 import com.linecorp.kotlinjdsl.querydsl.expression.col
 import com.linecorp.kotlinjdsl.subquery
+import com.linecorp.kotlinjdsl.updateQuery
+import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.follow.Follow
+import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.user.User
+import com.linecorp.kotlinjdsl.listQuery
+import com.linecorp.kotlinjdsl.querydsl.expression.col
+import com.linecorp.kotlinjdsl.subquery
+import com.linecorp.kotlinjdsl.updateQuery
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.jpa.repository.Modifying
-import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 
@@ -40,11 +45,12 @@ fun CommunityRepository.getFriendCommunitySliceBy(
     sortType: CommunitySortType,
 ): List<Community> = findFriendCommunitySliceBy(userId, size, lastId, sortType)
 
+fun CommunityRepository.getImageNamesById(communityId: Long): List<String> =
+    findContentImageNameListById(communityId)
+
 @Repository
 interface CommunityRepository : JpaRepository<Community, Long>, CustomCommunityRepository {
-    @Modifying
-    @Query("update Community c set c.travelJournal.id = null where c.travelJournal.id = :travelJournalId")
-    fun updateTravelJournalIdToNull(travelJournalId: Long)
+    fun deleteAllByUserId(userId: Long)
 }
 
 interface CustomCommunityRepository {
@@ -68,6 +74,10 @@ interface CustomCommunityRepository {
         lastId: Long?,
         sortType: CommunitySortType,
     ): List<Community>
+
+    fun findContentImageNameListById(communityId: Long): List<String>
+
+    fun updateTravelJournalIdToNull(travelJournalId: Long)
 }
 
 class CommunityRepositoryImpl(private val queryFactory: QueryFactory) : CustomCommunityRepository {
@@ -110,6 +120,24 @@ class CommunityRepositoryImpl(private val queryFactory: QueryFactory) : CustomCo
         val followingIds = getFollowingIdsSubQuery(userId)
         getCommunitySliceBaseQuery(lastId, sortType, size)
         where(nestedCol(col(Community::user), User::id).`in`(followingIds))
+    }
+
+    override fun findContentImageNameListById(communityId: Long): List<String> = queryFactory.listQuery {
+        select(col(ContentImage::name))
+        from(entity(Community::class))
+        associate(entity(Community::class), entity(CommunityContentImage::class), on(Community::communityContentImages))
+        associate(entity(CommunityContentImage::class), entity(ContentImage::class), on(CommunityContentImage::contentImage))
+        where(col(Community::id).equal(communityId))
+    }
+
+    override fun updateTravelJournalIdToNull(travelJournalId: Long) {
+        queryFactory.updateQuery<Community> {
+            associate(Community::class, TravelJournal::class, on(Community::travelJournal))
+            where(
+                col(TravelJournal::id).equal(travelJournalId),
+            )
+            set(col(Community::travelJournal), null)
+        }.executeUpdate()
     }
 
     private fun getMyFriendOnlyCommunityIdsSubQuery(userId: Long) = queryFactory.subquery<Long> {
@@ -203,6 +231,15 @@ class CommunityRepositoryImpl(private val queryFactory: QueryFactory) : CustomCo
             CommunitySortType.LATEST -> listOf(col(Community::id).desc())
 //            CommunitySortType.LIKE -> listOf(col(Community::).desc())
         }
+
+    companion object {
+        fun QueryFactory.communityByUserIdSubQuery(userId: Long) =
+            subquery {
+                select(col(Community::id))
+                from(entity(Community::class))
+                where(nestedCol(col(Community::user), User::id).equal(userId))
+            }
+    }
 }
 
 enum class CommunitySortType(val description: String) {
