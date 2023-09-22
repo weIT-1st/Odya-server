@@ -2,7 +2,6 @@ package kr.weit.odya.domain.report
 
 import io.kotest.core.spec.style.ExpectSpec
 import io.kotest.matchers.shouldBe
-import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.user.User
@@ -23,7 +22,6 @@ class ReportTravelJournalRepositoryTest(
     private val reportTravelJournalRepository: ReportTravelJournalRepository,
     private val travelJournalRepository: TravelJournalRepository,
     private val userRepository: UserRepository,
-    private val contentImageRepository: ContentImageRepository,
 ) : ExpectSpec(
     {
         lateinit var user1: User
@@ -62,12 +60,12 @@ class ReportTravelJournalRepositoryTest(
 
         context("여행 일지 신고 여부 확인(존재)") {
             expect("TRAVEL_JOURNAL_ID와 USER_ID가 일치하는 여행 일지의 신고 여부 확인(존재)") {
-                val result = reportTravelJournalRepository.existsByJournalAndUserId(travelJournal.id, user1.id)
+                val result = reportTravelJournalRepository.existsByJournalIdAndUserId(travelJournal.id, user1.id)
                 result shouldBe true
             }
 
             expect("TRAVEL_JOURNAL_ID와 USER_ID가 일치하는 여행 일지의 신고 여부 확인(존재하지 않음)") {
-                val result = reportTravelJournalRepository.existsByJournalAndUserId(travelJournal.id, user3.id)
+                val result = reportTravelJournalRepository.existsByJournalIdAndUserId(travelJournal.id, user3.id)
                 result shouldBe false
             }
         }
@@ -78,9 +76,9 @@ class ReportTravelJournalRepositoryTest(
                 reportTravelJournalRepository.existsById(travelJournal.id) shouldBe false
             }
 
-            expect("USER_ID와 일치하는 여행 일지의 신고 모두 삭제한다") {
-                reportTravelJournalRepository.deleteAllByCommonReportInformationUserId(user1.id)
-                reportTravelJournalRepository.count() shouldBe 1
+            expect("USER_ID와 일치하는 신고한 내역과 해당 유저의 여행일지 신고 내역 모두 삭제한다") {
+                reportTravelJournalRepository.deleteAllByUserId(user1.id)
+                reportTravelJournalRepository.count() shouldBe 0
             }
         }
     },

@@ -19,6 +19,7 @@ class WithdrawService(
     private val travelJournalService: TravelJournalService,
     private val userRepository: UserRepository,
     private val userService: UserService,
+    private val communityService: CommunityService,
 ) {
     @Transactional
     fun withdrawUser(userId: Long) {
@@ -27,8 +28,8 @@ class WithdrawService(
         placeReviewService.deleteReviewRelatedData(userId)
         favoriteTopicRepository.deleteAllByUserId(userId)
         agreedTermsRepository.deleteAllByUserId(userId)
+        communityService.deleteCommunityByUserId(userId)
         travelJournalService.deleteTravelJournalByUserId(userId)
-        // TODO: 커뮤니티 삭제
         userService.deleteUserRelatedData(userId)
         firebaseTokenHelper.withdrawUser(uid)
     }
