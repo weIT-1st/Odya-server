@@ -11,6 +11,7 @@ import java.time.LocalDateTime
 const val TEST_COMMUNITY_COMMENT_ID: Long = 1L
 const val TEST_OTHER_COMMUNITY_COMMENT_ID: Long = 2L
 const val TEST_COMMUNITY_COMMENT_CONTENT = "testCommunityCommentContent"
+const val TEST_COMMUNITY_COMMENT_COUNT = 5
 
 fun createCommunityComment(
     id: Long = TEST_COMMUNITY_COMMENT_ID,

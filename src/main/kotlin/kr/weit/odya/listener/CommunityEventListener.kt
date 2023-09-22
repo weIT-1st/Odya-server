@@ -1,6 +1,7 @@
 package kr.weit.odya.listener
 
 import kr.weit.odya.domain.community.CommunityDeleteEvent
+import kr.weit.odya.domain.community.CommunityUpdateEvent
 import kr.weit.odya.service.FileService
 import kr.weit.odya.service.ObjectStorageException
 import kr.weit.odya.support.log.Logger
@@ -21,6 +22,18 @@ class CommunityEventListener(
             }
         } catch (ex: ObjectStorageException) {
             Logger.error(ex) { "[communityDeleteEventHandle] ObjectStorageException: ${ex.message})]" }
+        }
+    }
+
+    @Async
+    @EventListener
+    fun communityUpdateEventHandle(event: CommunityUpdateEvent) {
+        try {
+            event.deletedCommunityContentImageNames.forEach {
+                fileService.deleteFile(it)
+            }
+        } catch (ex: ObjectStorageException) {
+            Logger.error(ex) { "[communityUpdateEventHandle] ObjectStorageException: ${ex.message})]" }
         }
     }
 }

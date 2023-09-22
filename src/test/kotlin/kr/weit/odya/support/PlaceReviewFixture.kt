@@ -16,6 +16,7 @@ const val TEST_INVALID_PLACE_REVIEW_ID = -1L
 const val TEST_NOT_EXIST_PLACE_REVIEW_ID = 5L
 const val TEST_PLACE_ID = "test_place_id"
 const val TEST_OTHER_PLACE_ID = "test_other_place_id"
+const val TEST_UPDATE_PLACE_ID = "test_update_place_id"
 const val TEST_REVIEW = "test review"
 const val TEST_HIGHEST_RATING = 10
 const val TEST_LOWEST_RATING = 1

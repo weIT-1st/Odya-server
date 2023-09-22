@@ -16,10 +16,10 @@ class FileService(
         objectStorageService.save(file.inputStream, it)
     }
 
-    fun getPreAuthenticatedObjectUrl(profileName: String): String =
-        objectStorageService.getPreAuthenticatedObjectUrl(profileName)
+    fun getPreAuthenticatedObjectUrl(fileName: String): String =
+        objectStorageService.getPreAuthenticatedObjectUrl(fileName)
 
-    fun deleteFile(profileName: String) = objectStorageService.delete(profileName)
+    fun deleteFile(fileName: String) = objectStorageService.delete(fileName)
 
     private fun getFileFormat(originFileName: String): String {
         return originFileName.let {

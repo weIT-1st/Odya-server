@@ -36,6 +36,8 @@ interface CommunityCommentRepository : JpaRepository<CommunityComment, Long>, Cu
     fun deleteAllByUserId(userId: Long)
 
     fun deleteAllByCommunityId(communityId: Long)
+
+    fun countByCommunityId(communityId: Long): Int
 }
 
 interface CustomCommunityCommentRepository {
