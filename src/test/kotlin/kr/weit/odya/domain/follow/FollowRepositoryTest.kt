@@ -37,15 +37,19 @@ class FollowRepositoryTest(
     {
         lateinit var follower: User
         lateinit var following: User
+        lateinit var following2: User
         lateinit var notFollowing: User
         beforeEach {
             follower = userRepository.save(createUser().apply { changeFcmToken(TEST_FCM_TOKEN) })
             following = userRepository.save(createOtherUser())
-            notFollowing = userRepository.save(createCustomUser("test_user_3", "test_user_3"))
+            following2 = userRepository.save(createCustomUser("test_user_3", "test_user_3"))
+            notFollowing = userRepository.save(createCustomUser("test_user_4", "test_user_4"))
             followRepository.save(createFollow(follower, following))
             followRepository.save(createFollow(following, follower))
+            followRepository.save(createFollow(follower, following2))
             followRepository.save(createFollow(following, notFollowing))
             followRepository.save(createFollow(notFollowing, following))
+            followRepository.save(createFollow(following2, notFollowing))
         }
 
         context("팔로우 목록 조회") {
@@ -55,7 +59,7 @@ class FollowRepositoryTest(
                     TEST_DEFAULT_PAGEABLE,
                     TEST_DEFAULT_SORT_TYPE,
                 )
-                result.size shouldBe 1
+                result.size shouldBe 2
             }
 
             expect("FOLLOWING을 팔로워하는 사용자 목록을 조회한다") {
@@ -78,7 +82,7 @@ class FollowRepositoryTest(
         context("팔로우 수 확인") {
             expect("FOLLOWER가 팔로잉하는 사용자의 수를 조회한다") {
                 val result = followRepository.countByFollowerId(follower.id)
-                result shouldBe 1
+                result shouldBe 2
             }
 
             expect("FOLLOWING을 팔로워하는 사용자의 수를 조회한다") {
@@ -117,7 +121,7 @@ class FollowRepositoryTest(
                     TEST_DEFAULT_SIZE,
                     null,
                 )
-                result.size shouldBe 1
+                result.size shouldBe 2
             }
 
             expect("팔로잉 id list에 해당하는 팔로잉 유저를 size만큼 조회한다") {
@@ -290,7 +294,7 @@ class FollowRepositoryTest(
         context("getFollowingIds") {
             expect("팔로잉 id list를 조회한다") {
                 val result = followRepository.getFollowingIds(follower.id)
-                result shouldBe listOf(following.id)
+                result shouldBe listOf(following.id, following2.id)
             }
         }
     },

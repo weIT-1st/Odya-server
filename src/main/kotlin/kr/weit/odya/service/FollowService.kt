@@ -139,8 +139,8 @@ class FollowService(
             size,
             mayKnowFollowings.map {
                 FollowUserResponse(
-                    it.following,
-                    fileService.getPreAuthenticatedObjectUrl(it.following.profile.profileName),
+                    it,
+                    fileService.getPreAuthenticatedObjectUrl(it.profile.profileName),
                 )
             },
         )
