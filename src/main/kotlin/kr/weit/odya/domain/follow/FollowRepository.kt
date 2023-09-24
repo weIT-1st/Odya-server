@@ -33,12 +33,20 @@ fun FollowRepository.getFollowerListBySearchCond(
     findSliceByFollowingIdOrderBySortType(followingId, pageable, sortType)
 
 fun FollowRepository.getByFollowerIdAndFollowingIdIn(
-    follower: Long,
+    followerId: Long,
     followingIds: List<Long>,
     size: Int,
     lastId: Long?,
 ): List<Follow> =
-    findAllByFollowerIdAndFollowingIdInAndLastId(follower, followingIds, size, lastId)
+    findAllByFollowerIdAndFollowingIdInAndLastId(followerId, followingIds, size, lastId)
+
+fun FollowRepository.getByFollowingIdAndFollowerIdIn(
+    followingId: Long,
+    followerIds: List<Long>,
+    size: Int,
+    lastId: Long?,
+): List<Follow> =
+    findAllByFollowingIdAndFollowerIdInAndLastId(followingId, followerIds, size, lastId)
 
 fun FollowRepository.getMayKnowFollowings(
     followerId: Long,
@@ -89,6 +97,13 @@ interface CustomFollowRepository {
     fun findAllByFollowerIdAndFollowingIdInAndLastId(
         followerId: Long,
         followingIds: List<Long>,
+        size: Int,
+        lastId: Long?,
+    ): List<Follow>
+
+    fun findAllByFollowingIdAndFollowerIdInAndLastId(
+        followerId: Long,
+        followerIds: List<Long>,
         size: Int,
         lastId: Long?,
     ): List<Follow>
@@ -152,7 +167,27 @@ open class FollowRepositoryImpl(private val queryFactory: QueryFactory) : Custom
             ),
         )
         if (lastId != null) {
-            where(col(followingUser, User::id).lessThan(lastId))
+            where(col(followingUser, User::id).greaterThan(lastId))
+        }
+        limit(size)
+    }
+
+    override fun findAllByFollowingIdAndFollowerIdInAndLastId(
+        followerId: Long,
+        followerIds: List<Long>,
+        size: Int,
+        lastId: Long?,
+    ): List<Follow> = queryFactory.listQuery {
+        select(entity(Follow::class))
+        from(entity(Follow::class))
+        where(
+            and(
+                nestedCol(col(Follow::following), User::id).equal(followerId),
+                nestedCol(col(Follow::follower), User::id).`in`(followerIds),
+            ),
+        )
+        if (lastId != null) {
+            where(nestedCol(col(Follow::follower), User::id).greaterThan(lastId))
         }
         limit(size)
     }
