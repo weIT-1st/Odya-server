@@ -35,6 +35,7 @@ import kr.weit.odya.support.TEST_EMAIL
 import kr.weit.odya.support.TEST_GENERATED_FILE_NAME
 import kr.weit.odya.support.TEST_ID_TOKEN
 import kr.weit.odya.support.TEST_INVALID_LAST_ID
+import kr.weit.odya.support.TEST_INVALID_PHONE_NUMBER
 import kr.weit.odya.support.TEST_INVALID_SIZE
 import kr.weit.odya.support.TEST_INVALID_USER_ID
 import kr.weit.odya.support.TEST_LAST_ID
@@ -1268,7 +1269,7 @@ class UserControllerTest(
                 it("400 응답한다.") {
                     restDocMockMvc.get(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
-                        param(PHONE_NUMBERS_PARAM, "1234567890")
+                        param(PHONE_NUMBERS_PARAM, TEST_INVALID_PHONE_NUMBER)
                     }.andExpect {
                         status { isBadRequest() }
                     }.andDo {
@@ -1278,7 +1279,7 @@ class UserControllerTest(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
                             queryParameters(
-                                PHONE_NUMBERS_PARAM parameterDescription "유효하지 않은 전화 번호" example "1234567890",
+                                PHONE_NUMBERS_PARAM parameterDescription "유효하지 않은 전화 번호" example TEST_INVALID_PHONE_NUMBER,
                             ),
                         )
                     }
