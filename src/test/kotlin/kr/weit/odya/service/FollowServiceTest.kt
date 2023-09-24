@@ -216,7 +216,7 @@ class FollowServiceTest : DescribeSpec(
 
         describe("getMayKnowFollowings") {
             context("요청이 들어오면") {
-                every { followRepository.getMayKnowFollowings(any(), any(), any()) } returns createFollowList()
+                every { followRepository.getMayKnowFollowings(any(), any(), any()) } returns listOf(createUser())
                 every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
                 it("알수도 있는 유저를 조회 한다") {
                     shouldNotThrowAny { followService.getMayKnowFollowings(TEST_USER_ID, 10, null) }
