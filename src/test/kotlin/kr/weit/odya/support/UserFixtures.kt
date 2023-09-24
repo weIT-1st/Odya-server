@@ -10,6 +10,7 @@ import kr.weit.odya.service.dto.FCMTokenRequest
 import kr.weit.odya.service.dto.ImageResponse
 import kr.weit.odya.service.dto.InformationRequest
 import kr.weit.odya.service.dto.LifeShotRequest
+import kr.weit.odya.service.dto.SearchPhoneNumberRequest
 import kr.weit.odya.service.dto.SliceResponse
 import kr.weit.odya.service.dto.UserResponse
 import kr.weit.odya.service.dto.UserSimpleResponse
@@ -105,6 +106,10 @@ fun createSliceSimpleUserResponse() = SliceResponse(
     ),
 )
 
+fun createSimpleUserResponseList() = listOf(
+    createSimpleUserResponse(),
+)
+
 fun createLifeShotImageResponse() = ImageResponse(
     imageId = TEST_IMAGE_ID,
     imageUrl = TEST_IMAGE_URL,
@@ -132,4 +137,8 @@ fun createUserStatisticsResponse() = UserStatisticsResponse(
 
 fun createLifeShotRequest(placeName: String? = TEST_PLACE_NAME) = LifeShotRequest(
     placeName = placeName,
+)
+
+fun createPhoneNumberList() = listOf(
+    SearchPhoneNumberRequest(TEST_PHONE_NUMBER),
 )

@@ -1,5 +1,6 @@
 package kr.weit.odya.service.dto
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import jakarta.validation.constraints.NotBlank
 import kr.weit.odya.domain.profilecolor.NONE_PROFILE_COLOR_HEX
 import kr.weit.odya.domain.profilecolor.ProfileColor
@@ -7,6 +8,7 @@ import kr.weit.odya.domain.user.Gender
 import kr.weit.odya.domain.user.SocialType
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.support.validator.Nickname
+import kr.weit.odya.support.validator.PhoneNumber
 import java.time.LocalDate
 
 data class UserResponse(
@@ -67,12 +69,14 @@ data class UserProfileResponse(
     }
 }
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class UserSimpleResponse(
     val userId: Long,
     val nickname: String,
     val profile: ProfileResponse,
+    val isFollowing: Boolean? = null, // 필요할때만 내려준다
 ) {
-    constructor(user: User, profileUrl: String) : this(
+    constructor(user: User, profileUrl: String, isFollowing: Boolean? = null) : this(
         user.id,
         user.nickname,
         ProfileResponse(
@@ -83,6 +87,7 @@ data class UserSimpleResponse(
                 null
             },
         ),
+        isFollowing,
     )
 }
 
@@ -111,4 +116,9 @@ data class UserStatisticsResponse(
     val followingsCount: Int,
     val followersCount: Int,
     val odyaCount: Int,
+)
+
+data class SearchPhoneNumberRequest(
+    @PhoneNumber
+    val phoneNumber: String,
 )

@@ -3,6 +3,7 @@ package kr.weit.odya.controller
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Positive
+import jakarta.validation.constraints.Size
 import kr.weit.odya.security.LoginUserId
 import kr.weit.odya.service.ImageService
 import kr.weit.odya.service.UserService
@@ -10,6 +11,7 @@ import kr.weit.odya.service.WithdrawService
 import kr.weit.odya.service.dto.FCMTokenRequest
 import kr.weit.odya.service.dto.ImageResponse
 import kr.weit.odya.service.dto.InformationRequest
+import kr.weit.odya.service.dto.SearchPhoneNumberRequest
 import kr.weit.odya.service.dto.SliceResponse
 import kr.weit.odya.service.dto.UserResponse
 import kr.weit.odya.service.dto.UserSimpleResponse
@@ -115,6 +117,18 @@ class UserController(
         lastId: Long?,
     ): ResponseEntity<SliceResponse<UserSimpleResponse>> {
         return ResponseEntity.ok(userService.searchByNickname(nickname, size, lastId))
+    }
+
+    @GetMapping("/search/phone-number")
+    fun searchByPhoneNumber(
+        @LoginUserId
+        userId: Long,
+        @Valid
+        @Size(min = 1, max = 10, message = "전화번호는 1개 이상 10개 이하로 입력해주세요.")
+        @RequestParam("phoneNumbers")
+        phoneNumbers: List<SearchPhoneNumberRequest>,
+    ): ResponseEntity<List<UserSimpleResponse>> {
+        return ResponseEntity.ok(userService.searchByPhoneNumbers(userId, phoneNumbers))
     }
 
     @GetMapping("/{userId}/statistics")
