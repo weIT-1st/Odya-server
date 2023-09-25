@@ -5,6 +5,7 @@ import kr.weit.odya.domain.follow.Follow
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.FollowSortType
 import kr.weit.odya.domain.follow.getByFollowerIdAndFollowingIdIn
+import kr.weit.odya.domain.follow.getByFollowingIdAndFollowerIdIn
 import kr.weit.odya.domain.follow.getFollowerListBySearchCond
 import kr.weit.odya.domain.follow.getFollowingListBySearchCond
 import kr.weit.odya.domain.follow.getMayKnowFollowings
@@ -103,7 +104,7 @@ class FollowService(
     }
 
     @Transactional(readOnly = true)
-    fun searchByNickname(userId: Long, nickname: String, size: Int, lastId: Long?): SliceResponse<FollowUserResponse> {
+    fun searchByFollowingNickname(userId: Long, nickname: String, size: Int, lastId: Long?): SliceResponse<FollowUserResponse> {
         val usersDocuments = usersDocumentRepository.getByNickname(nickname)
         val userIds = usersDocuments.map { it.id }
 
@@ -115,6 +116,19 @@ class FollowService(
                 )
             }
         return SliceResponse(size, followings)
+    }
+
+    @Transactional(readOnly = true)
+    fun searchByFollowerNickname(userId: Long, nickname: String, size: Int, lastId: Long?): SliceResponse<FollowUserResponse> {
+        val usersDocuments = usersDocumentRepository.getByNickname(nickname)
+        val userIds = usersDocuments.map { it.id }
+        val followers = followRepository.getByFollowingIdAndFollowerIdIn(userId, userIds, size + 1, lastId).map {
+            FollowUserResponse(
+                it.follower,
+                fileService.getPreAuthenticatedObjectUrl(it.follower.profile.profileName),
+            )
+        }
+        return SliceResponse(size, followers)
     }
 
     @Transactional(readOnly = true)
