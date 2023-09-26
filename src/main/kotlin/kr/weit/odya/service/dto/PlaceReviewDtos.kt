@@ -65,28 +65,14 @@ data class PlaceReviewListResponse(
     )
 }
 
-data class SlicePlaceReviewResponse private constructor(
-    override var hasNext: Boolean,
-    val averageRating: Double,
-    override val content: List<PlaceReviewListResponse>,
-) : SliceResponse<PlaceReviewListResponse>(hasNext, content) {
-    companion object {
-        fun of(size: Int, content: List<PlaceReviewListResponse>, averageRating: Double): SlicePlaceReviewResponse {
-            val hasNext: Boolean = content.size > size
-            val contents = if (hasNext) {
-                content.dropLast(1)
-            } else {
-                content
-            }
-            return SlicePlaceReviewResponse(hasNext, averageRating, contents)
-        }
-    }
-}
-
 data class ExistReviewResponse(
     val exist: Boolean,
 )
 
 data class ReviewCountResponse(
     val count: Int,
+)
+
+data class AverageRatingResponse(
+    val averageStarRating: Double,
 )

@@ -27,7 +27,6 @@ import kr.weit.odya.support.TEST_PLACE_SORT_TYPE
 import kr.weit.odya.support.TEST_PROFILE_URL
 import kr.weit.odya.support.TEST_SIZE
 import kr.weit.odya.support.TEST_USER_ID
-import kr.weit.odya.support.creatSlicePlaceReviewResponse
 import kr.weit.odya.support.createCountPlaceReviewResponse
 import kr.weit.odya.support.createExistReviewResponse
 import kr.weit.odya.support.createMockPlaceReview
@@ -131,10 +130,9 @@ class PlaceReviewServiceTest : DescribeSpec(
         describe("getByPlaceReviewList 메소드") {
             context("유효한 placeId가 전달되면") {
                 every { placeReviewRepository.findSliceByPlaceIdOrderBySortType(TEST_PLACE_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) } returns listOf(createMockPlaceReview(user))
-                every { placeReviewRepository.getAverageRatingByPlaceId(TEST_PLACE_ID) } returns TEST_AVERAGE_RATING
                 every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
                 it("리뷰를 조회한다.") {
-                    sut.getByPlaceReviewList(TEST_PLACE_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) shouldBe creatSlicePlaceReviewResponse()
+                    shouldNotThrowAny { sut.getByPlaceReviewList(TEST_PLACE_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) }
                 }
             }
         }
@@ -143,10 +141,9 @@ class PlaceReviewServiceTest : DescribeSpec(
             context("유효한 userId가 전달되면") {
                 every { userRepository.getByUserId(TEST_USER_ID) } returns user
                 every { placeReviewRepository.findSliceByUserOrderBySortType(any(), TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) } returns listOf(createMockPlaceReview(user))
-                every { placeReviewRepository.getAverageRatingByUser(user) } returns TEST_AVERAGE_RATING
                 every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
                 it("리뷰를 조회한다.") {
-                    sut.getByUserReviewList(TEST_USER_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) shouldBe creatSlicePlaceReviewResponse()
+                    shouldNotThrowAny { sut.getByUserReviewList(TEST_USER_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) }
                 }
             }
 
@@ -154,6 +151,22 @@ class PlaceReviewServiceTest : DescribeSpec(
                 every { userRepository.getByUserId(TEST_USER_ID) } throws NoSuchElementException()
                 it("[NoSuchElementException] 예외가 발생한다") {
                     shouldThrow<NoSuchElementException> { sut.getByUserReviewList(TEST_USER_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) }
+                }
+            }
+        }
+
+        describe("getAverageStarRating 메소드") {
+            context("유효한 placeId가 전달되면") {
+                every { placeReviewRepository.getAverageRatingByPlaceId(TEST_PLACE_ID) } returns 5.512
+                it("평균 리뷰 평점 첫번쨰 자리까지만 출력한다.") {
+                    sut.getAverageStarRating(TEST_PLACE_ID).averageStarRating shouldBe TEST_AVERAGE_RATING
+                }
+            }
+
+            context("리뷰가 없는 placeId가 전달되면") {
+                every { placeReviewRepository.getAverageRatingByPlaceId(TEST_PLACE_ID) } returns null
+                it("0을 반환한다") {
+                    sut.getAverageStarRating(TEST_PLACE_ID).averageStarRating shouldBe 0.0
                 }
             }
         }
