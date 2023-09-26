@@ -28,6 +28,7 @@ import kr.weit.odya.security.FirebaseTokenHelper
 import kr.weit.odya.security.InvalidTokenException
 import kr.weit.odya.support.DELETE_NOT_EXIST_PROFILE_ERROR_MESSAGE
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
+import kr.weit.odya.support.TEST_COMMUNITY_LIKE_COUNT
 import kr.weit.odya.support.TEST_DEFAULT_PROFILE_NAME
 import kr.weit.odya.support.TEST_DEFAULT_PROFILE_PNG
 import kr.weit.odya.support.TEST_EMAIL
@@ -38,7 +39,6 @@ import kr.weit.odya.support.TEST_ID_TOKEN
 import kr.weit.odya.support.TEST_INVALID_PROFILE_ORIGINAL_NAME
 import kr.weit.odya.support.TEST_MOCK_PROFILE_NAME
 import kr.weit.odya.support.TEST_NICKNAME
-import kr.weit.odya.support.TEST_ODYA_COUNT
 import kr.weit.odya.support.TEST_PHONE_NUMBER
 import kr.weit.odya.support.TEST_PROFILE_URL
 import kr.weit.odya.support.TEST_PROFILE_WEBP
@@ -362,7 +362,7 @@ class UserServiceTest : DescribeSpec(
                 every { followRepository.countByFollowerId(TEST_USER_ID) } returns TEST_FOLLOWING_COUNT
                 every { followRepository.countByFollowingId(TEST_USER_ID) } returns TEST_FOLLOWER_COUNT
                 every { travelJournalRepository.getByUserId(TEST_USER_ID) } returns listOf(createTravelJournal())
-                every { communityLikeRepository.countByUserId(TEST_USER_ID) } returns TEST_ODYA_COUNT
+                every { communityLikeRepository.countByUserId(TEST_USER_ID) } returns TEST_COMMUNITY_LIKE_COUNT
                 it("[FollowCountsResponse] 반환한다.") {
                     val response = userService.getStatistics(TEST_USER_ID)
                     response shouldBe createUserStatisticsResponse()

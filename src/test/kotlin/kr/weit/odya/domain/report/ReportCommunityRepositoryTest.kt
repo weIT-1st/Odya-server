@@ -10,6 +10,7 @@ import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
+import kr.weit.odya.support.TEST_OTHER_COMMUNITY_ID
 import kr.weit.odya.support.createCommunity
 import kr.weit.odya.support.createCommunityContentImage
 import kr.weit.odya.support.createContentImage
@@ -86,6 +87,7 @@ class ReportCommunityRepositoryTest(
             )
             community2 = communityRepository.save(
                 createCommunity(
+                    id = TEST_OTHER_COMMUNITY_ID,
                     user = user2,
                     travelJournal = travelJournal2,
                     communityContentImages =

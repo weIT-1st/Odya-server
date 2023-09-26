@@ -27,83 +27,93 @@ class CommunityLikeServiceTest : DescribeSpec(
         val userRepository = mockk<UserRepository>()
         val communityLikeService = CommunityLikeService(communityLikeRepository, communityRepository, userRepository)
 
-        describe("createCommunityLike") {
+        describe("increaseCommunityLikeCount") {
             context("유효한 요청이 주어지는 경우") {
+                val community = createCommunity()
+                val user = createUser()
+                every { communityRepository.getByCommunityId(TEST_COMMUNITY_ID) } returns community
+                every { userRepository.getByUserId(TEST_USER_ID) } returns user
+                every { communityLikeRepository.existsById(any<CommunityLikeId>()) } returns false
+                every { communityLikeRepository.save(any<CommunityLike>()) } returns createCommunityLike()
                 it("정상적으로 종료한다") {
-                    val community = createCommunity()
-                    val user = createUser()
-                    every { communityRepository.getByCommunityId(TEST_COMMUNITY_ID) } returns community
-                    every { userRepository.getByUserId(TEST_USER_ID) } returns user
-                    every { communityLikeRepository.existsById(any<CommunityLikeId>()) } returns false
-                    every { communityLikeRepository.save(any<CommunityLike>()) } returns createCommunityLike()
-
                     shouldNotThrowAny {
-                        communityLikeService.createCommunityLike(TEST_COMMUNITY_ID, TEST_USER_ID)
+                        communityLikeService.increaseCommunityLikeCount(TEST_COMMUNITY_ID, TEST_USER_ID)
                     }
                 }
             }
 
             context("존재하지 않는 커뮤니티 아이디가 주어지는 경우") {
+                every { communityRepository.getByCommunityId(TEST_COMMUNITY_ID) } throws NoSuchElementException("$TEST_COMMUNITY_ID: 존재하지 않는 커뮤니티입니다.")
                 it("[NoSuchElementException] 반환한다") {
-                    every { communityRepository.getByCommunityId(TEST_COMMUNITY_ID) } throws NoSuchElementException("$TEST_COMMUNITY_ID: 존재하지 않는 커뮤니티입니다.")
                     shouldThrow<NoSuchElementException> {
-                        communityLikeService.createCommunityLike(TEST_COMMUNITY_ID, TEST_USER_ID)
+                        communityLikeService.increaseCommunityLikeCount(TEST_COMMUNITY_ID, TEST_USER_ID)
                     }
                 }
             }
 
             context("존재하지 않는 유저 아이디가 주어지는 경우") {
+                every { userRepository.getByUserId(TEST_COMMUNITY_ID) } throws NoSuchElementException("$TEST_USER_ID: 사용자가 존재하지 않습니다")
                 it("[NoSuchElementException] 반환한다") {
-                    every { userRepository.getByUserId(TEST_COMMUNITY_ID) } throws NoSuchElementException("$TEST_USER_ID: 사용자가 존재하지 않습니다")
                     shouldThrow<NoSuchElementException> {
-                        communityLikeService.createCommunityLike(TEST_COMMUNITY_ID, TEST_USER_ID)
+                        communityLikeService.increaseCommunityLikeCount(TEST_COMMUNITY_ID, TEST_USER_ID)
                     }
                 }
             }
 
             context("요청 사용자가 이미 좋아요를 눌렀을 경우") {
+                val community = createCommunity()
+                val user = createUser()
+                every { communityRepository.getByCommunityId(TEST_COMMUNITY_ID) } returns community
+                every { userRepository.getByUserId(TEST_USER_ID) } returns user
+                every { communityLikeRepository.existsById(any<CommunityLikeId>()) } returns true
                 it("[ExistResourceException] 반환한다") {
-                    val community = createCommunity()
-                    val user = createUser()
-                    every { communityRepository.getByCommunityId(TEST_COMMUNITY_ID) } returns community
-                    every { userRepository.getByUserId(TEST_USER_ID) } returns user
-                    every { communityLikeRepository.existsById(any<CommunityLikeId>()) } returns true
                     shouldThrow<ExistResourceException> {
-                        communityLikeService.createCommunityLike(TEST_COMMUNITY_ID, TEST_USER_ID)
+                        communityLikeService.increaseCommunityLikeCount(TEST_COMMUNITY_ID, TEST_USER_ID)
                     }
                 }
             }
         }
 
-        describe("deleteCommunityLike") {
+        describe("decreaseCommunityLikeCount") {
             context("유효한 요청이 주어지는 경우") {
+                val community = createCommunity().apply { increaseLikeCount() }
+                val user = createUser()
+                every { communityRepository.getByCommunityId(TEST_COMMUNITY_ID) } returns community
+                every { userRepository.getByUserId(TEST_USER_ID) } returns user
+                every { communityLikeRepository.deleteById(any<CommunityLikeId>()) } just runs
                 it("정상적으로 종료한다") {
-                    val community = createCommunity()
-                    val user = createUser()
-                    every { communityRepository.getByCommunityId(TEST_COMMUNITY_ID) } returns community
-                    every { userRepository.getByUserId(TEST_USER_ID) } returns user
-                    every { communityLikeRepository.deleteById(any<CommunityLikeId>()) } just runs
-
                     shouldNotThrowAny {
-                        communityLikeService.deleteCommunityLike(TEST_COMMUNITY_ID, TEST_USER_ID)
+                        communityLikeService.decreaseCommunityLikeCount(TEST_COMMUNITY_ID, TEST_USER_ID)
                     }
                 }
             }
 
             context("존재하지 않는 커뮤니티 아이디가 주어지는 경우") {
+                every { communityRepository.getByCommunityId(TEST_COMMUNITY_ID) } throws NoSuchElementException("$TEST_COMMUNITY_ID: 존재하지 않는 커뮤니티입니다.")
                 it("[NoSuchElementException] 반환한다") {
-                    every { communityRepository.getByCommunityId(TEST_COMMUNITY_ID) } throws NoSuchElementException("$TEST_COMMUNITY_ID: 존재하지 않는 커뮤니티입니다.")
                     shouldThrow<NoSuchElementException> {
-                        communityLikeService.deleteCommunityLike(TEST_COMMUNITY_ID, TEST_USER_ID)
+                        communityLikeService.decreaseCommunityLikeCount(TEST_COMMUNITY_ID, TEST_USER_ID)
                     }
                 }
             }
 
             context("존재하지 않는 유저 아이디가 주어지는 경우") {
+                every { userRepository.getByUserId(TEST_COMMUNITY_ID) } throws NoSuchElementException("$TEST_USER_ID: 사용자가 존재하지 않습니다")
                 it("[NoSuchElementException] 반환한다") {
-                    every { userRepository.getByUserId(TEST_COMMUNITY_ID) } throws NoSuchElementException("$TEST_USER_ID: 사용자가 존재하지 않습니다")
                     shouldThrow<NoSuchElementException> {
-                        communityLikeService.deleteCommunityLike(TEST_COMMUNITY_ID, TEST_USER_ID)
+                        communityLikeService.decreaseCommunityLikeCount(TEST_COMMUNITY_ID, TEST_USER_ID)
+                    }
+                }
+            }
+
+            context("좋아요 개수가 0인 경우") {
+                val community = createCommunity()
+                val user = createUser()
+                every { communityRepository.getByCommunityId(TEST_COMMUNITY_ID) } returns community
+                every { userRepository.getByUserId(TEST_USER_ID) } returns user
+                it("[IllegalArgumentException] 반환한다") {
+                    shouldThrow<IllegalArgumentException> {
+                        communityLikeService.decreaseCommunityLikeCount(TEST_COMMUNITY_ID, TEST_USER_ID)
                     }
                 }
             }

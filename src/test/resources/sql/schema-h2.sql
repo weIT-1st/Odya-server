@@ -465,3 +465,8 @@ CREATE TABLE community_like
     created_date DATE           NOT NULL,
     CONSTRAINT pk_community_like PRIMARY KEY (community_id, user_id)
 );
+
+ALTER TABLE community
+    ADD like_count INTEGER DEFAULT 0 NOT NULL;
+
+CREATE INDEX community_like_count_index ON community (like_count);

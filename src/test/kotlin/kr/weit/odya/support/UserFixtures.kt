@@ -131,7 +131,7 @@ fun createUserStatisticsResponse() = UserStatisticsResponse(
     travelPlaceCount = TEST_TRAVEL_PLACE_COUNT,
     followingsCount = TEST_FOLLOWING_COUNT,
     followersCount = TEST_FOLLOWER_COUNT,
-    odyaCount = TEST_ODYA_COUNT,
+    odyaCount = TEST_COMMUNITY_LIKE_COUNT,
 )
 
 fun createLifeShotRequest(placeName: String? = TEST_PLACE_NAME) = LifeShotRequest(

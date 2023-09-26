@@ -21,7 +21,9 @@ import kr.weit.odya.domain.community.getByCommunityId
 import kr.weit.odya.domain.community.getCommunitySliceBy
 import kr.weit.odya.domain.community.getMyCommunitySliceBy
 import kr.weit.odya.domain.communitycomment.CommunityCommentRepository
-import kr.weit.odya.domain.communitycomment.deleteCommunityComment
+import kr.weit.odya.domain.communitycomment.deleteCommunityComments
+import kr.weit.odya.domain.communitylike.CommunityLikeRepository
+import kr.weit.odya.domain.communitylike.deleteCommunityLikes
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.report.ReportCommunityRepository
 import kr.weit.odya.domain.report.deleteAllByUserId
@@ -69,6 +71,7 @@ class CommunityServiceTest : DescribeSpec(
     {
         val communityRepository = mockk<CommunityRepository>()
         val communityCommentRepository = mockk<CommunityCommentRepository>()
+        val communityLikeRepository = mockk<CommunityLikeRepository>()
         val topicRepository = mockk<TopicRepository>()
         val travelJournalRepository = mockk<TravelJournalRepository>()
         val userRepository = mockk<UserRepository>()
@@ -81,6 +84,7 @@ class CommunityServiceTest : DescribeSpec(
             CommunityService(
                 communityRepository,
                 communityCommentRepository,
+                communityLikeRepository,
                 topicRepository,
                 travelJournalRepository,
                 userRepository,
@@ -238,6 +242,13 @@ class CommunityServiceTest : DescribeSpec(
                 every { communityRepository.getByCommunityId(TEST_COMMUNITY_ID) } returns createCommunity()
                 every { communityCommentRepository.countByCommunityId(TEST_COMMUNITY_ID) } returns TEST_COMMUNITY_COMMENT_COUNT
                 every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
+                every { communityCommentRepository.countByCommunityId(TEST_COMMUNITY_ID) } returns TEST_COMMUNITY_COMMENT_COUNT
+                every {
+                    communityLikeRepository.existsByCommunityIdAndUserId(
+                        TEST_COMMUNITY_ID,
+                        TEST_USER_ID,
+                    )
+                } returns false
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         communityService.getCommunity(TEST_COMMUNITY_ID, TEST_USER_ID)
@@ -460,6 +471,7 @@ class CommunityServiceTest : DescribeSpec(
         describe("deleteCommunity") {
             context("유효한 데이터가 주어지는 경우") {
                 every { communityRepository.getByCommunityId(TEST_COMMUNITY_ID) } returns createCommunity()
+                every { communityLikeRepository.deleteAllByCommunityId(TEST_COMMUNITY_ID) } just runs
                 every { communityCommentRepository.deleteAllByCommunityId(TEST_COMMUNITY_ID) } just runs
                 every { communityRepository.delete(any<Community>()) } just runs
                 every { applicationEventPublisher.publishEvent(any<CommunityDeleteEvent>()) } just runs
@@ -492,7 +504,8 @@ class CommunityServiceTest : DescribeSpec(
         describe("deleteCommunityByUserId") {
             context("유효한 유저 ID가 들어오는 경우") {
                 every { reportCommunityRepository.deleteAllByUserId(TEST_USER_ID) } just runs
-                every { communityCommentRepository.deleteCommunityComment(TEST_USER_ID) } just runs
+                every { communityLikeRepository.deleteCommunityLikes(TEST_COMMUNITY_ID) } just runs
+                every { communityCommentRepository.deleteCommunityComments(TEST_USER_ID) } just runs
                 every { communityRepository.deleteAllByUserId(TEST_USER_ID) } just runs
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny { communityService.deleteCommunityByUserId(TEST_USER_ID) }
