@@ -31,6 +31,10 @@ operation::community-like-controller-test/delete-community-like-success[snippets
 
 operation::community-like-controller-test/delete-community-like-not-found-community[snippets='http-request,path-parameters,request-headers,http-response']
 
-=== *2-3 실패 - 유효하지 않은 토큰이 주어지는 경우*
+=== *2-3 실패 - 좋아요 개수가 0인 경우*
+
+operation::community-like-controller-test/delete-community-like-count-zero[snippets='http-request,path-parameters,request-headers,http-response']
+
+=== *2-4 실패 - 유효하지 않은 토큰이 주어지는 경우*
 
 operation::community-like-controller-test/delete-community-like-invalid-token[snippets='http-request,path-parameters,request-headers,http-response']
