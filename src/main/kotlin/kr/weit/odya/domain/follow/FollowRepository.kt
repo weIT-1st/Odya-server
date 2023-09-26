@@ -52,7 +52,7 @@ fun FollowRepository.getMayKnowFollowings(
     followerId: Long,
     size: Int,
     lastId: Long?,
-): List<Follow> =
+): List<User> =
     findMayKnowFollowings(followerId, size, lastId)
 
 fun FollowRepository.getFollowerFcmTokens(followingId: Long): List<String> =
@@ -112,7 +112,7 @@ interface CustomFollowRepository {
         followerId: Long,
         size: Int,
         lastId: Long?,
-    ): List<Follow>
+    ): List<User>
 
     fun findFollowerFcmTokenByFollowingId(followingId: Long): List<String?>
 
@@ -197,7 +197,7 @@ open class FollowRepositoryImpl(private val queryFactory: QueryFactory) : Custom
         followerId: Long,
         size: Int,
         lastId: Long?,
-    ): List<Follow> {
+    ): List<User> {
         val followingList = queryFactory.listQuery<User> {
             select(column(entity(Follow::class), Follow::following))
             from(entity(Follow::class))
@@ -206,7 +206,7 @@ open class FollowRepositoryImpl(private val queryFactory: QueryFactory) : Custom
         }
 
         return queryFactory.listQuery {
-            select(entity(Follow::class))
+            selectDistinct(col(entity(Follow::class), Follow::following))
             from(entity(Follow::class))
             associate(Follow::class, entity(User::class), on(Follow::following))
             where(
