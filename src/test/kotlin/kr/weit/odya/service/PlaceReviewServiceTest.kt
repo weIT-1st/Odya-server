@@ -13,6 +13,7 @@ import jakarta.ws.rs.ForbiddenException
 import kr.weit.odya.domain.placeReview.PlaceReviewRepository
 import kr.weit.odya.domain.placeReview.getByPlaceReviewId
 import kr.weit.odya.domain.report.ReportPlaceReviewRepository
+import kr.weit.odya.domain.report.deleteAllByUserId
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.support.TEST_AVERAGE_RATING
@@ -184,7 +185,7 @@ class PlaceReviewServiceTest : DescribeSpec(
 
         describe("deleteReviewRelatedData 메소드") {
             context("userId가 전달되면") {
-                every { reportPlaceReviewRepository.deleteAllByCommonReportInformationUserId(TEST_USER_ID) } just runs
+                every { reportPlaceReviewRepository.deleteAllByUserId(TEST_USER_ID) } just runs
                 every { placeReviewRepository.deleteByUserId(TEST_USER_ID) } just runs
                 it("유저의 한 줄 리뷰 관련된 데이터 전부 삭제") {
                     shouldNotThrowAny { sut.deleteReviewRelatedData(TEST_USER_ID) }

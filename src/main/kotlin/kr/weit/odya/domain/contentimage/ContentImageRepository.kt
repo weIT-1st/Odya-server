@@ -26,13 +26,12 @@ fun ContentImageRepository.getImageByRectangle(
 ) = findImagesByRectangleAndSize(leftLongitude, bottomLatitude, rightLongitude, topLatitude, size)
 
 interface ContentImageRepository : JpaRepository<ContentImage, Long>, CustomContentImageRepository {
-    fun findAllByUserId(userId: Long): List<ContentImage>
-
     fun deleteAllByUserId(userId: Long)
 }
 
 interface CustomContentImageRepository {
     fun findSliceByUserId(userId: Long, size: Int, lastId: Long?): List<ContentImage>
+
     fun findLifeShotSliceByUserId(userId: Long, size: Int, lastId: Long?): List<ContentImage>
 
     fun findImagesByRectangleAndSize(
@@ -42,6 +41,8 @@ interface CustomContentImageRepository {
         topLatitude: Double,
         size: Int,
     ): List<ContentImage>
+
+    fun findAllByUserId(userId: Long): List<String>
 }
 
 class CustomContentImageRepositoryImpl(private val queryFactory: QueryFactory) : CustomContentImageRepository {
@@ -88,6 +89,12 @@ class CustomContentImageRepositoryImpl(private val queryFactory: QueryFactory) :
             orderBy(col(ContentImage::id).desc())
             limit(size)
         }
+
+    override fun findAllByUserId(userId: Long): List<String> = queryFactory.listQuery {
+        select(col(ContentImage::name))
+        from(entity(ContentImage::class))
+        where(nestedCol(col(ContentImage::user), User::id).equal(userId))
+    }
 
     private fun CriteriaQueryDsl<ContentImage>.getImagesSliceBaseQuery(userId: Long, size: Int, lastId: Long?) {
         select(entity(ContentImage::class))

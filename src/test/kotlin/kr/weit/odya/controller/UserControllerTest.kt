@@ -754,6 +754,24 @@ class UserControllerTest(
                 }
             }
 
+            context("Object Storage에 프로필이 존재하지 않는 경우,") {
+                every { withdrawService.withdrawUser(TEST_USER_ID) } throws IllegalArgumentException(DELETE_NOT_EXIST_PROFILE_ERROR_MESSAGE)
+                it("400 응답한다.") {
+                    restDocMockMvc.delete(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "withdraw-user-fail-not-exist-content-image",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                        )
+                    }
+                }
+            }
+
             context("유효하지 않은 토큰이면,") {
                 it("401 응답한다.") {
                     restDocMockMvc.delete(targetUri) {

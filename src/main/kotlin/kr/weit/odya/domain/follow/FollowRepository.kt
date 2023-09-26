@@ -7,6 +7,7 @@ import com.linecorp.kotlinjdsl.querydsl.CriteriaQueryDsl
 import com.linecorp.kotlinjdsl.querydsl.expression.col
 import com.linecorp.kotlinjdsl.querydsl.from.Relation
 import kr.weit.odya.domain.community.Community
+import kr.weit.odya.domain.community.CommunityInformation
 import kr.weit.odya.domain.placeReview.PlaceReview
 import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.traveljournal.TravelJournalContent
@@ -32,12 +33,20 @@ fun FollowRepository.getFollowerListBySearchCond(
     findSliceByFollowingIdOrderBySortType(followingId, pageable, sortType)
 
 fun FollowRepository.getByFollowerIdAndFollowingIdIn(
-    follower: Long,
+    followerId: Long,
     followingIds: List<Long>,
     size: Int,
     lastId: Long?,
 ): List<Follow> =
-    findAllByFollowerIdAndFollowingIdInAndLastId(follower, followingIds, size, lastId)
+    findAllByFollowerIdAndFollowingIdInAndLastId(followerId, followingIds, size, lastId)
+
+fun FollowRepository.getByFollowingIdAndFollowerIdIn(
+    followingId: Long,
+    followerIds: List<Long>,
+    size: Int,
+    lastId: Long?,
+): List<Follow> =
+    findAllByFollowingIdAndFollowerIdInAndLastId(followingId, followerIds, size, lastId)
 
 fun FollowRepository.getMayKnowFollowings(
     followerId: Long,
@@ -88,6 +97,13 @@ interface CustomFollowRepository {
     fun findAllByFollowerIdAndFollowingIdInAndLastId(
         followerId: Long,
         followingIds: List<Long>,
+        size: Int,
+        lastId: Long?,
+    ): List<Follow>
+
+    fun findAllByFollowingIdAndFollowerIdInAndLastId(
+        followerId: Long,
+        followerIds: List<Long>,
         size: Int,
         lastId: Long?,
     ): List<Follow>
@@ -151,7 +167,27 @@ open class FollowRepositoryImpl(private val queryFactory: QueryFactory) : Custom
             ),
         )
         if (lastId != null) {
-            where(col(followingUser, User::id).lessThan(lastId))
+            where(col(followingUser, User::id).greaterThan(lastId))
+        }
+        limit(size)
+    }
+
+    override fun findAllByFollowingIdAndFollowerIdInAndLastId(
+        followerId: Long,
+        followerIds: List<Long>,
+        size: Int,
+        lastId: Long?,
+    ): List<Follow> = queryFactory.listQuery {
+        select(entity(Follow::class))
+        from(entity(Follow::class))
+        where(
+            and(
+                nestedCol(col(Follow::following), User::id).equal(followerId),
+                nestedCol(col(Follow::follower), User::id).`in`(followerIds),
+            ),
+        )
+        if (lastId != null) {
+            where(nestedCol(col(Follow::follower), User::id).greaterThan(lastId))
         }
         limit(size)
     }
@@ -224,7 +260,8 @@ open class FollowRepositoryImpl(private val queryFactory: QueryFactory) : Custom
             select(col(User::id))
             from(entity(Community::class))
             associate(Community::class, entity(User::class), on(Community::user))
-            where(col(Community::placeId).equal(placeID))
+            associate(Community::class, entity(CommunityInformation::class), on(Community::communityInformation))
+            where(col(CommunityInformation::placeId).equal(placeID))
         }
 
         // JPA는 유니온을 지원하지 않기 때문에 아래와 같이 작업을 했다

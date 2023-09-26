@@ -15,6 +15,7 @@ import kr.weit.odya.domain.community.CommunityRepository
 import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.report.ReportTravelJournalRepository
+import kr.weit.odya.domain.report.deleteAllByUserId
 import kr.weit.odya.domain.traveljournal.TravelCompanionRepository
 import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.traveljournal.TravelJournalContentUpdateEvent
@@ -32,7 +33,6 @@ import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.domain.user.getByUserIds
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_ANOTHER_USER_ID
-import kr.weit.odya.support.TEST_CONTENT_IMAGES
 import kr.weit.odya.support.TEST_FILE_AUTHENTICATED_URL
 import kr.weit.odya.support.TEST_GENERATED_FILE_NAME
 import kr.weit.odya.support.TEST_IMAGE_FILE_WEBP
@@ -1035,10 +1035,9 @@ class TravelJournalServiceTest : DescribeSpec(
         describe("deleteTravelJournalByUserId") {
             context("유효한 UserId가 주어지는 경우") {
                 it("정상적으로 종료한다") {
-                    every { contentImageRepository.findAllByUserId(TEST_USER_ID) } returns TEST_CONTENT_IMAGES
-                    every { fileService.deleteFile(any()) } just runs
+                    every { contentImageRepository.findAllByUserId(TEST_USER_ID) } returns listOf(TEST_IMAGE_FILE_WEBP)
                     every { contentImageRepository.deleteAllByUserId(TEST_USER_ID) } just runs
-                    every { reportTravelJournalRepository.deleteAllByCommonReportInformationUserId(TEST_USER_ID) } just runs
+                    every { reportTravelJournalRepository.deleteAllByUserId(TEST_USER_ID) } just runs
                     every { travelCompanionRepository.deleteAllByUserId(TEST_USER_ID) } just runs
                     every { travelJournalRepository.deleteAllByUserId(TEST_USER_ID) } just runs
                     shouldNotThrowAny {

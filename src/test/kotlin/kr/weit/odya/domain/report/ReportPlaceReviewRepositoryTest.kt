@@ -67,9 +67,9 @@ class ReportPlaceReviewRepositoryTest(
                 reportPlaceReviewRepository.count() shouldBe 2
             }
 
-            expect("USER_ID와 일치하는 한줄 리뷰의 신고 모두 삭제한다") {
-                reportPlaceReviewRepository.deleteAllByCommonReportInformationUserId(user1.id)
-                reportPlaceReviewRepository.count() shouldBe 2
+            expect("USER_ID와 일치하는 한줄 리뷰의 신고 내역과 해당 유저의 한줄 리뷰 신고 내역 모두 삭제한다") {
+                reportPlaceReviewRepository.deleteAllByUserId(user1.id)
+                reportPlaceReviewRepository.count() shouldBe 1
             }
         }
     },
