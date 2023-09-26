@@ -102,7 +102,7 @@ interface CustomFollowRepository {
     ): List<Follow>
 
     fun findAllByFollowingIdAndFollowerIdInAndLastId(
-        following: Long,
+        followerId: Long,
         followerIds: List<Long>,
         size: Int,
         lastId: Long?,
@@ -173,7 +173,7 @@ open class FollowRepositoryImpl(private val queryFactory: QueryFactory) : Custom
     }
 
     override fun findAllByFollowingIdAndFollowerIdInAndLastId(
-        followingId: Long,
+        followerId: Long,
         followerIds: List<Long>,
         size: Int,
         lastId: Long?,
@@ -182,7 +182,7 @@ open class FollowRepositoryImpl(private val queryFactory: QueryFactory) : Custom
         from(entity(Follow::class))
         where(
             and(
-                nestedCol(col(Follow::following), User::id).equal(followingId),
+                nestedCol(col(Follow::following), User::id).equal(followerId),
                 nestedCol(col(Follow::follower), User::id).`in`(followerIds),
             ),
         )

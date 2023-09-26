@@ -10,6 +10,7 @@ import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.support.TEST_COMMUNITY_COMMENT_CONTENT
 import kr.weit.odya.support.TEST_DEFAULT_SIZE
+import kr.weit.odya.support.TEST_OTHER_COMMUNITY_ID
 import kr.weit.odya.support.createCommunity
 import kr.weit.odya.support.createCommunityComment
 import kr.weit.odya.support.createCommunityContentImage
@@ -66,6 +67,7 @@ class CommunityCommentRepositoryTest(
             )
             community2 = communityRepository.save(
                 createCommunity(
+                    id = TEST_OTHER_COMMUNITY_ID,
                     travelJournal = travelJournal,
                     user = otherUser,
                     communityContentImages = listOf(
@@ -100,9 +102,16 @@ class CommunityCommentRepositoryTest(
             }
         }
 
+        context("커뮤니티 댓글 개수 조회") {
+            expect("커뮤니티 ID와 조건에 일치하는 커뮤니티 댓글 개수를 조회한다.") {
+                val result = communityCommentRepository.countByCommunityId(community.id)
+                result shouldBe 2
+            }
+        }
+
         context("커뮤니티 댓글 삭제") {
             expect("USER ID와 일치하는 커뮤니티 댓글과 해당 유저의 커뮤니티 글의 댓글을 삭제한다.") {
-                communityCommentRepository.deleteCommunityComment(user.id)
+                communityCommentRepository.deleteCommunityComments(user.id)
                 communityCommentRepository.count() shouldBe 1
             }
 

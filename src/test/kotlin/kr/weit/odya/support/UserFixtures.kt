@@ -33,7 +33,6 @@ const val TEST_PHONE_NUMBER = "010-1234-1234"
 const val TEST_OTHER_PHONE_NUMBER = "010-1234-1235"
 const val TEST_INVALID_PHONE_NUMBER = "01012341234"
 const val TEST_PROFILE_ID = 1L
-const val TEST_ODYA_COUNT = 0 // TODO 오댜가 추가되면 수정
 val TEST_GENDER: Gender = Gender.M
 val TEST_BIRTHDAY: LocalDate = LocalDate.of(1999, 10, 10)
 val TEST_SOCIAL_TYPE: SocialType = SocialType.KAKAO
@@ -132,7 +131,7 @@ fun createUserStatisticsResponse() = UserStatisticsResponse(
     travelPlaceCount = TEST_TRAVEL_PLACE_COUNT,
     followingsCount = TEST_FOLLOWING_COUNT,
     followersCount = TEST_FOLLOWER_COUNT,
-    odyaCount = TEST_ODYA_COUNT,
+    odyaCount = TEST_COMMUNITY_LIKE_COUNT,
 )
 
 fun createLifeShotRequest(placeName: String? = TEST_PLACE_NAME) = LifeShotRequest(

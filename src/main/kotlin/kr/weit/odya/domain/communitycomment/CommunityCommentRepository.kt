@@ -23,7 +23,7 @@ fun CommunityCommentRepository.getSliceCommunityCommentBy(
 ): List<CommunityComment> =
     findSliceByCommunityIdAndSizeAndLastId(communityId, size, lastId)
 
-fun CommunityCommentRepository.deleteCommunityComment(userId: Long) {
+fun CommunityCommentRepository.deleteCommunityComments(userId: Long) {
     deleteAllByUserId(userId)
     deleteCommunityCommentByUserId(userId)
 }
@@ -36,6 +36,8 @@ interface CommunityCommentRepository : JpaRepository<CommunityComment, Long>, Cu
     fun deleteAllByUserId(userId: Long)
 
     fun deleteAllByCommunityId(communityId: Long)
+
+    fun countByCommunityId(communityId: Long): Int
 }
 
 interface CustomCommunityCommentRepository {

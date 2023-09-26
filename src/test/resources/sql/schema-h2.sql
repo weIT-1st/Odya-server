@@ -457,3 +457,16 @@ ALTER TABLE report_community
     ADD CONSTRAINT FK_REPORT_COMMUNITY_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
 CREATE INDEX report_community_user_id_index ON report_community (user_id);
+
+CREATE TABLE community_like
+(
+    community_id NUMERIC(19, 0) NOT NULL,
+    user_id      NUMERIC(19, 0) NOT NULL,
+    created_date DATE           NOT NULL,
+    CONSTRAINT pk_community_like PRIMARY KEY (community_id, user_id)
+);
+
+ALTER TABLE community
+    ADD like_count INTEGER DEFAULT 0 NOT NULL;
+
+CREATE INDEX community_like_count_index ON community (like_count);

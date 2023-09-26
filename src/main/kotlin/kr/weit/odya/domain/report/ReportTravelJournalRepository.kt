@@ -8,6 +8,7 @@ import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.user.User
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
+
 fun ReportTravelJournalRepository.existsByJournalIdAndUserId(travelJournalId: Long, userId: Long) =
     existsByTravelJournalIdAndCommonReportInformationUserId(travelJournalId, userId)
 
@@ -17,7 +18,8 @@ fun ReportTravelJournalRepository.deleteAllByUserId(userId: Long) {
 }
 
 @Repository
-interface ReportTravelJournalRepository : JpaRepository<ReportTravelJournal, Long>, CustomReportTravelJournalRepository {
+interface ReportTravelJournalRepository :
+    JpaRepository<ReportTravelJournal, Long>, CustomReportTravelJournalRepository {
     fun countAllByTravelJournalId(travelJournalId: Long): Int
 
     fun deleteAllByTravelJournalId(travelJournalId: Long)
@@ -31,7 +33,8 @@ interface CustomReportTravelJournalRepository {
     fun deleteReportTravelJournalByUserId(userId: Long)
 }
 
-class CustomReportTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) : CustomReportTravelJournalRepository {
+class CustomReportTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) :
+    CustomReportTravelJournalRepository {
     override fun deleteReportTravelJournalByUserId(userId: Long) {
         queryFactory.deleteQuery<ReportTravelJournal> {
             where(col(ReportTravelJournal::travelJournal).`in`(travelJournalByUserIdSubQuery(userId)))

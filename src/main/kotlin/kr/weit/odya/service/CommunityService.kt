@@ -15,7 +15,9 @@ import kr.weit.odya.domain.community.getCommunitySliceBy
 import kr.weit.odya.domain.community.getFriendCommunitySliceBy
 import kr.weit.odya.domain.community.getMyCommunitySliceBy
 import kr.weit.odya.domain.communitycomment.CommunityCommentRepository
-import kr.weit.odya.domain.communitycomment.deleteCommunityComment
+import kr.weit.odya.domain.communitycomment.deleteCommunityComments
+import kr.weit.odya.domain.communitylike.CommunityLikeRepository
+import kr.weit.odya.domain.communitylike.deleteCommunityLikes
 import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowerFcmTokens
@@ -48,6 +50,8 @@ private const val MIM_COMMUNITY_CONTENT_IMAGE_COUNT = 1
 @Service
 class CommunityService(
     private val communityRepository: CommunityRepository,
+    private val communityCommentRepository: CommunityCommentRepository,
+    private val communityLikeRepository: CommunityLikeRepository,
     private val topicRepository: TopicRepository,
     private val travelJournalRepository: TravelJournalRepository,
     private val userRepository: UserRepository,
@@ -56,7 +60,6 @@ class CommunityService(
     private val followRepository: FollowRepository,
     private val googleMapsClient: GoogleMapsClient,
     private val reportCommunityRepository: ReportCommunityRepository,
-    private val communityCommentRepository: CommunityCommentRepository,
 ) {
     @Transactional
     fun createCommunity(
@@ -88,7 +91,15 @@ class CommunityService(
         validateUserReadPermission(community, userId)
         val travelJournalSimpleResponse = getTravelJournalSimpleResponse(community)
         val communityContentImages = getCommunityContentImageResponses(community)
-        return CommunityResponse.from(community, travelJournalSimpleResponse, communityContentImages)
+        val communityCommentCount = communityCommentRepository.countByCommunityId(communityId)
+        val isUserLiked = communityLikeRepository.existsByCommunityIdAndUserId(communityId, userId)
+        return CommunityResponse.from(
+            community,
+            travelJournalSimpleResponse,
+            communityContentImages,
+            communityCommentCount,
+            isUserLiked,
+        )
     }
 
     @Transactional(readOnly = true)
@@ -143,13 +154,6 @@ class CommunityService(
     }
 
     @Transactional
-    fun deleteCommunityByUserId(userId: Long) {
-        reportCommunityRepository.deleteAllByUserId(userId)
-        communityCommentRepository.deleteCommunityComment(userId)
-        communityRepository.deleteAllByUserId(userId)
-    }
-
-    @Transactional
     fun updateCommunity(
         communityId: Long,
         userId: Long,
@@ -184,9 +188,18 @@ class CommunityService(
         val community = communityRepository.getByCommunityId(communityId)
         validateUserPermission(community.user.id, userId)
         val deleteCommunityContentImageNames = getDeleteCommunityContentImageNames(community.communityContentImages)
+        communityLikeRepository.deleteAllByCommunityId(communityId)
         communityCommentRepository.deleteAllByCommunityId(communityId)
         communityRepository.delete(community)
         eventPublisher.publishEvent(CommunityDeleteEvent(deleteCommunityContentImageNames))
+    }
+
+    @Transactional
+    fun deleteCommunityByUserId(userId: Long) {
+        reportCommunityRepository.deleteAllByUserId(userId)
+        communityLikeRepository.deleteCommunityLikes(userId)
+        communityCommentRepository.deleteCommunityComments(userId)
+        communityRepository.deleteAllByUserId(userId)
     }
 
     private fun getDeleteCommunityContentImageNames(deleteCommunityContentImages: List<CommunityContentImage>) =
@@ -232,13 +245,18 @@ class CommunityService(
 
     private fun getCommunitySliceResponse(
         size: Int,
-        it: List<Community>,
+        contents: List<Community>,
     ) = SliceResponse(
         size = size,
-        content = it.map { community ->
+        content = contents.map { community ->
             val communityMainImageUrl =
                 fileService.getPreAuthenticatedObjectUrl(community.communityContentImages[0].contentImage.name)
-            CommunitySummaryResponse(community.id, communityMainImageUrl)
+            val communityCommentCount = communityCommentRepository.countByCommunityId(community.id)
+            CommunitySummaryResponse.from(
+                community,
+                communityMainImageUrl,
+                communityCommentCount,
+            )
         },
     )
 
@@ -265,6 +283,21 @@ class CommunityService(
         }
     }
 
+    private fun publishFeedPushEvent(
+        user: User,
+        community: Community,
+    ) {
+        val fcmTokens = followRepository.getFollowerFcmTokens(user.id)
+        eventPublisher.publishEvent(
+            PushNotificationEvent(
+                title = "피드 알림",
+                body = "${user.nickname}님이 피드를 작성했어요!",
+                tokens = fcmTokens,
+                data = mapOf("communityId" to community.id.toString()),
+            ),
+        )
+    }
+
     private fun validateTravelJournal(travelJournal: TravelJournal, userId: Long) {
         require(travelJournal.visibility != TravelJournalVisibility.PRIVATE) {
             "비공개 여행일지는 커뮤니티와 연결할 수 없습니다."
@@ -289,19 +322,4 @@ class CommunityService(
         request.travelJournalId?.let { travelJournalRepository.getByTravelJournalId(it) }?.apply {
             validateTravelJournal(this, userId)
         }
-
-    private fun publishFeedPushEvent(
-        user: User,
-        community: Community,
-    ) {
-        val fcmTokens = followRepository.getFollowerFcmTokens(user.id)
-        eventPublisher.publishEvent(
-            PushNotificationEvent(
-                title = "피드 알림",
-                body = "${user.nickname}님이 피드를 작성했어요!",
-                tokens = fcmTokens,
-                data = mapOf("communityId" to community.id.toString()),
-            ),
-        )
-    }
 }

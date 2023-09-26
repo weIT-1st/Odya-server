@@ -8,6 +8,7 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
+import kr.weit.odya.domain.communitylike.CommunityLikeRepository
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowingIds
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
@@ -27,6 +28,7 @@ import kr.weit.odya.security.FirebaseTokenHelper
 import kr.weit.odya.security.InvalidTokenException
 import kr.weit.odya.support.DELETE_NOT_EXIST_PROFILE_ERROR_MESSAGE
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
+import kr.weit.odya.support.TEST_COMMUNITY_LIKE_COUNT
 import kr.weit.odya.support.TEST_DEFAULT_PROFILE_NAME
 import kr.weit.odya.support.TEST_DEFAULT_PROFILE_PNG
 import kr.weit.odya.support.TEST_EMAIL
@@ -61,8 +63,18 @@ class UserServiceTest : DescribeSpec(
         val usersDocumentRepository = mockk<UsersDocumentRepository>()
         val followRepository = mockk<FollowRepository>()
         val travelJournalRepository = mockk<TravelJournalRepository>()
+        val communityLikeRepository = mockk<CommunityLikeRepository>()
         val userService =
-            UserService(userRepository, firebaseTokenHelper, fileService, profileColorService, usersDocumentRepository, followRepository, travelJournalRepository)
+            UserService(
+                userRepository,
+                firebaseTokenHelper,
+                fileService,
+                profileColorService,
+                usersDocumentRepository,
+                followRepository,
+                travelJournalRepository,
+                communityLikeRepository,
+            )
 
         describe("getInformation") {
             context("가입되어 있는 USER ID가 주어지는 경우") {
@@ -350,6 +362,7 @@ class UserServiceTest : DescribeSpec(
                 every { followRepository.countByFollowerId(TEST_USER_ID) } returns TEST_FOLLOWING_COUNT
                 every { followRepository.countByFollowingId(TEST_USER_ID) } returns TEST_FOLLOWER_COUNT
                 every { travelJournalRepository.getByUserId(TEST_USER_ID) } returns listOf(createTravelJournal())
+                every { communityLikeRepository.countByUserId(TEST_USER_ID) } returns TEST_COMMUNITY_LIKE_COUNT
                 it("[FollowCountsResponse] 반환한다.") {
                     val response = userService.getStatistics(TEST_USER_ID)
                     response shouldBe createUserStatisticsResponse()

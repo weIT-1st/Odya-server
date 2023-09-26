@@ -8,8 +8,10 @@ import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
+import kr.weit.odya.support.TEST_ANOTHER_COMMUNITY_ID
 import kr.weit.odya.support.TEST_COMMUNITY_CONTENT
 import kr.weit.odya.support.TEST_GENERATED_FILE_NAME
+import kr.weit.odya.support.TEST_OTHER_COMMUNITY_ID
 import kr.weit.odya.support.createCommunity
 import kr.weit.odya.support.createCommunityContentImage
 import kr.weit.odya.support.createContentImage
@@ -34,11 +36,11 @@ class CommunityRepositoryTest(
     {
         lateinit var user1: User
         lateinit var user2: User
+        lateinit var travelJournal1: TravelJournal
+        lateinit var travelJournal2: TravelJournal
         lateinit var community1: Community
         lateinit var community2: Community
         lateinit var community3: Community
-        lateinit var travelJournal1: TravelJournal
-        lateinit var travelJournal2: TravelJournal
         beforeEach {
             user1 = userRepository.save(createUser())
             user2 = userRepository.save(createOtherUser())
@@ -47,15 +49,13 @@ class CommunityRepositoryTest(
             val contentImage2 = createContentImage(user = user2)
             val contentImage3 = createContentImage(user = user1)
             travelJournal1 = travelJournalRepository.save(
-                travelJournalRepository.save(
-                    createTravelJournal(
-                        user = user1,
-                        travelCompanions = listOf(createTravelCompanionById(user = user2)),
-                        travelJournalContents = listOf(
-                            createTravelJournalContent(
-                                travelJournalContentImages = listOf(
-                                    createTravelJournalContentImage(contentImage = contentImage1),
-                                ),
+                createTravelJournal(
+                    user = user1,
+                    travelCompanions = listOf(createTravelCompanionById(user = user2)),
+                    travelJournalContents = listOf(
+                        createTravelJournalContent(
+                            travelJournalContentImages = listOf(
+                                createTravelJournalContentImage(contentImage = contentImage1),
                             ),
                         ),
                     ),
@@ -83,6 +83,7 @@ class CommunityRepositoryTest(
             )
             community2 = communityRepository.save(
                 createCommunity(
+                    id = TEST_OTHER_COMMUNITY_ID,
                     user = user2,
                     travelJournal = travelJournal2,
                     communityContentImages = listOf(createCommunityContentImage(contentImage2)),
@@ -90,6 +91,7 @@ class CommunityRepositoryTest(
             )
             community3 = communityRepository.save(
                 createCommunity(
+                    id = TEST_ANOTHER_COMMUNITY_ID,
                     user = user2,
                     travelJournal = null,
                     visibility = CommunityVisibility.FRIEND_ONLY,
@@ -105,37 +107,39 @@ class CommunityRepositoryTest(
             }
         }
 
-        context("커뮤니티 이미지") {
-            expect("커뮤니티 ID와 일치하는 커뮤니티의 이미지 이름을 조회한다") {
-                val result = communityRepository.getImageNamesById(community1.id)
-                result shouldBe listOf(TEST_GENERATED_FILE_NAME, TEST_GENERATED_FILE_NAME)
-            }
-        }
-
         context("커뮤니티 목록 조회") {
-            expect("나와 친구인 사용자의 친구만 공개 여행 일지 목록을 조회한다.") {
+            expect("공개 커뮤니티와 나의 친구들 커뮤니티 목록을 조회한다.") {
                 val result =
                     communityRepository.getCommunitySliceBy(user1.id, 10, null, CommunitySortType.LATEST)
                 result.size shouldBe 3
             }
 
-            expect("나의 여행 일지 목록을 조회한다.") {
+            expect("공개 커뮤니티와 나의 친구들 커뮤니티 목록을 좋아요 순으로 조회한다.") {
+                community1.apply {
+                    repeat(2) {
+                        increaseLikeCount()
+                    }
+                }
+                community2.apply {
+                    repeat(5) {
+                        increaseLikeCount()
+                    }
+                }
+                val result =
+                    communityRepository.getCommunitySliceBy(user1.id, 10, null, CommunitySortType.LIKE)
+                result.map { it.id } shouldBe listOf(community2.id, community1.id, community3.id)
+            }
+
+            expect("나의 커뮤니티 목록을 조회한다.") {
                 val result =
                     communityRepository.getMyCommunitySliceBy(user1.id, 10, null, CommunitySortType.LATEST)
                 result.size shouldBe 1
             }
 
-            expect("나와 친구인 사용자의 여행 일지 목록을 조회한다.") {
+            expect("나와 친구인 사용자의 커뮤니티 목록을 조회한다.") {
                 val result =
                     communityRepository.getFriendCommunitySliceBy(user1.id, 10, null, CommunitySortType.LATEST)
                 result.size shouldBe 2
-            }
-        }
-
-        context("커뮤니티 삭제") {
-            expect("유저 ID와 일치하는 커뮤니티를 삭제한다") {
-                communityRepository.deleteAllByUserId(user1.id)
-                communityRepository.findAll().size shouldBe 2
             }
         }
 
@@ -145,6 +149,20 @@ class CommunityRepositoryTest(
                 tem.flushAndClear()
                 val result = communityRepository.getByCommunityId(community1.id)
                 result.travelJournal shouldBe null
+            }
+        }
+
+        context("커뮤니티 이미지") {
+            expect("커뮤니티 ID와 일치하는 커뮤니티의 이미지 이름을 조회한다") {
+                val result = communityRepository.getImageNamesById(community1.id)
+                result shouldBe listOf(TEST_GENERATED_FILE_NAME, TEST_GENERATED_FILE_NAME)
+            }
+        }
+
+        context("커뮤니티 삭제") {
+            expect("유저 ID와 일치하는 커뮤니티를 삭제한다") {
+                communityRepository.deleteAllByUserId(user1.id)
+                communityRepository.findAll().size shouldBe 2
             }
         }
     },
