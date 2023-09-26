@@ -17,21 +17,23 @@ class CommunityLikeService(
     private val userRepository: UserRepository,
 ) {
     @Transactional
-    fun createCommunityLike(communityId: Long, userId: Long) {
+    fun increaseCommunityLikeCount(communityId: Long, userId: Long) {
         val community = communityRepository.getByCommunityId(communityId)
         val user = userRepository.getByUserId(userId)
 
         if (communityLikeRepository.existsById(CommunityLikeId(community, user))) {
             throw ExistResourceException("요청 사용자($userId)가 이미 좋아요를 누른 게시글($communityId)입니다.")
         }
+        community.increaseLikeCount()
         communityLikeRepository.save(CommunityLike(community, user))
     }
 
     @Transactional
-    fun deleteCommunityLike(communityId: Long, userId: Long) {
+    fun decreaseCommunityLikeCount(communityId: Long, userId: Long) {
         val community = communityRepository.getByCommunityId(communityId)
         val user = userRepository.getByUserId(userId)
 
+        community.decreaseLikeCount()
         communityLikeRepository.deleteById(CommunityLikeId(community, user))
     }
 }
