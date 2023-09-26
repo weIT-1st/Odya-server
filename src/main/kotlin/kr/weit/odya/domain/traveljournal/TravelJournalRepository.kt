@@ -13,6 +13,7 @@ import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.follow.Follow
 import kr.weit.odya.domain.user.User
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 
@@ -57,6 +58,9 @@ interface TravelJournalRepository : JpaRepository<TravelJournal, Long>, CustomTr
     fun findAllByUserId(userId: Long): List<TravelJournal>
 
     fun deleteAllByUserId(userId: Long)
+
+    @Query("SELECT TravelJournal.mutableTravelCompanions")
+    fun existsAllByTravelJournalContentsUserIdAndId()
 }
 
 interface CustomTravelJournalRepository {

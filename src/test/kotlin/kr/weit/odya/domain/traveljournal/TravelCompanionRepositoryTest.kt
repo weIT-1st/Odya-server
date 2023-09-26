@@ -57,6 +57,17 @@ class TravelCompanionRepositoryTest(
                 travelCompanionRepository.deleteAllByUserId(otherUser2.id)
                 travelCompanionRepository.count() shouldBe 1L
             }
+
+            expect("UserId와 TravelJournalId가 일치하는 TravelCompanion를 삭제한다.") {
+                travelCompanionRepository.count() shouldBe 2L
+                travelCompanionRepository.cancelTravelCompanion(otherUser.id, travelJournal.id)
+                travelCompanionRepository.count() shouldBe 1L
+            }
+        }
+
+        context("TravelCompanion 유무 확인") {
+            expect("UserId와 TravelJournalId가 일치하는 TravelCompanion 유뮤 확인(존재)")
+            travelCompanionRepository.existsTravelCompanion(otherUser2.id, travelJournal.id)
         }
     },
 )
