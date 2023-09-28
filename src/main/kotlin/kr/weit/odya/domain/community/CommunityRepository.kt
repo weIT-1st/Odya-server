@@ -8,7 +8,6 @@ import com.linecorp.kotlinjdsl.query.spec.predicate.PredicateSpec
 import com.linecorp.kotlinjdsl.querydsl.CriteriaQueryDsl
 import com.linecorp.kotlinjdsl.querydsl.expression.col
 import com.linecorp.kotlinjdsl.querydsl.from.Relation
-import com.linecorp.kotlinjdsl.selectQuery
 import com.linecorp.kotlinjdsl.subquery
 import com.linecorp.kotlinjdsl.updateQuery
 import kr.weit.odya.domain.contentimage.ContentImage
@@ -21,6 +20,8 @@ import org.springframework.stereotype.Repository
 
 fun CommunityRepository.getByCommunityId(communityId: Long): Community =
     findByIdOrNull(communityId) ?: throw NoSuchElementException("$communityId: 존재하지 않는 커뮤니티입니다.")
+
+fun CommunityRepository.getAllByUserId(userId: Long): List<Community> = findAllByUserId(userId)
 
 fun CommunityRepository.getCommunitySliceBy(
     userId: Long,
@@ -49,6 +50,8 @@ fun CommunityRepository.getImageNamesById(communityId: Long): List<String> =
 @Repository
 interface CommunityRepository : JpaRepository<Community, Long>, CustomCommunityRepository {
     fun deleteAllByUserId(userId: Long)
+
+    fun findAllByUserId(userId: Long): List<Community>
 }
 
 interface CustomCommunityRepository {
@@ -226,10 +229,10 @@ class CommunityRepositoryImpl(private val queryFactory: QueryFactory) : CustomCo
         when (sortType) {
             CommunitySortType.LATEST -> col(Community::id).lessThan(lastId)
             CommunitySortType.LIKE -> {
-                val likeCount = getCommunityLikeCountByLastId(lastId)
+                val likeCountSubQuery = communityLikeCountByLastIdSubQuery(lastId)
                 or(
-                    and(col(Community::likeCount).equal(likeCount), col(Community::id).lessThan(lastId)),
-                    col(Community::likeCount).lessThan(likeCount),
+                    and(col(Community::likeCount).equal(likeCountSubQuery), col(Community::id).lessThan(lastId)),
+                    col(Community::likeCount).lessThan(likeCountSubQuery),
                 )
             }
         }
@@ -237,11 +240,12 @@ class CommunityRepositoryImpl(private val queryFactory: QueryFactory) : CustomCo
         PredicateSpec.empty
     }
 
-    private fun getCommunityLikeCountByLastId(lastId: Long): Int = queryFactory.selectQuery<Int> {
-        select(col(Community::likeCount))
-        from(entity(Community::class))
-        where(col(Community::id).equal(lastId))
-    }.singleResult
+    private fun communityLikeCountByLastIdSubQuery(lastId: Long) = queryFactory.subquery<Int> {
+        val c4Entity = entity(Community::class, "c4")
+        select(col(c4Entity, Community::likeCount))
+        from(c4Entity)
+        where(col(c4Entity, Community::id).equal(lastId))
+    }
 
     private fun CriteriaQueryDsl<Community>.dynamicOrderingSortType(
         sortType: CommunitySortType,

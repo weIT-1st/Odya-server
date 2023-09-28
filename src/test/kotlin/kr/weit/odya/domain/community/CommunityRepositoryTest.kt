@@ -105,6 +105,11 @@ class CommunityRepositoryTest(
                 val result = communityRepository.getByCommunityId(community1.id)
                 result.content shouldBe TEST_COMMUNITY_CONTENT
             }
+
+            expect("유저 ID와 일치하는 모든 커뮤니티를 조회한다") {
+                val result = communityRepository.getAllByUserId(user1.id)
+                result.size shouldBe 1
+            }
         }
 
         context("커뮤니티 목록 조회") {
