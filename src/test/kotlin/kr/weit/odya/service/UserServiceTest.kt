@@ -8,7 +8,8 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
-import kr.weit.odya.domain.communitylike.CommunityLikeRepository
+import kr.weit.odya.domain.community.CommunityRepository
+import kr.weit.odya.domain.community.getAllByUserId
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowingIds
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
@@ -28,7 +29,6 @@ import kr.weit.odya.security.FirebaseTokenHelper
 import kr.weit.odya.security.InvalidTokenException
 import kr.weit.odya.support.DELETE_NOT_EXIST_PROFILE_ERROR_MESSAGE
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
-import kr.weit.odya.support.TEST_COMMUNITY_LIKE_COUNT
 import kr.weit.odya.support.TEST_DEFAULT_PROFILE_NAME
 import kr.weit.odya.support.TEST_DEFAULT_PROFILE_PNG
 import kr.weit.odya.support.TEST_EMAIL
@@ -43,6 +43,7 @@ import kr.weit.odya.support.TEST_PHONE_NUMBER
 import kr.weit.odya.support.TEST_PROFILE_URL
 import kr.weit.odya.support.TEST_PROFILE_WEBP
 import kr.weit.odya.support.TEST_USER_ID
+import kr.weit.odya.support.createCommunity
 import kr.weit.odya.support.createFcmTokenRequest
 import kr.weit.odya.support.createInformationRequest
 import kr.weit.odya.support.createMockProfile
@@ -63,7 +64,7 @@ class UserServiceTest : DescribeSpec(
         val usersDocumentRepository = mockk<UsersDocumentRepository>()
         val followRepository = mockk<FollowRepository>()
         val travelJournalRepository = mockk<TravelJournalRepository>()
-        val communityLikeRepository = mockk<CommunityLikeRepository>()
+        val communityRepository = mockk<CommunityRepository>()
         val userService =
             UserService(
                 userRepository,
@@ -73,7 +74,7 @@ class UserServiceTest : DescribeSpec(
                 usersDocumentRepository,
                 followRepository,
                 travelJournalRepository,
-                communityLikeRepository,
+                communityRepository,
             )
 
         describe("getInformation") {
@@ -362,7 +363,9 @@ class UserServiceTest : DescribeSpec(
                 every { followRepository.countByFollowerId(TEST_USER_ID) } returns TEST_FOLLOWING_COUNT
                 every { followRepository.countByFollowingId(TEST_USER_ID) } returns TEST_FOLLOWER_COUNT
                 every { travelJournalRepository.getByUserId(TEST_USER_ID) } returns listOf(createTravelJournal())
-                every { communityLikeRepository.countByUserId(TEST_USER_ID) } returns TEST_COMMUNITY_LIKE_COUNT
+                every { communityRepository.getAllByUserId(TEST_USER_ID) } returns listOf(createCommunity()).onEach { community ->
+                    repeat(2) { community.increaseLikeCount() }
+                }
                 it("[FollowCountsResponse] 반환한다.") {
                     val response = userService.getStatistics(TEST_USER_ID)
                     response shouldBe createUserStatisticsResponse()
