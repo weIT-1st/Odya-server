@@ -7,6 +7,7 @@ import kr.weit.odya.domain.traveljournal.TravelJournalSortType
 import kr.weit.odya.security.LoginUserId
 import kr.weit.odya.service.TravelJournalService
 import kr.weit.odya.service.dto.SliceResponse
+import kr.weit.odya.service.dto.TaggedTravelJournalResponse
 import kr.weit.odya.service.dto.TravelJournalContentUpdateRequest
 import kr.weit.odya.service.dto.TravelJournalRequest
 import kr.weit.odya.service.dto.TravelJournalResponse
@@ -68,7 +69,7 @@ class TravelJournalController(private val travelJournalService: TravelJournalSer
     }
 
     @GetMapping
-    fun getTravelJournalsTest(
+    fun getTravelJournals(
         @Positive(message = "사이즈는 양수여야 합니다.")
         @RequestParam(name = "size", required = false, defaultValue = "10")
         size: Int,
@@ -129,6 +130,19 @@ class TravelJournalController(private val travelJournalService: TravelJournalSer
     ): ResponseEntity<SliceResponse<TravelJournalSummaryResponse>> {
         val response = travelJournalService.getRecommendTravelJournals(userId, size, lastId, sortType)
         return ResponseEntity.ok(response)
+    }
+
+    @GetMapping("/tagged")
+    fun getTaggedTravelJournals(
+        @Positive(message = "사이즈는 양수여야 합니다.")
+        @RequestParam(name = "size", required = false, defaultValue = "10")
+        size: Int,
+        @Positive(message = "마지막 Id는 양수여야 합니다.")
+        @RequestParam(name = "lastId", required = false)
+        lastId: Long?,
+        @LoginUserId userId: Long,
+    ): ResponseEntity<SliceResponse<TaggedTravelJournalResponse>> {
+        return ResponseEntity.ok(travelJournalService.getTaggedTravelJournals(userId, size, lastId))
     }
 
     @PutMapping(path = ["/{travelJournalId}"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])

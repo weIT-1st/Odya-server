@@ -26,8 +26,12 @@ import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
 import kr.weit.odya.support.TEST_DEFAULT_SIZE
 import kr.weit.odya.support.TEST_IMAGE_FILE_WEBP
+import kr.weit.odya.support.TEST_INVALID_LAST_ID
+import kr.weit.odya.support.TEST_INVALID_SIZE
+import kr.weit.odya.support.TEST_LAST_ID
 import kr.weit.odya.support.TEST_OTHER_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE
 import kr.weit.odya.support.TEST_PLACE_ID
+import kr.weit.odya.support.TEST_SIZE
 import kr.weit.odya.support.TEST_TRAVEL_CONTENT_IMAGE_MAP
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_CONTENT_ID
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_CONTENT_INCORRECT_COUNT
@@ -48,6 +52,7 @@ import kr.weit.odya.support.createMockOtherImageFile
 import kr.weit.odya.support.createOtherTravelJournalContentRequest
 import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createPlaceDetailsMap
+import kr.weit.odya.support.createSliceTaggedTravelJournalResponse
 import kr.weit.odya.support.createSliceTravelJournalResponse
 import kr.weit.odya.support.createTravelCompanionById
 import kr.weit.odya.support.createTravelJournalByTravelCompanionIdSize
@@ -1398,6 +1403,119 @@ class TravelJournalControllerTest(
                     }.andDo {
                         createDocument(
                             "get-recommend-travel-journals-fail-invalid-token",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_DEFAULT_SIZE isOptional true,
+                                LAST_ID_PARAM parameterDescription "마지막 여행 일지 ID" example TEST_TRAVEL_JOURNAL_ID isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+        }
+
+        describe("GET /api/v1/travel-journals/tagged") {
+            val targetUri = "/api/v1/travel-journals/tagged"
+            context("유효한 요청이 왔을 경우") {
+                val response = createSliceTaggedTravelJournalResponse()
+                every {
+                    travelJournalService.getTaggedTravelJournals(
+                        TEST_USER_ID,
+                        TEST_DEFAULT_SIZE,
+                        null,
+                    )
+                } returns response
+                it("200 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                    }.andExpect {
+                        status { isOk() }
+                    }.andDo {
+                        createDocument(
+                            "get-tagged-travel-journals-success",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_DEFAULT_SIZE isOptional true,
+                                LAST_ID_PARAM parameterDescription "마지막 여행 일지 ID" example TEST_TRAVEL_JOURNAL_ID isOptional true,
+                            ),
+                            responseBody(
+                                "hasNext" type JsonFieldType.BOOLEAN description "다음 페이지 여부" example response.hasNext,
+                                "content[].travelJournalId" type JsonFieldType.NUMBER description "여행 일지 아이디" example response.content[0].travelJournalId,
+                                "content[].title" type JsonFieldType.STRING description "여행 일지 제목" example response.content[0].title,
+                                "content[].travelStartDate" type JsonFieldType.STRING description "여행 시작일" example response.content[0].travelStartDate,
+                                "content[].mainImageUrl" type JsonFieldType.STRING description "여행 일지의 대표 이미지 URL" example response.content[0].mainImageUrl,
+                                "content[].writer.userId" type JsonFieldType.NUMBER description "여행 일지 작성자의 아이디" example response.content[0].writer.userId,
+                                "content[].writer.nickname" type JsonFieldType.STRING description "여행 일지 작성자의 닉네임" example response.content[0].writer.nickname,
+                                "content[].writer.profile.profileUrl" type JsonFieldType.STRING description "여행 일지 작성자의 프로필 사진" example response.content[0].writer.profile.profileUrl,
+                                "content[].writer.profile.profileColor.colorHex" type JsonFieldType.STRING description "여행 일지 작성자의 프로필 색상" example response.content[0].writer.profile.profileColor?.colorHex isOptional true,
+                                "content[].writer.profile.profileColor.red" type JsonFieldType.NUMBER description "여행 일지 작성자의 프로필 색상의 빨간색 값" example response.content[0].writer.profile.profileColor?.red isOptional true,
+                                "content[].writer.profile.profileColor.green" type JsonFieldType.NUMBER description "여행 일지 작성자의 프로필 색상의 초록색 값" example response.content[0].writer.profile.profileColor?.green isOptional true,
+                                "content[].writer.profile.profileColor.blue" type JsonFieldType.NUMBER description "여행 일지 작성자의 프로필 색상의 파란색 값" example response.content[0].writer.profile.profileColor?.blue isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이지만 조회할 마지막 ID가 양수가 아닌 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(SIZE_PARAM, TEST_SIZE.toString())
+                        param(LAST_ID_PARAM, TEST_INVALID_LAST_ID.toString())
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "get-tagged-travel-journals-fail-invalid-last-id",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_SIZE isOptional true,
+                                LAST_ID_PARAM parameterDescription "양수가 아닌 마지막 데이터의 ID" example TEST_INVALID_LAST_ID isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효한 토큰이지만 size가 양수가 아닌 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(SIZE_PARAM, TEST_INVALID_SIZE.toString())
+                        param(LAST_ID_PARAM, TEST_LAST_ID.toString())
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "get-tagged-travel-journals-fail-invalid-size",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                SIZE_PARAM parameterDescription "양수가 아닌 데이터 개수" example TEST_INVALID_SIZE isOptional true,
+                                LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example TEST_LAST_ID isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효하지 않은 토큰일 경우") {
+                it("401 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                    }.andExpect {
+                        status { isUnauthorized() }
+                    }.andDo {
+                        createDocument(
+                            "get-tagged-travel-journals-fail-invalid-token",
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
                             ),
