@@ -11,6 +11,7 @@ import kr.weit.odya.domain.traveljournal.TravelJournalInformation
 import kr.weit.odya.domain.traveljournal.TravelJournalVisibility
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.service.dto.SliceResponse
+import kr.weit.odya.service.dto.TaggedTravelJournalResponse
 import kr.weit.odya.service.dto.TravelCompanionResponse
 import kr.weit.odya.service.dto.TravelCompanionSimpleResponse
 import kr.weit.odya.service.dto.TravelJournalContentImageResponse
@@ -349,4 +350,19 @@ fun createTravelJournalContentImageResponse(travelJournalContentImageId: TravelJ
         travelJournalContentImageId.id,
         travelJournalContentImageId.contentImage.name,
         TEST_GENERATED_FILE_NAME,
+    )
+
+fun createTaggedTravelJournalResponse(): TaggedTravelJournalResponse =
+    TaggedTravelJournalResponse(
+        TEST_TRAVEL_JOURNAL_ID,
+        TEST_TRAVEL_JOURNAL_TITLE,
+        TEST_FILE_AUTHENTICATED_URL,
+        UserSimpleResponse(createUser(), TEST_FILE_AUTHENTICATED_URL),
+        TEST_TRAVEL_JOURNAL_START_DATE,
+    )
+
+fun createSliceTaggedTravelJournalResponse(): SliceResponse<TaggedTravelJournalResponse> =
+    SliceResponse(
+        size = TEST_DEFAULT_SIZE,
+        content = listOf(createTaggedTravelJournalResponse()),
     )

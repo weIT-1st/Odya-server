@@ -137,6 +137,16 @@ class TravelJournalRepositoryTest(
                 result.size shouldBe 1
                 result[0] shouldBe friendTravelJournal
             }
+
+            expect("유저가 태그된 여행일지 목록을 조회한다.") {
+                val result = travelJournalRepository.getTaggedTravelJournalSliceBy(
+                    user = user,
+                    size = 10,
+                    lastId = null,
+                )
+                result.size shouldBe 1
+                result[0] shouldBe friendTravelJournal
+            }
         }
 
         context("ContentImage name 조회") {

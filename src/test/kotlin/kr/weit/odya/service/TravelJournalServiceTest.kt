@@ -27,6 +27,7 @@ import kr.weit.odya.domain.traveljournal.getByTravelJournalId
 import kr.weit.odya.domain.traveljournal.getFriendTravelJournalSliceBy
 import kr.weit.odya.domain.traveljournal.getMyTravelJournalSliceBy
 import kr.weit.odya.domain.traveljournal.getRecommendTravelJournalSliceBy
+import kr.weit.odya.domain.traveljournal.getTaggedTravelJournalSliceBy
 import kr.weit.odya.domain.traveljournal.getTravelJournalSliceBy
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
@@ -606,6 +607,29 @@ class TravelJournalServiceTest : DescribeSpec(
                             10,
                             null,
                             TravelJournalSortType.LATEST,
+                        )
+                    }
+                }
+            }
+        }
+
+        describe("getTaggedTravelJournals") {
+            context("유효한 데이터가 주어지는 경우") {
+                every { userRepository.getByUserId(TEST_USER_ID) } returns TEST_USER
+                every {
+                    travelJournalRepository.getTaggedTravelJournalSliceBy(
+                        TEST_USER,
+                        10,
+                        null,
+                    )
+                } returns listOf(TEST_TRAVEL_JOURNAL)
+                every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
+                it("정상적으로 종료한다") {
+                    shouldNotThrowAny {
+                        travelJournalService.getTaggedTravelJournals(
+                            TEST_USER_ID,
+                            10,
+                            null,
                         )
                     }
                 }
