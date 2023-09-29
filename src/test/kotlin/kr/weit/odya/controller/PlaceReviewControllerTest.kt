@@ -39,6 +39,7 @@ import kr.weit.odya.support.TEST_TOO_LONG_PHRASE
 import kr.weit.odya.support.TEST_TOO_LOW_RATING
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.creatSlicePlaceReviewResponse
+import kr.weit.odya.support.createAverageReviewResponse
 import kr.weit.odya.support.createCountPlaceReviewResponse
 import kr.weit.odya.support.createExistReviewResponse
 import kr.weit.odya.support.createPlaceReviewRequest
@@ -699,7 +700,6 @@ class PlaceReviewControllerTest(
                                 ),
                                 responseBody(
                                     "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
-                                    "averageRating" type JsonFieldType.NUMBER description "장소 평균 별점" example response.averageRating,
                                     "content[].id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example content.id,
                                     "content[].placeId" type JsonFieldType.STRING description "장소 ID" example content.placeId,
                                     "content[].userInfo.userId" type JsonFieldType.NUMBER description "사용자 ID" example response.content[0].userInfo.userId,
@@ -876,7 +876,6 @@ class PlaceReviewControllerTest(
                                 ),
                                 responseBody(
                                     "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
-                                    "averageRating" type JsonFieldType.NUMBER description "장소 평균 별점" example response.averageRating,
                                     "content[].id" type JsonFieldType.NUMBER description "장소 리뷰 ID" example content.id,
                                     "content[].placeId" type JsonFieldType.STRING description "장소 ID" example content.placeId,
                                     "content[].userInfo.userId" type JsonFieldType.NUMBER description "사용자 ID" example response.content[0].userInfo.userId,
@@ -1074,6 +1073,58 @@ class PlaceReviewControllerTest(
                                     SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example PlaceReviewSortType.values()
                                         .joinToString() isOptional true,
                                     LAST_ID_PARAM parameterDescription "마지막 데이터의 ID" example TEST_LAST_ID isOptional true,
+                                ),
+                            ),
+                        )
+                }
+            }
+        }
+
+        describe("GET /api/v1/place-reviews/average/{id}") {
+            val targetUri = "/api/v1/place-reviews/average/{id}"
+            val response = createAverageReviewResponse()
+            context("유효한 placeId가 전달되면") {
+                every { placeReviewService.getAverageStarRating(TEST_PLACE_ID) } returns response
+                it("200 및 평균 별점 반환") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_PLACE_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    )
+                        .andExpect(status().isOk)
+                        .andDo(
+                            createPathDocument(
+                                "placeReview-average-success",
+                                pathParameters(
+                                    "id" pathDescription "장소 ID" example TEST_PLACE_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                responseBody(
+                                    "averageStarRating" type JsonFieldType.NUMBER description "평균 별점" example response.averageStarRating,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효하지 않은 토큰이 전달되면") {
+                it("401 반환") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_PLACE_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN),
+                    )
+                        .andExpect(status().isUnauthorized)
+                        .andDo(
+                            createPathDocument(
+                                "placeReview-average-fail-invalid-token",
+                                pathParameters(
+                                    "id" pathDescription "장소 ID" example TEST_PLACE_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
                                 ),
                             ),
                         )

@@ -3,12 +3,13 @@ package kr.weit.odya.support
 import kr.weit.odya.domain.placeReview.PlaceReview
 import kr.weit.odya.domain.placeReview.PlaceReviewSortType
 import kr.weit.odya.domain.user.User
+import kr.weit.odya.service.dto.AverageRatingResponse
 import kr.weit.odya.service.dto.ExistReviewResponse
 import kr.weit.odya.service.dto.PlaceReviewCreateRequest
 import kr.weit.odya.service.dto.PlaceReviewListResponse
 import kr.weit.odya.service.dto.PlaceReviewUpdateRequest
 import kr.weit.odya.service.dto.ReviewCountResponse
-import kr.weit.odya.service.dto.SlicePlaceReviewResponse
+import kr.weit.odya.service.dto.SliceResponse
 import java.time.LocalDateTime
 
 const val TEST_PLACE_REVIEW_ID = 1L
@@ -65,8 +66,8 @@ fun createLatestReview(user: User = createUser()): PlaceReview {
     return PlaceReview(0L, TEST_OTHER_PLACE_ID, user, TEST_LOWEST_RATING, TEST_REVIEW)
 }
 
-fun creatSlicePlaceReviewResponse(): SlicePlaceReviewResponse {
-    return SlicePlaceReviewResponse.of(
+fun creatSlicePlaceReviewResponse() =
+    SliceResponse(
         TEST_SIZE,
         listOf(createMockPlaceReview(createUser())).map {
             PlaceReviewListResponse(
@@ -74,10 +75,10 @@ fun creatSlicePlaceReviewResponse(): SlicePlaceReviewResponse {
                 TEST_PROFILE_URL,
             )
         },
-        TEST_AVERAGE_RATING,
     )
-}
 
 fun createExistReviewResponse(exist: Boolean = true) = ExistReviewResponse(exist)
 
 fun createCountPlaceReviewResponse(count: Int = TEST_PLACE_REVIEW_COUNT) = ReviewCountResponse(count)
+
+fun createAverageReviewResponse(averageRating: Double = TEST_AVERAGE_RATING) = AverageRatingResponse(averageRating)
