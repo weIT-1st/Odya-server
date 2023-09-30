@@ -15,7 +15,9 @@ import kr.weit.odya.domain.community.getCommunitySliceBy
 import kr.weit.odya.domain.community.getFriendCommunitySliceBy
 import kr.weit.odya.domain.community.getMyCommunitySliceBy
 import kr.weit.odya.domain.communitycomment.CommunityCommentRepository
-import kr.weit.odya.domain.communitycomment.deleteCommunityComment
+import kr.weit.odya.domain.communitycomment.deleteCommunityComments
+import kr.weit.odya.domain.communitylike.CommunityLikeRepository
+import kr.weit.odya.domain.communitylike.deleteCommunityLikes
 import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowerFcmTokens
@@ -49,6 +51,7 @@ private const val MIM_COMMUNITY_CONTENT_IMAGE_COUNT = 1
 class CommunityService(
     private val communityRepository: CommunityRepository,
     private val communityCommentRepository: CommunityCommentRepository,
+    private val communityLikeRepository: CommunityLikeRepository,
     private val topicRepository: TopicRepository,
     private val travelJournalRepository: TravelJournalRepository,
     private val userRepository: UserRepository,
@@ -89,13 +92,13 @@ class CommunityService(
         val travelJournalSimpleResponse = getTravelJournalSimpleResponse(community)
         val communityContentImages = getCommunityContentImageResponses(community)
         val communityCommentCount = communityCommentRepository.countByCommunityId(communityId)
-        val communityLikeCount = 0 // TODO: 좋아요 기능 추가 시 수정
+        val isUserLiked = communityLikeRepository.existsByCommunityIdAndUserId(communityId, userId)
         return CommunityResponse.from(
             community,
             travelJournalSimpleResponse,
             communityContentImages,
             communityCommentCount,
-            communityLikeCount,
+            isUserLiked,
         )
     }
 
@@ -185,6 +188,7 @@ class CommunityService(
         val community = communityRepository.getByCommunityId(communityId)
         validateUserPermission(community.user.id, userId)
         val deleteCommunityContentImageNames = getDeleteCommunityContentImageNames(community.communityContentImages)
+        communityLikeRepository.deleteAllByCommunityId(communityId)
         communityCommentRepository.deleteAllByCommunityId(communityId)
         communityRepository.delete(community)
         eventPublisher.publishEvent(CommunityDeleteEvent(deleteCommunityContentImageNames))
@@ -193,7 +197,8 @@ class CommunityService(
     @Transactional
     fun deleteCommunityByUserId(userId: Long) {
         reportCommunityRepository.deleteAllByUserId(userId)
-        communityCommentRepository.deleteCommunityComment(userId)
+        communityLikeRepository.deleteCommunityLikes(userId)
+        communityCommentRepository.deleteCommunityComments(userId)
         communityRepository.deleteAllByUserId(userId)
     }
 
@@ -247,13 +252,10 @@ class CommunityService(
             val communityMainImageUrl =
                 fileService.getPreAuthenticatedObjectUrl(community.communityContentImages[0].contentImage.name)
             val communityCommentCount = communityCommentRepository.countByCommunityId(community.id)
-            val communityLikeCount = 0 // TODO: 좋아요 기능 추가 시 수정
-            CommunitySummaryResponse(
-                community.id,
+            CommunitySummaryResponse.from(
+                community,
                 communityMainImageUrl,
-                community.placeId,
                 communityCommentCount,
-                communityLikeCount,
             )
         },
     )

@@ -2,15 +2,16 @@ package kr.weit.odya.domain.community
 
 import io.kotest.core.spec.style.ExpectSpec
 import io.kotest.matchers.shouldBe
-import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.follow.Follow
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
+import kr.weit.odya.support.TEST_ANOTHER_COMMUNITY_ID
 import kr.weit.odya.support.TEST_COMMUNITY_CONTENT
 import kr.weit.odya.support.TEST_GENERATED_FILE_NAME
+import kr.weit.odya.support.TEST_OTHER_COMMUNITY_ID
 import kr.weit.odya.support.createCommunity
 import kr.weit.odya.support.createCommunityContentImage
 import kr.weit.odya.support.createContentImage
@@ -30,7 +31,6 @@ class CommunityRepositoryTest(
     private val followRepository: FollowRepository,
     private val userRepository: UserRepository,
     private val travelJournalRepository: TravelJournalRepository,
-    private val contentImageRepository: ContentImageRepository,
     private val tem: TestEntityManager,
 ) : ExpectSpec(
     {
@@ -83,6 +83,7 @@ class CommunityRepositoryTest(
             )
             community2 = communityRepository.save(
                 createCommunity(
+                    id = TEST_OTHER_COMMUNITY_ID,
                     user = user2,
                     travelJournal = travelJournal2,
                     communityContentImages = listOf(createCommunityContentImage(contentImage2)),
@@ -90,6 +91,7 @@ class CommunityRepositoryTest(
             )
             community3 = communityRepository.save(
                 createCommunity(
+                    id = TEST_ANOTHER_COMMUNITY_ID,
                     user = user2,
                     travelJournal = null,
                     visibility = CommunityVisibility.FRIEND_ONLY,
@@ -103,22 +105,43 @@ class CommunityRepositoryTest(
                 val result = communityRepository.getByCommunityId(community1.id)
                 result.content shouldBe TEST_COMMUNITY_CONTENT
             }
+
+            expect("유저 ID와 일치하는 모든 커뮤니티를 조회한다") {
+                val result = communityRepository.getAllByUserId(user1.id)
+                result.size shouldBe 1
+            }
         }
 
         context("커뮤니티 목록 조회") {
-            expect("나와 친구인 사용자의 친구만 공개 여행 일지 목록을 조회한다.") {
+            expect("공개 커뮤니티와 나의 친구들 커뮤니티 목록을 조회한다.") {
                 val result =
                     communityRepository.getCommunitySliceBy(user1.id, 10, null, CommunitySortType.LATEST)
                 result.size shouldBe 3
             }
 
-            expect("나의 여행 일지 목록을 조회한다.") {
+            expect("공개 커뮤니티와 나의 친구들 커뮤니티 목록을 좋아요 순으로 조회한다.") {
+                community1.apply {
+                    repeat(2) {
+                        increaseLikeCount()
+                    }
+                }
+                community2.apply {
+                    repeat(5) {
+                        increaseLikeCount()
+                    }
+                }
+                val result =
+                    communityRepository.getCommunitySliceBy(user1.id, 10, null, CommunitySortType.LIKE)
+                result.map { it.id } shouldBe listOf(community2.id, community1.id, community3.id)
+            }
+
+            expect("나의 커뮤니티 목록을 조회한다.") {
                 val result =
                     communityRepository.getMyCommunitySliceBy(user1.id, 10, null, CommunitySortType.LATEST)
                 result.size shouldBe 1
             }
 
-            expect("나와 친구인 사용자의 여행 일지 목록을 조회한다.") {
+            expect("나와 친구인 사용자의 커뮤니티 목록을 조회한다.") {
                 val result =
                     communityRepository.getFriendCommunitySliceBy(user1.id, 10, null, CommunitySortType.LATEST)
                 result.size shouldBe 2

@@ -12,3 +12,6 @@ class ObjectStorageException(message: String) : OdyaException(ErrorCode.OBJECT_S
 
 class NotFoundDefaultResourceException(message: String) :
     OdyaException(ErrorCode.NOT_FOUND_DEFAULT_RESOURCE, message)
+
+class RedisLockFailedException(message: String) :
+    OdyaException(ErrorCode.REDIS_LOCK_FAILED_EXCEPTION, message)

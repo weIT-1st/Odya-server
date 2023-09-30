@@ -21,6 +21,7 @@ import java.io.InputStream
 
 const val TEST_COMMUNITY_ID = 1L
 const val TEST_OTHER_COMMUNITY_ID = 2L
+const val TEST_ANOTHER_COMMUNITY_ID = 3L
 const val TEST_NOT_EXISTS_COMMUNITY_ID = 9999L
 const val TEST_COMMUNITY_CONTENT = "테스트 커뮤니티 글입니다."
 const val TEST_COMMUNITY_PLACE_ID = "테스트 장소 아이디"
@@ -36,6 +37,8 @@ const val TEST_COMMUNITY_UPDATE_REQUEST_NAME = "update-community"
 const val TEST_COMMUNITY_UPDATE_MOCK_FILE_NAME = "update-community-content-image"
 const val MIM_COMMUNITY_CONTENT_IMAGE_COUNT = 1
 const val MAX_COMMUNITY_CONTENT_IMAGE_COUNT = 15
+const val TEST_COMMUNITY_LIKE_COUNT = 2
+const val TEST_IS_USER_LIKED = false
 
 fun createCommunityCreateRequest(
     content: String = TEST_COMMUNITY_CONTENT,
@@ -149,7 +152,8 @@ fun createCommunityResponse(
     topic = topic,
     communityContentImages = communityContentImages,
     communityCommentCount = TEST_COMMUNITY_COMMENT_COUNT,
-    communityLikeCount = 0, // TODO: 좋아요 기능 추가 시 수정
+    communityLikeCount = TEST_COMMUNITY_LIKE_COUNT,
+    TEST_IS_USER_LIKED,
 )
 
 fun createOtherCommunityResponse(
@@ -169,7 +173,8 @@ fun createOtherCommunityResponse(
     topic = topic,
     communityContentImages = communityContentImages,
     communityCommentCount = TEST_COMMUNITY_COMMENT_COUNT,
-    communityLikeCount = 0, // TODO: 좋아요 기능 추가 시 수정
+    communityLikeCount = TEST_COMMUNITY_COMMENT_COUNT,
+    TEST_IS_USER_LIKED,
 )
 
 fun createTravelJournalSimpleResponse(
@@ -206,7 +211,7 @@ fun createCommunitySummaryResponse(
     communityMainImageUrl = mainImageUrl,
     placeId = TEST_PLACE_ID,
     communityCommentCount = TEST_COMMUNITY_COMMENT_COUNT,
-    communityLikeCount = 0, // TODO: 좋아요 기능 추가 시 수정
+    communityLikeCount = TEST_COMMUNITY_LIKE_COUNT,
 )
 
 fun createOtherCommunitySummaryResponse(
@@ -217,7 +222,7 @@ fun createOtherCommunitySummaryResponse(
     communityMainImageUrl = mainImageUrl,
     placeId = TEST_OTHER_PLACE_ID,
     communityCommentCount = TEST_COMMUNITY_COMMENT_COUNT,
-    communityLikeCount = 0, // TODO: 좋아요 기능 추가 시 수정
+    communityLikeCount = TEST_COMMUNITY_LIKE_COUNT,
 )
 
 fun createSliceCommunityResponse(

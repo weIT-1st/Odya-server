@@ -21,6 +21,8 @@ import org.springframework.stereotype.Repository
 fun CommunityRepository.getByCommunityId(communityId: Long): Community =
     findByIdOrNull(communityId) ?: throw NoSuchElementException("$communityId: 존재하지 않는 커뮤니티입니다.")
 
+fun CommunityRepository.getAllByUserId(userId: Long): List<Community> = findAllByUserId(userId)
+
 fun CommunityRepository.getCommunitySliceBy(
     userId: Long,
     size: Int,
@@ -48,6 +50,8 @@ fun CommunityRepository.getImageNamesById(communityId: Long): List<String> =
 @Repository
 interface CommunityRepository : JpaRepository<Community, Long>, CustomCommunityRepository {
     fun deleteAllByUserId(userId: Long)
+
+    fun findAllByUserId(userId: Long): List<Community>
 }
 
 interface CustomCommunityRepository {
@@ -224,9 +228,23 @@ class CommunityRepositoryImpl(private val queryFactory: QueryFactory) : CustomCo
     ) = if (lastId != null) {
         when (sortType) {
             CommunitySortType.LATEST -> col(Community::id).lessThan(lastId)
+            CommunitySortType.LIKE -> {
+                val likeCountSubQuery = communityLikeCountByLastIdSubQuery(lastId)
+                or(
+                    and(col(Community::likeCount).equal(likeCountSubQuery), col(Community::id).lessThan(lastId)),
+                    col(Community::likeCount).lessThan(likeCountSubQuery),
+                )
+            }
         }
     } else {
         PredicateSpec.empty
+    }
+
+    private fun communityLikeCountByLastIdSubQuery(lastId: Long) = queryFactory.subquery<Int> {
+        val c4Entity = entity(Community::class, "c4")
+        select(col(c4Entity, Community::likeCount))
+        from(c4Entity)
+        where(col(c4Entity, Community::id).equal(lastId))
     }
 
     private fun CriteriaQueryDsl<Community>.dynamicOrderingSortType(
@@ -234,7 +252,7 @@ class CommunityRepositoryImpl(private val queryFactory: QueryFactory) : CustomCo
     ): List<OrderSpec> =
         when (sortType) {
             CommunitySortType.LATEST -> listOf(col(Community::id).desc())
-//            CommunitySortType.LIKE -> listOf(col(Community::).desc())
+            CommunitySortType.LIKE -> listOf(col(Community::likeCount).desc(), col(Community::id).desc())
         }
 
     companion object {
@@ -248,6 +266,5 @@ class CommunityRepositoryImpl(private val queryFactory: QueryFactory) : CustomCo
 }
 
 enum class CommunitySortType(val description: String) {
-    LATEST("최신순"),
-    // TODO: LIKE("좋아요순")
+    LATEST("최신순"), LIKE("좋아요순")
 }

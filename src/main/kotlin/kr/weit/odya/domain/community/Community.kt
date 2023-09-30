@@ -27,6 +27,7 @@ private const val MIN_COMMUNITY_CONTENT_IMAGE_COUNT = 1
         Index(name = "community_travel_journal_id_index", columnList = "travel_journal_id"),
         Index(name = "community_user_id_index", columnList = "user_id"),
         Index(name = "community_place_id_index", columnList = "placeId"),
+        Index(name = "community_like_count_index", columnList = "likeCount"),
     ],
 )
 @Entity
@@ -68,11 +69,16 @@ class Community(
     @JoinColumn(name = "community_id", nullable = false, updatable = false, columnDefinition = "NUMERIC(19, 0)")
     private val mutableCommunityContentImages: MutableList<CommunityContentImage> =
         communityContentImages.toMutableList()
+
     val communityContentImages: List<CommunityContentImage>
         get() = mutableCommunityContentImages
 
     @Embedded
     var communityInformation: CommunityInformation = communityInformation
+        protected set
+
+    @Column(nullable = false)
+    var likeCount: Int = 0
         protected set
 
     val content: String
@@ -99,5 +105,16 @@ class Community(
             throw IllegalArgumentException("커뮤니티 컨텐츠 이미지는 최소 $MIN_COMMUNITY_CONTENT_IMAGE_COUNT 개 이상이어야 합니다.")
         }
         mutableCommunityContentImages.removeAll(communityContentImages)
+    }
+
+    fun increaseLikeCount() {
+        likeCount += 1
+    }
+
+    fun decreaseLikeCount() {
+        require(likeCount > 0) {
+            "좋아요 개수($likeCount)는 더 이상 감소할 수 없습니다."
+        }
+        likeCount -= 1
     }
 }

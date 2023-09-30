@@ -32,9 +32,10 @@ interface CustomReportCommunityRepository {
 }
 
 class CustomReportCommunityRepositoryImpl(private val queryFactory: QueryFactory) : CustomReportCommunityRepository {
-    override fun deleteReportCommunitiesByUserId(userId: Long) { queryFactory.deleteQuery<ReportCommunity> {
-        val subQuery = queryFactory.communityByUserIdSubQuery(userId)
-        where(nestedCol(col(ReportCommunity::community), Community::id).`in`(subQuery))
-    }.executeUpdate()
+    override fun deleteReportCommunitiesByUserId(userId: Long) {
+        queryFactory.deleteQuery<ReportCommunity> {
+            val subQuery = queryFactory.communityByUserIdSubQuery(userId)
+            where(nestedCol(col(ReportCommunity::community), Community::id).`in`(subQuery))
+        }.executeUpdate()
     }
 }

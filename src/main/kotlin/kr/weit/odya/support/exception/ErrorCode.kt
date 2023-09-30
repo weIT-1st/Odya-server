@@ -26,4 +26,5 @@ enum class ErrorCode(val httpStatus: HttpStatus, val code: Int, val errorMessage
     FIREBASE_USER_WITHDRAW_FAIL(HttpStatus.NOT_FOUND, -11003, "Firebase user withdraw fail(USER_NOT_FOUND)"),
     OBJECT_STORAGE_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, -12000, "Object storage exception"),
     KAKAO_CLIENT_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, -13000, "Kakao client exception"),
+    REDIS_LOCK_FAILED_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, -14000, "Failed to get Redis lock"),
 }
