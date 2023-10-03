@@ -9,7 +9,6 @@ import com.linecorp.kotlinjdsl.querydsl.expression.col
 import com.linecorp.kotlinjdsl.selectQuery
 import kr.weit.odya.domain.user.User
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 
@@ -36,12 +35,6 @@ fun PlaceReviewRepository.getPlaceReviewListByUser(
 interface PlaceReviewRepository : JpaRepository<PlaceReview, Long>, CustomPlaceReviewRepository {
     fun existsByUserIdAndPlaceId(userId: Long, placeId: String): Boolean
 
-    @Query("select avg(pr.starRating) from PlaceReview pr where pr.placeId = :placeId")
-    fun getAverageRatingByPlaceId(placeId: String): Double?
-
-    @Query("select avg(pr.starRating) from PlaceReview pr where pr.user = :user")
-    fun getAverageRatingByUser(user: User): Double?
-
     fun deleteByUserId(userId: Long)
 
     fun countByPlaceId(placeId: String): Int
@@ -61,6 +54,8 @@ interface CustomPlaceReviewRepository {
         sortType: PlaceReviewSortType,
         lastId: Long?,
     ): List<PlaceReview>
+
+    fun getAverageRatingByPlaceId(placeId: String): Double?
 }
 
 class PlaceReviewRepositoryImpl(private val queryFactory: QueryFactory) : CustomPlaceReviewRepository {
@@ -83,6 +78,13 @@ class PlaceReviewRepositoryImpl(private val queryFactory: QueryFactory) : Custom
         baseSearchQuery(size, sortType, lastId)
         where(col(PlaceReview::user).equal(user))
     }
+
+    override fun getAverageRatingByPlaceId(placeId: String): Double? =
+        queryFactory.selectQuery {
+            select(avg(col(PlaceReview::starRating)))
+            from(entity(PlaceReview::class))
+            where(col(PlaceReview::placeId).equal(placeId))
+        }.singleResult
 
     private fun CriteriaQueryDsl<PlaceReview>.baseSearchQuery(
         size: Int,

@@ -50,11 +50,6 @@ class PlaceReviewRepositoryTest(
                 result shouldBe TEST_AVERAGE_RATING
             }
 
-            expect("USER와 일치하는 장소의 평균 별점을 조회한다") {
-                val result = placeReviewRepository.getAverageRatingByUser(user1)
-                result shouldBe TEST_AVERAGE_RATING
-            }
-
             expect("PLACE_ID와 일치하는 lastId 초과의 id인 장소 리뷰를 조회한다") {
                 val result = placeReviewRepository.getPlaceReviewListByPlaceId(
                     TEST_PLACE_ID,

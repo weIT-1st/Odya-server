@@ -12,12 +12,13 @@ import kr.weit.odya.domain.report.deleteAllByUserId
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
+import kr.weit.odya.service.dto.AverageRatingResponse
 import kr.weit.odya.service.dto.ExistReviewResponse
 import kr.weit.odya.service.dto.PlaceReviewCreateRequest
 import kr.weit.odya.service.dto.PlaceReviewListResponse
 import kr.weit.odya.service.dto.PlaceReviewUpdateRequest
 import kr.weit.odya.service.dto.ReviewCountResponse
-import kr.weit.odya.service.dto.SlicePlaceReviewResponse
+import kr.weit.odya.service.dto.SliceResponse
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import kotlin.math.roundToInt
@@ -63,14 +64,13 @@ class PlaceReviewService(
         size: Int,
         sortType: PlaceReviewSortType,
         lastId: Long?,
-    ): SlicePlaceReviewResponse {
+    ): SliceResponse<PlaceReviewListResponse> {
         val placeReviewListResponses = placeReviewRepository.getPlaceReviewListByPlaceId(placeId, size, sortType, lastId).map { placeReview ->
             PlaceReviewListResponse(placeReview, fileService.getPreAuthenticatedObjectUrl(placeReview.user.profile.profileName))
         }
-        return SlicePlaceReviewResponse.of(
+        return SliceResponse(
             size,
             placeReviewListResponses,
-            getAverage(placeReviewRepository.getAverageRatingByPlaceId(placeId)),
         )
     }
 
@@ -80,16 +80,19 @@ class PlaceReviewService(
         size: Int,
         sortType: PlaceReviewSortType,
         lastId: Long?,
-    ): SlicePlaceReviewResponse {
+    ): SliceResponse<PlaceReviewListResponse> {
         val user: User = userRepository.getByUserId(userId)
         val placeReviewListResponses = placeReviewRepository.getPlaceReviewListByUser(user, size, sortType, lastId).map { placeReview ->
             PlaceReviewListResponse(placeReview, fileService.getPreAuthenticatedObjectUrl(placeReview.user.profile.profileName))
         }
-        return SlicePlaceReviewResponse.of(
+        return SliceResponse(
             size,
             placeReviewListResponses,
-            getAverage(placeReviewRepository.getAverageRatingByUser(user)),
         )
+    }
+
+    fun getAverageStarRating(placeId: String): AverageRatingResponse {
+        return AverageRatingResponse(getAverage(placeReviewRepository.getAverageRatingByPlaceId(placeId)))
     }
 
     fun getExistReview(userId: Long, placeId: String): ExistReviewResponse {

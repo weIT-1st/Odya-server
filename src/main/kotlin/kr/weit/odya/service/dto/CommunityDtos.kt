@@ -51,7 +51,8 @@ data class CommunityResponse(
     val topic: TopicResponse?,
     val communityContentImages: List<CommunityContentImageResponse>,
     val communityCommentCount: Int,
-    val communityLikeCount: Int, // TODO: 좋아요 기능 추가 시 수정
+    val communityLikeCount: Int,
+    val isUserLiked: Boolean,
 ) {
     companion object {
         fun from(
@@ -59,7 +60,7 @@ data class CommunityResponse(
             travelJournalSimpleResponse: TravelJournalSimpleResponse?,
             communityContentImages: List<CommunityContentImageResponse>,
             communityCommentCount: Int,
-            communityLikeCount: Int,
+            isUserLiked: Boolean,
         ): CommunityResponse =
             CommunityResponse(
                 communityId = community.id,
@@ -72,7 +73,8 @@ data class CommunityResponse(
                 },
                 communityContentImages = communityContentImages,
                 communityCommentCount = communityCommentCount,
-                communityLikeCount = communityLikeCount,
+                communityLikeCount = community.likeCount,
+                isUserLiked = isUserLiked,
             )
     }
 }
@@ -87,8 +89,23 @@ data class CommunitySummaryResponse(
     val communityMainImageUrl: String,
     val placeId: String?,
     val communityCommentCount: Int,
-    val communityLikeCount: Int, // TODO: 좋아요 기능 추가 시 수정
-)
+    val communityLikeCount: Int,
+) {
+    companion object {
+        fun from(
+            community: Community,
+            communityMainImageUrl: String,
+            communityCommentCount: Int,
+        ): CommunitySummaryResponse =
+            CommunitySummaryResponse(
+                communityId = community.id,
+                communityMainImageUrl = communityMainImageUrl,
+                placeId = community.placeId,
+                communityCommentCount = communityCommentCount,
+                communityLikeCount = community.likeCount,
+            )
+    }
+}
 
 data class CommunityUpdateRequest(
     @field:NotBlank(message = "커뮤니티 글은 필수 입력 값입니다.")

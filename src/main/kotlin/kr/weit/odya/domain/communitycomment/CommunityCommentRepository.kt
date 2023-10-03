@@ -23,7 +23,7 @@ fun CommunityCommentRepository.getSliceCommunityCommentBy(
 ): List<CommunityComment> =
     findSliceByCommunityIdAndSizeAndLastId(communityId, size, lastId)
 
-fun CommunityCommentRepository.deleteCommunityComment(userId: Long) {
+fun CommunityCommentRepository.deleteCommunityComments(userId: Long) {
     deleteAllByUserId(userId)
     deleteCommunityCommentByUserId(userId)
 }

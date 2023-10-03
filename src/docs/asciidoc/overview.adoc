@@ -76,6 +76,9 @@
 
 | `-13000`
 | Kakao client exception
+
+| `-14000`
+| Failed to get Redis lock
 |===
 
 [[참고사항]]

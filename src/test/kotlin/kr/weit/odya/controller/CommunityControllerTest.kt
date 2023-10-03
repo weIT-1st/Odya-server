@@ -435,6 +435,7 @@ class CommunityControllerTest(
                                     "communityContentImages[].imageUrl" type JsonFieldType.STRING description "커뮤니티 콘텐츠 이미지 URL" example response.communityContentImages[0].imageUrl,
                                     "communityCommentCount" type JsonFieldType.NUMBER description "커뮤니티 댓글 수" example response.communityCommentCount,
                                     "communityLikeCount" type JsonFieldType.NUMBER description "커뮤니티 좋아요 수" example response.communityLikeCount,
+                                    "isUserLiked" type JsonFieldType.BOOLEAN description "사용자가 좋아요를 눌렀는지 여부" example response.isUserLiked,
                                 ),
                             ),
                         )
