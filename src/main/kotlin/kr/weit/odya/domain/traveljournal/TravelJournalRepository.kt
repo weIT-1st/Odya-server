@@ -53,6 +53,12 @@ fun TravelJournalRepository.getRecommendTravelJournalSliceBy(
     sortType: TravelJournalSortType,
 ): List<TravelJournal> = findRecommendTravelJournalSliceBy(user, size, lastId, sortType)
 
+fun TravelJournalRepository.getTaggedTravelJournalSliceBy(
+    user: User,
+    size: Int,
+    lastId: Long?,
+): List<TravelJournal> = findTaggedTravelJournalSliceBy(user, size, lastId)
+
 @Repository
 interface TravelJournalRepository : JpaRepository<TravelJournal, Long>, CustomTravelJournalRepository {
     fun findAllByUserId(userId: Long): List<TravelJournal>
@@ -94,6 +100,12 @@ interface CustomTravelJournalRepository {
         size: Int,
         lastId: Long?,
         sortType: TravelJournalSortType,
+    ): List<TravelJournal>
+
+    fun findTaggedTravelJournalSliceBy(
+        user: User,
+        size: Int,
+        lastId: Long?,
     ): List<TravelJournal>
 }
 
@@ -176,6 +188,27 @@ class CustomTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) 
             and(
                 col(TravelJournalInformation::visibility).notEqual(TravelJournalVisibility.PRIVATE),
                 nestedCol(col(TravelJournal::user), User::id).`in`(sameAgeRangeFollowingIds),
+            ),
+        )
+    }
+
+    override fun findTaggedTravelJournalSliceBy(user: User, size: Int, lastId: Long?): List<TravelJournal> = queryFactory.listQuery {
+        select(entity(TravelJournal::class))
+        from(entity(TravelJournal::class))
+        associate(
+            entity(TravelJournal::class),
+            entity(TravelCompanion::class),
+            Relation<TravelJournal, TravelCompanion>("mutableTravelCompanions"),
+        )
+        associate(
+            entity(TravelJournal::class),
+            entity(TravelJournalInformation::class),
+            on(TravelJournal::travelJournalInformation),
+        )
+        where(
+            and(
+                col(TravelJournalInformation::visibility).notEqual(TravelJournalVisibility.PRIVATE),
+                col(TravelCompanion::user).equal(user),
             ),
         )
     }

@@ -1,5 +1,6 @@
 package kr.weit.odya.service.dto
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.PastOrPresent
@@ -239,6 +240,15 @@ data class TravelJournalSimpleResponse(
     val travelJournalId: Long,
     val title: String,
     val mainImageUrl: String,
+)
+
+data class TaggedTravelJournalResponse(
+    val travelJournalId: Long,
+    val title: String,
+    val mainImageUrl: String,
+    val writer: UserSimpleResponse,
+    @JsonFormat(pattern = "yyyy.MM.dd")
+    val travelStartDate: LocalDate,
 )
 
 data class TravelCompanionSimpleResponse(

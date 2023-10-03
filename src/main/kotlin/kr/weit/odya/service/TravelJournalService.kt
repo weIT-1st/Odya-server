@@ -28,12 +28,14 @@ import kr.weit.odya.domain.traveljournal.getByTravelJournalId
 import kr.weit.odya.domain.traveljournal.getFriendTravelJournalSliceBy
 import kr.weit.odya.domain.traveljournal.getMyTravelJournalSliceBy
 import kr.weit.odya.domain.traveljournal.getRecommendTravelJournalSliceBy
+import kr.weit.odya.domain.traveljournal.getTaggedTravelJournalSliceBy
 import kr.weit.odya.domain.traveljournal.getTravelJournalSliceBy
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.domain.user.getByUserIds
 import kr.weit.odya.service.dto.SliceResponse
+import kr.weit.odya.service.dto.TaggedTravelJournalResponse
 import kr.weit.odya.service.dto.TravelCompanionResponse
 import kr.weit.odya.service.dto.TravelCompanionSimpleResponse
 import kr.weit.odya.service.dto.TravelJournalContentImageResponse
@@ -43,6 +45,7 @@ import kr.weit.odya.service.dto.TravelJournalRequest
 import kr.weit.odya.service.dto.TravelJournalResponse
 import kr.weit.odya.service.dto.TravelJournalSummaryResponse
 import kr.weit.odya.service.dto.TravelJournalUpdateRequest
+import kr.weit.odya.service.dto.UserSimpleResponse
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -92,7 +95,9 @@ class TravelJournalService(
             }
         val travelJournal = travelJournalRequest.toEntity(register, travelCompanions, travelJournalContents)
         val savedTravelJournal = travelJournalRepository.save(travelJournal)
-        publishTravelJournalPushEvent(register, travelJournal)
+        if (travelJournal.visibility != TravelJournalVisibility.PRIVATE) {
+            publishTravelJournalPushEvent(register, travelJournal)
+        }
         return savedTravelJournal.id
     }
 
@@ -218,6 +223,16 @@ class TravelJournalService(
         return SliceResponse(
             size,
             getTravelJournalSimpleResponses(travelJournals),
+        )
+    }
+
+    @Transactional(readOnly = true)
+    fun getTaggedTravelJournals(userId: Long, size: Int, lastId: Long?): SliceResponse<TaggedTravelJournalResponse> {
+        val user = userRepository.getByUserId(userId)
+        val travelJournals = travelJournalRepository.getTaggedTravelJournalSliceBy(user, size, lastId)
+        return SliceResponse(
+            size,
+            getTaggedTravelJournalResponses(travelJournals),
         )
     }
 
@@ -461,6 +476,23 @@ class TravelJournalService(
                 travelJournalContent,
                 travelJournalContent.coordinates?.splitCoordinates(),
                 travelJournalContentImageResponses,
+            )
+        }
+    }
+
+    private fun getTaggedTravelJournalResponses(travelJournals: List<TravelJournal>): List<TaggedTravelJournalResponse> {
+        return travelJournals.map { travelJournal ->
+            val mainImageAuthenticatedUrl =
+                fileService.getPreAuthenticatedObjectUrl(travelJournal.travelJournalContents[0].travelJournalContentImages[0].contentImage.name)
+            TaggedTravelJournalResponse(
+                travelJournal.id,
+                travelJournal.title,
+                mainImageAuthenticatedUrl,
+                UserSimpleResponse(
+                    travelJournal.user,
+                    fileService.getPreAuthenticatedObjectUrl(travelJournal.user.profile.profileName),
+                ),
+                travelJournal.travelStartDate,
             )
         }
     }
