@@ -320,6 +320,7 @@ class TravelJournalService(
         // Community - TravelJournal FK 위반으로 인한 null 처리
         communityRepository.updateTravelJournalIdToNull(travelJournalId)
         reportTravelJournalRepository.deleteAllByTravelJournalId(travelJournalId)
+        travelJournalBookmarkRepository.deleteAllByTravelJournalId(travelJournalId)
         travelJournalRepository.delete(travelJournal)
         eventPublisher.publishEvent(TravelJournalDeleteEvent(travelJournalContentImageNames))
     }
@@ -601,6 +602,7 @@ class TravelJournalService(
         }
 
     private fun getRemoveTravelCompanionId(user: User, travelJournalId: Long): Long {
-        return travelJournalRepository.findTravelCompanionId(user, travelJournalId) ?: throw ForbiddenException("요청 사용자(${user.id})는 해당 여행일지($travelJournalId)의 같이 간 친구를 처리할 권한이 없습니다.")
+        return travelJournalRepository.findTravelCompanionId(user, travelJournalId)
+            ?: throw ForbiddenException("요청 사용자(${user.id})는 해당 여행일지($travelJournalId)의 같이 간 친구를 처리할 권한이 없습니다.")
     }
 }

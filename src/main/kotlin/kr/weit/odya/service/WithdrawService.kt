@@ -3,6 +3,7 @@ package kr.weit.odya.service
 import kr.weit.odya.domain.agreedTerms.AgreedTermsRepository
 import kr.weit.odya.domain.favoritePlace.FavoritePlaceRepository
 import kr.weit.odya.domain.favoriteTopic.FavoriteTopicRepository
+import kr.weit.odya.domain.traveljournalbookmark.TravelJournalBookmarkRepository
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.security.FirebaseTokenHelper
@@ -17,6 +18,7 @@ class WithdrawService(
     private val firebaseTokenHelper: FirebaseTokenHelper,
     private val placeReviewService: PlaceReviewService,
     private val travelJournalService: TravelJournalService,
+    private val travelJournalBookmarkRepository: TravelJournalBookmarkRepository,
     private val userRepository: UserRepository,
     private val userService: UserService,
     private val communityService: CommunityService,
@@ -30,6 +32,7 @@ class WithdrawService(
         agreedTermsRepository.deleteAllByUserId(userId)
         communityService.deleteCommunityByUserId(userId)
         travelJournalService.deleteTravelJournalByUserId(userId)
+        travelJournalBookmarkRepository.deleteAllByUserId(userId)
         userService.deleteUserRelatedData(userId)
         firebaseTokenHelper.withdrawUser(uid)
     }
