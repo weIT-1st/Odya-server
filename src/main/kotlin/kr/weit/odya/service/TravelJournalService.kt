@@ -22,8 +22,7 @@ import kr.weit.odya.domain.traveljournal.TravelJournalDeleteEvent
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.traveljournal.TravelJournalSortType
 import kr.weit.odya.domain.traveljournal.TravelJournalVisibility
-import kr.weit.odya.domain.traveljournal.cancelTravelCompanion
-import kr.weit.odya.domain.traveljournal.existsTravelCompanion
+import kr.weit.odya.domain.traveljournal.findTravelCompanionId
 import kr.weit.odya.domain.traveljournal.getByTravelJournalId
 import kr.weit.odya.domain.traveljournal.getFriendTravelJournalSliceBy
 import kr.weit.odya.domain.traveljournal.getMyTravelJournalSliceBy
@@ -343,6 +342,12 @@ class TravelJournalService(
         eventPublisher.publishEvent(TravelJournalDeleteEvent(contentImageRepository.findAllByUserId(userId)))
     }
 
+    @Transactional
+    fun removeTravelCompanion(userId: Long, travelJournalId: Long) {
+        val user = userRepository.getByUserId(userId)
+        travelCompanionRepository.deleteById(getRemoveTravelCompanionId(user, travelJournalId))
+    }
+
     private fun updateTravelCompanions(
         travelJournal: TravelJournal,
         travelJournalUpdateRequest: TravelJournalUpdateRequest,
@@ -367,11 +372,6 @@ class TravelJournalService(
     fun getPlaceDetailsMap(placeIdList: Set<String>): Map<String, PlaceDetails> =
         placeIdList.associateWith { googleMapsClient.findPlaceDetailsByPlaceId(it) }
 
-    @Transactional
-    fun cancelTravelCompanion(userId: Long, travelJournalId: Long) {
-        validateCancelTravelCompanion(userId, travelJournalId)
-        travelCompanionRepository.cancelTravelCompanion(userId, travelJournalId)
-    }
     private fun getTravelJournalContent(
         travelJournal: TravelJournal,
         travelJournalContentId: Long,
@@ -595,9 +595,7 @@ class TravelJournalService(
             }
         }
 
-    private fun validateCancelTravelCompanion(userId: Long, travelJournalId: Long) {
-        if (!travelCompanionRepository.existsTravelCompanion(userId, travelJournalId)) {
-            throw ForbiddenException("요청 사용자($userId)는 해당 여행일지의 같이 간 친구로 되어 있지 않습니다.")
-        }
+    private fun getRemoveTravelCompanionId(user: User, travelJournalId: Long): Long {
+        return travelJournalRepository.findTravelCompanionId(user, travelJournalId) ?: throw ForbiddenException("요청 사용자(${user.id})는 해당 여행일지($travelJournalId)의 같이 간 친구를 처리할 권한이 없습니다.")
     }
 }

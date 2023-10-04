@@ -8,12 +8,12 @@ import com.linecorp.kotlinjdsl.query.spec.predicate.PredicateSpec
 import com.linecorp.kotlinjdsl.querydsl.CriteriaQueryDsl
 import com.linecorp.kotlinjdsl.querydsl.expression.col
 import com.linecorp.kotlinjdsl.querydsl.from.Relation
+import com.linecorp.kotlinjdsl.selectQuery
 import com.linecorp.kotlinjdsl.subquery
 import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.follow.Follow
 import kr.weit.odya.domain.user.User
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 
@@ -59,14 +59,14 @@ fun TravelJournalRepository.getTaggedTravelJournalSliceBy(
     lastId: Long?,
 ): List<TravelJournal> = findTaggedTravelJournalSliceBy(user, size, lastId)
 
+fun TravelJournalRepository.findTravelCompanionId(user: User, id: Long) =
+    findAllByUserIdAndTravelJournalId(user, id)
+
 @Repository
 interface TravelJournalRepository : JpaRepository<TravelJournal, Long>, CustomTravelJournalRepository {
     fun findAllByUserId(userId: Long): List<TravelJournal>
 
     fun deleteAllByUserId(userId: Long)
-
-    @Query("SELECT TravelJournal.mutableTravelCompanions")
-    fun existsAllByTravelJournalContentsUserIdAndId()
 }
 
 interface CustomTravelJournalRepository {
@@ -107,6 +107,8 @@ interface CustomTravelJournalRepository {
         size: Int,
         lastId: Long?,
     ): List<TravelJournal>
+
+    fun findAllByUserIdAndTravelJournalId(user: User, id: Long): Long?
 }
 
 class CustomTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) : CustomTravelJournalRepository {
@@ -212,6 +214,29 @@ class CustomTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) 
             ),
         )
     }
+
+    override fun findAllByUserIdAndTravelJournalId(user: User, id: Long): Long? =
+        queryFactory.selectQuery {
+            select(col(TravelCompanion::id))
+            from(entity(TravelJournal::class))
+            associate(
+                entity(TravelJournal::class),
+                entity(TravelCompanion::class),
+                Relation<TravelJournal, TravelCompanion>("mutableTravelCompanions"),
+            )
+            associate(
+                entity(TravelJournal::class),
+                entity(TravelJournalInformation::class),
+                on(TravelJournal::travelJournalInformation),
+            )
+            where(
+                and(
+                    col(TravelJournalInformation::visibility).notEqual(TravelJournalVisibility.PRIVATE),
+                    col(TravelCompanion::user).equal(user),
+                    col(TravelJournal::id).equal(id),
+                ),
+            )
+        }.resultList.stream().findFirst().orElse(null)
 
     private fun getMyFriendOnlyTravelJournalIdsSubQuery(userId: Long) =
         queryFactory.subquery<Long> {

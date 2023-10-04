@@ -28,6 +28,7 @@ import kr.weit.odya.support.TEST_DEFAULT_SIZE
 import kr.weit.odya.support.TEST_IMAGE_FILE_WEBP
 import kr.weit.odya.support.TEST_INVALID_LAST_ID
 import kr.weit.odya.support.TEST_INVALID_SIZE
+import kr.weit.odya.support.TEST_INVALID_TRAVEL_JOURNAL_ID
 import kr.weit.odya.support.TEST_LAST_ID
 import kr.weit.odya.support.TEST_OTHER_UPDATE_TRAVEL_JOURNAL_CONTENT_IMAGE
 import kr.weit.odya.support.TEST_PLACE_ID
@@ -2689,6 +2690,122 @@ class TravelJournalControllerTest(
                                 pathParameters(
                                     "travelJournalId" pathDescription "삭제할 여행 일지의 아이디",
                                     "travelJournalContentId" pathDescription "삭제할 여행 일지의 콘텐츠 아이디",
+                                ),
+                            ),
+                        )
+                }
+            }
+        }
+
+        describe("DELETE /api/v1/travel-journals/travelCompanion/{travelJournalId}") {
+            val targetUri = "/api/v1/travel-journals/travelCompanion/{travelJournalId}"
+            context("유효한 요청이 왔을 경우") {
+                every { travelJournalService.removeTravelCompanion(TEST_USER_ID, TEST_TRAVEL_JOURNAL_ID) } just runs
+                it("204 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .delete(targetUri, TEST_TRAVEL_JOURNAL_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    )
+                        .andExpect(status().isNoContent)
+                        .andDo(
+                            RestDocsHelper.createPathDocument(
+                                "travel-journal-remove-travel-companion-success",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "travelJournalId" pathDescription "삭제할 여행 일지의 아이디" example TEST_TRAVEL_JOURNAL_ID,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("양수가 아닌 여행 일지 아이디가 들어온 경우") {
+                it("204 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .delete(targetUri, TEST_INVALID_TRAVEL_JOURNAL_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    )
+                        .andExpect(status().isBadRequest)
+                        .andDo(
+                            RestDocsHelper.createPathDocument(
+                                "travel-journal-remove-travel-companion-fail-invalid-id",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "travelJournalId" pathDescription "양수가 아닌 여행 일지의 아이디" example TEST_INVALID_TRAVEL_JOURNAL_ID,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("해당 여행일지의 같이 간 친구를 처리할 권한이 없는 경우") {
+                every { travelJournalService.removeTravelCompanion(TEST_USER_ID, TEST_TRAVEL_JOURNAL_ID) } throws ForbiddenException("요청 사용자($TEST_USER_ID)는 해당 여행일지($TEST_TRAVEL_JOURNAL_ID)의 같이 간 친구를 처리할 권한이 없습니다.")
+                it("403 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .delete(targetUri, TEST_TRAVEL_JOURNAL_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    )
+                        .andExpect(status().isForbidden)
+                        .andDo(
+                            RestDocsHelper.createPathDocument(
+                                "travel-journal-remove-travel-companion-fail-no-permission",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "처리할 권한이 없는 사용자의 ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "travelJournalId" pathDescription "삭제할 여행 일지의 아이디" example TEST_TRAVEL_JOURNAL_ID,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("존재하지 않는 유저ID가 들어온 경우") {
+                every { travelJournalService.removeTravelCompanion(TEST_USER_ID, TEST_TRAVEL_JOURNAL_ID) } throws NoSuchElementException(NOT_EXIST_USER_ERROR_MESSAGE)
+                it("404 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .delete(targetUri, TEST_TRAVEL_JOURNAL_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    )
+                        .andExpect(status().isNotFound)
+                        .andDo(
+                            RestDocsHelper.createPathDocument(
+                                "travel-journal-remove-travel-companion-fail-not-found",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "travelJournalId" pathDescription "삭제할 여행 일지의 아이디" example TEST_TRAVEL_JOURNAL_ID,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효하지 않은 토큰일 경우") {
+                it("401 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .delete(targetUri, TEST_TRAVEL_JOURNAL_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN),
+                    )
+                        .andExpect(status().isUnauthorized)
+                        .andDo(
+                            RestDocsHelper.createPathDocument(
+                                "travel-journal-remove-travel-companion-fail-invalid-token",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "travelJournalId" pathDescription "삭제할 여행 일지의 아이디" example TEST_TRAVEL_JOURNAL_ID,
                                 ),
                             ),
                         )
