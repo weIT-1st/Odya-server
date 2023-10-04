@@ -112,7 +112,12 @@ infix fun String.requestPartDescription(value: String): RequestPartDescriptor {
 }
 
 infix fun ParameterDescriptor.example(value: Any): ParameterDescriptor {
-    return this.attributes(field(EXAMPLE, if (value is String) value else value.toString()))
+    return this.attributes(
+        field(
+            EXAMPLE,
+            if (value is String) value else if (value is Array<*>) value.joinToString() else value.toString(),
+        ),
+    )
 }
 
 infix fun ParameterDescriptor.isOptional(value: Boolean): ParameterDescriptor {

@@ -39,6 +39,7 @@ const val TEST_OTHER_TRAVEL_JOURNAL_ID = 4L
 const val TEST_NOT_EXIST_TRAVEL_JOURNAL_ID = 5L
 const val TEST_INVALID_TRAVEL_JOURNAL_ID = -1L
 const val TEST_TRAVEL_JOURNAL_TITLE = "testTitle"
+const val TEST_OTHER_TRAVEL_JOURNAL_TITLE = "testTitle2"
 const val TEST_TRAVEL_JOURNAL_CONTENT = "testContent"
 const val TEST_OTHER_TRAVEL_JOURNAL_CONTENT = "testContent2"
 const val TEST_TRAVEL_COMPANION_NAME = "testCompanion"
@@ -330,6 +331,7 @@ fun createTravelJournalResponse(travelJournal: TravelJournal = createTravelJourn
         travelJournal.travelStartDate,
         travelJournal.travelEndDate,
         travelJournal.visibility,
+        TEST_IS_BOOK_MARKED_FALSE,
         UserSimpleResponse(createUser(), TEST_FILE_AUTHENTICATED_URL),
         listOf(createTravelJournalContentResponse()),
         listOf(createTravelCompanionResponse()),

@@ -29,6 +29,7 @@ import kr.weit.odya.domain.traveljournal.getMyTravelJournalSliceBy
 import kr.weit.odya.domain.traveljournal.getRecommendTravelJournalSliceBy
 import kr.weit.odya.domain.traveljournal.getTaggedTravelJournalSliceBy
 import kr.weit.odya.domain.traveljournal.getTravelJournalSliceBy
+import kr.weit.odya.domain.traveljournalbookmark.TravelJournalBookmarkRepository
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.domain.user.getByUserIds
@@ -88,6 +89,7 @@ class TravelJournalServiceTest : DescribeSpec(
         val followRepository = mockk<FollowRepository>()
         val communityRepository = mockk<CommunityRepository>()
         val googleMapsClient = mockk<GoogleMapsClient>()
+        val travelJournalBookmarkRepository = mockk<TravelJournalBookmarkRepository>()
         val travelJournalService = TravelJournalService(
             userRepository,
             travelJournalRepository,
@@ -99,6 +101,7 @@ class TravelJournalServiceTest : DescribeSpec(
             contentImageRepository,
             travelCompanionRepository,
             googleMapsClient,
+            travelJournalBookmarkRepository,
         )
 
         describe("createTravelJournal") {
@@ -444,6 +447,12 @@ class TravelJournalServiceTest : DescribeSpec(
         describe("getTravelJournal") {
             context("모두 공개 여행 일지가 주어지는 경우") {
                 every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns TEST_TRAVEL_JOURNAL
+                every {
+                    travelJournalBookmarkRepository.existsByUserIdAndTravelJournal(
+                        TEST_USER_ID,
+                        TEST_TRAVEL_JOURNAL,
+                    )
+                } returns false
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
@@ -456,6 +465,12 @@ class TravelJournalServiceTest : DescribeSpec(
                 every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns createTravelJournal(
                     visibility = TravelJournalVisibility.FRIEND_ONLY,
                 )
+                every {
+                    travelJournalBookmarkRepository.existsByUserIdAndTravelJournal(
+                        TEST_OTHER_USER_ID,
+                        any<TravelJournal>(),
+                    )
+                } returns false
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
                 every {
                     followRepository.existsByFollowerIdAndFollowingId(
@@ -494,6 +509,12 @@ class TravelJournalServiceTest : DescribeSpec(
                 every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns createTravelJournal(
                     visibility = TravelJournalVisibility.PRIVATE,
                 )
+                every {
+                    travelJournalBookmarkRepository.existsByUserIdAndTravelJournal(
+                        TEST_USER_ID,
+                        any<TravelJournal>(),
+                    )
+                } returns false
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
