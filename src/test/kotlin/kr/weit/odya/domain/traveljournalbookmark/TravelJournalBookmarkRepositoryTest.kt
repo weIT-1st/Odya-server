@@ -104,6 +104,17 @@ class TravelJournalBookmarkRepositoryTest(
                 travelJournalBookmarkRepository.deleteByUserAndTravelJournal(user, travelJournal)
                 travelJournalBookmarkRepository.existsByUserAndTravelJournal(user, travelJournal) shouldBe false
             }
+
+
+            expect("여행일지 아이디와 일치하는 모든 여행일지 즐겨찾기를 삭제한다.") {
+                travelJournalBookmarkRepository.deleteAllByTravelJournalId(travelJournal.id)
+                travelJournalBookmarkRepository.findAll().size shouldBe 1
+            }
+
+            expect("유저 아이디와 일치하는 모든 여행일지 즐겨찾기를 삭제한다.") {
+                travelJournalBookmarkRepository.deleteAllByUserId(user.id)
+                travelJournalBookmarkRepository.findAll().size shouldBe 0
+            }
         }
     },
 )

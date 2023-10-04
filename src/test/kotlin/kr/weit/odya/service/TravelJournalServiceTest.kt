@@ -1008,14 +1008,16 @@ class TravelJournalServiceTest : DescribeSpec(
 
         describe("deleteTravelJournal") {
             context("유요한 데이터가 주어지는 경우") {
-                every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns createTravelJournal()
+                every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns TEST_TRAVEL_JOURNAL
                 every { communityRepository.updateTravelJournalIdToNull(TEST_TRAVEL_JOURNAL_ID) } just runs
+                every { reportTravelJournalRepository.deleteAllByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } just runs
+                every { travelJournalBookmarkRepository.deleteAllByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } just runs
+                every { travelJournalRepository.delete(TEST_TRAVEL_JOURNAL) } just runs
                 every { applicationEventPublisher.publishEvent(any<TravelJournalDeleteEvent>()) } just runs
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
-                        travelJournalService.deleteTravelJournalContent(
+                        travelJournalService.deleteTravelJournal(
                             TEST_TRAVEL_JOURNAL_ID,
-                            TEST_TRAVEL_JOURNAL_CONTENT_ID,
                             TEST_USER_ID,
                         )
                     }
@@ -1026,22 +1028,20 @@ class TravelJournalServiceTest : DescribeSpec(
                 every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns createTravelJournal()
                 it("[ForbiddenException] 반환한다") {
                     shouldThrow<ForbiddenException> {
-                        travelJournalService.deleteTravelJournalContent(
+                        travelJournalService.deleteTravelJournal(
                             TEST_TRAVEL_JOURNAL_ID,
-                            TEST_TRAVEL_JOURNAL_CONTENT_ID,
                             TEST_OTHER_USER_ID,
                         )
                     }
                 }
             }
 
-            context("여행일지 콘텐츠가 존재하지 않는 경우") {
-                every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns createTravelJournal()
+            context("여행일지가 존재하지 않는 경우") {
+                every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } throws NoSuchElementException()
                 it("[NoSuchElementException] 반환한다") {
                     shouldThrow<NoSuchElementException> {
-                        travelJournalService.deleteTravelJournalContent(
+                        travelJournalService.deleteTravelJournal(
                             TEST_TRAVEL_JOURNAL_ID,
-                            TEST_TRAVEL_JOURNAL_NOT_EXIST_CONTENT_ID,
                             TEST_USER_ID,
                         )
                     }
