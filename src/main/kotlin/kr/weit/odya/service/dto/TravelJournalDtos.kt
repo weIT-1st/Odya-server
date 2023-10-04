@@ -80,12 +80,14 @@ data class TravelJournalResponse(
     val travelStartDate: LocalDate,
     val travelEndDate: LocalDate,
     val visibility: TravelJournalVisibility,
+    val isBookmarked: Boolean,
     val writer: UserSimpleResponse,
     val travelJournalContents: List<TravelJournalContentResponse>,
     val travelJournalCompanions: List<TravelCompanionResponse>,
 ) {
     constructor(
         travelJournal: TravelJournal,
+        isBookmarked: Boolean,
         writerProfileUrl: String,
         travelJournalContents: List<TravelJournalContentResponse>,
         travelJournalCompanions: List<TravelCompanionResponse>,
@@ -95,6 +97,7 @@ data class TravelJournalResponse(
         travelJournal.travelStartDate,
         travelJournal.travelEndDate,
         travelJournal.visibility,
+        isBookmarked,
         UserSimpleResponse(travelJournal.user, writerProfileUrl),
         travelJournalContents,
         travelJournalCompanions,

@@ -98,6 +98,15 @@ fun createSimpleUserResponse(user: User = createUser(), profileUrl: String = TES
         profileUrl = profileUrl,
     )
 
+fun createOtherSimpleUserResponse(
+    user: User = createOtherUser(),
+    profileUrl: String = TEST_PROFILE_URL,
+): UserSimpleResponse =
+    UserSimpleResponse(
+        user = user,
+        profileUrl = profileUrl,
+    )
+
 fun createSliceSimpleUserResponse() = SliceResponse(
     hasNext = false,
     content = listOf(

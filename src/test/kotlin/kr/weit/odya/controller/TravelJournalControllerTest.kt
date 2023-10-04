@@ -1002,6 +1002,7 @@ class TravelJournalControllerTest(
                                     "travelStartDate" type JsonFieldType.STRING description "여행 시작일" example response.travelStartDate,
                                     "travelEndDate" type JsonFieldType.STRING description "여행 종료일" example response.travelEndDate,
                                     "visibility" type JsonFieldType.STRING description "여행 일지 공개 범위" example response.visibility,
+                                    "isBookmarked" type JsonFieldType.BOOLEAN description "여행 일지 북마크 여부" example response.isBookmarked,
                                     "writer.userId" type JsonFieldType.NUMBER description "여행 일지 작성자의 아이디" example response.writer.userId,
                                     "writer.nickname" type JsonFieldType.STRING description "여행 일지 작성자의 닉네임" example response.writer.nickname,
                                     "writer.profile.profileUrl" type JsonFieldType.STRING description "여행 일지 작성자의 프로필 사진" example response.writer.profile.profileUrl,

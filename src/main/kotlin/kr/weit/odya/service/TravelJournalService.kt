@@ -29,6 +29,7 @@ import kr.weit.odya.domain.traveljournal.getMyTravelJournalSliceBy
 import kr.weit.odya.domain.traveljournal.getRecommendTravelJournalSliceBy
 import kr.weit.odya.domain.traveljournal.getTaggedTravelJournalSliceBy
 import kr.weit.odya.domain.traveljournal.getTravelJournalSliceBy
+import kr.weit.odya.domain.traveljournalbookmark.TravelJournalBookmarkRepository
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
@@ -66,6 +67,7 @@ class TravelJournalService(
     private val contentImageRepository: ContentImageRepository,
     private val travelCompanionRepository: TravelCompanionRepository,
     private val googleMapsClient: GoogleMapsClient,
+    private val travelJournalBookmarkRepository: TravelJournalBookmarkRepository,
 ) {
     @Transactional
     fun createTravelJournal(
@@ -165,7 +167,7 @@ class TravelJournalService(
     fun getTravelJournal(travelJournalId: Long, userId: Long): TravelJournalResponse {
         val travelJournal = travelJournalRepository.getByTravelJournalId(travelJournalId)
         validateUserReadPermission(travelJournal, userId)
-        return getTravelJournalResponse(travelJournal)
+        return getTravelJournalResponse(userId, travelJournal)
     }
 
     @Transactional(readOnly = true)
@@ -439,11 +441,14 @@ class TravelJournalService(
                 }
             }
 
-    private fun getTravelJournalResponse(travelJournal: TravelJournal): TravelJournalResponse {
+    private fun getTravelJournalResponse(userId: Long, travelJournal: TravelJournal): TravelJournalResponse {
         val travelJournalContentResponses = getTravelJournalContentResponses(travelJournal)
         val travelCompanionResponses = getTravelCompanionResponses(travelJournal)
+        val isBookmarked =
+            travelJournalBookmarkRepository.existsByUserIdAndTravelJournal(userId, travelJournal)
         return TravelJournalResponse(
             travelJournal,
+            isBookmarked,
             fileService.getPreAuthenticatedObjectUrl(travelJournal.user.profile.profileName),
             travelJournalContentResponses,
             travelCompanionResponses,
