@@ -27,6 +27,10 @@ interface TravelJournalBookmarkRepository :
     fun existsByUserIdAndTravelJournal(userId: Long, travelJournal: TravelJournal): Boolean
 
     fun deleteByUserAndTravelJournal(user: User, travelJournal: TravelJournal)
+
+    fun deleteAllByTravelJournalId(travelJournalId: Long)
+
+    fun deleteAllByUserId(userId: Long)
 }
 
 interface CustomTravelJournalBookmarkRepository {

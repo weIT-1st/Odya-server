@@ -319,6 +319,7 @@ class TravelJournalService(
         // Community - TravelJournal FK 위반으로 인한 null 처리
         communityRepository.updateTravelJournalIdToNull(travelJournalId)
         reportTravelJournalRepository.deleteAllByTravelJournalId(travelJournalId)
+        travelJournalBookmarkRepository.deleteAllByTravelJournalId(travelJournalId)
         travelJournalRepository.delete(travelJournal)
         eventPublisher.publishEvent(TravelJournalDeleteEvent(travelJournalContentImageNames))
     }
