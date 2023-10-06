@@ -60,7 +60,7 @@ fun TravelJournalRepository.getTaggedTravelJournalSliceBy(
 ): List<TravelJournal> = findTaggedTravelJournalSliceBy(user, size, lastId)
 
 fun TravelJournalRepository.findTravelCompanionId(user: User, id: Long) =
-    findAllByUserIdAndTravelJournalId(user, id)
+    findByUserIdAndTravelJournalId(user, id)
 
 @Repository
 interface TravelJournalRepository : JpaRepository<TravelJournal, Long>, CustomTravelJournalRepository {
@@ -108,7 +108,7 @@ interface CustomTravelJournalRepository {
         lastId: Long?,
     ): List<TravelJournal>
 
-    fun findAllByUserIdAndTravelJournalId(user: User, id: Long): Long?
+    fun findByUserIdAndTravelJournalId(user: User, id: Long): Long?
 }
 
 class CustomTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) : CustomTravelJournalRepository {
@@ -215,7 +215,7 @@ class CustomTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) 
         )
     }
 
-    override fun findAllByUserIdAndTravelJournalId(user: User, id: Long): Long? =
+    override fun findByUserIdAndTravelJournalId(user: User, id: Long): Long? =
         queryFactory.selectQuery {
             select(col(TravelCompanion::id))
             from(entity(TravelJournal::class))
@@ -236,7 +236,7 @@ class CustomTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) 
                     col(TravelJournal::id).equal(id),
                 ),
             )
-        }.resultList.stream().findFirst().orElse(null)
+        }.resultList.firstOrNull()
 
     private fun getMyFriendOnlyTravelJournalIdsSubQuery(userId: Long) =
         queryFactory.subquery<Long> {
