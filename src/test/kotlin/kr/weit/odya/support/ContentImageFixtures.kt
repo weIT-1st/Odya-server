@@ -12,6 +12,7 @@ import kr.weit.odya.service.dto.ImageUserType
 import kr.weit.odya.service.dto.SliceResponse
 
 const val TEST_IMAGE_ID = 1L
+const val TEST_OTHER_IMAGE_ID = 1L
 const val TEST_INVALID_IMAGE_ID = -1L
 const val TEST_IMAGE_URL: String = "testImageUrl"
 const val TEST_PLACE_NAME: String = "testPlaceName"
@@ -51,6 +52,7 @@ fun createOtherContentImage(
     originName: String = TEST_OTHER_IMAGE_FILE_WEBP,
     user: User = createUser(),
 ) = ContentImage(
+    id = TEST_OTHER_IMAGE_ID,
     name = name,
     originName = originName,
     user = user,
@@ -63,7 +65,11 @@ fun createSliceImageResponse() = SliceResponse(
     content = listOf(createImageResponse()),
 )
 
-fun createPlaceDetails(lat: Double = TEST_BOTTOM_LATITUDE, lng: Double = TEST_LEFT_LONGITUDE, placeId: String = TEST_PLACE_ID) = PlaceDetails().apply {
+fun createPlaceDetails(
+    lat: Double = TEST_BOTTOM_LATITUDE,
+    lng: Double = TEST_LEFT_LONGITUDE,
+    placeId: String = TEST_PLACE_ID,
+) = PlaceDetails().apply {
     this.placeId = placeId
     geometry = Geometry().apply { location = LatLng(lat, lng) }
 }

@@ -1,0 +1,47 @@
+[[TravelJournal-Bookmark-API]]
+= *TravelJournal Bookmark API*
+
+[[여행일지-즐겨찾기-생성-API]]
+== *1. 여행일지 즐겨찾기 생성 API*
+
+=== *1-1 성공*
+
+operation::travel-journal-bookmark-controller-test/create-travel-journal-bookmark[snippets='http-request,path-parameters,request-headers,http-response']
+
+=== *1-2 실패 - 존재하지 않는 여행일지 아이디가 주어지는 경우*
+
+operation::travel-journal-bookmark-controller-test/create-travel-journal-bookmark-not-exist[snippets='http-request,path-parameters,request-headers,http-response']
+
+=== *1-3 실패 - 이미 여행일지 즐겨찾기를 눌렀을 경우*
+
+operation::travel-journal-bookmark-controller-test/create-travel-journal-bookmark-already-exist[snippets='http-request,path-parameters,request-headers,http-response']
+
+=== *1-4 실패 - 유효하지 않은 토큰이 주어지는 경우*
+
+operation::travel-journal-bookmark-controller-test/create-travel-journal-bookmark-invalid-token[snippets='http-request,path-parameters,request-headers,http-response']
+
+[[여행일지-즐겨찾기-내-목록-조회-API]]
+== *2. 여행일지 즐겨찾기 내 목록 조회 API*
+
+=== *2-1 성공*
+
+operation::travel-journal-bookmark-controller-test/get-my-travel-journal-bookmarks[snippets='http-request,request-headers,query-parameters,http-response,response-fields']
+
+=== *2-2 실패 - 유효하지 않은 토큰이 주어지는 경우*
+
+operation::travel-journal-bookmark-controller-test/get-my-travel-journal-bookmarks-invalid-token[snippets='http-request,request-headers,http-response']
+
+[[여행일지-즐겨찾기-삭제-API]]
+== *3. 여행일지 즐겨찾기 삭제 API*
+
+=== *3-1 성공*
+
+operation::travel-journal-bookmark-controller-test/delete-travel-journal-bookmark[snippets='http-request,path-parameters,request-headers,http-response']
+
+=== *3-2 실패 - 존재하지 않는 여행일지 아이디가 주어지는 경우*
+
+operation::travel-journal-bookmark-controller-test/delete-travel-journal-bookmark-not-exist[snippets='http-request,path-parameters,request-headers,http-response']
+
+=== *3-3 실패 - 유효하지 않은 토큰이 주어지는 경우*
+
+operation::travel-journal-bookmark-controller-test/delete-travel-journal-bookmark-invalid-token[snippets='http-request,path-parameters,request-headers,http-response']
