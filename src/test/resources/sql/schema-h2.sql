@@ -482,6 +482,6 @@ CREATE TABLE travel_journal_bookmark
 
 CREATE SEQUENCE travel_journal_bookmark_seq START WITH 1 INCREMENT BY 1;
 
-CREATE INDEX travel_journal_bookmark_user_id_index ON travel_journal_bookmark (user_id);
+CREATE INDEX travel_journal_bookmark_travel_journal_id_index ON travel_journal_bookmark (travel_journal_id);
 ALTER TABLE travel_journal_bookmark
     ADD CONSTRAINT travel_journal_bookmark_unique UNIQUE (user_id, travel_journal_id);

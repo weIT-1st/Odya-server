@@ -19,7 +19,7 @@ import kr.weit.odya.support.domain.BaseTimeEntity
 @Entity
 @Table(
     indexes = [
-        Index(name = "travel_journal_bookmark_user_id_index", columnList = "user_id"),
+        Index(name = "travel_journal_bookmark_travel_journal_id_index", columnList = "travel_journal_id"),
     ],
     uniqueConstraints = [
         UniqueConstraint(

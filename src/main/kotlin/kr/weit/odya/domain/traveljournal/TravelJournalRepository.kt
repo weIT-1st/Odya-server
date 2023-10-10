@@ -10,6 +10,7 @@ import com.linecorp.kotlinjdsl.querydsl.expression.col
 import com.linecorp.kotlinjdsl.querydsl.from.Relation
 import com.linecorp.kotlinjdsl.selectQuery
 import com.linecorp.kotlinjdsl.subquery
+import jakarta.ws.rs.ForbiddenException
 import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.follow.Follow
 import kr.weit.odya.domain.user.User
@@ -60,7 +61,7 @@ fun TravelJournalRepository.getTaggedTravelJournalSliceBy(
 ): List<TravelJournal> = findTaggedTravelJournalSliceBy(user, size, lastId)
 
 fun TravelJournalRepository.findTravelCompanionId(user: User, id: Long) =
-    findAllByUserIdAndTravelJournalId(user, id)
+    findByUserIdAndTravelJournalId(user, id) ?: throw ForbiddenException("요청 사용자(${user.id})는 해당 여행일지($id)의 같이 간 친구를 처리할 권한이 없습니다.")
 
 @Repository
 interface TravelJournalRepository : JpaRepository<TravelJournal, Long>, CustomTravelJournalRepository {
@@ -108,7 +109,7 @@ interface CustomTravelJournalRepository {
         lastId: Long?,
     ): List<TravelJournal>
 
-    fun findAllByUserIdAndTravelJournalId(user: User, id: Long): Long?
+    fun findByUserIdAndTravelJournalId(user: User, id: Long): Long?
 }
 
 class CustomTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) : CustomTravelJournalRepository {
@@ -215,7 +216,7 @@ class CustomTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) 
         )
     }
 
-    override fun findAllByUserIdAndTravelJournalId(user: User, id: Long): Long? =
+    override fun findByUserIdAndTravelJournalId(user: User, id: Long): Long? =
         queryFactory.selectQuery {
             select(col(TravelCompanion::id))
             from(entity(TravelJournal::class))
@@ -236,7 +237,7 @@ class CustomTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) 
                     col(TravelJournal::id).equal(id),
                 ),
             )
-        }.resultList.stream().findFirst().orElse(null)
+        }.resultList.firstOrNull()
 
     private fun getMyFriendOnlyTravelJournalIdsSubQuery(userId: Long) =
         queryFactory.subquery<Long> {
