@@ -158,11 +158,11 @@ class TravelJournalRepositoryTest(
 
         context("TravelCompanion Id 조회") {
             expect("UserId와 TravelJournalId가 일치하는 TravelCompanion Id를 조회(존재)") {
-                travelJournalRepository.findTravelCompanionId(otherUser, travelJournal.id) shouldBe travelJournal.travelCompanions[0].id
+                travelJournalRepository.findByUserIdAndTravelJournalId(otherUser, travelJournal.id) shouldBe travelJournal.travelCompanions[0].id
             }
 
             expect("UserId와 TravelJournalId가 일치하는 TravelCompanion Id를 조회(존재하지 않음)") {
-                travelJournalRepository.findTravelCompanionId(user, travelJournal.id) shouldBe null
+                travelJournalRepository.findByUserIdAndTravelJournalId(user, travelJournal.id) shouldBe null
             }
         }
 

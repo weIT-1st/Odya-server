@@ -2698,8 +2698,8 @@ class TravelJournalControllerTest(
             }
         }
 
-        describe("DELETE /api/v1/travel-journals/travelCompanion/{travelJournalId}") {
-            val targetUri = "/api/v1/travel-journals/travelCompanion/{travelJournalId}"
+        describe("DELETE /api/v1/travel-journals/{travelJournalId}/travelCompanion") {
+            val targetUri = "/api/v1/travel-journals/{travelJournalId}/travelCompanion"
             context("유효한 요청이 왔을 경우") {
                 every { travelJournalService.removeTravelCompanion(TEST_USER_ID, TEST_TRAVEL_JOURNAL_ID) } just runs
                 it("204 응답한다.") {

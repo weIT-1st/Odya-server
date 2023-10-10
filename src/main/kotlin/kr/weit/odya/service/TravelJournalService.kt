@@ -348,7 +348,7 @@ class TravelJournalService(
     @Transactional
     fun removeTravelCompanion(userId: Long, travelJournalId: Long) {
         val user = userRepository.getByUserId(userId)
-        travelCompanionRepository.deleteById(getRemoveTravelCompanionId(user, travelJournalId))
+        travelCompanionRepository.deleteById(travelJournalRepository.findTravelCompanionId(user, travelJournalId))
     }
 
     private fun updateTravelCompanions(
@@ -600,8 +600,4 @@ class TravelJournalService(
                 travelJournalContentImage.contentImage.name
             }
         }
-
-    private fun getRemoveTravelCompanionId(user: User, travelJournalId: Long): Long {
-        return travelJournalRepository.findTravelCompanionId(user, travelJournalId) ?: throw ForbiddenException("요청 사용자(${user.id})는 해당 여행일지($travelJournalId)의 같이 간 친구를 처리할 권한이 없습니다.")
-    }
 }

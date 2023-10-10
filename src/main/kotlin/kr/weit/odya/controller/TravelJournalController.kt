@@ -231,7 +231,7 @@ class TravelJournalController(private val travelJournalService: TravelJournalSer
         return ResponseEntity.noContent().build()
     }
 
-    @DeleteMapping("travelCompanion/{travelJournalId}")
+    @DeleteMapping("/{travelJournalId}/travelCompanion")
     fun removeTravelCompanion(
         @Positive(message = "travelJournalId는 0보다 커야합니다.")
         @PathVariable("travelJournalId")
