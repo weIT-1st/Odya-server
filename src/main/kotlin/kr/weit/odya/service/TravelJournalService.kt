@@ -22,6 +22,7 @@ import kr.weit.odya.domain.traveljournal.TravelJournalDeleteEvent
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.traveljournal.TravelJournalSortType
 import kr.weit.odya.domain.traveljournal.TravelJournalVisibility
+import kr.weit.odya.domain.traveljournal.findTravelCompanionId
 import kr.weit.odya.domain.traveljournal.getByTravelJournalId
 import kr.weit.odya.domain.traveljournal.getFriendTravelJournalSliceBy
 import kr.weit.odya.domain.traveljournal.getMyTravelJournalSliceBy
@@ -342,6 +343,12 @@ class TravelJournalService(
         travelJournalRepository.deleteAllByUserId(userId)
         contentImageRepository.deleteAllByUserId(userId)
         eventPublisher.publishEvent(TravelJournalDeleteEvent(contentImageRepository.findAllByUserId(userId)))
+    }
+
+    @Transactional
+    fun removeTravelCompanion(userId: Long, travelJournalId: Long) {
+        val user = userRepository.getByUserId(userId)
+        travelCompanionRepository.deleteById(travelJournalRepository.findTravelCompanionId(user, travelJournalId))
     }
 
     private fun updateTravelCompanions(

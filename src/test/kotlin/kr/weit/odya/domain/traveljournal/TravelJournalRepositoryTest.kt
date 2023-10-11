@@ -156,6 +156,16 @@ class TravelJournalRepositoryTest(
             }
         }
 
+        context("TravelCompanion Id 조회") {
+            expect("UserId와 TravelJournalId가 일치하는 TravelCompanion Id를 조회(존재)") {
+                travelJournalRepository.findByUserIdAndTravelJournalId(otherUser, travelJournal.id) shouldBe travelJournal.travelCompanions[0].id
+            }
+
+            expect("UserId와 TravelJournalId가 일치하는 TravelCompanion Id를 조회(존재하지 않음)") {
+                travelJournalRepository.findByUserIdAndTravelJournalId(user, travelJournal.id) shouldBe null
+            }
+        }
+
         context("여행 일지 삭제") {
             expect("여행 일지 ID와 일치하는 여행 일지를 삭제한다.") {
                 travelJournalRepository.deleteById(travelJournal.id)

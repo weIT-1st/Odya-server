@@ -23,6 +23,7 @@ import kr.weit.odya.domain.traveljournal.TravelJournalDeleteEvent
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.traveljournal.TravelJournalSortType
 import kr.weit.odya.domain.traveljournal.TravelJournalVisibility
+import kr.weit.odya.domain.traveljournal.findTravelCompanionId
 import kr.weit.odya.domain.traveljournal.getByTravelJournalId
 import kr.weit.odya.domain.traveljournal.getFriendTravelJournalSliceBy
 import kr.weit.odya.domain.traveljournal.getMyTravelJournalSliceBy
@@ -1087,6 +1088,39 @@ class TravelJournalServiceTest : DescribeSpec(
                     every { travelJournalRepository.deleteAllByUserId(TEST_USER_ID) } just runs
                     shouldNotThrowAny {
                         travelJournalService.deleteTravelJournalByUserId(TEST_USER_ID)
+                    }
+                }
+            }
+        }
+
+        describe("removeTravelCompanion") {
+            val user = createUser()
+            context("유효한 UserId와 TravelJournalId가 주어지는 경우") {
+                it("정상적으로 종료한다") {
+                    every { userRepository.getByUserId(TEST_USER_ID) } returns user
+                    every { travelJournalRepository.findTravelCompanionId(user, TEST_TRAVEL_JOURNAL_ID) } returns 1L
+                    every { travelCompanionRepository.deleteById(1L) } just runs
+                    shouldNotThrowAny {
+                        travelJournalService.removeTravelCompanion(TEST_USER_ID, TEST_TRAVEL_JOURNAL_ID)
+                    }
+                }
+            }
+
+            context("유효하지 않은 USER ID가 주어지는 경우") {
+                it("[NoSuchElementException] 반환한다") {
+                    every { userRepository.getByUserId(TEST_USER_ID) } throws NoSuchElementException()
+                    shouldThrow<NoSuchElementException> {
+                        travelJournalService.removeTravelCompanion(TEST_USER_ID, TEST_TRAVEL_JOURNAL_ID)
+                    }
+                }
+            }
+
+            context("해당 여행일지의 같이 간 친구를 처리할 권한이 없는 경우") {
+                it("정상적으로 종료한다") {
+                    every { userRepository.getByUserId(TEST_USER_ID) } returns user
+                    every { travelJournalRepository.findTravelCompanionId(user, TEST_TRAVEL_JOURNAL_ID) } throws ForbiddenException()
+                    shouldThrow<ForbiddenException> {
+                        travelJournalService.removeTravelCompanion(TEST_USER_ID, TEST_TRAVEL_JOURNAL_ID)
                     }
                 }
             }

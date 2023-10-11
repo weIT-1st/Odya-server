@@ -303,3 +303,26 @@ operation::travel-journal-controller-test/travel-journal-content-delete-fail-not
 === *11-4 실패 - 유효하지 않은 토큰일 경우*
 
 operation::travel-journal-controller-test/travel-journal-content-delete-fail-invalid-token[snippets='http-request,request-headers,path-parameters,http-response']
+
+[[여행일지같이간친구삭제-API]]
+== *12. 여행 일지 같이 간 친구 삭제 API*
+
+=== *12-1 성공*
+
+operation::travel-journal-controller-test/travel-journal-remove-travel-companion-success[snippets='http-request,request-headers,path-parameters,http-response']
+
+=== *12-2 실패 - 양수가 아닌 여행 일지 ID가 들어온 경우*
+
+operation::travel-journal-controller-test/travel-journal-remove-travel-companion-fail-invalid-id[snippets='http-request,request-headers,path-parameters,http-response']
+
+=== *12-3 실패 - 해당 여행일지의 같이 간 친구를 처리할 권한이 없는 경우*
+
+operation::travel-journal-controller-test/travel-journal-remove-travel-companion-fail-no-permission[snippets='http-request,request-headers,path-parameters,http-response']
+
+=== *12-4 실패 - 존재하지 않는 유저ID가 들어온 경우*
+
+operation::travel-journal-controller-test/travel-journal-remove-travel-companion-fail-not-found[snippets='http-request,request-headers,path-parameters,http-response']
+
+=== *12-5 실패 - 유효하지 않은 토큰일 경우*
+
+operation::travel-journal-controller-test/travel-journal-remove-travel-companion-fail-invalid-token[snippets='http-request,request-headers,path-parameters,http-response']
