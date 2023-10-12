@@ -35,7 +35,8 @@ import kr.weit.odya.support.createCommunityResponse
 import kr.weit.odya.support.createCommunityUpdateRequest
 import kr.weit.odya.support.createMockImageFile
 import kr.weit.odya.support.createMockOtherImageFile
-import kr.weit.odya.support.createSliceCommunityResponse
+import kr.weit.odya.support.createSliceCommunitySimpleResponse
+import kr.weit.odya.support.createSliceCommunitySummaryResponse
 import kr.weit.odya.support.createUpdateCommunityContentImagePairs
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
 import kr.weit.odya.support.test.ControllerTestHelper.Companion.jsonContent
@@ -524,7 +525,7 @@ class CommunityControllerTest(
         describe("GET /api/v1/communities") {
             val targetUri = "/api/v1/communities"
             context("유효한 요청 데이터가 전달되면") {
-                val response = createSliceCommunityResponse()
+                val response = createSliceCommunitySummaryResponse()
                 every {
                     communityService.getCommunities(
                         TEST_USER_ID,
@@ -554,8 +555,20 @@ class CommunityControllerTest(
                                 responseBody(
                                     "hasNext" type JsonFieldType.BOOLEAN description "다음 페이지 존재 여부" example response.hasNext,
                                     "content[].communityId" type JsonFieldType.NUMBER description "커뮤니티 아이디" example response.content[0].communityId,
+                                    "content[].communityContent" type JsonFieldType.STRING description "커뮤니티 내용" example response.content[0].communityContent,
                                     "content[].communityMainImageUrl" type JsonFieldType.STRING description "커뮤니티 대표 이미지 URL" example response.content[0].communityMainImageUrl,
                                     "content[].placeId" type JsonFieldType.STRING description "장소 아이디" example response.content[0].placeId isOptional true,
+                                    "content[].writer.userId" type JsonFieldType.NUMBER description "작성자 아이디" example response.content[0].writer.userId,
+                                    "content[].writer.nickname" type JsonFieldType.STRING description "작성자 닉네임" example response.content[0].writer.nickname,
+                                    "content[].writer.isFollowing" type JsonFieldType.BOOLEAN description "작성자를 팔로우 중인지 여부" example response.content[0].writer.isFollowing,
+                                    "content[].writer.profile.profileUrl" type JsonFieldType.STRING description "작성자 프로필 이미지 URL" example response.content[0].writer.profile.profileUrl,
+                                    "content[].writer.profile.profileColor.colorHex" type JsonFieldType.STRING description "작성자 프로필 색상" example response.content[0].writer.profile.profileColor?.colorHex isOptional true,
+                                    "content[].writer.profile.profileColor.red" type JsonFieldType.NUMBER description "작성자 프로필 색상의 빨간색 값" example response.content[0].writer.profile.profileColor?.red isOptional true,
+                                    "content[].writer.profile.profileColor.green" type JsonFieldType.NUMBER description "작성자 프로필 색상의 초록색 값" example response.content[0].writer.profile.profileColor?.green isOptional true,
+                                    "content[].writer.profile.profileColor.blue" type JsonFieldType.NUMBER description "작성자 프로필 색상의 파란색 값" example response.content[0].writer.profile.profileColor?.blue isOptional true,
+                                    "content[].travelJournalSimpleResponse.travelJournalId" type JsonFieldType.NUMBER description "여행 일지 아이디" example response.content[0].travelJournalSimpleResponse?.travelJournalId isOptional true,
+                                    "content[].travelJournalSimpleResponse.title" type JsonFieldType.STRING description "여행 일지 제목" example response.content[0].travelJournalSimpleResponse?.title isOptional true,
+                                    "content[].travelJournalSimpleResponse.mainImageUrl" type JsonFieldType.STRING description "여행 일지 대표 이미지 URL" example response.content[0].travelJournalSimpleResponse?.mainImageUrl isOptional true,
                                     "content[].communityCommentCount" type JsonFieldType.NUMBER description "커뮤니티 댓글 수" example response.content[0].communityCommentCount,
                                     "content[].communityLikeCount" type JsonFieldType.NUMBER description "커뮤니티 좋아요 수" example response.content[0].communityLikeCount,
                                 ),
@@ -592,7 +605,7 @@ class CommunityControllerTest(
         describe("GET /api/v1/communities/me") {
             val targetUri = "/api/v1/communities/me"
             context("유효한 요청 데이터가 전달되면") {
-                val response = createSliceCommunityResponse()
+                val response = createSliceCommunitySimpleResponse()
                 every {
                     communityService.getMyCommunities(
                         TEST_USER_ID,
@@ -624,8 +637,6 @@ class CommunityControllerTest(
                                     "content[].communityId" type JsonFieldType.NUMBER description "커뮤니티 아이디" example response.content[0].communityId,
                                     "content[].communityMainImageUrl" type JsonFieldType.STRING description "커뮤니티 대표 이미지 URL" example response.content[0].communityMainImageUrl,
                                     "content[].placeId" type JsonFieldType.STRING description "장소 아이디" example response.content[0].placeId isOptional true,
-                                    "content[].communityCommentCount" type JsonFieldType.NUMBER description "커뮤니티 댓글 수" example response.content[0].communityCommentCount,
-                                    "content[].communityLikeCount" type JsonFieldType.NUMBER description "커뮤니티 좋아요 수" example response.content[0].communityLikeCount,
                                 ),
                             )
                         }
@@ -660,7 +671,7 @@ class CommunityControllerTest(
         describe("GET /api/v1/communities/friends") {
             val targetUri = "/api/v1/communities/friends"
             context("유효한 요청 데이터가 전달되면") {
-                val response = createSliceCommunityResponse()
+                val response = createSliceCommunitySummaryResponse()
                 every {
                     communityService.getFriendCommunities(
                         TEST_USER_ID,
@@ -690,8 +701,20 @@ class CommunityControllerTest(
                                 responseBody(
                                     "hasNext" type JsonFieldType.BOOLEAN description "다음 페이지 존재 여부" example response.hasNext,
                                     "content[].communityId" type JsonFieldType.NUMBER description "커뮤니티 아이디" example response.content[0].communityId,
+                                    "content[].communityContent" type JsonFieldType.STRING description "커뮤니티 내용" example response.content[0].communityContent,
                                     "content[].communityMainImageUrl" type JsonFieldType.STRING description "커뮤니티 대표 이미지 URL" example response.content[0].communityMainImageUrl,
                                     "content[].placeId" type JsonFieldType.STRING description "장소 아이디" example response.content[0].placeId isOptional true,
+                                    "content[].writer.userId" type JsonFieldType.NUMBER description "작성자 아이디" example response.content[0].writer.userId,
+                                    "content[].writer.nickname" type JsonFieldType.STRING description "작성자 닉네임" example response.content[0].writer.nickname,
+                                    "content[].writer.isFollowing" type JsonFieldType.BOOLEAN description "작성자를 팔로우 중인지 여부" example response.content[0].writer.isFollowing,
+                                    "content[].writer.profile.profileUrl" type JsonFieldType.STRING description "작성자 프로필 이미지 URL" example response.content[0].writer.profile.profileUrl,
+                                    "content[].writer.profile.profileColor.colorHex" type JsonFieldType.STRING description "작성자 프로필 색상" example response.content[0].writer.profile.profileColor?.colorHex isOptional true,
+                                    "content[].writer.profile.profileColor.red" type JsonFieldType.NUMBER description "작성자 프로필 색상의 빨간색 값" example response.content[0].writer.profile.profileColor?.red isOptional true,
+                                    "content[].writer.profile.profileColor.green" type JsonFieldType.NUMBER description "작성자 프로필 색상의 초록색 값" example response.content[0].writer.profile.profileColor?.green isOptional true,
+                                    "content[].writer.profile.profileColor.blue" type JsonFieldType.NUMBER description "작성자 프로필 색상의 파란색 값" example response.content[0].writer.profile.profileColor?.blue isOptional true,
+                                    "content[].travelJournalSimpleResponse.travelJournalId" type JsonFieldType.NUMBER description "여행 일지 아이디" example response.content[0].travelJournalSimpleResponse?.travelJournalId isOptional true,
+                                    "content[].travelJournalSimpleResponse.title" type JsonFieldType.STRING description "여행 일지 제목" example response.content[0].travelJournalSimpleResponse?.title isOptional true,
+                                    "content[].travelJournalSimpleResponse.mainImageUrl" type JsonFieldType.STRING description "여행 일지 대표 이미지 URL" example response.content[0].travelJournalSimpleResponse?.mainImageUrl isOptional true,
                                     "content[].communityCommentCount" type JsonFieldType.NUMBER description "커뮤니티 댓글 수" example response.content[0].communityCommentCount,
                                     "content[].communityLikeCount" type JsonFieldType.NUMBER description "커뮤니티 좋아요 수" example response.content[0].communityLikeCount,
                                 ),

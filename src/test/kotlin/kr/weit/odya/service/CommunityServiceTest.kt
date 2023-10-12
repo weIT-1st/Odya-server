@@ -19,6 +19,7 @@ import kr.weit.odya.domain.community.CommunityUpdateEvent
 import kr.weit.odya.domain.community.CommunityVisibility
 import kr.weit.odya.domain.community.getByCommunityId
 import kr.weit.odya.domain.community.getCommunitySliceBy
+import kr.weit.odya.domain.community.getFriendCommunitySliceBy
 import kr.weit.odya.domain.community.getMyCommunitySliceBy
 import kr.weit.odya.domain.communitycomment.CommunityCommentRepository
 import kr.weit.odya.domain.communitycomment.deleteCommunityComments
@@ -307,6 +308,7 @@ class CommunityServiceTest : DescribeSpec(
                     )
                 } returns createAllCommunities()
                 every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
+                every { followRepository.existsByFollowerIdAndFollowingId(any<Long>(), any<Long>()) } returns false
                 every { communityCommentRepository.countByCommunityId(any<Long>()) } returns TEST_COMMUNITY_COMMENT_COUNT
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
@@ -330,7 +332,7 @@ class CommunityServiceTest : DescribeSpec(
                 every { communityCommentRepository.countByCommunityId(any<Long>()) } returns TEST_COMMUNITY_COMMENT_COUNT
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
-                        communityService.getCommunities(TEST_USER_ID, 10, null, CommunitySortType.LATEST)
+                        communityService.getMyCommunities(TEST_USER_ID, 10, null, CommunitySortType.LATEST)
                     }
                 }
             }
@@ -339,7 +341,7 @@ class CommunityServiceTest : DescribeSpec(
         describe("getFriendCommunities") {
             context("유효한 데이터가 주어지는 경우") {
                 every {
-                    communityRepository.getMyCommunitySliceBy(
+                    communityRepository.getFriendCommunitySliceBy(
                         TEST_USER_ID,
                         10,
                         null,
@@ -347,10 +349,11 @@ class CommunityServiceTest : DescribeSpec(
                     )
                 } returns createFriendCommunities()
                 every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
+                every { followRepository.existsByFollowerIdAndFollowingId(any<Long>(), any<Long>()) } returns false
                 every { communityCommentRepository.countByCommunityId(any<Long>()) } returns TEST_COMMUNITY_COMMENT_COUNT
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
-                        communityService.getCommunities(TEST_USER_ID, 10, null, CommunitySortType.LATEST)
+                        communityService.getFriendCommunities(TEST_USER_ID, 10, null, CommunitySortType.LATEST)
                     }
                 }
             }
