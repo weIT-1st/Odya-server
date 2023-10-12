@@ -35,6 +35,7 @@ import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.service.dto.CommunityContentImageResponse
 import kr.weit.odya.service.dto.CommunityCreateRequest
 import kr.weit.odya.service.dto.CommunityResponse
+import kr.weit.odya.service.dto.CommunitySimpleResponse
 import kr.weit.odya.service.dto.CommunitySummaryResponse
 import kr.weit.odya.service.dto.CommunityUpdateRequest
 import kr.weit.odya.service.dto.SliceResponse
@@ -110,7 +111,7 @@ class CommunityService(
         sortType: CommunitySortType,
     ): SliceResponse<CommunitySummaryResponse> {
         val communities = communityRepository.getCommunitySliceBy(userId, size, lastId, sortType)
-        return getCommunitySliceResponse(size, communities)
+        return getCommunitySummarySliceResponse(size, communities, userId)
     }
 
     @Transactional(readOnly = true)
@@ -119,9 +120,9 @@ class CommunityService(
         size: Int,
         lastId: Long?,
         sortType: CommunitySortType,
-    ): SliceResponse<CommunitySummaryResponse> {
+    ): SliceResponse<CommunitySimpleResponse> {
         val communities = communityRepository.getMyCommunitySliceBy(userId, size, lastId, sortType)
-        return getCommunitySliceResponse(size, communities)
+        return getCommunitySimpleSliceResponse(size, communities)
     }
 
     @Transactional(readOnly = true)
@@ -132,7 +133,7 @@ class CommunityService(
         sortType: CommunitySortType,
     ): SliceResponse<CommunitySummaryResponse> {
         val communities = communityRepository.getFriendCommunitySliceBy(userId, size, lastId, sortType)
-        return getCommunitySliceResponse(size, communities)
+        return getCommunitySummarySliceResponse(size, communities, userId)
     }
 
     @Transactional(readOnly = true)
@@ -243,7 +244,7 @@ class CommunityService(
         }
     }
 
-    private fun getCommunitySliceResponse(
+    private fun getCommunitySimpleSliceResponse(
         size: Int,
         contents: List<Community>,
     ) = SliceResponse(
@@ -251,10 +252,31 @@ class CommunityService(
         content = contents.map { community ->
             val communityMainImageUrl =
                 fileService.getPreAuthenticatedObjectUrl(community.communityContentImages[0].contentImage.name)
+            CommunitySimpleResponse.from(
+                community,
+                communityMainImageUrl,
+            )
+        },
+    )
+
+    private fun getCommunitySummarySliceResponse(
+        size: Int,
+        contents: List<Community>,
+        userId: Long,
+    ) = SliceResponse(
+        size = size,
+        content = contents.map { community ->
+            val communityMainImageUrl =
+                fileService.getPreAuthenticatedObjectUrl(community.communityContentImages[0].contentImage.name)
+            val writerProfileUrl =
+                fileService.getPreAuthenticatedObjectUrl(community.user.profile.profileName)
+            val isFollowing = followRepository.existsByFollowerIdAndFollowingId(userId, community.user.id)
             val communityCommentCount = communityCommentRepository.countByCommunityId(community.id)
             CommunitySummaryResponse.from(
                 community,
                 communityMainImageUrl,
+                writerProfileUrl,
+                isFollowing,
                 communityCommentCount,
             )
         },

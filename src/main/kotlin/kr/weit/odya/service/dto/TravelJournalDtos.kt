@@ -242,7 +242,7 @@ data class TravelJournalSummaryResponse(
 data class TravelJournalSimpleResponse(
     val travelJournalId: Long,
     val title: String,
-    val mainImageUrl: String,
+    val mainImageUrl: String?,
 )
 
 data class TaggedTravelJournalResponse(
