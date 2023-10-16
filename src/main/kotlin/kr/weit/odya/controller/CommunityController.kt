@@ -8,6 +8,7 @@ import kr.weit.odya.security.LoginUserId
 import kr.weit.odya.service.CommunityService
 import kr.weit.odya.service.dto.CommunityCreateRequest
 import kr.weit.odya.service.dto.CommunityResponse
+import kr.weit.odya.service.dto.CommunitySimpleResponse
 import kr.weit.odya.service.dto.CommunitySummaryResponse
 import kr.weit.odya.service.dto.CommunityUpdateRequest
 import kr.weit.odya.service.dto.SliceResponse
@@ -80,7 +81,7 @@ class CommunityController(
         lastId: Long?,
         @RequestParam("sortType", defaultValue = "LATEST", required = false)
         sortType: CommunitySortType,
-    ): ResponseEntity<SliceResponse<CommunitySummaryResponse>> {
+    ): ResponseEntity<SliceResponse<CommunitySimpleResponse>> {
         val response = communityService.getMyCommunities(userId, size, lastId, sortType)
         return ResponseEntity.ok(response)
     }

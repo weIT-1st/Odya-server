@@ -86,8 +86,11 @@ data class CommunityContentImageResponse(
 
 data class CommunitySummaryResponse(
     val communityId: Long,
+    val communityContent: String,
     val communityMainImageUrl: String,
     val placeId: String?,
+    val writer: UserSimpleResponse,
+    val travelJournalSimpleResponse: TravelJournalSimpleResponse? = null,
     val communityCommentCount: Int,
     val communityLikeCount: Int,
 ) {
@@ -95,12 +98,25 @@ data class CommunitySummaryResponse(
         fun from(
             community: Community,
             communityMainImageUrl: String,
+            writerProfileUrl: String,
+            isFollowing: Boolean,
             communityCommentCount: Int,
         ): CommunitySummaryResponse =
             CommunitySummaryResponse(
                 communityId = community.id,
+                communityContent = community.content,
                 communityMainImageUrl = communityMainImageUrl,
                 placeId = community.placeId,
+                writer = UserSimpleResponse(community.user, writerProfileUrl, isFollowing),
+                travelJournalSimpleResponse = if (community.travelJournal != null) {
+                    TravelJournalSimpleResponse(
+                        travelJournalId = community.travelJournal!!.id,
+                        title = community.travelJournal!!.title,
+                        null,
+                    )
+                } else {
+                    null
+                },
                 communityCommentCount = communityCommentCount,
                 communityLikeCount = community.likeCount,
             )
@@ -124,4 +140,22 @@ data class CommunityUpdateRequest(
         visibility = visibility,
         placeId = placeId,
     )
+}
+
+data class CommunitySimpleResponse(
+    val communityId: Long,
+    val communityMainImageUrl: String,
+    val placeId: String?,
+) {
+    companion object {
+        fun from(
+            community: Community,
+            communityMainImageUrl: String,
+        ): CommunitySimpleResponse =
+            CommunitySimpleResponse(
+                communityId = community.id,
+                communityMainImageUrl = communityMainImageUrl,
+                placeId = community.placeId,
+            )
+    }
 }

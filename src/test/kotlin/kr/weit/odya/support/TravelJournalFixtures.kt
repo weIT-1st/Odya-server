@@ -20,6 +20,7 @@ import kr.weit.odya.service.dto.TravelJournalContentResponse
 import kr.weit.odya.service.dto.TravelJournalContentUpdateRequest
 import kr.weit.odya.service.dto.TravelJournalRequest
 import kr.weit.odya.service.dto.TravelJournalResponse
+import kr.weit.odya.service.dto.TravelJournalSimpleResponse
 import kr.weit.odya.service.dto.TravelJournalSummaryResponse
 import kr.weit.odya.service.dto.TravelJournalUpdateRequest
 import kr.weit.odya.service.dto.UserSimpleResponse
@@ -368,3 +369,13 @@ fun createSliceTaggedTravelJournalResponse(): SliceResponse<TaggedTravelJournalR
         size = TEST_DEFAULT_SIZE,
         content = listOf(createTaggedTravelJournalResponse()),
     )
+
+fun createTravelJournalSimpleResponse(
+    id: Long = TEST_TRAVEL_JOURNAL_ID,
+    title: String = TEST_TRAVEL_JOURNAL_TITLE,
+    mainImageUrl: String = TEST_FILE_AUTHENTICATED_URL,
+) = TravelJournalSimpleResponse(
+    travelJournalId = id,
+    title = title,
+    mainImageUrl = mainImageUrl,
+)

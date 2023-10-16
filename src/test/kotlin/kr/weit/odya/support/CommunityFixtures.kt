@@ -11,6 +11,7 @@ import kr.weit.odya.domain.user.User
 import kr.weit.odya.service.dto.CommunityContentImageResponse
 import kr.weit.odya.service.dto.CommunityCreateRequest
 import kr.weit.odya.service.dto.CommunityResponse
+import kr.weit.odya.service.dto.CommunitySimpleResponse
 import kr.weit.odya.service.dto.CommunitySummaryResponse
 import kr.weit.odya.service.dto.CommunityUpdateRequest
 import kr.weit.odya.service.dto.SliceResponse
@@ -177,16 +178,6 @@ fun createOtherCommunityResponse(
     TEST_IS_USER_LIKED,
 )
 
-fun createTravelJournalSimpleResponse(
-    id: Long = TEST_TRAVEL_JOURNAL_ID,
-    title: String = TEST_TRAVEL_JOURNAL_TITLE,
-    mainImageUrl: String = TEST_FILE_AUTHENTICATED_URL,
-) = TravelJournalSimpleResponse(
-    travelJournalId = id,
-    title = title,
-    mainImageUrl = mainImageUrl,
-)
-
 fun createCommunityTopicResponse(
     id: Long = TEST_TOPIC_ID,
     word: String = TEST_TOPIC,
@@ -204,32 +195,74 @@ fun createCommunityContentImageResponse(
 )
 
 fun createCommunitySummaryResponse(
-    id: Long = TEST_COMMUNITY_ID,
-    mainImageUrl: String = TEST_FILE_AUTHENTICATED_URL,
-) = CommunitySummaryResponse(
-    communityId = id,
-    communityMainImageUrl = mainImageUrl,
-    placeId = TEST_PLACE_ID,
-    communityCommentCount = TEST_COMMUNITY_COMMENT_COUNT,
-    communityLikeCount = TEST_COMMUNITY_LIKE_COUNT,
+    community: Community = createCommunity(
+        id = TEST_COMMUNITY_ID,
+        communityContentImages = listOf(createCommunityContentImage()),
+    ),
+    communityMainImageUrl: String = TEST_FILE_AUTHENTICATED_URL,
+    writerProfileUrl: String = TEST_FILE_AUTHENTICATED_URL,
+    isFollowing: Boolean = true,
+    communityCommentCount: Int = TEST_COMMUNITY_COMMENT_COUNT,
+) = CommunitySummaryResponse.from(
+    community = community,
+    communityMainImageUrl = communityMainImageUrl,
+    writerProfileUrl = writerProfileUrl,
+    isFollowing = isFollowing,
+    communityCommentCount = communityCommentCount,
 )
 
 fun createOtherCommunitySummaryResponse(
+    community: Community = createCommunity(
+        id = TEST_OTHER_COMMUNITY_ID,
+        communityContentImages = listOf(createCommunityContentImage()),
+        placeId = TEST_OTHER_PLACE_ID,
+    ),
+    communityMainImageUrl: String = TEST_FILE_AUTHENTICATED_URL,
+    writerProfileUrl: String = TEST_FILE_AUTHENTICATED_URL,
+    isFollowing: Boolean = true,
+    communityCommentCount: Int = TEST_COMMUNITY_COMMENT_COUNT,
+) = CommunitySummaryResponse.from(
+    community = community,
+    communityMainImageUrl = communityMainImageUrl,
+    writerProfileUrl = writerProfileUrl,
+    isFollowing = isFollowing,
+    communityCommentCount = communityCommentCount,
+)
+
+fun createCommunitySimpleResponse(
+    id: Long = TEST_COMMUNITY_ID,
+    mainImageUrl: String = TEST_FILE_AUTHENTICATED_URL,
+) = CommunitySimpleResponse(
+    communityId = id,
+    communityMainImageUrl = mainImageUrl,
+    placeId = TEST_PLACE_ID,
+)
+
+fun createOtherCommunitySimpleResponse(
     id: Long = TEST_OTHER_COMMUNITY_ID,
     mainImageUrl: String = TEST_FILE_AUTHENTICATED_URL,
-) = CommunitySummaryResponse(
+) = CommunitySimpleResponse(
     communityId = id,
     communityMainImageUrl = mainImageUrl,
     placeId = TEST_OTHER_PLACE_ID,
-    communityCommentCount = TEST_COMMUNITY_COMMENT_COUNT,
-    communityLikeCount = TEST_COMMUNITY_LIKE_COUNT,
 )
 
-fun createSliceCommunityResponse(
+fun createSliceCommunitySummaryResponse(
     hasNext: Boolean = false,
     content: List<CommunitySummaryResponse> = listOf(
         createCommunitySummaryResponse(),
         createOtherCommunitySummaryResponse(),
+    ),
+) = SliceResponse(
+    hasNext = hasNext,
+    content = content,
+)
+
+fun createSliceCommunitySimpleResponse(
+    hasNext: Boolean = false,
+    content: List<CommunitySimpleResponse> = listOf(
+        createCommunitySimpleResponse(),
+        createOtherCommunitySimpleResponse(),
     ),
 ) = SliceResponse(
     hasNext = hasNext,
