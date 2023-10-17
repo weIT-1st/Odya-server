@@ -106,7 +106,7 @@ class CommunityController(
         return ResponseEntity.ok(response)
     }
 
-    @GetMapping("/search/topic/{topicId}")
+    @GetMapping("/topic/{topicId}")
     fun searchByTopic(
         @LoginUserId
         userId: Long,
