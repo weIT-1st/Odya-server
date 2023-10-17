@@ -35,9 +35,12 @@ class CommunityController(
     @PostMapping
     fun createCommunity(
         @LoginUserId userId: Long,
-        @Valid @RequestPart("community") communityRequest: CommunityCreateRequest,
+        @Valid
+        @RequestPart("community")
+        communityRequest: CommunityCreateRequest,
         @Size(min = 1, max = 15, message = "이미지는 최소 1개, 최대 15개까지 업로드할 수 있습니다.")
-        @RequestPart("community-content-image") contentImages: List<MultipartFile>,
+        @RequestPart("community-content-image")
+        contentImages: List<MultipartFile>,
     ): ResponseEntity<Void> {
         val contentImagePairs = communityService.uploadContentImages(contentImages)
         val createdCommunityId = communityService.createCommunity(userId, communityRequest, contentImagePairs)
@@ -47,7 +50,8 @@ class CommunityController(
     @GetMapping("/{communityId}")
     fun getCommunity(
         @Positive(message = "커뮤니티 아이디는 0보다 커야 합니다.")
-        @PathVariable("communityId") communityId: Long,
+        @PathVariable("communityId")
+        communityId: Long,
         @LoginUserId userId: Long,
     ): ResponseEntity<CommunityResponse> {
         val response = communityService.getCommunity(communityId, userId)
@@ -102,10 +106,31 @@ class CommunityController(
         return ResponseEntity.ok(response)
     }
 
+    @GetMapping("/search/topic/{topicId}")
+    fun searchByTopic(
+        @LoginUserId
+        userId: Long,
+        @Positive(message = "조회할 토픽ID는 양수여야 합니다.")
+        @PathVariable("topicId")
+        topicId: Long,
+        @Positive(message = "조회할 개수는 양수여야 합니다.")
+        @RequestParam("size", defaultValue = "10", required = false)
+        size: Int,
+        @Positive(message = "마지막 ID는 양수여야 합니다.")
+        @RequestParam("lastId", required = false)
+        lastId: Long?,
+        @RequestParam("sortType", defaultValue = "LATEST", required = false)
+        sortType: CommunitySortType,
+    ): ResponseEntity<SliceResponse<CommunitySummaryResponse>> {
+        val response = communityService.searchByTopic(userId, topicId, size, lastId, sortType)
+        return ResponseEntity.ok(response)
+    }
+
     @PutMapping("/{communityId}")
     fun updateCommunity(
         @Positive(message = "커뮤니티 아이디는 0보다 커야 합니다.")
-        @PathVariable("communityId") communityId: Long,
+        @PathVariable("communityId")
+        communityId: Long,
         @RequestPart("update-community") communityUpdateRequest: CommunityUpdateRequest,
         @RequestPart("update-community-content-image", required = false) images: List<MultipartFile>?,
         @LoginUserId userId: Long,
@@ -125,7 +150,8 @@ class CommunityController(
     @DeleteMapping("/{communityId}")
     fun deleteCommunity(
         @Positive(message = "커뮤니티 아이디는 0보다 커야 합니다.")
-        @PathVariable("communityId") communityId: Long,
+        @PathVariable("communityId")
+        communityId: Long,
         @LoginUserId userId: Long,
     ): ResponseEntity<Void> {
         communityService.deleteCommunity(communityId, userId)

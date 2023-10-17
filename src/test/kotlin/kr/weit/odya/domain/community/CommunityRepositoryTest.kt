@@ -4,6 +4,7 @@ import io.kotest.core.spec.style.ExpectSpec
 import io.kotest.matchers.shouldBe
 import kr.weit.odya.domain.follow.Follow
 import kr.weit.odya.domain.follow.FollowRepository
+import kr.weit.odya.domain.topic.Topic
 import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.user.User
@@ -16,6 +17,7 @@ import kr.weit.odya.support.createCommunity
 import kr.weit.odya.support.createCommunityContentImage
 import kr.weit.odya.support.createContentImage
 import kr.weit.odya.support.createOtherUser
+import kr.weit.odya.support.createTopic
 import kr.weit.odya.support.createTravelCompanionById
 import kr.weit.odya.support.createTravelJournal
 import kr.weit.odya.support.createTravelJournalContent
@@ -41,6 +43,7 @@ class CommunityRepositoryTest(
         lateinit var community1: Community
         lateinit var community2: Community
         lateinit var community3: Community
+        lateinit var topic: Topic
         beforeEach {
             user1 = userRepository.save(createUser())
             user2 = userRepository.save(createOtherUser())
@@ -48,6 +51,7 @@ class CommunityRepositoryTest(
             val contentImage1 = createContentImage(user = user1)
             val contentImage2 = createContentImage(user = user2)
             val contentImage3 = createContentImage(user = user1)
+            topic = createTopic()
             travelJournal1 = travelJournalRepository.save(
                 createTravelJournal(
                     user = user1,
@@ -79,6 +83,7 @@ class CommunityRepositoryTest(
                     travelJournal = travelJournal1,
                     communityContentImages =
                     listOf(createCommunityContentImage(contentImage1), createCommunityContentImage(contentImage3)),
+                    topic = topic,
                 ),
             )
             community2 = communityRepository.save(
@@ -87,6 +92,7 @@ class CommunityRepositoryTest(
                     user = user2,
                     travelJournal = travelJournal2,
                     communityContentImages = listOf(createCommunityContentImage(contentImage2)),
+                    topic = topic,
                 ),
             )
             community3 = communityRepository.save(
@@ -96,6 +102,7 @@ class CommunityRepositoryTest(
                     travelJournal = null,
                     visibility = CommunityVisibility.FRIEND_ONLY,
                     communityContentImages = listOf(createCommunityContentImage(contentImage2)),
+                    topic = null,
                 ),
             )
         }
@@ -144,6 +151,11 @@ class CommunityRepositoryTest(
             expect("나와 친구인 사용자의 커뮤니티 목록을 조회한다.") {
                 val result =
                     communityRepository.getFriendCommunitySliceBy(user1.id, 10, null, CommunitySortType.LATEST)
+                result.size shouldBe 2
+            }
+
+            expect("토픽과 일치하는 커뮤니티를 조회한다") {
+                val result = communityRepository.getCommunityByTopic(topic, 10, null, CommunitySortType.LATEST)
                 result.size shouldBe 2
             }
         }

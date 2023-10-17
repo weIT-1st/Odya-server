@@ -11,6 +11,7 @@ import kr.weit.odya.domain.community.CommunitySortType
 import kr.weit.odya.domain.community.CommunityUpdateEvent
 import kr.weit.odya.domain.community.CommunityVisibility
 import kr.weit.odya.domain.community.getByCommunityId
+import kr.weit.odya.domain.community.getCommunityByTopic
 import kr.weit.odya.domain.community.getCommunitySliceBy
 import kr.weit.odya.domain.community.getFriendCommunitySliceBy
 import kr.weit.odya.domain.community.getMyCommunitySliceBy
@@ -133,6 +134,19 @@ class CommunityService(
         sortType: CommunitySortType,
     ): SliceResponse<CommunitySummaryResponse> {
         val communities = communityRepository.getFriendCommunitySliceBy(userId, size, lastId, sortType)
+        return getCommunitySummarySliceResponse(size, communities, userId)
+    }
+
+    @Transactional(readOnly = true)
+    fun searchByTopic(
+        userId: Long,
+        topicId: Long,
+        size: Int,
+        lastId: Long?,
+        sortType: CommunitySortType,
+    ): SliceResponse<CommunitySummaryResponse> {
+        val topic = topicRepository.getByTopicId(topicId)
+        val communities = communityRepository.getCommunityByTopic(topic, size, lastId, sortType)
         return getCommunitySummarySliceResponse(size, communities, userId)
     }
 
