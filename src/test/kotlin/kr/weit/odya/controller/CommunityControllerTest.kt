@@ -750,8 +750,8 @@ class CommunityControllerTest(
             }
         }
 
-        describe("GET /api/v1/communities/search/topic/{topicId}") {
-            val targetUri = "/api/v1/communities/search/topic/{topicId}"
+        describe("GET /api/v1/communities/topic/{topicId}") {
+            val targetUri = "/api/v1/communities/topic/{topicId}"
             context("유효한 요청 데이터가 전달되면") {
                 val response = createSliceCommunitySummaryResponse()
                 every { communityService.searchByTopic(TEST_USER_ID, TEST_TOPIC_ID, TEST_DEFAULT_SIZE, null, any<CommunitySortType>()) } returns response
