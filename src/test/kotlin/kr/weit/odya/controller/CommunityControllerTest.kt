@@ -24,8 +24,10 @@ import kr.weit.odya.support.TEST_COMMUNITY_MOCK_FILE_NAME
 import kr.weit.odya.support.TEST_COMMUNITY_UPDATE_MOCK_FILE_NAME
 import kr.weit.odya.support.TEST_COMMUNITY_UPDATE_REQUEST_NAME
 import kr.weit.odya.support.TEST_DEFAULT_SIZE
+import kr.weit.odya.support.TEST_INVALID_TOPIC_ID
 import kr.weit.odya.support.TEST_NOT_EXIST_TOPIC_ID
 import kr.weit.odya.support.TEST_NOT_EXIST_TRAVEL_JOURNAL_ID
+import kr.weit.odya.support.TEST_TOPIC_ID
 import kr.weit.odya.support.TEST_UPDATE_IMAGE_FILE_WEBP
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createCommunityContentImagePairs
@@ -744,6 +746,140 @@ class CommunityControllerTest(
                                 ),
                             )
                         }
+                }
+            }
+        }
+
+        describe("GET /api/v1/communities/topic/{topicId}") {
+            val targetUri = "/api/v1/communities/topic/{topicId}"
+            context("유효한 요청 데이터가 전달되면") {
+                val response = createSliceCommunitySummaryResponse()
+                every { communityService.searchByTopic(TEST_USER_ID, TEST_TOPIC_ID, TEST_DEFAULT_SIZE, null, any<CommunitySortType>()) } returns response
+                it("200 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_TOPIC_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    )
+                        .andExpect(status().isOk)
+                        .andDo(
+                            createPathDocument(
+                                "community-search-by-topic-success",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "topicId" pathDescription "토픽 아이디" example TEST_TOPIC_ID,
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_DEFAULT_SIZE isOptional true,
+                                    LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example "null" isOptional true,
+                                    SORT_TYPE_PARAM parameterDescription "정렬 타입" example CommunitySortType.values() isOptional true,
+                                ),
+                                responseBody(
+                                    "hasNext" type JsonFieldType.BOOLEAN description "다음 페이지 존재 여부" example response.hasNext,
+                                    "content[].communityId" type JsonFieldType.NUMBER description "커뮤니티 아이디" example response.content[0].communityId,
+                                    "content[].communityContent" type JsonFieldType.STRING description "커뮤니티 내용" example response.content[0].communityContent,
+                                    "content[].communityMainImageUrl" type JsonFieldType.STRING description "커뮤니티 대표 이미지 URL" example response.content[0].communityMainImageUrl,
+                                    "content[].placeId" type JsonFieldType.STRING description "장소 아이디" example response.content[0].placeId isOptional true,
+                                    "content[].writer.userId" type JsonFieldType.NUMBER description "작성자 아이디" example response.content[0].writer.userId,
+                                    "content[].writer.nickname" type JsonFieldType.STRING description "작성자 닉네임" example response.content[0].writer.nickname,
+                                    "content[].writer.isFollowing" type JsonFieldType.BOOLEAN description "작성자를 팔로우 중인지 여부" example response.content[0].writer.isFollowing,
+                                    "content[].writer.profile.profileUrl" type JsonFieldType.STRING description "작성자 프로필 이미지 URL" example response.content[0].writer.profile.profileUrl,
+                                    "content[].writer.profile.profileColor.colorHex" type JsonFieldType.STRING description "작성자 프로필 색상" example response.content[0].writer.profile.profileColor?.colorHex isOptional true,
+                                    "content[].writer.profile.profileColor.red" type JsonFieldType.NUMBER description "작성자 프로필 색상의 빨간색 값" example response.content[0].writer.profile.profileColor?.red isOptional true,
+                                    "content[].writer.profile.profileColor.green" type JsonFieldType.NUMBER description "작성자 프로필 색상의 초록색 값" example response.content[0].writer.profile.profileColor?.green isOptional true,
+                                    "content[].writer.profile.profileColor.blue" type JsonFieldType.NUMBER description "작성자 프로필 색상의 파란색 값" example response.content[0].writer.profile.profileColor?.blue isOptional true,
+                                    "content[].travelJournalSimpleResponse.travelJournalId" type JsonFieldType.NUMBER description "여행 일지 아이디" example response.content[0].travelJournalSimpleResponse?.travelJournalId isOptional true,
+                                    "content[].travelJournalSimpleResponse.title" type JsonFieldType.STRING description "여행 일지 제목" example response.content[0].travelJournalSimpleResponse?.title isOptional true,
+                                    "content[].travelJournalSimpleResponse.mainImageUrl" type JsonFieldType.STRING description "여행 일지 대표 이미지 URL" example response.content[0].travelJournalSimpleResponse?.mainImageUrl isOptional true,
+                                    "content[].communityCommentCount" type JsonFieldType.NUMBER description "커뮤니티 댓글 수" example response.content[0].communityCommentCount,
+                                    "content[].communityLikeCount" type JsonFieldType.NUMBER description "커뮤니티 좋아요 수" example response.content[0].communityLikeCount,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("양수가 아닌 TOPIC_ID가 전달되면") {
+                it("400 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_INVALID_TOPIC_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    )
+                        .andExpect(status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "community-search-by-topic-fail-invalid-topic-id",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "topicId" pathDescription "양수가 아닌 토픽 아이디" example TEST_INVALID_TOPIC_ID,
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_DEFAULT_SIZE isOptional true,
+                                    LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example "null" isOptional true,
+                                    SORT_TYPE_PARAM parameterDescription "정렬 타입" example CommunitySortType.values() isOptional true,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("존재하지 않는 TOPIC_ID가 전달되면") {
+                every { communityService.searchByTopic(TEST_USER_ID, TEST_NOT_EXIST_TOPIC_ID, TEST_DEFAULT_SIZE, null, any<CommunitySortType>()) } throws NoSuchElementException("토픽 아이디($TEST_NOT_EXIST_TOPIC_ID)에 해당하는 토픽이 없습니다.")
+                it("404 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_NOT_EXIST_TOPIC_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    )
+                        .andExpect(status().isNotFound)
+                        .andDo(
+                            createPathDocument(
+                                "community-search-by-topic-fail-not-found-topic",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "topicId" pathDescription "존재하지 않는 토픽 아이디" example TEST_NOT_EXIST_TOPIC_ID,
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_DEFAULT_SIZE isOptional true,
+                                    LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example "null" isOptional true,
+                                    SORT_TYPE_PARAM parameterDescription "정렬 타입" example CommunitySortType.values() isOptional true,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효하지 않은 토큰인 경우") {
+                it("401 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_TOPIC_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN),
+                    )
+                        .andExpect(status().isUnauthorized)
+                        .andDo(
+                            createPathDocument(
+                                "community-search-by-topic-fail-invalid-token",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "topicId" pathDescription "토픽 아이디" example TEST_TOPIC_ID,
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_DEFAULT_SIZE isOptional true,
+                                    LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example "null" isOptional true,
+                                    SORT_TYPE_PARAM parameterDescription "정렬 타입" example CommunitySortType.values() isOptional true,
+                                ),
+                            ),
+                        )
                 }
             }
         }

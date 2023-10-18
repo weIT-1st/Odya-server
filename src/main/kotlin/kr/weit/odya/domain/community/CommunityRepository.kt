@@ -12,6 +12,7 @@ import com.linecorp.kotlinjdsl.subquery
 import com.linecorp.kotlinjdsl.updateQuery
 import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.follow.Follow
+import kr.weit.odya.domain.topic.Topic
 import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.user.User
 import org.springframework.data.jpa.repository.JpaRepository
@@ -47,6 +48,13 @@ fun CommunityRepository.getFriendCommunitySliceBy(
 fun CommunityRepository.getImageNamesById(communityId: Long): List<String> =
     findContentImageNameListById(communityId)
 
+fun CommunityRepository.getCommunityByTopic(
+    topic: Topic,
+    size: Int,
+    lastId: Long?,
+    sortType: CommunitySortType,
+): List<Community> = findCommunityByTopicSliceBy(topic, size, lastId, sortType)
+
 @Repository
 interface CommunityRepository : JpaRepository<Community, Long>, CustomCommunityRepository {
     fun deleteAllByUserId(userId: Long)
@@ -71,6 +79,13 @@ interface CustomCommunityRepository {
 
     fun findFriendCommunitySliceBy(
         userId: Long,
+        size: Int,
+        lastId: Long?,
+        sortType: CommunitySortType,
+    ): List<Community>
+
+    fun findCommunityByTopicSliceBy(
+        topic: Topic,
         size: Int,
         lastId: Long?,
         sortType: CommunitySortType,
@@ -121,6 +136,16 @@ class CommunityRepositoryImpl(private val queryFactory: QueryFactory) : CustomCo
         val followingIds = getFollowingIdsSubQuery(userId)
         getCommunitySliceBaseQuery(lastId, sortType, size)
         where(nestedCol(col(Community::user), User::id).`in`(followingIds))
+    }
+
+    override fun findCommunityByTopicSliceBy(
+        topic: Topic,
+        size: Int,
+        lastId: Long?,
+        sortType: CommunitySortType,
+    ): List<Community> = queryFactory.listQuery {
+        getCommunitySliceBaseQuery(lastId, sortType, size)
+        where(col(Community::topic).equal(topic))
     }
 
     override fun findContentImageNameListById(communityId: Long): List<String> = queryFactory.listQuery {
