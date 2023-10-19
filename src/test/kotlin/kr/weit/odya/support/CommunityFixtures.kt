@@ -116,6 +116,9 @@ fun createMyCommunities() = listOf(createCommunity(), createCommunity(id = TEST_
 fun createFriendCommunities() =
     listOf(createCommunity(), createCommunity(id = TEST_OTHER_COMMUNITY_ID, user = createOtherUser()))
 
+fun createTopicCommunities() =
+    listOf(createCommunity(topic = createOtherTopic()), createCommunity(id = TEST_OTHER_COMMUNITY_ID, user = createOtherUser(), topic = createOtherTopic()))
+
 fun createCommunityUpdateRequest(
     content: String = TEST_UPDATE_COMMUNITY_CONTENT,
     visibility: CommunityVisibility = TEST_UPDATE_COMMUNITY_VISIBILITY,

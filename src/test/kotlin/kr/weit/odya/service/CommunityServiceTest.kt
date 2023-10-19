@@ -21,6 +21,7 @@ import kr.weit.odya.domain.community.getByCommunityId
 import kr.weit.odya.domain.community.getCommunityByTopic
 import kr.weit.odya.domain.community.getCommunitySliceBy
 import kr.weit.odya.domain.community.getFriendCommunitySliceBy
+import kr.weit.odya.domain.community.getLikedCommunitySliceBy
 import kr.weit.odya.domain.community.getMyCommunitySliceBy
 import kr.weit.odya.domain.communitycomment.CommunityCommentRepository
 import kr.weit.odya.domain.communitycomment.deleteCommunityComments
@@ -66,6 +67,7 @@ import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createPlaceDetails
 import kr.weit.odya.support.createPrivateTravelJournal
 import kr.weit.odya.support.createTopic
+import kr.weit.odya.support.createTopicCommunities
 import kr.weit.odya.support.createTravelJournal
 import kr.weit.odya.support.createUser
 import org.springframework.context.ApplicationEventPublisher
@@ -366,7 +368,7 @@ class CommunityServiceTest : DescribeSpec(
             context("유효한 데이터가 주어지는 경우") {
                 val topic = createTopic()
                 every { topicRepository.getByTopicId(TEST_TOPIC_ID) } returns topic
-                every { communityRepository.getCommunityByTopic(topic, TEST_DEFAULT_SIZE, null, CommunitySortType.LATEST) } returns createAllCommunities()
+                every { communityRepository.getCommunityByTopic(topic, TEST_DEFAULT_SIZE, null, CommunitySortType.LATEST) } returns createTopicCommunities()
                 every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
                 every { communityCommentRepository.countByCommunityId(any<Long>()) } returns TEST_COMMUNITY_COMMENT_COUNT
                 it("정상적으로 종료한다.") {
@@ -382,6 +384,24 @@ class CommunityServiceTest : DescribeSpec(
                     shouldThrow<NoSuchElementException> {
                         communityService.searchByTopic(TEST_USER_ID, TEST_INVALID_TOPIC_ID, 10, null, CommunitySortType.LATEST)
                     }
+                }
+            }
+        }
+
+        describe("getLikedCommunities") {
+            context("유효한 데이터가 주어지는 경우") {
+                every { communityRepository.getLikedCommunitySliceBy(TEST_USER_ID, 10, null, CommunitySortType.LATEST) } returns createAllCommunities()
+                every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
+                every { communityCommentRepository.countByCommunityId(any<Long>()) } returns TEST_COMMUNITY_COMMENT_COUNT
+                it("정상적으로 종료한다") {
+                    shouldNotThrowAny { communityService.getLikedCommunities(TEST_USER_ID, 10, null, CommunitySortType.LATEST) }
+                }
+            }
+
+            context("유효한 데이터가 주어지는 경우") {
+                every { communityRepository.getLikedCommunitySliceBy(TEST_USER_ID, 10, null, CommunitySortType.LATEST) } returns createAllCommunities()
+                it("정상적으로 종료한다") {
+                    shouldNotThrowAny { communityService.getLikedCommunities(TEST_USER_ID, 10, null, CommunitySortType.LATEST) }
                 }
             }
         }
