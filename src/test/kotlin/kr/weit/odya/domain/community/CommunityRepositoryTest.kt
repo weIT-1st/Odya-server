@@ -2,6 +2,7 @@ package kr.weit.odya.domain.community
 
 import io.kotest.core.spec.style.ExpectSpec
 import io.kotest.matchers.shouldBe
+import kr.weit.odya.domain.communitycomment.CommunityCommentRepository
 import kr.weit.odya.domain.communitylike.CommunityLikeRepository
 import kr.weit.odya.domain.follow.Follow
 import kr.weit.odya.domain.follow.FollowRepository
@@ -15,6 +16,7 @@ import kr.weit.odya.support.TEST_COMMUNITY_CONTENT
 import kr.weit.odya.support.TEST_GENERATED_FILE_NAME
 import kr.weit.odya.support.TEST_OTHER_COMMUNITY_ID
 import kr.weit.odya.support.createCommunity
+import kr.weit.odya.support.createCommunityComment
 import kr.weit.odya.support.createCommunityContentImage
 import kr.weit.odya.support.createCommunityLike
 import kr.weit.odya.support.createContentImage
@@ -36,6 +38,7 @@ class CommunityRepositoryTest(
     private val userRepository: UserRepository,
     private val travelJournalRepository: TravelJournalRepository,
     private val communityLikeRepository: CommunityLikeRepository,
+    private val communityCommentRepository: CommunityCommentRepository,
     private val tem: TestEntityManager,
 ) : ExpectSpec(
     {
@@ -108,8 +111,11 @@ class CommunityRepositoryTest(
                     topic = null,
                 ),
             )
-            communityLikeRepository.save(createCommunityLike(community1, user1))
+            communityLikeRepository.save(createCommunityLike(community2, user1))
             communityLikeRepository.save(createCommunityLike(community3, user1))
+            communityCommentRepository.save(createCommunityComment(user = user1, community = community2))
+            communityCommentRepository.save(createCommunityComment(user = user1, community = community2))
+            communityCommentRepository.save(createCommunityComment(user = user1, community = community3))
         }
 
         context("커뮤니티 조회") {
@@ -165,7 +171,12 @@ class CommunityRepositoryTest(
             }
 
             expect("좋아요를 누른 커뮤니티 목록을 조회한다") {
-                val result = communityRepository.getCommunitySliceBy(user1.id, 10, null, CommunitySortType.LATEST)
+                val result = communityRepository.getLikedCommunitySliceBy(user1.id, 10, null, CommunitySortType.LATEST)
+                result.size shouldBe 2
+            }
+
+            expect("댓글 단 커뮤니티 목록을 조회한다") {
+                val result = communityRepository.getCommunityWithCommentSliceBy(user1.id, 10, null, CommunitySortType.LATEST)
                 result.size shouldBe 2
             }
         }

@@ -950,6 +950,72 @@ class CommunityControllerTest(
             }
         }
 
+        describe("GET /api/v1/communities/comment") {
+            val targetUri = "/api/v1/communities/comment"
+            context("유효한 요청 데이터가 전달되면") {
+                val response = createSliceCommunitySimpleResponse()
+                every {
+                    communityService.getCommunityWithComments(
+                        TEST_USER_ID,
+                        TEST_DEFAULT_SIZE,
+                        null,
+                        any<CommunitySortType>(),
+                    )
+                } returns response
+                it("200 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                    }
+                        .andExpect {
+                            status { isOk() }
+                        }
+                        .andDo {
+                            createDocument(
+                                "community-get-communities-with-comments-success",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_DEFAULT_SIZE isOptional true,
+                                    LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example "null" isOptional true,
+                                    SORT_TYPE_PARAM parameterDescription "정렬 타입" example CommunitySortType.values() isOptional true,
+                                ),
+                                responseBody(
+                                    "hasNext" type JsonFieldType.BOOLEAN description "다음 페이지 존재 여부" example response.hasNext,
+                                    "content[].communityId" type JsonFieldType.NUMBER description "커뮤니티 아이디" example response.content[0].communityId,
+                                    "content[].communityMainImageUrl" type JsonFieldType.STRING description "커뮤니티 대표 이미지 URL" example response.content[0].communityMainImageUrl,
+                                    "content[].placeId" type JsonFieldType.STRING description "장소 아이디" example response.content[0].placeId isOptional true,
+                                ),
+                            )
+                        }
+                }
+            }
+
+            context("유효하지 않은 토큰인 경우") {
+                it("401 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                    }
+                        .andExpect {
+                            status { isUnauthorized() }
+                        }
+                        .andDo {
+                            createDocument(
+                                "community-get-communities-with-comments-fail-invalid-token",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_DEFAULT_SIZE isOptional true,
+                                    LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example "null" isOptional true,
+                                    SORT_TYPE_PARAM parameterDescription "정렬 타입" example CommunitySortType.values() isOptional true,
+                                ),
+                            )
+                        }
+                }
+            }
+        }
+
         describe("PUT /api/v1/communities/{communityId}") {
             val targetUri = "/api/v1/communities/{communityId}"
             context("유효한 요청 데이터가 전달되면") {

@@ -13,6 +13,7 @@ import kr.weit.odya.domain.community.CommunityVisibility
 import kr.weit.odya.domain.community.getByCommunityId
 import kr.weit.odya.domain.community.getCommunityByTopic
 import kr.weit.odya.domain.community.getCommunitySliceBy
+import kr.weit.odya.domain.community.getCommunityWithCommentSliceBy
 import kr.weit.odya.domain.community.getFriendCommunitySliceBy
 import kr.weit.odya.domain.community.getLikedCommunitySliceBy
 import kr.weit.odya.domain.community.getMyCommunitySliceBy
@@ -159,6 +160,17 @@ class CommunityService(
         sortType: CommunitySortType,
     ): SliceResponse<CommunitySimpleResponse> {
         val communities = communityRepository.getLikedCommunitySliceBy(userId, size, lastId, sortType)
+        return getCommunitySimpleSliceResponse(size, communities)
+    }
+
+    @Transactional(readOnly = true)
+    fun getCommunityWithComments(
+        userId: Long,
+        size: Int,
+        lastId: Long?,
+        sortType: CommunitySortType,
+    ): SliceResponse<CommunitySimpleResponse> {
+        val communities = communityRepository.getCommunityWithCommentSliceBy(userId, size, lastId, sortType)
         return getCommunitySimpleSliceResponse(size, communities)
     }
 

@@ -143,6 +143,23 @@ class CommunityController(
         return ResponseEntity.ok(response)
     }
 
+    @GetMapping("/comment")
+    fun communityWithComments(
+        @LoginUserId
+        userId: Long,
+        @Positive(message = "조회할 개수는 양수여야 합니다.")
+        @RequestParam("size", defaultValue = "10", required = false)
+        size: Int,
+        @Positive(message = "마지막 ID는 양수여야 합니다.")
+        @RequestParam("lastId", required = false)
+        lastId: Long?,
+        @RequestParam("sortType", defaultValue = "LATEST", required = false)
+        sortType: CommunitySortType,
+    ): ResponseEntity<SliceResponse<CommunitySimpleResponse>> {
+        val response = communityService.getCommunityWithComments(userId, size, lastId, sortType)
+        return ResponseEntity.ok(response)
+    }
+
     @PutMapping("/{communityId}")
     fun updateCommunity(
         @Positive(message = "커뮤니티 아이디는 0보다 커야 합니다.")

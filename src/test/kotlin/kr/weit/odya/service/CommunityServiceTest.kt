@@ -20,6 +20,7 @@ import kr.weit.odya.domain.community.CommunityVisibility
 import kr.weit.odya.domain.community.getByCommunityId
 import kr.weit.odya.domain.community.getCommunityByTopic
 import kr.weit.odya.domain.community.getCommunitySliceBy
+import kr.weit.odya.domain.community.getCommunityWithCommentSliceBy
 import kr.weit.odya.domain.community.getFriendCommunitySliceBy
 import kr.weit.odya.domain.community.getLikedCommunitySliceBy
 import kr.weit.odya.domain.community.getMyCommunitySliceBy
@@ -397,11 +398,15 @@ class CommunityServiceTest : DescribeSpec(
                     shouldNotThrowAny { communityService.getLikedCommunities(TEST_USER_ID, 10, null, CommunitySortType.LATEST) }
                 }
             }
+        }
 
+        describe("getCommunityWithCommentSliceBy") {
             context("유효한 데이터가 주어지는 경우") {
-                every { communityRepository.getLikedCommunitySliceBy(TEST_USER_ID, 10, null, CommunitySortType.LATEST) } returns createAllCommunities()
+                every { communityRepository.getCommunityWithCommentSliceBy(TEST_USER_ID, 10, null, CommunitySortType.LATEST) } returns createAllCommunities()
+                every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
+                every { communityCommentRepository.countByCommunityId(any<Long>()) } returns TEST_COMMUNITY_COMMENT_COUNT
                 it("정상적으로 종료한다") {
-                    shouldNotThrowAny { communityService.getLikedCommunities(TEST_USER_ID, 10, null, CommunitySortType.LATEST) }
+                    shouldNotThrowAny { communityService.getCommunityWithComments(TEST_USER_ID, 10, null, CommunitySortType.LATEST) }
                 }
             }
         }
