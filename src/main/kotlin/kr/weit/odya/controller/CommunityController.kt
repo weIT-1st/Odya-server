@@ -154,10 +154,8 @@ class CommunityController(
         @Positive(message = "마지막 ID는 양수여야 합니다.")
         @RequestParam("lastId", required = false)
         lastId: Long?,
-        @RequestParam("sortType", defaultValue = "LATEST", required = false)
-        sortType: CommunitySortType,
     ): ResponseEntity<SliceResponse<CommunityWithCommentsResponse>> {
-        val response = communityService.getCommunityWithComments(userId, size, lastId, sortType)
+        val response = communityService.getCommunityWithComments(userId, size, lastId)
         return ResponseEntity.ok(response)
     }
 

@@ -87,7 +87,6 @@ class CustomCommunityCommentRepositoryImpl(private val queryFactory: QueryFactor
         queryFactory.listQuery {
             select(entity(CommunityComment::class))
             from(entity(CommunityComment::class))
-            associate(entity(CommunityComment::class), entity(Community::class), on(CommunityComment::community))
             where(
                 and(
                     nestedCol(col(CommunityComment::user), User::id).equal(userId),

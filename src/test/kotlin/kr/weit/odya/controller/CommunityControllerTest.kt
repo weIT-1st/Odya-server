@@ -960,7 +960,6 @@ class CommunityControllerTest(
                         TEST_USER_ID,
                         TEST_DEFAULT_SIZE,
                         null,
-                        any<CommunitySortType>(),
                     )
                 } returns response
                 it("200 응답한다.") {
@@ -979,7 +978,6 @@ class CommunityControllerTest(
                                 queryParameters(
                                     SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_DEFAULT_SIZE isOptional true,
                                     LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example "null" isOptional true,
-                                    SORT_TYPE_PARAM parameterDescription "정렬 타입" example CommunitySortType.values() isOptional true,
                                 ),
                                 responseBody(
                                     "hasNext" type JsonFieldType.BOOLEAN description "다음 페이지 존재 여부" example response.hasNext,
@@ -1027,7 +1025,6 @@ class CommunityControllerTest(
                                 queryParameters(
                                     SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_DEFAULT_SIZE isOptional true,
                                     LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example "null" isOptional true,
-                                    SORT_TYPE_PARAM parameterDescription "정렬 타입" example CommunitySortType.values() isOptional true,
                                 ),
                             )
                         }
