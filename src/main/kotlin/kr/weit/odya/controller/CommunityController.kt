@@ -11,6 +11,7 @@ import kr.weit.odya.service.dto.CommunityResponse
 import kr.weit.odya.service.dto.CommunitySimpleResponse
 import kr.weit.odya.service.dto.CommunitySummaryResponse
 import kr.weit.odya.service.dto.CommunityUpdateRequest
+import kr.weit.odya.service.dto.CommunityWithCommentsResponse
 import kr.weit.odya.service.dto.SliceResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -155,7 +156,7 @@ class CommunityController(
         lastId: Long?,
         @RequestParam("sortType", defaultValue = "LATEST", required = false)
         sortType: CommunitySortType,
-    ): ResponseEntity<SliceResponse<CommunitySimpleResponse>> {
+    ): ResponseEntity<SliceResponse<CommunityWithCommentsResponse>> {
         val response = communityService.getCommunityWithComments(userId, size, lastId, sortType)
         return ResponseEntity.ok(response)
     }

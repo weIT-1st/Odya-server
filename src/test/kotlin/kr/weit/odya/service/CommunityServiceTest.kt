@@ -20,12 +20,12 @@ import kr.weit.odya.domain.community.CommunityVisibility
 import kr.weit.odya.domain.community.getByCommunityId
 import kr.weit.odya.domain.community.getCommunityByTopic
 import kr.weit.odya.domain.community.getCommunitySliceBy
-import kr.weit.odya.domain.community.getCommunityWithCommentSliceBy
 import kr.weit.odya.domain.community.getFriendCommunitySliceBy
 import kr.weit.odya.domain.community.getLikedCommunitySliceBy
 import kr.weit.odya.domain.community.getMyCommunitySliceBy
 import kr.weit.odya.domain.communitycomment.CommunityCommentRepository
 import kr.weit.odya.domain.communitycomment.deleteCommunityComments
+import kr.weit.odya.domain.communitycomment.getCommunityWithCommentSliceBy
 import kr.weit.odya.domain.communitylike.CommunityLikeRepository
 import kr.weit.odya.domain.communitylike.deleteCommunityLikes
 import kr.weit.odya.domain.follow.FollowRepository
@@ -54,6 +54,7 @@ import kr.weit.odya.support.TEST_UPDATE_TOPIC_ID
 import kr.weit.odya.support.TEST_UPDATE_TRAVEL_JOURNAL_ID
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createAllCommunities
+import kr.weit.odya.support.createCommunitiesComments
 import kr.weit.odya.support.createCommunity
 import kr.weit.odya.support.createCommunityContentImagePairs
 import kr.weit.odya.support.createCommunityContentImageUpdatePairs
@@ -402,7 +403,7 @@ class CommunityServiceTest : DescribeSpec(
 
         describe("getCommunityWithCommentSliceBy") {
             context("유효한 데이터가 주어지는 경우") {
-                every { communityRepository.getCommunityWithCommentSliceBy(TEST_USER_ID, 10, null, CommunitySortType.LATEST) } returns createAllCommunities()
+                every { communityCommentRepository.getCommunityWithCommentSliceBy(TEST_USER_ID, 10, null) } returns createCommunitiesComments()
                 every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
                 every { communityCommentRepository.countByCommunityId(any<Long>()) } returns TEST_COMMUNITY_COMMENT_COUNT
                 it("정상적으로 종료한다") {
