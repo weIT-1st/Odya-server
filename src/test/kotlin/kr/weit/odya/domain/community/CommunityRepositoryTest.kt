@@ -16,7 +16,6 @@ import kr.weit.odya.support.TEST_GENERATED_FILE_NAME
 import kr.weit.odya.support.TEST_OTHER_COMMUNITY_ID
 import kr.weit.odya.support.createCommunity
 import kr.weit.odya.support.createCommunityContentImage
-import kr.weit.odya.support.createCommunityLike
 import kr.weit.odya.support.createContentImage
 import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createTopic
@@ -108,8 +107,6 @@ class CommunityRepositoryTest(
                     topic = null,
                 ),
             )
-            communityLikeRepository.save(createCommunityLike(community2, user1))
-            communityLikeRepository.save(createCommunityLike(community3, user1))
         }
 
         context("커뮤니티 조회") {
@@ -161,11 +158,6 @@ class CommunityRepositoryTest(
 
             expect("토픽과 일치하는 커뮤니티 목록을 조회한다") {
                 val result = communityRepository.getCommunityByTopic(topic, 10, null, CommunitySortType.LATEST)
-                result.size shouldBe 2
-            }
-
-            expect("좋아요를 누른 커뮤니티 목록을 조회한다") {
-                val result = communityRepository.getLikedCommunitySliceBy(user1.id, 10, null, CommunitySortType.LATEST)
                 result.size shouldBe 2
             }
         }

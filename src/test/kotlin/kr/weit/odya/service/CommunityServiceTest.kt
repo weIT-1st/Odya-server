@@ -21,13 +21,13 @@ import kr.weit.odya.domain.community.getByCommunityId
 import kr.weit.odya.domain.community.getCommunityByTopic
 import kr.weit.odya.domain.community.getCommunitySliceBy
 import kr.weit.odya.domain.community.getFriendCommunitySliceBy
-import kr.weit.odya.domain.community.getLikedCommunitySliceBy
 import kr.weit.odya.domain.community.getMyCommunitySliceBy
 import kr.weit.odya.domain.communitycomment.CommunityCommentRepository
 import kr.weit.odya.domain.communitycomment.deleteCommunityComments
 import kr.weit.odya.domain.communitycomment.getCommunityWithCommentSliceBy
 import kr.weit.odya.domain.communitylike.CommunityLikeRepository
 import kr.weit.odya.domain.communitylike.deleteCommunityLikes
+import kr.weit.odya.domain.communitylike.getLikedCommunitySliceBy
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.report.ReportCommunityRepository
 import kr.weit.odya.domain.report.deleteAllByUserId
@@ -59,6 +59,7 @@ import kr.weit.odya.support.createCommunity
 import kr.weit.odya.support.createCommunityContentImagePairs
 import kr.weit.odya.support.createCommunityContentImageUpdatePairs
 import kr.weit.odya.support.createCommunityCreateRequest
+import kr.weit.odya.support.createCommunityLikes
 import kr.weit.odya.support.createCommunityUpdateRequest
 import kr.weit.odya.support.createFollowerFcmTokenList
 import kr.weit.odya.support.createFriendCommunities
@@ -392,7 +393,7 @@ class CommunityServiceTest : DescribeSpec(
 
         describe("getLikedCommunities") {
             context("유효한 데이터가 주어지는 경우") {
-                every { communityRepository.getLikedCommunitySliceBy(TEST_USER_ID, 10, null, CommunitySortType.LATEST) } returns createAllCommunities()
+                every { communityLikeRepository.getLikedCommunitySliceBy(TEST_USER_ID, 10, null) } returns createCommunityLikes()
                 every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
                 every { communityCommentRepository.countByCommunityId(any<Long>()) } returns TEST_COMMUNITY_COMMENT_COUNT
                 it("정상적으로 종료한다") {
@@ -407,7 +408,7 @@ class CommunityServiceTest : DescribeSpec(
                 every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
                 every { communityCommentRepository.countByCommunityId(any<Long>()) } returns TEST_COMMUNITY_COMMENT_COUNT
                 it("정상적으로 종료한다") {
-                    shouldNotThrowAny { communityService.getCommunityWithComments(TEST_USER_ID, 10, null, CommunitySortType.LATEST) }
+                    shouldNotThrowAny { communityService.getCommunityWithComments(TEST_USER_ID, 10, null) }
                 }
             }
         }
