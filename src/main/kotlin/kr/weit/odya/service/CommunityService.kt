@@ -170,7 +170,6 @@ class CommunityService(
         userId: Long,
         size: Int,
         lastId: Long?,
-        sortType: CommunitySortType,
     ): SliceResponse<CommunityWithCommentsResponse> {
         val communityComments = communityCommentRepository.getCommunityWithCommentSliceBy(userId, size, lastId)
         return getCommunityWithCommentSliceResponse(size, communityComments)
