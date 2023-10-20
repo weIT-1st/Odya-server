@@ -124,52 +124,75 @@ operation::community-controller-test/community-search-by-topic-fail-not-found-to
 
 operation::community-controller-test/community-search-by-topic-fail-invalid-token[snippets='http-request,request-headers,path-parameters,query-parameters,http-response']
 
-[[커뮤니티수정-API]]
-== *7. 커뮤니티 수정 API*
+[[좋아요누른커뮤니티목록조회-API]]
+== *7. 좋아요 누른 커뮤니티 목록 조회 API*
 
 === *7-1 성공*
 
+operation::community-controller-test/community-get-liked-communities-success[snippets='http-request,request-headers,query-parameters,http-response,response-fields']
+
+=== *7-2 실패 - 유효하지 않은 토큰인 경우*
+
+operation::community-controller-test/community-get-liked-communities-fail-invalid-token[snippets='http-request,request-headers,query-parameters,http-response']
+
+[[댓글단커뮤니티목록조회-API]]
+== *8. 댓글 단 커뮤니티 목록 조회 API*
+
+=== *8-1 성공*
+
+operation::community-controller-test/community-get-communities-with-comments-success[snippets='http-request,request-headers,query-parameters,http-response,response-fields']
+
+=== *8-2 실패 - 유효하지 않은 토큰인 경우*
+
+operation::community-controller-test/community-get-communities-with-comments-fail-invalid-token[snippets='http-request,request-headers,query-parameters,http-response']
+
+
+[[커뮤니티수정-API]]
+== *9. 커뮤니티 수정 API*
+
+=== *9-1 성공*
+
 operation::community-controller-test/community-update-success[snippets='http-request,request-headers,path-parameters,request-parts,http-response']
 
-=== *7-2 실패 - 존재하지 않는 커뮤니티 아이디가 주어지는 경우*
+=== *9-2 실패 - 존재하지 않는 커뮤니티 아이디가 주어지는 경우*
 
 operation::community-controller-test/community-update-fail-not-found[snippets='http-request,request-headers,path-parameters,request-parts,http-response']
 
-=== *7-3 실패 - 수정 요청자가 작성자와 다른 경우*
+=== *9-3 실패 - 수정 요청자가 작성자와 다른 경우*
 
 operation::community-controller-test/community-update-fail-not-writer[snippets='http-request,request-headers,path-parameters,request-parts,http-response']
 
-=== *7-4 실패 - 커뮤니티 이미지 개수가 제한 범위를 벗어나는 경우*
+=== *9-4 실패 - 커뮤니티 이미지 개수가 제한 범위를 벗어나는 경우*
 
 operation::community-controller-test/community-update-fail-exceed-max-community-content-image-count[snippets='http-request,request-headers,path-parameters,request-parts,http-response']
 
-=== *7-5 실패 - 존재하지 않는 여행 일지 아이디가 주어지는 경우*
+=== *9-5 실패 - 존재하지 않는 여행 일지 아이디가 주어지는 경우*
 
 operation::community-controller-test/community-update-fail-not-found-travel-journal[snippets='http-request,request-headers,path-parameters,request-parts,http-response']
 
-=== *7-6 실패 - 존재하지 않는 토픽 아이디가 주어지는 경우*
+=== *9-6 실패 - 존재하지 않는 토픽 아이디가 주어지는 경우*
 
 operation::community-controller-test/community-update-fail-not-found-topic[snippets='http-request,request-headers,path-parameters,request-parts,http-response']
 
-=== *7-7 실패 - 유효하지 않은 토큰인 경우*
+=== *9-7 실패 - 유효하지 않은 토큰인 경우*
 
 operation::community-controller-test/community-update-fail-invalid-token[snippets='http-request,request-headers,path-parameters,request-parts,http-response']
 
 [[커뮤니티삭제-API]]
-== *8. 커뮤니티 삭제 API*
+== *10. 커뮤니티 삭제 API*
 
-=== *8-1 성공*
+=== *10-1 성공*
 
 operation::community-controller-test/community-delete-success[snippets='http-request,request-headers,path-parameters,http-response']
 
-=== *8-2 실패 - 존재하지 않는 커뮤니티 아이디가 주어지는 경우*
+=== *10-2 실패 - 존재하지 않는 커뮤니티 아이디가 주어지는 경우*
 
 operation::community-controller-test/community-delete-fail-not-found[snippets='http-request,request-headers,path-parameters,http-response']
 
-=== *8-3 실패 - 삭제 요청자와 작성자가 다른 경우*
+=== *10-3 실패 - 삭제 요청자와 작성자가 다른 경우*
 
 operation::community-controller-test/community-delete-fail-not-writer[snippets='http-request,request-headers,path-parameters,http-response']
 
-=== *8-4 실패 - 유효하지 않은 토큰이 주어지는 경우*
+=== *10-4 실패 - 유효하지 않은 토큰이 주어지는 경우*
 
 operation::community-controller-test/community-delete-fail-invalid-token[snippets='http-request,request-headers,path-parameters,http-response']

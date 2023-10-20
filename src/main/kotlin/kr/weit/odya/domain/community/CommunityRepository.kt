@@ -10,6 +10,8 @@ import com.linecorp.kotlinjdsl.querydsl.expression.col
 import com.linecorp.kotlinjdsl.querydsl.from.Relation
 import com.linecorp.kotlinjdsl.subquery
 import com.linecorp.kotlinjdsl.updateQuery
+import kr.weit.odya.domain.communitycomment.CommunityComment
+import kr.weit.odya.domain.communitylike.CommunityLike
 import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.follow.Follow
 import kr.weit.odya.domain.topic.Topic
@@ -55,6 +57,20 @@ fun CommunityRepository.getCommunityByTopic(
     sortType: CommunitySortType,
 ): List<Community> = findCommunityByTopicSliceBy(topic, size, lastId, sortType)
 
+fun CommunityRepository.getLikedCommunitySliceBy(
+    userId: Long,
+    size: Int,
+    lastId: Long?,
+    sortType: CommunitySortType,
+): List<Community> = findLikedCommunitySliceBy(userId, size, lastId, sortType)
+
+fun CommunityRepository.getCommunityWithCommentSliceBy(
+    userId: Long,
+    size: Int,
+    lastId: Long?,
+    sortType: CommunitySortType,
+): List<Community> = findCommunityWithCommentSliceBy(userId, size, lastId, sortType)
+
 @Repository
 interface CommunityRepository : JpaRepository<Community, Long>, CustomCommunityRepository {
     fun deleteAllByUserId(userId: Long)
@@ -86,6 +102,20 @@ interface CustomCommunityRepository {
 
     fun findCommunityByTopicSliceBy(
         topic: Topic,
+        size: Int,
+        lastId: Long?,
+        sortType: CommunitySortType,
+    ): List<Community>
+
+    fun findLikedCommunitySliceBy(
+        userId: Long,
+        size: Int,
+        lastId: Long?,
+        sortType: CommunitySortType,
+    ): List<Community>
+
+    fun findCommunityWithCommentSliceBy(
+        userId: Long,
         size: Int,
         lastId: Long?,
         sortType: CommunitySortType,
@@ -147,6 +177,25 @@ class CommunityRepositoryImpl(private val queryFactory: QueryFactory) : CustomCo
         getCommunitySliceBaseQuery(lastId, sortType, size)
         where(col(Community::topic).equal(topic))
     }
+
+    override fun findLikedCommunitySliceBy(
+        userId: Long,
+        size: Int,
+        lastId: Long?,
+        sortType: CommunitySortType,
+    ): List<Community> =
+        queryFactory.listQuery {
+            val likedCommunityIds = getLikedCommunityIdsSubQuery(userId)
+            getCommunitySliceBaseQuery(lastId, sortType, size)
+            where(col(Community::id).`in`(likedCommunityIds))
+        }
+
+    override fun findCommunityWithCommentSliceBy(userId: Long, size: Int, lastId: Long?, sortType: CommunitySortType): List<Community> =
+        queryFactory.listQuery {
+            val communityWithCommentIds = getCommunityWithCommentSubQuery(userId)
+            getCommunitySliceBaseQuery(lastId, sortType, size)
+            where(col(Community::id).`in`(communityWithCommentIds))
+        }
 
     override fun findContentImageNameListById(communityId: Long): List<String> = queryFactory.listQuery {
         select(col(ContentImage::name))
@@ -228,6 +277,18 @@ class CommunityRepositoryImpl(private val queryFactory: QueryFactory) : CustomCo
         select(nestedCol(col(Follow::following), User::id))
         from(entity(Follow::class))
         where(nestedCol(col(Follow::follower), User::id).equal(userId))
+    }
+
+    private fun getLikedCommunityIdsSubQuery(userId: Long) = queryFactory.subquery<Long> {
+        select(nestedCol(col(CommunityLike::community), Community::id))
+        from(entity(CommunityLike::class))
+        where(nestedCol(col(CommunityLike::user), User::id).equal(userId))
+    }
+
+    private fun getCommunityWithCommentSubQuery(userId: Long) = queryFactory.subquery<Long> {
+        select(nestedCol(col(CommunityComment::community), Community::id))
+        from(entity(CommunityComment::class))
+        where(nestedCol(col(CommunityComment::user), User::id).equal(userId))
     }
 
     private fun CriteriaQueryDsl<Community>.getCommunitySliceBaseQuery(
