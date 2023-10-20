@@ -39,6 +39,7 @@ import kr.weit.odya.support.createMockImageFile
 import kr.weit.odya.support.createMockOtherImageFile
 import kr.weit.odya.support.createSliceCommunitySimpleResponse
 import kr.weit.odya.support.createSliceCommunitySummaryResponse
+import kr.weit.odya.support.createSliceCommunityWithCommentResponse
 import kr.weit.odya.support.createUpdateCommunityContentImagePairs
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
 import kr.weit.odya.support.test.ControllerTestHelper.Companion.jsonContent
@@ -953,7 +954,7 @@ class CommunityControllerTest(
         describe("GET /api/v1/communities/comment") {
             val targetUri = "/api/v1/communities/comment"
             context("유효한 요청 데이터가 전달되면") {
-                val response = createSliceCommunitySimpleResponse()
+                val response = createSliceCommunityWithCommentResponse()
                 every {
                     communityService.getCommunityWithComments(
                         TEST_USER_ID,
@@ -983,8 +984,26 @@ class CommunityControllerTest(
                                 responseBody(
                                     "hasNext" type JsonFieldType.BOOLEAN description "다음 페이지 존재 여부" example response.hasNext,
                                     "content[].communityId" type JsonFieldType.NUMBER description "커뮤니티 아이디" example response.content[0].communityId,
+                                    "content[].communityContent" type JsonFieldType.STRING description "커뮤니티 내용" example response.content[0].communityContent,
                                     "content[].communityMainImageUrl" type JsonFieldType.STRING description "커뮤니티 대표 이미지 URL" example response.content[0].communityMainImageUrl,
-                                    "content[].placeId" type JsonFieldType.STRING description "장소 아이디" example response.content[0].placeId isOptional true,
+                                    "content[].updatedAt" type JsonFieldType.STRING description "수정 일자" example response.content[0].updatedAt,
+                                    "content[].writer.userId" type JsonFieldType.NUMBER description "작성자 아이디" example response.content[0].writer.userId,
+                                    "content[].writer.nickname" type JsonFieldType.STRING description "작성자 닉네임" example response.content[0].writer.nickname,
+                                    "content[].writer.profile.profileUrl" type JsonFieldType.STRING description "작성자 프로필 이미지 URL" example response.content[0].writer.profile.profileUrl,
+                                    "content[].writer.profile.profileColor.colorHex" type JsonFieldType.STRING description "작성자 프로필 색상" example response.content[0].writer.profile.profileColor?.colorHex isOptional true,
+                                    "content[].writer.profile.profileColor.red" type JsonFieldType.NUMBER description "작성자 프로필 색상의 빨간색 값" example response.content[0].writer.profile.profileColor?.red isOptional true,
+                                    "content[].writer.profile.profileColor.green" type JsonFieldType.NUMBER description "작성자 프로필 색상의 초록색 값" example response.content[0].writer.profile.profileColor?.green isOptional true,
+                                    "content[].writer.profile.profileColor.blue" type JsonFieldType.NUMBER description "작성자 프로필 색상의 파란색 값" example response.content[0].writer.profile.profileColor?.blue isOptional true,
+                                    "content[].communityCommentSimpleResponse.communityCommentId" type JsonFieldType.NUMBER description "댓글 아이디" example response.content[0].communityCommentSimpleResponse.communityCommentId,
+                                    "content[].communityCommentSimpleResponse.content" type JsonFieldType.STRING description "댓글 내용" example response.content[0].communityCommentSimpleResponse.content,
+                                    "content[].communityCommentSimpleResponse.updatedAt" type JsonFieldType.STRING description "수정 일자" example response.content[0].communityCommentSimpleResponse.updatedAt,
+                                    "content[].communityCommentSimpleResponse.user.userId" type JsonFieldType.NUMBER description "댓글 작성자 아이디" example response.content[0].communityCommentSimpleResponse.user.userId,
+                                    "content[].communityCommentSimpleResponse.user.nickname" type JsonFieldType.STRING description "댓글 작성자 닉네임" example response.content[0].communityCommentSimpleResponse.user.nickname,
+                                    "content[].communityCommentSimpleResponse.user.profile.profileUrl" type JsonFieldType.STRING description "댓글 작성자 프로필 이미지 URL" example response.content[0].communityCommentSimpleResponse.user.profile.profileUrl,
+                                    "content[].communityCommentSimpleResponse.user.profile.profileColor.colorHex" type JsonFieldType.STRING description "댓글 작성자 프로필 색상" example response.content[0].communityCommentSimpleResponse.user.profile.profileColor?.colorHex isOptional true,
+                                    "content[].communityCommentSimpleResponse.user.profile.profileColor.red" type JsonFieldType.NUMBER description "댓글 작성자 프로필 색상의 빨간색 값" example response.content[0].communityCommentSimpleResponse.user.profile.profileColor?.red isOptional true,
+                                    "content[].communityCommentSimpleResponse.user.profile.profileColor.green" type JsonFieldType.NUMBER description "댓글 작성자 프로필 색상의 초록색 값" example response.content[0].communityCommentSimpleResponse.user.profile.profileColor?.green isOptional true,
+                                    "content[].communityCommentSimpleResponse.user.profile.profileColor.blue" type JsonFieldType.NUMBER description "댓글 작성자 프로필 색상의 파란색 값" example response.content[0].communityCommentSimpleResponse.user.profile.profileColor?.blue isOptional true,
                                 ),
                             )
                         }

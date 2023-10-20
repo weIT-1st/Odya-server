@@ -29,3 +29,10 @@ data class CommunityCommentResponse(
         UserSimpleResponse(user, profileUrl),
     )
 }
+
+data class CommunityCommentSimpleResponse(
+    val communityCommentId: Long,
+    val content: String,
+    val updatedAt: LocalDateTime,
+    val user: UserSimpleResponse,
+)

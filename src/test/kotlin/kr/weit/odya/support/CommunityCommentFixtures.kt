@@ -28,8 +28,20 @@ fun createCommunityComment(
 fun createMockCommunityComment(
     id: Long = TEST_COMMUNITY_COMMENT_ID,
     user: User = createUser(),
-    community: Community = createCommunity(),
+    community: Community = createMockCommunity(),
 ): MockCommunityComment = MockCommunityComment(id, user, community)
+
+fun createOtherMockCommunityComment(
+    id: Long = TEST_OTHER_COMMUNITY_COMMENT_ID,
+    user: User = createUser(),
+    community: Community = createMockCommunity(id = TEST_OTHER_COMMUNITY_ID),
+): MockCommunityComment = MockCommunityComment(id, user, community)
+
+fun createCommunitiesComments(): List<CommunityComment> =
+    listOf(
+        createMockCommunityComment(),
+        createOtherMockCommunityComment(),
+    )
 
 fun createCommunityCommentRequest(): CommunityCommentRequest =
     CommunityCommentRequest(content = TEST_COMMUNITY_COMMENT_CONTENT)
