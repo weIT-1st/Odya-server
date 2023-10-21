@@ -17,8 +17,10 @@ import kr.weit.odya.service.dto.CommunityUpdateRequest
 import kr.weit.odya.service.dto.SliceResponse
 import kr.weit.odya.service.dto.TopicResponse
 import kr.weit.odya.service.dto.TravelJournalSimpleResponse
+import kr.weit.odya.service.dto.UserSimpleResponse
 import org.springframework.mock.web.MockMultipartFile
 import java.io.InputStream
+import java.time.LocalDateTime
 
 const val TEST_COMMUNITY_ID = 1L
 const val TEST_OTHER_COMMUNITY_ID = 2L
@@ -40,6 +42,7 @@ const val MIM_COMMUNITY_CONTENT_IMAGE_COUNT = 1
 const val MAX_COMMUNITY_CONTENT_IMAGE_COUNT = 15
 const val TEST_COMMUNITY_LIKE_COUNT = 2
 const val TEST_IS_USER_LIKED = false
+val TEST_CREATED_DATE: LocalDateTime = LocalDateTime.parse("2021-01-01T00:00:00")
 
 fun createCommunityCreateRequest(
     content: String = TEST_COMMUNITY_CONTENT,
@@ -109,12 +112,12 @@ fun createCommunityContentImage(contentImage: ContentImage = createContentImage(
 )
 
 fun createAllCommunities() =
-    listOf(createCommunity(), createCommunity(id = TEST_OTHER_COMMUNITY_ID, user = createOtherUser()))
+    listOf(createMockCommunity(), createMockCommunity(id = TEST_OTHER_COMMUNITY_ID, user = createOtherUser()))
 
-fun createMyCommunities() = listOf(createCommunity(), createCommunity(id = TEST_OTHER_COMMUNITY_ID))
+fun createMyCommunities() = listOf(createMockCommunity(), createMockCommunity(id = TEST_OTHER_COMMUNITY_ID))
 
 fun createFriendCommunities() =
-    listOf(createCommunity(), createCommunity(id = TEST_OTHER_COMMUNITY_ID, user = createOtherUser()))
+    listOf(createMockCommunity(), createMockCommunity(id = TEST_OTHER_COMMUNITY_ID, user = createOtherUser()))
 
 fun createCommunityUpdateRequest(
     content: String = TEST_UPDATE_COMMUNITY_CONTENT,
@@ -149,12 +152,14 @@ fun createCommunityResponse(
     content = content,
     visibility = visibility,
     placeId = placeId,
+    writer = UserSimpleResponse(createUser(), TEST_FILE_AUTHENTICATED_URL),
     travelJournal = travelJournal,
     topic = topic,
     communityContentImages = communityContentImages,
     communityCommentCount = TEST_COMMUNITY_COMMENT_COUNT,
     communityLikeCount = TEST_COMMUNITY_LIKE_COUNT,
-    TEST_IS_USER_LIKED,
+    isUserLiked = TEST_IS_USER_LIKED,
+    createdDate = TEST_CREATED_DATE,
 )
 
 fun createOtherCommunityResponse(
@@ -170,12 +175,14 @@ fun createOtherCommunityResponse(
     content = content,
     visibility = visibility,
     placeId = placeId,
+    writer = UserSimpleResponse(createOtherUser(), TEST_FILE_AUTHENTICATED_URL),
     travelJournal = travelJournal,
     topic = topic,
     communityContentImages = communityContentImages,
     communityCommentCount = TEST_COMMUNITY_COMMENT_COUNT,
     communityLikeCount = TEST_COMMUNITY_COMMENT_COUNT,
-    TEST_IS_USER_LIKED,
+    isUserLiked = TEST_IS_USER_LIKED,
+    createdDate = TEST_CREATED_DATE,
 )
 
 fun createCommunityTopicResponse(
@@ -195,7 +202,7 @@ fun createCommunityContentImageResponse(
 )
 
 fun createCommunitySummaryResponse(
-    community: Community = createCommunity(
+    community: Community = createMockCommunity(
         id = TEST_COMMUNITY_ID,
         communityContentImages = listOf(createCommunityContentImage()),
     ),
@@ -212,7 +219,7 @@ fun createCommunitySummaryResponse(
 )
 
 fun createOtherCommunitySummaryResponse(
-    community: Community = createCommunity(
+    community: Community = createMockCommunity(
         id = TEST_OTHER_COMMUNITY_ID,
         communityContentImages = listOf(createCommunityContentImage()),
         placeId = TEST_OTHER_PLACE_ID,
@@ -268,3 +275,43 @@ fun createSliceCommunitySimpleResponse(
     hasNext = hasNext,
     content = content,
 )
+
+class MockCommunity(
+    id: Long = TEST_COMMUNITY_ID,
+    visibility: CommunityVisibility = TEST_COMMUNITY_VISIBILITY,
+    topic: Topic? = createTopic(),
+    travelJournal: TravelJournal? = createTravelJournal(),
+    communityContentImages: List<CommunityContentImage> = listOf(
+        createCommunityContentImage(),
+        createCommunityContentImage(
+            createOtherContentImage(),
+        ),
+    ),
+    user: User = createUser(),
+    placeId: String? = TEST_PLACE_ID,
+) : Community(
+    id = id,
+    user = user,
+    topic = topic,
+    travelJournal = travelJournal,
+    communityContentImages = communityContentImages,
+    communityInformation = CommunityInformation(
+        content = TEST_COMMUNITY_CONTENT,
+        visibility = visibility,
+        placeId = placeId,
+    ),
+) {
+    override var createdDate: LocalDateTime = LocalDateTime.of(2023, 9, 1, 0, 0, 0)
+}
+
+fun createMockCommunity(
+    id: Long = TEST_COMMUNITY_ID,
+    communityContentImages: List<CommunityContentImage> = listOf(
+        createCommunityContentImage(),
+        createCommunityContentImage(
+            createOtherContentImage(),
+        ),
+    ),
+    placeId: String? = TEST_PLACE_ID,
+    user: User = createUser(),
+) = MockCommunity(id = id, communityContentImages = communityContentImages, placeId = placeId, user = user)
