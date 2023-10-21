@@ -1,5 +1,6 @@
 package kr.weit.odya.service.dto
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import kr.weit.odya.domain.community.Community
@@ -49,16 +50,20 @@ data class CommunityResponse(
     val content: String,
     val visibility: CommunityVisibility,
     val placeId: String?,
+    val writer: UserSimpleResponse,
     val travelJournal: TravelJournalSimpleResponse?,
     val topic: TopicResponse?,
     val communityContentImages: List<CommunityContentImageResponse>,
     val communityCommentCount: Int,
     val communityLikeCount: Int,
     val isUserLiked: Boolean,
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    val createdDate: LocalDateTime,
 ) {
     companion object {
         fun from(
             community: Community,
+            profileUrl: String,
             travelJournalSimpleResponse: TravelJournalSimpleResponse?,
             communityContentImages: List<CommunityContentImageResponse>,
             communityCommentCount: Int,
@@ -69,6 +74,7 @@ data class CommunityResponse(
                 content = community.communityInformation.content,
                 visibility = community.communityInformation.visibility,
                 placeId = community.communityInformation.placeId,
+                writer = UserSimpleResponse(community.user, profileUrl),
                 travelJournal = travelJournalSimpleResponse,
                 topic = community.topic?.let {
                     TopicResponse(it.id, it.word)
@@ -77,6 +83,7 @@ data class CommunityResponse(
                 communityCommentCount = communityCommentCount,
                 communityLikeCount = community.likeCount,
                 isUserLiked = isUserLiked,
+                createdDate = community.createdDate,
             )
     }
 }
@@ -95,6 +102,8 @@ data class CommunitySummaryResponse(
     val travelJournalSimpleResponse: TravelJournalSimpleResponse? = null,
     val communityCommentCount: Int,
     val communityLikeCount: Int,
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    val createdDate: LocalDateTime,
 ) {
     companion object {
         fun from(
@@ -121,6 +130,7 @@ data class CommunitySummaryResponse(
                 },
                 communityCommentCount = communityCommentCount,
                 communityLikeCount = community.likeCount,
+                createdDate = community.createdDate,
             )
     }
 }
