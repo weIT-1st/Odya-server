@@ -14,7 +14,6 @@ import kr.weit.odya.domain.community.getByCommunityId
 import kr.weit.odya.domain.community.getCommunityByTopic
 import kr.weit.odya.domain.community.getCommunitySliceBy
 import kr.weit.odya.domain.community.getFriendCommunitySliceBy
-import kr.weit.odya.domain.community.getLikedCommunitySliceBy
 import kr.weit.odya.domain.community.getMyCommunitySliceBy
 import kr.weit.odya.domain.communitycomment.CommunityComment
 import kr.weit.odya.domain.communitycomment.CommunityCommentRepository
@@ -22,6 +21,7 @@ import kr.weit.odya.domain.communitycomment.deleteCommunityComments
 import kr.weit.odya.domain.communitycomment.getCommunityWithCommentSliceBy
 import kr.weit.odya.domain.communitylike.CommunityLikeRepository
 import kr.weit.odya.domain.communitylike.deleteCommunityLikes
+import kr.weit.odya.domain.communitylike.getLikedCommunitySliceBy
 import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowerFcmTokens
@@ -161,7 +161,7 @@ class CommunityService(
         lastId: Long?,
         sortType: CommunitySortType,
     ): SliceResponse<CommunitySimpleResponse> {
-        val communities = communityRepository.getLikedCommunitySliceBy(userId, size, lastId, sortType)
+        val communities = communityLikeRepository.getLikedCommunitySliceBy(userId, size, lastId).map { it.community }
         return getCommunitySimpleSliceResponse(size, communities)
     }
 
