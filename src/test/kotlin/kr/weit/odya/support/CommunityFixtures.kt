@@ -122,7 +122,10 @@ fun createFriendCommunities() =
     listOf(createMockCommunity(), createMockCommunity(id = TEST_OTHER_COMMUNITY_ID, user = createOtherUser()))
 
 fun createTopicCommunities() =
-    listOf(createMockCommunity(topic = createOtherTopic()), createCommunity(id = TEST_OTHER_COMMUNITY_ID, user = createOtherUser(), topic = createOtherTopic()))
+    listOf(
+        createMockCommunity(topic = createOtherTopic()),
+        createCommunity(id = TEST_OTHER_COMMUNITY_ID, user = createOtherUser(), topic = createOtherTopic()),
+    )
 
 fun createCommunityUpdateRequest(
     content: String = TEST_UPDATE_COMMUNITY_CONTENT,
@@ -352,6 +355,7 @@ class MockCommunity(
     user: User = createUser(),
     placeId: String? = TEST_PLACE_ID,
     topic: Topic? = createTopic(),
+    travelJournal: TravelJournal? = createTravelJournal(),
 ) : Community(
     id = id,
     user = user,
@@ -361,6 +365,7 @@ class MockCommunity(
         visibility = visibility,
         placeId = placeId,
     ),
+    travelJournal = travelJournal,
     topic = topic,
 ) {
     override var updatedDate: LocalDateTime = LocalDateTime.of(2023, 9, 1, 0, 0, 0)
