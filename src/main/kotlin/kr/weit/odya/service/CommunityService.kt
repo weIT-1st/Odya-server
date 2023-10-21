@@ -91,12 +91,14 @@ class CommunityService(
     fun getCommunity(communityId: Long, userId: Long): CommunityResponse {
         val community = communityRepository.getByCommunityId(communityId)
         validateUserReadPermission(community, userId)
+        val profileUrl = fileService.getPreAuthenticatedObjectUrl(community.user.profile.profileName)
         val travelJournalSimpleResponse = getTravelJournalSimpleResponse(community)
         val communityContentImages = getCommunityContentImageResponses(community)
         val communityCommentCount = communityCommentRepository.countByCommunityId(communityId)
         val isUserLiked = communityLikeRepository.existsByCommunityIdAndUserId(communityId, userId)
         return CommunityResponse.from(
             community,
+            profileUrl,
             travelJournalSimpleResponse,
             communityContentImages,
             communityCommentCount,
