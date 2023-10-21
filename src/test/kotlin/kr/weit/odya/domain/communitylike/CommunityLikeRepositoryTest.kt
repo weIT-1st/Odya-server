@@ -101,5 +101,12 @@ class CommunityLikeRepositoryTest(
                 isUserLiked shouldBe true
             }
         }
+
+        context("좋아요한 커뮤니티 전체 조회") {
+            expect("유저 ID와 일치하는 커뮤니티 목록을 조회한다") {
+                val result = communityLikeRepository.getLikedCommunitySliceBy(user.id, 10, null)
+                result.size shouldBe 2
+            }
+        }
     },
 )

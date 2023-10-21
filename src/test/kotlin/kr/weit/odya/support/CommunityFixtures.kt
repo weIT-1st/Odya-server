@@ -4,6 +4,7 @@ import kr.weit.odya.domain.community.Community
 import kr.weit.odya.domain.community.CommunityContentImage
 import kr.weit.odya.domain.community.CommunityInformation
 import kr.weit.odya.domain.community.CommunityVisibility
+import kr.weit.odya.domain.communitycomment.CommunityComment
 import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.topic.Topic
 import kr.weit.odya.domain.traveljournal.TravelJournal
@@ -14,6 +15,7 @@ import kr.weit.odya.service.dto.CommunityResponse
 import kr.weit.odya.service.dto.CommunitySimpleResponse
 import kr.weit.odya.service.dto.CommunitySummaryResponse
 import kr.weit.odya.service.dto.CommunityUpdateRequest
+import kr.weit.odya.service.dto.CommunityWithCommentsResponse
 import kr.weit.odya.service.dto.SliceResponse
 import kr.weit.odya.service.dto.TopicResponse
 import kr.weit.odya.service.dto.TravelJournalSimpleResponse
@@ -118,6 +120,9 @@ fun createMyCommunities() = listOf(createMockCommunity(), createMockCommunity(id
 
 fun createFriendCommunities() =
     listOf(createMockCommunity(), createMockCommunity(id = TEST_OTHER_COMMUNITY_ID, user = createOtherUser()))
+
+fun createTopicCommunities() =
+    listOf(createMockCommunity(topic = createOtherTopic()), createCommunity(id = TEST_OTHER_COMMUNITY_ID, user = createOtherUser(), topic = createOtherTopic()))
 
 fun createCommunityUpdateRequest(
     content: String = TEST_UPDATE_COMMUNITY_CONTENT,
@@ -254,6 +259,40 @@ fun createOtherCommunitySimpleResponse(
     placeId = TEST_OTHER_PLACE_ID,
 )
 
+fun createCommunityWithCommentResponse(
+    community: Community = createMockCommunity(
+        id = TEST_COMMUNITY_ID,
+        communityContentImages = listOf(createCommunityContentImage()),
+    ),
+    communityMainImageUrl: String = TEST_FILE_AUTHENTICATED_URL,
+    writerProfileUrl: String = TEST_FILE_AUTHENTICATED_URL,
+    communityComment: CommunityComment = createMockCommunityComment(),
+    commenterProfileUrl: String = TEST_FILE_AUTHENTICATED_URL,
+) = CommunityWithCommentsResponse.from(
+    community = community,
+    communityMainImageUrl = communityMainImageUrl,
+    writerProfileUrl = writerProfileUrl,
+    communityComment = communityComment,
+    commenterProfileUrl = commenterProfileUrl,
+)
+
+fun createOtherCommunityWithCommentResponse(
+    community: Community = createMockCommunity(
+        id = TEST_OTHER_COMMUNITY_ID,
+        communityContentImages = listOf(createCommunityContentImage()),
+    ),
+    communityMainImageUrl: String = TEST_FILE_AUTHENTICATED_URL,
+    writerProfileUrl: String = TEST_FILE_AUTHENTICATED_URL,
+    communityComment: CommunityComment = createMockCommunityComment(),
+    commenterProfileUrl: String = TEST_FILE_AUTHENTICATED_URL,
+) = CommunityWithCommentsResponse.from(
+    community = community,
+    communityMainImageUrl = communityMainImageUrl,
+    writerProfileUrl = writerProfileUrl,
+    communityComment = communityComment,
+    commenterProfileUrl = commenterProfileUrl,
+)
+
 fun createSliceCommunitySummaryResponse(
     hasNext: Boolean = false,
     content: List<CommunitySummaryResponse> = listOf(
@@ -276,11 +315,20 @@ fun createSliceCommunitySimpleResponse(
     content = content,
 )
 
-class MockCommunity(
+fun createSliceCommunityWithCommentResponse(
+    hasNext: Boolean = false,
+    content: List<CommunityWithCommentsResponse> = listOf(
+        createCommunityWithCommentResponse(),
+        createOtherCommunityWithCommentResponse(),
+    ),
+) = SliceResponse(
+    hasNext = hasNext,
+    content = content,
+)
+
+fun createMockCommunity(
     id: Long = TEST_COMMUNITY_ID,
     visibility: CommunityVisibility = TEST_COMMUNITY_VISIBILITY,
-    topic: Topic? = createTopic(),
-    travelJournal: TravelJournal? = createTravelJournal(),
     communityContentImages: List<CommunityContentImage> = listOf(
         createCommunityContentImage(),
         createCommunityContentImage(
@@ -289,29 +337,32 @@ class MockCommunity(
     ),
     user: User = createUser(),
     placeId: String? = TEST_PLACE_ID,
+    topic: Topic? = createTopic(),
+): MockCommunity = MockCommunity(id, visibility, communityContentImages, user, placeId, topic)
+
+class MockCommunity(
+    id: Long = TEST_COMMUNITY_ID,
+    visibility: CommunityVisibility = TEST_COMMUNITY_VISIBILITY,
+    communityContentImages: List<CommunityContentImage> = listOf(
+        createCommunityContentImage(),
+        createCommunityContentImage(
+            createOtherContentImage(),
+        ),
+    ),
+    user: User = createUser(),
+    placeId: String? = TEST_PLACE_ID,
+    topic: Topic? = createTopic(),
 ) : Community(
     id = id,
     user = user,
-    topic = topic,
-    travelJournal = travelJournal,
     communityContentImages = communityContentImages,
     communityInformation = CommunityInformation(
         content = TEST_COMMUNITY_CONTENT,
         visibility = visibility,
         placeId = placeId,
     ),
+    topic = topic,
 ) {
+    override var updatedDate: LocalDateTime = LocalDateTime.of(2023, 9, 1, 0, 0, 0)
     override var createdDate: LocalDateTime = LocalDateTime.of(2023, 9, 1, 0, 0, 0)
 }
-
-fun createMockCommunity(
-    id: Long = TEST_COMMUNITY_ID,
-    communityContentImages: List<CommunityContentImage> = listOf(
-        createCommunityContentImage(),
-        createCommunityContentImage(
-            createOtherContentImage(),
-        ),
-    ),
-    placeId: String? = TEST_PLACE_ID,
-    user: User = createUser(),
-) = MockCommunity(id = id, communityContentImages = communityContentImages, placeId = placeId, user = user)

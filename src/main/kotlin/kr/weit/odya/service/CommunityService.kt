@@ -15,10 +15,13 @@ import kr.weit.odya.domain.community.getCommunityByTopic
 import kr.weit.odya.domain.community.getCommunitySliceBy
 import kr.weit.odya.domain.community.getFriendCommunitySliceBy
 import kr.weit.odya.domain.community.getMyCommunitySliceBy
+import kr.weit.odya.domain.communitycomment.CommunityComment
 import kr.weit.odya.domain.communitycomment.CommunityCommentRepository
 import kr.weit.odya.domain.communitycomment.deleteCommunityComments
+import kr.weit.odya.domain.communitycomment.getCommunityWithCommentSliceBy
 import kr.weit.odya.domain.communitylike.CommunityLikeRepository
 import kr.weit.odya.domain.communitylike.deleteCommunityLikes
+import kr.weit.odya.domain.communitylike.getLikedCommunitySliceBy
 import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowerFcmTokens
@@ -39,6 +42,7 @@ import kr.weit.odya.service.dto.CommunityResponse
 import kr.weit.odya.service.dto.CommunitySimpleResponse
 import kr.weit.odya.service.dto.CommunitySummaryResponse
 import kr.weit.odya.service.dto.CommunityUpdateRequest
+import kr.weit.odya.service.dto.CommunityWithCommentsResponse
 import kr.weit.odya.service.dto.SliceResponse
 import kr.weit.odya.service.dto.TravelJournalSimpleResponse
 import org.springframework.context.ApplicationEventPublisher
@@ -150,6 +154,27 @@ class CommunityService(
         val topic = topicRepository.getByTopicId(topicId)
         val communities = communityRepository.getCommunityByTopic(topic, size, lastId, sortType)
         return getCommunitySummarySliceResponse(size, communities, userId)
+    }
+
+    @Transactional(readOnly = true)
+    fun getLikedCommunities(
+        userId: Long,
+        size: Int,
+        lastId: Long?,
+        sortType: CommunitySortType,
+    ): SliceResponse<CommunitySimpleResponse> {
+        val communities = communityLikeRepository.getLikedCommunitySliceBy(userId, size, lastId).map { it.community }
+        return getCommunitySimpleSliceResponse(size, communities)
+    }
+
+    @Transactional(readOnly = true)
+    fun getCommunityWithComments(
+        userId: Long,
+        size: Int,
+        lastId: Long?,
+    ): SliceResponse<CommunityWithCommentsResponse> {
+        val communityComments = communityCommentRepository.getCommunityWithCommentSliceBy(userId, size, lastId)
+        return getCommunityWithCommentSliceResponse(size, communityComments)
     }
 
     @Transactional(readOnly = true)
@@ -297,6 +322,26 @@ class CommunityService(
             )
         },
     )
+
+    private fun getCommunityWithCommentSliceResponse(size: Int, contents: List<CommunityComment>): SliceResponse<CommunityWithCommentsResponse> =
+        SliceResponse(
+            size = size,
+            content = contents.map { comment ->
+                val communityMainImageUrl =
+                    fileService.getPreAuthenticatedObjectUrl(comment.community.communityContentImages[0].contentImage.name)
+                val writerProfileUrl =
+                    fileService.getPreAuthenticatedObjectUrl(comment.community.user.profile.profileName)
+                val commenterProfileUrl =
+                    fileService.getPreAuthenticatedObjectUrl(comment.user.profile.profileName)
+                CommunityWithCommentsResponse.from(
+                    comment.community,
+                    communityMainImageUrl,
+                    writerProfileUrl,
+                    comment,
+                    commenterProfileUrl,
+                )
+            },
+        )
 
     private fun getTravelJournalSimpleResponse(community: Community): TravelJournalSimpleResponse? =
         community.travelJournal?.let {

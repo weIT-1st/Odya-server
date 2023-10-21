@@ -8,3 +8,5 @@ fun createCommunityLike(community: Community = createCommunity(), user: User = c
     community = community,
     user = user,
 )
+
+fun createCommunityLikes() = listOf(createCommunityLike(), createCommunityLike(createCommunity(TEST_COMMUNITY_ID)))

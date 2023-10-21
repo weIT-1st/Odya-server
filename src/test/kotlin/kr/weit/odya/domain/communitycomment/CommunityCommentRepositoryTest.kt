@@ -100,6 +100,16 @@ class CommunityCommentRepositoryTest(
                     )
                 result.size shouldBe 1
             }
+
+            expect("userId와 일치하는 커뮤니티 댓글 목록을 조회한다.") {
+                val result =
+                    communityCommentRepository.getCommunityWithCommentSliceBy(
+                        otherUser.id,
+                        TEST_DEFAULT_SIZE,
+                        null,
+                    )
+                result.size shouldBe 2
+            }
         }
 
         context("커뮤니티 댓글 개수 조회") {

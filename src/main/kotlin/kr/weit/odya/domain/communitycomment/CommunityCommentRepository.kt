@@ -8,6 +8,7 @@ import com.linecorp.kotlinjdsl.querydsl.CriteriaQueryDsl
 import com.linecorp.kotlinjdsl.querydsl.expression.col
 import kr.weit.odya.domain.community.Community
 import kr.weit.odya.domain.community.CommunityRepositoryImpl.Companion.communityByUserIdSubQuery
+import kr.weit.odya.domain.user.User
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
@@ -28,6 +29,13 @@ fun CommunityCommentRepository.deleteCommunityComments(userId: Long) {
     deleteCommunityCommentByUserId(userId)
 }
 
+fun CommunityCommentRepository.getCommunityWithCommentSliceBy(
+    userId: Long,
+    size: Int,
+    lastId: Long?,
+): List<CommunityComment> =
+    findCommunityWithCommentSliceBy(userId, size, lastId)
+
 @Repository
 interface CommunityCommentRepository : JpaRepository<CommunityComment, Long>, CustomCommunityCommentRepository {
     @EntityGraph(attributePaths = ["user"])
@@ -43,6 +51,12 @@ interface CommunityCommentRepository : JpaRepository<CommunityComment, Long>, Cu
 interface CustomCommunityCommentRepository {
     fun findSliceByCommunityIdAndSizeAndLastId(
         communityId: Long,
+        size: Int,
+        lastId: Long?,
+    ): List<CommunityComment>
+
+    fun findCommunityWithCommentSliceBy(
+        userId: Long,
         size: Int,
         lastId: Long?,
     ): List<CommunityComment>
@@ -68,6 +82,20 @@ class CustomCommunityCommentRepositoryImpl(private val queryFactory: QueryFactor
         orderBy(col(CommunityComment::id).asc())
         limit(size + 1)
     }
+
+    override fun findCommunityWithCommentSliceBy(userId: Long, size: Int, lastId: Long?): List<CommunityComment> =
+        queryFactory.listQuery {
+            select(entity(CommunityComment::class))
+            from(entity(CommunityComment::class))
+            where(
+                and(
+                    nestedCol(col(CommunityComment::user), User::id).equal(userId),
+                    dynamicPredicateByLastId(lastId),
+                ),
+            )
+            orderBy(col(CommunityComment::id).desc())
+            limit(size + 1)
+        }
 
     override fun deleteCommunityCommentByUserId(userId: Long) {
         queryFactory.deleteQuery<CommunityComment> {
