@@ -11,6 +11,7 @@ import kr.weit.odya.service.dto.CommunityResponse
 import kr.weit.odya.service.dto.CommunitySimpleResponse
 import kr.weit.odya.service.dto.CommunitySummaryResponse
 import kr.weit.odya.service.dto.CommunityUpdateRequest
+import kr.weit.odya.service.dto.CommunityWithCommentsResponse
 import kr.weit.odya.service.dto.SliceResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -123,6 +124,38 @@ class CommunityController(
         sortType: CommunitySortType,
     ): ResponseEntity<SliceResponse<CommunitySummaryResponse>> {
         val response = communityService.searchByTopic(userId, topicId, size, lastId, sortType)
+        return ResponseEntity.ok(response)
+    }
+
+    @GetMapping("/like")
+    fun likedCommunities(
+        @LoginUserId
+        userId: Long,
+        @Positive(message = "조회할 개수는 양수여야 합니다.")
+        @RequestParam("size", defaultValue = "10", required = false)
+        size: Int,
+        @Positive(message = "마지막 ID는 양수여야 합니다.")
+        @RequestParam("lastId", required = false)
+        lastId: Long?,
+        @RequestParam("sortType", defaultValue = "LATEST", required = false)
+        sortType: CommunitySortType,
+    ): ResponseEntity<SliceResponse<CommunitySimpleResponse>> {
+        val response = communityService.getLikedCommunities(userId, size, lastId, sortType)
+        return ResponseEntity.ok(response)
+    }
+
+    @GetMapping("/comment")
+    fun communityWithComments(
+        @LoginUserId
+        userId: Long,
+        @Positive(message = "조회할 개수는 양수여야 합니다.")
+        @RequestParam("size", defaultValue = "10", required = false)
+        size: Int,
+        @Positive(message = "마지막 ID는 양수여야 합니다.")
+        @RequestParam("lastId", required = false)
+        lastId: Long?,
+    ): ResponseEntity<SliceResponse<CommunityWithCommentsResponse>> {
+        val response = communityService.getCommunityWithComments(userId, size, lastId)
         return ResponseEntity.ok(response)
     }
 

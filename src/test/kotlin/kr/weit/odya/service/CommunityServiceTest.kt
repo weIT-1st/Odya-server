@@ -24,8 +24,10 @@ import kr.weit.odya.domain.community.getFriendCommunitySliceBy
 import kr.weit.odya.domain.community.getMyCommunitySliceBy
 import kr.weit.odya.domain.communitycomment.CommunityCommentRepository
 import kr.weit.odya.domain.communitycomment.deleteCommunityComments
+import kr.weit.odya.domain.communitycomment.getCommunityWithCommentSliceBy
 import kr.weit.odya.domain.communitylike.CommunityLikeRepository
 import kr.weit.odya.domain.communitylike.deleteCommunityLikes
+import kr.weit.odya.domain.communitylike.getLikedCommunitySliceBy
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.report.ReportCommunityRepository
 import kr.weit.odya.domain.report.deleteAllByUserId
@@ -52,10 +54,12 @@ import kr.weit.odya.support.TEST_UPDATE_TOPIC_ID
 import kr.weit.odya.support.TEST_UPDATE_TRAVEL_JOURNAL_ID
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createAllCommunities
+import kr.weit.odya.support.createCommunitiesComments
 import kr.weit.odya.support.createCommunity
 import kr.weit.odya.support.createCommunityContentImagePairs
 import kr.weit.odya.support.createCommunityContentImageUpdatePairs
 import kr.weit.odya.support.createCommunityCreateRequest
+import kr.weit.odya.support.createCommunityLikes
 import kr.weit.odya.support.createCommunityUpdateRequest
 import kr.weit.odya.support.createFollowerFcmTokenList
 import kr.weit.odya.support.createFriendCommunities
@@ -66,6 +70,7 @@ import kr.weit.odya.support.createOtherUser
 import kr.weit.odya.support.createPlaceDetails
 import kr.weit.odya.support.createPrivateTravelJournal
 import kr.weit.odya.support.createTopic
+import kr.weit.odya.support.createTopicCommunities
 import kr.weit.odya.support.createTravelJournal
 import kr.weit.odya.support.createUser
 import org.springframework.context.ApplicationEventPublisher
@@ -366,7 +371,7 @@ class CommunityServiceTest : DescribeSpec(
             context("유효한 데이터가 주어지는 경우") {
                 val topic = createTopic()
                 every { topicRepository.getByTopicId(TEST_TOPIC_ID) } returns topic
-                every { communityRepository.getCommunityByTopic(topic, TEST_DEFAULT_SIZE, null, CommunitySortType.LATEST) } returns createAllCommunities()
+                every { communityRepository.getCommunityByTopic(topic, TEST_DEFAULT_SIZE, null, CommunitySortType.LATEST) } returns createTopicCommunities()
                 every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
                 every { communityCommentRepository.countByCommunityId(any<Long>()) } returns TEST_COMMUNITY_COMMENT_COUNT
                 it("정상적으로 종료한다.") {
@@ -382,6 +387,28 @@ class CommunityServiceTest : DescribeSpec(
                     shouldThrow<NoSuchElementException> {
                         communityService.searchByTopic(TEST_USER_ID, TEST_INVALID_TOPIC_ID, 10, null, CommunitySortType.LATEST)
                     }
+                }
+            }
+        }
+
+        describe("getLikedCommunities") {
+            context("유효한 데이터가 주어지는 경우") {
+                every { communityLikeRepository.getLikedCommunitySliceBy(TEST_USER_ID, 10, null) } returns createCommunityLikes()
+                every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
+                every { communityCommentRepository.countByCommunityId(any<Long>()) } returns TEST_COMMUNITY_COMMENT_COUNT
+                it("정상적으로 종료한다") {
+                    shouldNotThrowAny { communityService.getLikedCommunities(TEST_USER_ID, 10, null, CommunitySortType.LATEST) }
+                }
+            }
+        }
+
+        describe("getCommunityWithCommentSliceBy") {
+            context("유효한 데이터가 주어지는 경우") {
+                every { communityCommentRepository.getCommunityWithCommentSliceBy(TEST_USER_ID, 10, null) } returns createCommunitiesComments()
+                every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
+                every { communityCommentRepository.countByCommunityId(any<Long>()) } returns TEST_COMMUNITY_COMMENT_COUNT
+                it("정상적으로 종료한다") {
+                    shouldNotThrowAny { communityService.getCommunityWithComments(TEST_USER_ID, 10, null) }
                 }
             }
         }

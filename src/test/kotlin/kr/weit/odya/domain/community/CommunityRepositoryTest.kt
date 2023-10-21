@@ -154,7 +154,7 @@ class CommunityRepositoryTest(
                 result.size shouldBe 2
             }
 
-            expect("토픽과 일치하는 커뮤니티를 조회한다") {
+            expect("토픽과 일치하는 커뮤니티 목록을 조회한다") {
                 val result = communityRepository.getCommunityByTopic(topic, 10, null, CommunitySortType.LATEST)
                 result.size shouldBe 2
             }

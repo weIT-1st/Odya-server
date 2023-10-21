@@ -6,11 +6,13 @@ import kr.weit.odya.domain.community.Community
 import kr.weit.odya.domain.community.CommunityContentImage
 import kr.weit.odya.domain.community.CommunityInformation
 import kr.weit.odya.domain.community.CommunityVisibility
+import kr.weit.odya.domain.communitycomment.CommunityComment
 import kr.weit.odya.domain.topic.Topic
 import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.support.validator.NullOrNotBlank
 import org.hibernate.validator.constraints.Length
+import java.time.LocalDateTime
 
 data class CommunityCreateRequest(
     @field:NotBlank(message = "커뮤니티 글은 필수 입력 값입니다.")
@@ -157,5 +159,36 @@ data class CommunitySimpleResponse(
                 communityMainImageUrl = communityMainImageUrl,
                 placeId = community.placeId,
             )
+    }
+}
+
+data class CommunityWithCommentsResponse(
+    val communityId: Long,
+    val communityContent: String,
+    val communityMainImageUrl: String,
+    val updatedAt: LocalDateTime,
+    val writer: UserSimpleResponse,
+    val communityCommentSimpleResponse: CommunityCommentSimpleResponse,
+) {
+    companion object {
+        fun from(
+            community: Community,
+            communityMainImageUrl: String,
+            writerProfileUrl: String,
+            communityComment: CommunityComment,
+            commenterProfileUrl: String,
+        ): CommunityWithCommentsResponse = CommunityWithCommentsResponse(
+            communityId = community.id,
+            communityContent = community.content,
+            communityMainImageUrl = communityMainImageUrl,
+            updatedAt = community.updatedDate,
+            writer = UserSimpleResponse(community.user, writerProfileUrl),
+            communityCommentSimpleResponse = CommunityCommentSimpleResponse(
+                communityCommentId = communityComment.id,
+                content = communityComment.content,
+                updatedAt = communityComment.updatedDate,
+                user = UserSimpleResponse(communityComment.user, commenterProfileUrl),
+            ),
+        )
     }
 }
