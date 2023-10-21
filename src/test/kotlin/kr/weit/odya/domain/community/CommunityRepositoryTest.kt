@@ -2,7 +2,6 @@ package kr.weit.odya.domain.community
 
 import io.kotest.core.spec.style.ExpectSpec
 import io.kotest.matchers.shouldBe
-import kr.weit.odya.domain.communitylike.CommunityLikeRepository
 import kr.weit.odya.domain.follow.Follow
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.topic.Topic
@@ -34,7 +33,6 @@ class CommunityRepositoryTest(
     private val followRepository: FollowRepository,
     private val userRepository: UserRepository,
     private val travelJournalRepository: TravelJournalRepository,
-    private val communityLikeRepository: CommunityLikeRepository,
     private val tem: TestEntityManager,
 ) : ExpectSpec(
     {
