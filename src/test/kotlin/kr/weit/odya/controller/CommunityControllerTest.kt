@@ -429,6 +429,13 @@ class CommunityControllerTest(
                                     "content" type JsonFieldType.STRING description "커뮤니티 내용" example response.content,
                                     "visibility" type JsonFieldType.STRING description "커뮤니티 접근 권한" example response.visibility,
                                     "placeId" type JsonFieldType.STRING description "장소 아이디" example response.placeId isOptional true,
+                                    "writer.userId" type JsonFieldType.NUMBER description "커뮤니티 작성자의 아이디" example response.writer.userId,
+                                    "writer.nickname" type JsonFieldType.STRING description "커뮤니티 작성자의 닉네임" example response.writer.nickname,
+                                    "writer.profile.profileUrl" type JsonFieldType.STRING description "커뮤니티 작성자의 프로필 사진" example response.writer.profile.profileUrl,
+                                    "writer.profile.profileColor.colorHex" type JsonFieldType.STRING description "커뮤니티 작성자의 프로필 색상" example response.writer.profile.profileColor?.colorHex isOptional true,
+                                    "writer.profile.profileColor.red" type JsonFieldType.NUMBER description "커뮤니티 작성자의 프로필 색상의 빨간색 값" example response.writer.profile.profileColor?.red isOptional true,
+                                    "writer.profile.profileColor.green" type JsonFieldType.NUMBER description "커뮤니티 작성자의 프로필 색상의 초록색 값" example response.writer.profile.profileColor?.green isOptional true,
+                                    "writer.profile.profileColor.blue" type JsonFieldType.NUMBER description "커뮤니티 작성자의 프로필 색상의 파란색 값" example response.writer.profile.profileColor?.blue isOptional true,
                                     "travelJournal.travelJournalId" type JsonFieldType.NUMBER description "여행 일지 아이디" example response.travelJournal?.travelJournalId isOptional true,
                                     "travelJournal.title" type JsonFieldType.STRING description "여행 일지 제목" example response.travelJournal?.title isOptional true,
                                     "travelJournal.mainImageUrl" type JsonFieldType.STRING description "여행 일지 대표 이미지 URL" example response.travelJournal?.mainImageUrl isOptional true,
@@ -440,6 +447,7 @@ class CommunityControllerTest(
                                     "communityCommentCount" type JsonFieldType.NUMBER description "커뮤니티 댓글 수" example response.communityCommentCount,
                                     "communityLikeCount" type JsonFieldType.NUMBER description "커뮤니티 좋아요 수" example response.communityLikeCount,
                                     "isUserLiked" type JsonFieldType.BOOLEAN description "사용자가 좋아요를 눌렀는지 여부" example response.isUserLiked,
+                                    "createdDate" type JsonFieldType.STRING description "커뮤니티 생성 날짜" example response.createdDate,
                                 ),
                             ),
                         )
@@ -574,6 +582,7 @@ class CommunityControllerTest(
                                     "content[].travelJournalSimpleResponse.mainImageUrl" type JsonFieldType.STRING description "여행 일지 대표 이미지 URL" example response.content[0].travelJournalSimpleResponse?.mainImageUrl isOptional true,
                                     "content[].communityCommentCount" type JsonFieldType.NUMBER description "커뮤니티 댓글 수" example response.content[0].communityCommentCount,
                                     "content[].communityLikeCount" type JsonFieldType.NUMBER description "커뮤니티 좋아요 수" example response.content[0].communityLikeCount,
+                                    "content[].createdDate" type JsonFieldType.STRING description "커뮤니티 생성 날짜" example response.content[0].createdDate,
                                 ),
                             )
                         }
@@ -720,6 +729,7 @@ class CommunityControllerTest(
                                     "content[].travelJournalSimpleResponse.mainImageUrl" type JsonFieldType.STRING description "여행 일지 대표 이미지 URL" example response.content[0].travelJournalSimpleResponse?.mainImageUrl isOptional true,
                                     "content[].communityCommentCount" type JsonFieldType.NUMBER description "커뮤니티 댓글 수" example response.content[0].communityCommentCount,
                                     "content[].communityLikeCount" type JsonFieldType.NUMBER description "커뮤니티 좋아요 수" example response.content[0].communityLikeCount,
+                                    "content[].createdDate" type JsonFieldType.STRING description "커뮤니티 생성 날짜" example response.content[0].createdDate,
                                 ),
                             )
                         }
@@ -755,7 +765,15 @@ class CommunityControllerTest(
             val targetUri = "/api/v1/communities/topic/{topicId}"
             context("유효한 요청 데이터가 전달되면") {
                 val response = createSliceCommunitySummaryResponse()
-                every { communityService.searchByTopic(TEST_USER_ID, TEST_TOPIC_ID, TEST_DEFAULT_SIZE, null, any<CommunitySortType>()) } returns response
+                every {
+                    communityService.searchByTopic(
+                        TEST_USER_ID,
+                        TEST_TOPIC_ID,
+                        TEST_DEFAULT_SIZE,
+                        null,
+                        any<CommunitySortType>(),
+                    )
+                } returns response
                 it("200 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -796,6 +814,7 @@ class CommunityControllerTest(
                                     "content[].travelJournalSimpleResponse.mainImageUrl" type JsonFieldType.STRING description "여행 일지 대표 이미지 URL" example response.content[0].travelJournalSimpleResponse?.mainImageUrl isOptional true,
                                     "content[].communityCommentCount" type JsonFieldType.NUMBER description "커뮤니티 댓글 수" example response.content[0].communityCommentCount,
                                     "content[].communityLikeCount" type JsonFieldType.NUMBER description "커뮤니티 좋아요 수" example response.content[0].communityLikeCount,
+                                    "content[].createdDate" type JsonFieldType.STRING description "커뮤니티 생성 날짜" example response.content[0].createdDate,
                                 ),
                             ),
                         )
@@ -830,7 +849,15 @@ class CommunityControllerTest(
             }
 
             context("존재하지 않는 TOPIC_ID가 전달되면") {
-                every { communityService.searchByTopic(TEST_USER_ID, TEST_NOT_EXIST_TOPIC_ID, TEST_DEFAULT_SIZE, null, any<CommunitySortType>()) } throws NoSuchElementException("토픽 아이디($TEST_NOT_EXIST_TOPIC_ID)에 해당하는 토픽이 없습니다.")
+                every {
+                    communityService.searchByTopic(
+                        TEST_USER_ID,
+                        TEST_NOT_EXIST_TOPIC_ID,
+                        TEST_DEFAULT_SIZE,
+                        null,
+                        any<CommunitySortType>(),
+                    )
+                } throws NoSuchElementException("토픽 아이디($TEST_NOT_EXIST_TOPIC_ID)에 해당하는 토픽이 없습니다.")
                 it("404 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders

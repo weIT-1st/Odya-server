@@ -63,6 +63,7 @@ import kr.weit.odya.support.createCommunityLikes
 import kr.weit.odya.support.createCommunityUpdateRequest
 import kr.weit.odya.support.createFollowerFcmTokenList
 import kr.weit.odya.support.createFriendCommunities
+import kr.weit.odya.support.createMockCommunity
 import kr.weit.odya.support.createMockImageFile
 import kr.weit.odya.support.createMockImageFiles
 import kr.weit.odya.support.createMyCommunities
@@ -248,7 +249,7 @@ class CommunityServiceTest : DescribeSpec(
 
         describe("getCommunity") {
             context("유효한 데이터가 주어지는 경우") {
-                every { communityRepository.getByCommunityId(TEST_COMMUNITY_ID) } returns createCommunity()
+                every { communityRepository.getByCommunityId(TEST_COMMUNITY_ID) } returns createMockCommunity()
                 every { communityCommentRepository.countByCommunityId(TEST_COMMUNITY_ID) } returns TEST_COMMUNITY_COMMENT_COUNT
                 every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
                 every { communityCommentRepository.countByCommunityId(TEST_COMMUNITY_ID) } returns TEST_COMMUNITY_COMMENT_COUNT
@@ -376,7 +377,13 @@ class CommunityServiceTest : DescribeSpec(
                 every { communityCommentRepository.countByCommunityId(any<Long>()) } returns TEST_COMMUNITY_COMMENT_COUNT
                 it("정상적으로 종료한다.") {
                     shouldNotThrowAny {
-                        communityService.searchByTopic(TEST_USER_ID, TEST_TOPIC_ID, TEST_DEFAULT_SIZE, null, CommunitySortType.LATEST)
+                        communityService.searchByTopic(
+                            TEST_USER_ID,
+                            TEST_TOPIC_ID,
+                            TEST_DEFAULT_SIZE,
+                            null,
+                            CommunitySortType.LATEST,
+                        )
                     }
                 }
             }
@@ -385,7 +392,13 @@ class CommunityServiceTest : DescribeSpec(
                 every { topicRepository.getByTopicId(TEST_INVALID_TOPIC_ID) } throws NoSuchElementException("$TEST_TOPIC_ID: 존재하지 않는 토픽입니다.")
                 it("[NoSuchElementException] 반환한다") {
                     shouldThrow<NoSuchElementException> {
-                        communityService.searchByTopic(TEST_USER_ID, TEST_INVALID_TOPIC_ID, 10, null, CommunitySortType.LATEST)
+                        communityService.searchByTopic(
+                            TEST_USER_ID,
+                            TEST_INVALID_TOPIC_ID,
+                            10,
+                            null,
+                            CommunitySortType.LATEST,
+                        )
                     }
                 }
             }
