@@ -124,7 +124,7 @@ fun createFriendCommunities() =
 fun createTopicCommunities() =
     listOf(
         createMockCommunity(topic = createOtherTopic()),
-        createCommunity(id = TEST_OTHER_COMMUNITY_ID, user = createOtherUser(), topic = createOtherTopic()),
+        createMockCommunity(id = TEST_OTHER_COMMUNITY_ID, user = createOtherUser(), topic = createOtherTopic()),
     )
 
 fun createCommunityUpdateRequest(
