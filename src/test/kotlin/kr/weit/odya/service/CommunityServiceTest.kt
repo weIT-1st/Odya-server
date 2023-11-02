@@ -259,6 +259,7 @@ class CommunityServiceTest : DescribeSpec(
                         TEST_USER_ID,
                     )
                 } returns false
+                every { followRepository.existsByFollowerIdAndFollowingId(any<Long>(), any<Long>()) } returns true
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         communityService.getCommunity(TEST_COMMUNITY_ID, TEST_USER_ID)
@@ -379,7 +380,7 @@ class CommunityServiceTest : DescribeSpec(
                         null,
                         CommunitySortType.LATEST,
                     )
-                } returns createAllCommunities()
+                } returns createTopicCommunities()
                 every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
                 every { communityCommentRepository.countByCommunityId(any<Long>()) } returns TEST_COMMUNITY_COMMENT_COUNT
                 it("정상적으로 종료한다.") {
@@ -413,18 +414,37 @@ class CommunityServiceTest : DescribeSpec(
 
         describe("getLikedCommunities") {
             context("유효한 데이터가 주어지는 경우") {
-                every { communityLikeRepository.getLikedCommunitySliceBy(TEST_USER_ID, 10, null) } returns createCommunityLikes()
+                every {
+                    communityLikeRepository.getLikedCommunitySliceBy(
+                        TEST_USER_ID,
+                        10,
+                        null,
+                    )
+                } returns createCommunityLikes()
                 every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
                 every { communityCommentRepository.countByCommunityId(any<Long>()) } returns TEST_COMMUNITY_COMMENT_COUNT
                 it("정상적으로 종료한다") {
-                    shouldNotThrowAny { communityService.getLikedCommunities(TEST_USER_ID, 10, null, CommunitySortType.LATEST) }
+                    shouldNotThrowAny {
+                        communityService.getLikedCommunities(
+                            TEST_USER_ID,
+                            10,
+                            null,
+                            CommunitySortType.LATEST,
+                        )
+                    }
                 }
             }
         }
 
         describe("getCommunityWithCommentSliceBy") {
             context("유효한 데이터가 주어지는 경우") {
-                every { communityCommentRepository.getCommunityWithCommentSliceBy(TEST_USER_ID, 10, null) } returns createCommunitiesComments()
+                every {
+                    communityCommentRepository.getCommunityWithCommentSliceBy(
+                        TEST_USER_ID,
+                        10,
+                        null,
+                    )
+                } returns createCommunitiesComments()
                 every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
                 every { communityCommentRepository.countByCommunityId(any<Long>()) } returns TEST_COMMUNITY_COMMENT_COUNT
                 it("정상적으로 종료한다") {

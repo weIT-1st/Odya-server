@@ -155,12 +155,13 @@ fun createCommunityResponse(
     travelJournal: TravelJournalSimpleResponse? = createTravelJournalSimpleResponse(),
     topic: TopicResponse? = createCommunityTopicResponse(),
     communityContentImages: List<CommunityContentImageResponse> = listOf(createCommunityContentImageResponse()),
+    isFollowing: Boolean? = null,
 ) = CommunityResponse(
     communityId = id,
     content = content,
     visibility = visibility,
     placeId = placeId,
-    writer = UserSimpleResponse(createUser(), TEST_FILE_AUTHENTICATED_URL),
+    writer = UserSimpleResponse(createUser(), TEST_FILE_AUTHENTICATED_URL, isFollowing),
     travelJournal = travelJournal,
     topic = topic,
     communityContentImages = communityContentImages,
@@ -341,7 +342,7 @@ fun createMockCommunity(
     user: User = createUser(),
     placeId: String? = TEST_PLACE_ID,
     topic: Topic? = createTopic(),
-): MockCommunity = MockCommunity(id, visibility, communityContentImages, user, placeId)
+): MockCommunity = MockCommunity(id, visibility, communityContentImages, user, placeId, topic)
 
 class MockCommunity(
     id: Long = TEST_COMMUNITY_ID,
@@ -354,6 +355,7 @@ class MockCommunity(
     ),
     user: User = createUser(),
     placeId: String? = TEST_PLACE_ID,
+    topic: Topic? = createTopic(),
     travelJournal: TravelJournal? = createTravelJournal(),
 ) : Community(
     id = id,
@@ -365,6 +367,7 @@ class MockCommunity(
         placeId = placeId,
     ),
     travelJournal = travelJournal,
+    topic = topic,
 ) {
     override var updatedDate: LocalDateTime = LocalDateTime.of(2023, 9, 1, 0, 0, 0)
     override var createdDate: LocalDateTime = LocalDateTime.of(2023, 9, 1, 0, 0, 0)
