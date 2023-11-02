@@ -68,13 +68,14 @@ data class CommunityResponse(
             communityContentImages: List<CommunityContentImageResponse>,
             communityCommentCount: Int,
             isUserLiked: Boolean,
+            isFollowing: Boolean,
         ): CommunityResponse =
             CommunityResponse(
                 communityId = community.id,
                 content = community.communityInformation.content,
                 visibility = community.communityInformation.visibility,
                 placeId = community.communityInformation.placeId,
-                writer = UserSimpleResponse(community.user, profileUrl),
+                writer = UserSimpleResponse(community.user, profileUrl, isFollowing),
                 travelJournal = travelJournalSimpleResponse,
                 topic = community.topic?.let {
                     TopicResponse(it.id, it.word)
