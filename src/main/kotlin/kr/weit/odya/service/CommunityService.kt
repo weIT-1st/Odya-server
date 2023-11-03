@@ -100,6 +100,8 @@ class CommunityService(
         val communityContentImages = getCommunityContentImageResponses(community)
         val communityCommentCount = communityCommentRepository.countByCommunityId(communityId)
         val isUserLiked = communityLikeRepository.existsByCommunityIdAndUserId(communityId, userId)
+        val isFollowing =
+            followRepository.existsByFollowerIdAndFollowingId(userId, community.user.id)
         return CommunityResponse.from(
             community,
             profileUrl,
@@ -107,6 +109,7 @@ class CommunityService(
             communityContentImages,
             communityCommentCount,
             isUserLiked,
+            isFollowing,
         )
     }
 
@@ -323,7 +326,10 @@ class CommunityService(
         },
     )
 
-    private fun getCommunityWithCommentSliceResponse(size: Int, contents: List<CommunityComment>): SliceResponse<CommunityWithCommentsResponse> =
+    private fun getCommunityWithCommentSliceResponse(
+        size: Int,
+        contents: List<CommunityComment>,
+    ): SliceResponse<CommunityWithCommentsResponse> =
         SliceResponse(
             size = size,
             content = contents.map { comment ->
