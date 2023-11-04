@@ -316,12 +316,14 @@ class CommunityService(
                 fileService.getPreAuthenticatedObjectUrl(community.user.profile.profileName)
             val isFollowing = followRepository.existsByFollowerIdAndFollowingId(userId, community.user.id)
             val communityCommentCount = communityCommentRepository.countByCommunityId(community.id)
+            val isUserLiked = communityLikeRepository.existsByCommunityIdAndUserId(community.id, userId)
             CommunitySummaryResponse.from(
                 community,
                 communityMainImageUrl,
                 writerProfileUrl,
                 isFollowing,
                 communityCommentCount,
+                isUserLiked,
             )
         },
     )

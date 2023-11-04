@@ -219,12 +219,14 @@ fun createCommunitySummaryResponse(
     writerProfileUrl: String = TEST_FILE_AUTHENTICATED_URL,
     isFollowing: Boolean = true,
     communityCommentCount: Int = TEST_COMMUNITY_COMMENT_COUNT,
+    isUserLiked: Boolean = true,
 ) = CommunitySummaryResponse.from(
     community = community,
     communityMainImageUrl = communityMainImageUrl,
     writerProfileUrl = writerProfileUrl,
     isFollowing = isFollowing,
     communityCommentCount = communityCommentCount,
+    isUserLiked = isUserLiked,
 )
 
 fun createOtherCommunitySummaryResponse(
@@ -237,12 +239,14 @@ fun createOtherCommunitySummaryResponse(
     writerProfileUrl: String = TEST_FILE_AUTHENTICATED_URL,
     isFollowing: Boolean = true,
     communityCommentCount: Int = TEST_COMMUNITY_COMMENT_COUNT,
+    isUserLiked: Boolean = true,
 ) = CommunitySummaryResponse.from(
     community = community,
     communityMainImageUrl = communityMainImageUrl,
     writerProfileUrl = writerProfileUrl,
     isFollowing = isFollowing,
     communityCommentCount = communityCommentCount,
+    isUserLiked = isUserLiked,
 )
 
 fun createCommunitySimpleResponse(

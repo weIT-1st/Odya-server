@@ -320,6 +320,7 @@ class CommunityServiceTest : DescribeSpec(
                 every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
                 every { followRepository.existsByFollowerIdAndFollowingId(any<Long>(), any<Long>()) } returns false
                 every { communityCommentRepository.countByCommunityId(any<Long>()) } returns TEST_COMMUNITY_COMMENT_COUNT
+                every { communityLikeRepository.existsByCommunityIdAndUserId(any<Long>(), any<Long>()) } returns true
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         communityService.getCommunities(TEST_USER_ID, 10, null, CommunitySortType.LATEST)
@@ -361,6 +362,7 @@ class CommunityServiceTest : DescribeSpec(
                 every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
                 every { followRepository.existsByFollowerIdAndFollowingId(any<Long>(), any<Long>()) } returns false
                 every { communityCommentRepository.countByCommunityId(any<Long>()) } returns TEST_COMMUNITY_COMMENT_COUNT
+                every { communityLikeRepository.existsByCommunityIdAndUserId(any<Long>(), any<Long>()) } returns true
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         communityService.getFriendCommunities(TEST_USER_ID, 10, null, CommunitySortType.LATEST)
@@ -383,6 +385,7 @@ class CommunityServiceTest : DescribeSpec(
                 } returns createTopicCommunities()
                 every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
                 every { communityCommentRepository.countByCommunityId(any<Long>()) } returns TEST_COMMUNITY_COMMENT_COUNT
+                every { communityLikeRepository.existsByCommunityIdAndUserId(any<Long>(), any<Long>()) } returns true
                 it("정상적으로 종료한다.") {
                     shouldNotThrowAny {
                         communityService.searchByTopic(
