@@ -103,6 +103,7 @@ data class CommunitySummaryResponse(
     val travelJournalSimpleResponse: TravelJournalSimpleResponse? = null,
     val communityCommentCount: Int,
     val communityLikeCount: Int,
+    val isUserLiked: Boolean,
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     val createdDate: LocalDateTime,
 ) {
@@ -113,6 +114,7 @@ data class CommunitySummaryResponse(
             writerProfileUrl: String,
             isFollowing: Boolean,
             communityCommentCount: Int,
+            isUserLiked: Boolean,
         ): CommunitySummaryResponse =
             CommunitySummaryResponse(
                 communityId = community.id,
@@ -129,6 +131,7 @@ data class CommunitySummaryResponse(
                 } else {
                     null
                 },
+                isUserLiked = isUserLiked,
                 communityCommentCount = communityCommentCount,
                 communityLikeCount = community.likeCount,
                 createdDate = community.createdDate,

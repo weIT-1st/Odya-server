@@ -28,6 +28,9 @@
 | `409 CONFLICT`
 | Request resource already exists
 
+| `413 Content Too Large`
+| Request content is too large
+
 | `500 INTERNAL_SERVER_ERROR`
 | Internal server error
 |===
