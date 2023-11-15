@@ -401,7 +401,7 @@ class CommunityControllerTest(
         describe("GET /api/v1/communities/{communityId}") {
             val targetUri = "/api/v1/communities/{communityId}"
             context("유효한 요청 데이터가 전달되면") {
-                val response = createCommunityResponse()
+                val response = createCommunityResponse(isFollowing = true)
                 every {
                     communityService.getCommunity(
                         TEST_COMMUNITY_ID,
@@ -437,6 +437,7 @@ class CommunityControllerTest(
                                     "writer.profile.profileColor.red" type JsonFieldType.NUMBER description "커뮤니티 작성자의 프로필 색상의 빨간색 값" example response.writer.profile.profileColor?.red isOptional true,
                                     "writer.profile.profileColor.green" type JsonFieldType.NUMBER description "커뮤니티 작성자의 프로필 색상의 초록색 값" example response.writer.profile.profileColor?.green isOptional true,
                                     "writer.profile.profileColor.blue" type JsonFieldType.NUMBER description "커뮤니티 작성자의 프로필 색상의 파란색 값" example response.writer.profile.profileColor?.blue isOptional true,
+                                    "writer.isFollowing" type JsonFieldType.BOOLEAN description "커뮤니티 작성자를 팔로우하고 있는지 여부" example response.writer.isFollowing,
                                     "travelJournal.travelJournalId" type JsonFieldType.NUMBER description "여행 일지 아이디" example response.travelJournal?.travelJournalId isOptional true,
                                     "travelJournal.title" type JsonFieldType.STRING description "여행 일지 제목" example response.travelJournal?.title isOptional true,
                                     "travelJournal.mainImageUrl" type JsonFieldType.STRING description "여행 일지 대표 이미지 URL" example response.travelJournal?.mainImageUrl isOptional true,
@@ -583,6 +584,7 @@ class CommunityControllerTest(
                                     "content[].travelJournalSimpleResponse.mainImageUrl" type JsonFieldType.STRING description "여행 일지 대표 이미지 URL" example response.content[0].travelJournalSimpleResponse?.mainImageUrl isOptional true,
                                     "content[].communityCommentCount" type JsonFieldType.NUMBER description "커뮤니티 댓글 수" example response.content[0].communityCommentCount,
                                     "content[].communityLikeCount" type JsonFieldType.NUMBER description "커뮤니티 좋아요 수" example response.content[0].communityLikeCount,
+                                    "content[].isUserLiked" type JsonFieldType.BOOLEAN description "사용자가 좋아요를 눌렀는지 여부" example response.content[0].isUserLiked,
                                     "content[].createdDate" type JsonFieldType.STRING description "커뮤니티 생성 날짜" example response.content[0].createdDate,
                                 ),
                             )
@@ -730,6 +732,7 @@ class CommunityControllerTest(
                                     "content[].travelJournalSimpleResponse.mainImageUrl" type JsonFieldType.STRING description "여행 일지 대표 이미지 URL" example response.content[0].travelJournalSimpleResponse?.mainImageUrl isOptional true,
                                     "content[].communityCommentCount" type JsonFieldType.NUMBER description "커뮤니티 댓글 수" example response.content[0].communityCommentCount,
                                     "content[].communityLikeCount" type JsonFieldType.NUMBER description "커뮤니티 좋아요 수" example response.content[0].communityLikeCount,
+                                    "content[].isUserLiked" type JsonFieldType.BOOLEAN description "사용자가 좋아요를 눌렀는지 여부" example response.content[0].isUserLiked,
                                     "content[].createdDate" type JsonFieldType.STRING description "커뮤니티 생성 날짜" example response.content[0].createdDate,
                                 ),
                             )
@@ -815,6 +818,7 @@ class CommunityControllerTest(
                                     "content[].travelJournalSimpleResponse.mainImageUrl" type JsonFieldType.STRING description "여행 일지 대표 이미지 URL" example response.content[0].travelJournalSimpleResponse?.mainImageUrl isOptional true,
                                     "content[].communityCommentCount" type JsonFieldType.NUMBER description "커뮤니티 댓글 수" example response.content[0].communityCommentCount,
                                     "content[].communityLikeCount" type JsonFieldType.NUMBER description "커뮤니티 좋아요 수" example response.content[0].communityLikeCount,
+                                    "content[].isUserLiked" type JsonFieldType.BOOLEAN description "사용자가 좋아요를 눌렀는지 여부" example response.content[0].isUserLiked,
                                     "content[].createdDate" type JsonFieldType.STRING description "커뮤니티 생성 날짜" example response.content[0].createdDate,
                                 ),
                             ),

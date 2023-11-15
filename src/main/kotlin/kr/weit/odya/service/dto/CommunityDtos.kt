@@ -70,6 +70,7 @@ data class CommunityResponse(
             communityContentImages: List<CommunityContentImageResponse>,
             communityCommentCount: Int,
             isUserLiked: Boolean,
+            isFollowing: Boolean,
         ): CommunityResponse =
             CommunityResponse(
                 communityId = community.id,
@@ -77,7 +78,7 @@ data class CommunityResponse(
                 visibility = community.communityInformation.visibility,
                 placeId = community.communityInformation.placeId,
                 isWriter = isWriter,
-                writer = UserSimpleResponse(community.user, profileUrl),
+                writer = UserSimpleResponse(community.user, profileUrl, isFollowing),
                 travelJournal = travelJournalSimpleResponse,
                 topic = community.topic?.let {
                     TopicResponse(it.id, it.word)
@@ -105,6 +106,7 @@ data class CommunitySummaryResponse(
     val travelJournalSimpleResponse: TravelJournalSimpleResponse? = null,
     val communityCommentCount: Int,
     val communityLikeCount: Int,
+    val isUserLiked: Boolean,
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     val createdDate: LocalDateTime,
 ) {
@@ -115,6 +117,7 @@ data class CommunitySummaryResponse(
             writerProfileUrl: String,
             isFollowing: Boolean,
             communityCommentCount: Int,
+            isUserLiked: Boolean,
         ): CommunitySummaryResponse =
             CommunitySummaryResponse(
                 communityId = community.id,
@@ -131,6 +134,7 @@ data class CommunitySummaryResponse(
                 } else {
                     null
                 },
+                isUserLiked = isUserLiked,
                 communityCommentCount = communityCommentCount,
                 communityLikeCount = community.likeCount,
                 createdDate = community.createdDate,
