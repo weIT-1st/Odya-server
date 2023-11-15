@@ -103,6 +103,7 @@ class CommunityService(
         return CommunityResponse.from(
             community,
             profileUrl,
+            userId == community.user.id,
             travelJournalSimpleResponse,
             communityContentImages,
             communityCommentCount,
@@ -323,7 +324,10 @@ class CommunityService(
         },
     )
 
-    private fun getCommunityWithCommentSliceResponse(size: Int, contents: List<CommunityComment>): SliceResponse<CommunityWithCommentsResponse> =
+    private fun getCommunityWithCommentSliceResponse(
+        size: Int,
+        contents: List<CommunityComment>,
+    ): SliceResponse<CommunityWithCommentsResponse> =
         SliceResponse(
             size = size,
             content = contents.map { comment ->

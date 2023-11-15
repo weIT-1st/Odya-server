@@ -50,6 +50,7 @@ data class CommunityResponse(
     val content: String,
     val visibility: CommunityVisibility,
     val placeId: String?,
+    val isWriter: Boolean,
     val writer: UserSimpleResponse,
     val travelJournal: TravelJournalSimpleResponse?,
     val topic: TopicResponse?,
@@ -64,6 +65,7 @@ data class CommunityResponse(
         fun from(
             community: Community,
             profileUrl: String,
+            isWriter: Boolean,
             travelJournalSimpleResponse: TravelJournalSimpleResponse?,
             communityContentImages: List<CommunityContentImageResponse>,
             communityCommentCount: Int,
@@ -74,6 +76,7 @@ data class CommunityResponse(
                 content = community.communityInformation.content,
                 visibility = community.communityInformation.visibility,
                 placeId = community.communityInformation.placeId,
+                isWriter = isWriter,
                 writer = UserSimpleResponse(community.user, profileUrl),
                 travelJournal = travelJournalSimpleResponse,
                 topic = community.topic?.let {

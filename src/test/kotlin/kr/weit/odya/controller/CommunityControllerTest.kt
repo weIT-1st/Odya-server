@@ -429,6 +429,7 @@ class CommunityControllerTest(
                                     "content" type JsonFieldType.STRING description "커뮤니티 내용" example response.content,
                                     "visibility" type JsonFieldType.STRING description "커뮤니티 접근 권한" example response.visibility,
                                     "placeId" type JsonFieldType.STRING description "장소 아이디" example response.placeId isOptional true,
+                                    "isWriter" type JsonFieldType.BOOLEAN description "사용자가 커뮤니티 작성자인지 여부" example response.isWriter,
                                     "writer.userId" type JsonFieldType.NUMBER description "커뮤니티 작성자의 아이디" example response.writer.userId,
                                     "writer.nickname" type JsonFieldType.STRING description "커뮤니티 작성자의 닉네임" example response.writer.nickname,
                                     "writer.profile.profileUrl" type JsonFieldType.STRING description "커뮤니티 작성자의 프로필 사진" example response.writer.profile.profileUrl,
