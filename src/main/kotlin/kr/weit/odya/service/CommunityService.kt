@@ -105,6 +105,7 @@ class CommunityService(
         return CommunityResponse.from(
             community,
             profileUrl,
+            userId == community.user.id,
             travelJournalSimpleResponse,
             communityContentImages,
             communityCommentCount,
