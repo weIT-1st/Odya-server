@@ -1,5 +1,6 @@
 package kr.weit.odya.service.dto
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import jakarta.validation.constraints.NotBlank
 import kr.weit.odya.domain.communitycomment.CommunityComment
 import kr.weit.odya.domain.user.User
@@ -13,6 +14,7 @@ data class CommunityCommentRequest(
 data class CommunityCommentResponse(
     val communityCommentId: Long,
     val content: String,
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     val updatedAt: LocalDateTime,
     val isWriter: Boolean = false,
     val user: UserSimpleResponse,
@@ -33,6 +35,7 @@ data class CommunityCommentResponse(
 data class CommunityCommentSimpleResponse(
     val communityCommentId: Long,
     val content: String,
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     val updatedAt: LocalDateTime,
     val user: UserSimpleResponse,
 )
