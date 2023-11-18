@@ -43,7 +43,7 @@ operation::follow-controller-test/delete-follow-fail-invalid-token[snippets='htt
 operation::follow-controller-test/delete-follower-success[snippets='http-request,path-parameters,request-headers,http-response']
 
 === *3-2 실패 - 음수의 FOLLOWER ID인 경우*
-operation::follow-controller-test/delete-follower-fail-request-resource-negative[snippets='http-request,path-parameters,request-headers,http-response']
+operation::follow-controller-test/delete-follower-fail-follower-id-negative[snippets='http-request,path-parameters,request-headers,http-response']
 
 === *3-3 실패 - 유효하지 않는 토큰인 경우*
 operation::follow-controller-test/delete-follower-fail-invalid-token[snippets='http-request,path-parameters,request-headers,http-response']

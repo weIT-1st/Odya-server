@@ -250,19 +250,19 @@ class FollowControllerTest(
                         RestDocumentationRequestBuilders
                             .delete(targetUri, TEST_ANOTHER_USER_ID)
                             .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
-                    )
-                        .andExpect(status().isNoContent)
-                        .andDo(
-                            createPathDocument(
-                                "delete-follower-success",
-                                pathParameters(
-                                    "followerId" pathDescription "취소할 팔로워 USER ID" example TEST_ANOTHER_USER_ID,
-                                ),
-                                requestHeaders(
-                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
-                                ),
+                    ).andExpect(
+                        status().isNoContent,
+                    ).andDo(
+                        createPathDocument(
+                            "delete-follower-success",
+                            pathParameters(
+                                "followerId" pathDescription "취소할 팔로워 USER ID" example TEST_ANOTHER_USER_ID,
                             ),
-                        )
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                        ),
+                    )
                 }
             }
 
@@ -274,17 +274,17 @@ class FollowControllerTest(
                             .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
                     ).andExpect(
                         status().isBadRequest,
-                    ).andDo {
+                    ).andDo(
                         createPathDocument(
-                            "delete-follower-fail-request-resource-negative",
+                            "delete-follower-fail-follower-id-negative",
                             pathParameters(
-                                "followerId" pathDescription "음수인 취소할 팔로워 USER ID" example TEST_INVALID_USER_ID,
+                                "followerId" pathDescription "음수인 팔로워 USER ID" example TEST_INVALID_USER_ID,
                             ),
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
-                        )
-                    }
+                        ),
+                    )
                 }
             }
 
@@ -296,7 +296,7 @@ class FollowControllerTest(
                             .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN),
                     ).andExpect(
                         status().isUnauthorized,
-                    ).andDo {
+                    ).andDo(
                         createPathDocument(
                             "delete-follower-fail-invalid-token",
                             pathParameters(
@@ -305,8 +305,8 @@ class FollowControllerTest(
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
                             ),
-                        )
-                    }
+                        ),
+                    )
                 }
             }
         }
