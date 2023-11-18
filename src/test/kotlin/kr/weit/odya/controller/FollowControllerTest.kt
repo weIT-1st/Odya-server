@@ -16,6 +16,7 @@ import kr.weit.odya.support.PAGE_PARAM
 import kr.weit.odya.support.SIZE_PARAM
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.SORT_TYPE_PARAM
+import kr.weit.odya.support.TEST_ANOTHER_USER_ID
 import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_NOT_EXIST_USER_ID_TOKEN
@@ -198,7 +199,7 @@ class FollowControllerTest(
             context("유효한 토큰이면서, FOLLOWING ID가 음수인 경우") {
                 val request = createFollowRequest().copy(TEST_INVALID_USER_ID)
                 it("400 응답한다.") {
-                    restDocMockMvc.post(targetUri) {
+                    restDocMockMvc.delete(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                         jsonContent(request)
                     }.andExpect {
@@ -220,7 +221,7 @@ class FollowControllerTest(
             context("유효하지 않은 토큰이 전달되면") {
                 val request = createFollowRequest()
                 it("401 응답한다.") {
-                    restDocMockMvc.post(targetUri) {
+                    restDocMockMvc.delete(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
                         jsonContent(request)
                     }.andExpect {
@@ -233,6 +234,76 @@ class FollowControllerTest(
                             ),
                             requestBody(
                                 "followingId" type JsonFieldType.NUMBER description "팔로우를 취소할 USER ID" example request.followingId,
+                            ),
+                        )
+                    }
+                }
+            }
+        }
+
+        describe("DELETE /api/v1/follows/follower/{followerId}") {
+            val targetUri = "/api/v1/follows/follower/{followerId}"
+            context("유효한 토큰이면서, 유효한 요청인 경우") {
+                every { followService.deleteFollower(TEST_USER_ID, TEST_ANOTHER_USER_ID) } just runs
+                it("204 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .delete(targetUri, TEST_ANOTHER_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    )
+                        .andExpect(status().isNoContent)
+                        .andDo(
+                            createPathDocument(
+                                "delete-follower-success",
+                                pathParameters(
+                                    "followerId" pathDescription "취소할 팔로워 USER ID" example TEST_ANOTHER_USER_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효한 토큰이면서, FOLLOWER ID가 음수인 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .delete(targetUri, TEST_INVALID_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    ).andExpect(
+                        status().isBadRequest,
+                    ).andDo {
+                        createPathDocument(
+                            "delete-follower-fail-request-resource-negative",
+                            pathParameters(
+                                "followerId" pathDescription "음수인 취소할 팔로워 USER ID" example TEST_INVALID_USER_ID,
+                            ),
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("유효하지 않은 토큰이 전달되면") {
+                it("401 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .delete(targetUri, TEST_ANOTHER_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN),
+                    ).andExpect(
+                        status().isUnauthorized,
+                    ).andDo {
+                        createPathDocument(
+                            "delete-follower-fail-invalid-token",
+                            pathParameters(
+                                "followerId" pathDescription "취소할 팔로워 USER ID" example TEST_ANOTHER_USER_ID,
+                            ),
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
                             ),
                         )
                     }

@@ -21,6 +21,7 @@ import kr.weit.odya.domain.user.getByNickname
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.domain.user.getByUserIds
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
+import kr.weit.odya.support.TEST_ANOTHER_USER_ID
 import kr.weit.odya.support.TEST_DEFAULT_PAGEABLE
 import kr.weit.odya.support.TEST_DEFAULT_PROFILE_PNG
 import kr.weit.odya.support.TEST_DEFAULT_SIZE
@@ -110,6 +111,15 @@ class FollowServiceTest : DescribeSpec(
                 every { followRepository.deleteByFollowerIdAndFollowingId(TEST_USER_ID, TEST_OTHER_USER_ID) } just runs
                 it("정상적으로 종료한다.") {
                     shouldNotThrowAny { followService.deleteFollow(TEST_USER_ID, createFollowRequest()) }
+                }
+            }
+        }
+
+        describe("deleteFollower") {
+            context("USERID와 FOLLOWER ID가 주어지는 경우") {
+                every { followRepository.deleteByFollowerIdAndFollowingId(TEST_ANOTHER_USER_ID, TEST_USER_ID) } just runs
+                it("정상적으로 종료한다.") {
+                    shouldNotThrowAny { followService.deleteFollower(TEST_USER_ID, TEST_ANOTHER_USER_ID) }
                 }
             }
         }
