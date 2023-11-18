@@ -10,6 +10,9 @@ import kr.weit.odya.security.FirebaseAuthException
 import kr.weit.odya.service.OdyaException
 import kr.weit.odya.service.dto.ErrorResponse
 import kr.weit.odya.support.exception.ErrorCode
+import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException
+import org.apache.tomcat.util.http.fileupload.impl.SizeException
+import org.apache.tomcat.util.http.fileupload.impl.SizeLimitExceededException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
@@ -161,6 +164,14 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         val internalServerErrorCode = ErrorCode.INTERNAL_SERVER_ERROR
         return ResponseEntity.status(internalServerErrorCode.httpStatus)
             .body(ErrorResponse.of(internalServerErrorCode, ex.message))
+    }
+
+    @ExceptionHandler(SizeLimitExceededException::class, FileSizeLimitExceededException::class)
+    fun sizeLimitExceededException(ex: SizeException): ResponseEntity<ErrorResponse> {
+        logger.error("[SizeException]", ex)
+        val payloadTooLargeErrorCode = ErrorCode.PAYLOAD_TOO_LARGE
+        return ResponseEntity.status(payloadTooLargeErrorCode.httpStatus)
+            .body(ErrorResponse.of(payloadTooLargeErrorCode, ex.message))
     }
 
     private fun MethodArgumentNotValidException.messages(): List<String> {
