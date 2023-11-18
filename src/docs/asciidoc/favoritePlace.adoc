@@ -54,7 +54,11 @@ operation::favorite-place-controller-test/favorite-place-delete-failed-invalid-t
 
 operation::favorite-place-controller-test/favorite-place-check-success[snippets='http-request,request-headers,path-parameters,http-response']
 
-=== *3-2 실패 - 유효하지 않은 토큰*
+=== *3-2 실패 - 장소 ID가 공백인 경우*
+
+operation::favorite-place-controller-test/favorite-place-check-failed-empty-place-id[snippets='http-request,request-headers,path-parameters,http-response']
+
+=== *3-3 실패 - 유효하지 않은 토큰*
 
 operation::favorite-place-controller-test/favorite-place-check-failed-invalid-token[snippets='http-request,request-headers,path-parameters,http-response']
 

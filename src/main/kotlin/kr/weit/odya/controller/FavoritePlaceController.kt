@@ -1,6 +1,7 @@
 package kr.weit.odya.controller
 
 import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Positive
 import kr.weit.odya.domain.favoritePlace.FavoritePlaceSortType
@@ -53,7 +54,7 @@ class FavoritePlaceController(private val favoritePlaceService: FavoritePlaceSer
     fun getFavoritePlace(
         @LoginUserId
         userId: Long,
-        @NotNull(message = "관심 장소 ID는 필수 입력값입니다.")
+        @NotBlank(message = "관심 장소 ID는 필수 입력값입니다.")
         @PathVariable("placeId")
         placeId: String,
     ): ResponseEntity<Boolean> {

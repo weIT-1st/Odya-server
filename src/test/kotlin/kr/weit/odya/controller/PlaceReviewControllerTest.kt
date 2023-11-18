@@ -718,6 +718,37 @@ class PlaceReviewControllerTest(
                 }
             }
 
+            context("유효한 토큰이지만 장소 ID가 공백인 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, " ")
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_SIZE.toString())
+                            .param(SORT_TYPE_PARAM, TEST_PLACE_SORT_TYPE.name)
+                            .param(LAST_ID_PARAM, TEST_LAST_ID.toString()),
+                    )
+                        .andExpect(status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "placeReview-placeId-get-fail-blank-placeId",
+                                pathParameters(
+                                    "id" pathDescription "공백인 장소 ID" example " ",
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_SIZE isOptional true,
+                                    SORT_TYPE_PARAM parameterDescription "정렬 기준 (default = LATEST)" example PlaceReviewSortType.values()
+                                        .joinToString() isOptional true,
+                                    LAST_ID_PARAM parameterDescription "마지막 데이터의 ID" example TEST_LAST_ID isOptional true,
+                                ),
+                            ),
+                        )
+                }
+            }
+
             context("유효한 토큰이지만 조회할 마지막 ID가 양수가 아닌 경우") {
                 it("400 응답한다.") {
                     restDocMockMvc.perform(
@@ -1109,6 +1140,28 @@ class PlaceReviewControllerTest(
                 }
             }
 
+            context("placeId가 공백인 경우") {
+                it("400 반환") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, " ")
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    )
+                        .andExpect(status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "placeReview-average-fail-blank-placeId",
+                                pathParameters(
+                                    "id" pathDescription "공백인 장소 ID" example " ",
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                            ),
+                        )
+                }
+            }
+
             context("유효하지 않은 토큰이 전달되면") {
                 it("401 반환") {
                     restDocMockMvc.perform(
@@ -1186,6 +1239,28 @@ class PlaceReviewControllerTest(
                 }
             }
 
+            context("장소 ID가 공백인 경우") {
+                it("400 반환") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, " ")
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    )
+                        .andExpect(status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "placeReview-exist-get-fail-blank-placeId",
+                                pathParameters(
+                                    "id" pathDescription "공백인 장소 ID" example " ",
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                            ),
+                        )
+                }
+            }
+
             context("유효하지 않은 토큰이 전달되면") {
                 it("401 반환") {
                     restDocMockMvc.perform(
@@ -1231,6 +1306,28 @@ class PlaceReviewControllerTest(
                                 ),
                                 responseBody(
                                     "count" type JsonFieldType.NUMBER description "해당 장소의 리뷰 수" example TEST_PLACE_REVIEW_COUNT,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("placeId가 공백인 경우") {
+                it("400 반환") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, " ")
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    )
+                        .andExpect(status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "placeReview-count-get-fail-blank-placeId",
+                                pathParameters(
+                                    "id" pathDescription "공백인 장소 ID" example " ",
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
                                 ),
                             ),
                         )
