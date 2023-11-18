@@ -55,7 +55,7 @@ class FollowController(
     fun deleteFollower(
         @LoginUserId
         userId: Long,
-        @PathVariable("followerId", required = true)
+        @PathVariable("followerId")
         @Positive(message = "팔로워의 USER ID는 양수여야 합니다.")
         followerId: Long,
     ): ResponseEntity<Void> {

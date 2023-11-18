@@ -111,7 +111,7 @@ operation::place-review-controller-test/placeReview-delete-invalid-token[snippet
 
 === *4-1 성공*
 
-operation::place-review-controller-test/placeReview-#placeId#-get-list-success[snippets='http-request,path-parameters,request-headers,query-parameters,http-response']
+operation::place-review-controller-test/placeReview-placeId-get-list-success[snippets='http-request,path-parameters,request-headers,query-parameters,http-response']
 
 === *4-2 실패 - 장소 ID가 공백인 경우*
 
