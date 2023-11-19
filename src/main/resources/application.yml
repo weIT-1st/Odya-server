@@ -11,6 +11,7 @@ spring:
   servlet:
     multipart:
       max-file-size: 25MB # 사진 1개당 약 100kb * 최대 15일까지 한번에 올릴수 있음 * 1일당 15장까지 올릴수 있음 + 10% 버퍼 = 25MB
+      max-request-size: 30MB # 최대 파일 사이즈 + 넉넉하게 5mb 버퍼 = 30MB
   cloud:
     compatibility-verifier:
       enabled: false

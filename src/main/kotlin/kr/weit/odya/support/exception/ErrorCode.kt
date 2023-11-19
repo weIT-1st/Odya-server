@@ -16,6 +16,7 @@ enum class ErrorCode(val httpStatus: HttpStatus, val code: Int, val errorMessage
     UNREGISTERED_USER(HttpStatus.UNAUTHORIZED, -10005, "Unregistered user"),
     EXIST_RESOURCE(HttpStatus.CONFLICT, -10006, "Exist resource"),
     NOT_FOUND_DEFAULT_RESOURCE(HttpStatus.INTERNAL_SERVER_ERROR, -10007, "Not found default resource"),
+    PAYLOAD_TOO_LARGE(HttpStatus.PAYLOAD_TOO_LARGE, -10008, "Payload too large"),
     INVALID_FIREBASE_ID_TOKEN(HttpStatus.UNAUTHORIZED, -11000, "Invalid Firebase ID token"),
     FIREBASE_USER_CREATION_FAIL(HttpStatus.CONFLICT, -11001, "Firebase user creation fail"),
     FIREBASE_CUSTOM_TOKEN_CREATION_FAIL(
