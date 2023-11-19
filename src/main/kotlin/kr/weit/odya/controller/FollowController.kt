@@ -51,6 +51,18 @@ class FollowController(
         return ResponseEntity.noContent().build()
     }
 
+    @DeleteMapping("follower/{followerId}")
+    fun deleteFollower(
+        @LoginUserId
+        userId: Long,
+        @PathVariable("followerId")
+        @Positive(message = "팔로워의 USER ID는 양수여야 합니다.")
+        followerId: Long,
+    ): ResponseEntity<Void> {
+        followService.deleteFollower(userId, followerId)
+        return ResponseEntity.noContent().build()
+    }
+
     @GetMapping("/{userId}/counts")
     fun getFollowCounts(
         @Positive(message = "USER ID는 양수여야 합니다.")

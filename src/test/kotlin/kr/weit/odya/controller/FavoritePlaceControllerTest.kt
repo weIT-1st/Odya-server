@@ -318,6 +318,27 @@ class FavoritePlaceControllerTest(
                 }
             }
 
+            context("placeId가 공백인 경우") {
+                it("400를 반환한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, " ")
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    ).andExpect(status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "favorite-place-check-failed-empty-place-id",
+                                pathParameters(
+                                    "placeId" pathDescription "공백인 장소 ID" example " ",
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                            ),
+                        )
+                }
+            }
+
             context("유효하지 않은 토큰 전달되면") {
                 it("401를 반환한다.") {
                     restDocMockMvc.perform(

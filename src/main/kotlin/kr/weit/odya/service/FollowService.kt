@@ -65,6 +65,11 @@ class FollowService(
         followRepository.deleteByFollowerIdAndFollowingId(followerId, followRequest.followingId)
     }
 
+    @Transactional
+    fun deleteFollower(userId: Long, followerId: Long) {
+        followRepository.deleteByFollowerIdAndFollowingId(followerId, userId)
+    }
+
     @Transactional(readOnly = true)
     fun getSliceFollowings(
         followerId: Long,

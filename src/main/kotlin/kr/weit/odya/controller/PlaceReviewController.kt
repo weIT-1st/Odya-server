@@ -1,6 +1,7 @@
 package kr.weit.odya.controller
 
 import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Positive
 import kr.weit.odya.domain.placeReview.PlaceReviewSortType
@@ -66,7 +67,7 @@ class PlaceReviewController(private val placeReviewService: PlaceReviewService) 
 
     @GetMapping("/places/{id}")
     fun getByPlaceReviewList(
-        @NotNull(message = "장소 ID는 필수 입력값입니다.")
+        @NotBlank(message = "장소 ID는 필수 입력값입니다.")
         @PathVariable("id")
         placeId: String,
         @Positive(message = "사이즈는 양수여야 합니다.")
@@ -100,7 +101,7 @@ class PlaceReviewController(private val placeReviewService: PlaceReviewService) 
 
     @GetMapping("/average/{id}")
     fun getAverageStarRating(
-        @NotNull(message = "장소 ID는 필수 입력값입니다.")
+        @NotBlank(message = "장소 ID는 필수 입력값입니다.")
         @PathVariable("id")
         placeId: String,
     ): ResponseEntity<AverageRatingResponse> {
@@ -109,7 +110,7 @@ class PlaceReviewController(private val placeReviewService: PlaceReviewService) 
 
     @GetMapping("/{id}")
     fun getExistReview(
-        @NotNull(message = "장소 ID는 필수 입력값입니다.")
+        @NotBlank(message = "장소 ID는 필수 입력값입니다.")
         @PathVariable("id")
         placeId: String,
         @LoginUserId userId: Long,
@@ -119,7 +120,7 @@ class PlaceReviewController(private val placeReviewService: PlaceReviewService) 
 
     @GetMapping("/count/{id}")
     fun getReviewCount(
-        @NotNull(message = "장소 ID는 필수 입력값입니다.")
+        @NotBlank(message = "장소 ID는 필수 입력값입니다.")
         @PathVariable("id")
         placeId: String,
     ): ResponseEntity<ReviewCountResponse> {
