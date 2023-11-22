@@ -5,6 +5,7 @@ enum class ReportReason(val reason: String) {
     PORNOGRAPHY("음란성이 포함된 글"),
     SWEAR_WORD("욕설/생명경시/혐오/차별적인 글"),
     OVER_POST("게시글 도배"),
+    COPYRIGHT_VIOLATION("저작권 위배"),
     INFO_LEAK("개인정보 노출 및 불법 정보"),
     OTHER("기타"),
 }
