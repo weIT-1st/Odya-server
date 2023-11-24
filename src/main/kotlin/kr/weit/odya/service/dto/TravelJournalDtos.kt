@@ -218,6 +218,7 @@ data class TravelJournalSummaryResponse(
     val contentImageUrl: String,
     val travelStartDate: LocalDate,
     val travelEndDate: LocalDate,
+    val placeIds: List<String>,
     val writer: UserSimpleResponse,
     val travelCompanionSimpleResponses: List<TravelCompanionSimpleResponse>?,
 ) {
@@ -234,6 +235,7 @@ data class TravelJournalSummaryResponse(
         contentImageUrl,
         travelJournal.travelStartDate,
         travelJournal.travelEndDate,
+        travelJournal.travelJournalContents.mapNotNull { it.placeId },
         UserSimpleResponse(travelJournal.user, writerProfileUrl),
         travelCompanionSimpleResponses,
     )
