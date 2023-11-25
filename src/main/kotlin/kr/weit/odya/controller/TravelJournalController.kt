@@ -13,6 +13,7 @@ import kr.weit.odya.service.dto.TravelJournalRequest
 import kr.weit.odya.service.dto.TravelJournalResponse
 import kr.weit.odya.service.dto.TravelJournalSummaryResponse
 import kr.weit.odya.service.dto.TravelJournalUpdateRequest
+import kr.weit.odya.support.validator.NullOrNotBlank
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -92,11 +93,14 @@ class TravelJournalController(private val travelJournalService: TravelJournalSer
         @Positive(message = "마지막 Id는 양수여야 합니다.")
         @RequestParam(name = "lastId", required = false)
         lastId: Long?,
+        @NullOrNotBlank(message = "placeId는 공백이면 안됩니다.")
+        @RequestParam(name = "placeId", required = false)
+        placeId: String?,
         @RequestParam(name = "sortType", required = false, defaultValue = "LATEST")
         sortType: TravelJournalSortType,
         @LoginUserId userId: Long,
     ): ResponseEntity<SliceResponse<TravelJournalSummaryResponse>> {
-        val response = travelJournalService.getMyTravelJournals(userId, size, lastId, sortType)
+        val response = travelJournalService.getMyTravelJournals(userId, size, lastId, placeId, sortType)
         return ResponseEntity.ok(response)
     }
 
@@ -108,11 +112,14 @@ class TravelJournalController(private val travelJournalService: TravelJournalSer
         @Positive(message = "마지막 Id는 양수여야 합니다.")
         @RequestParam(name = "lastId", required = false)
         lastId: Long?,
+        @NullOrNotBlank(message = "placeId는 공백이면 안됩니다.")
+        @RequestParam(name = "placeId", required = false)
+        placeId: String?,
         @RequestParam(name = "sortType", required = false, defaultValue = "LATEST")
         sortType: TravelJournalSortType,
         @LoginUserId userId: Long,
     ): ResponseEntity<SliceResponse<TravelJournalSummaryResponse>> {
-        val response = travelJournalService.getFriendTravelJournals(userId, size, lastId, sortType)
+        val response = travelJournalService.getFriendTravelJournals(userId, size, lastId, placeId, sortType)
         return ResponseEntity.ok(response)
     }
 
@@ -124,11 +131,14 @@ class TravelJournalController(private val travelJournalService: TravelJournalSer
         @Positive(message = "마지막 Id는 양수여야 합니다.")
         @RequestParam(name = "lastId", required = false)
         lastId: Long?,
+        @NullOrNotBlank(message = "placeId는 공백이면 안됩니다.")
+        @RequestParam(name = "placeId", required = false)
+        placeId: String?,
         @RequestParam(name = "sortType", required = false, defaultValue = "LATEST")
         sortType: TravelJournalSortType,
         @LoginUserId userId: Long,
     ): ResponseEntity<SliceResponse<TravelJournalSummaryResponse>> {
-        val response = travelJournalService.getRecommendTravelJournals(userId, size, lastId, sortType)
+        val response = travelJournalService.getRecommendTravelJournals(userId, size, lastId, placeId, sortType)
         return ResponseEntity.ok(response)
     }
 

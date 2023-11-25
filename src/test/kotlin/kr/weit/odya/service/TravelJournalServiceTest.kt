@@ -568,6 +568,7 @@ class TravelJournalServiceTest : DescribeSpec(
                         TEST_USER_ID,
                         10,
                         null,
+                        TEST_PLACE_ID,
                         TravelJournalSortType.LATEST,
                     )
                 } returns listOf(TEST_TRAVEL_JOURNAL)
@@ -578,6 +579,7 @@ class TravelJournalServiceTest : DescribeSpec(
                             TEST_USER_ID,
                             10,
                             null,
+                            TEST_PLACE_ID,
                             TravelJournalSortType.LATEST,
                         )
                     }
@@ -592,6 +594,7 @@ class TravelJournalServiceTest : DescribeSpec(
                         TEST_OTHER_USER_ID,
                         10,
                         null,
+                        TEST_PLACE_ID,
                         TravelJournalSortType.LATEST,
                     )
                 } returns listOf(TEST_TRAVEL_JOURNAL)
@@ -602,6 +605,7 @@ class TravelJournalServiceTest : DescribeSpec(
                             TEST_OTHER_USER_ID,
                             10,
                             null,
+                            TEST_PLACE_ID,
                             TravelJournalSortType.LATEST,
                         )
                     }
@@ -618,6 +622,7 @@ class TravelJournalServiceTest : DescribeSpec(
                         otherUser,
                         10,
                         null,
+                        TEST_PLACE_ID,
                         TravelJournalSortType.LATEST,
                     )
                 } returns listOf(TEST_TRAVEL_JOURNAL)
@@ -628,6 +633,7 @@ class TravelJournalServiceTest : DescribeSpec(
                             TEST_OTHER_USER_ID,
                             10,
                             null,
+                            TEST_PLACE_ID,
                             TravelJournalSortType.LATEST,
                         )
                     }

@@ -28,8 +28,9 @@ fun CommunityRepository.getCommunitySliceBy(
     userId: Long,
     size: Int,
     lastId: Long?,
+    placeId: String?,
     sortType: CommunitySortType,
-): List<Community> = findCommunitySliceBy(userId, size, lastId, sortType)
+): List<Community> = findCommunitySliceBy(userId, size, lastId, placeId, sortType)
 
 fun CommunityRepository.getMyCommunitySliceBy(
     userId: Long,
@@ -67,6 +68,7 @@ interface CustomCommunityRepository {
         userId: Long,
         size: Int,
         lastId: Long?,
+        placeId: String?,
         sortType: CommunitySortType,
     ): List<Community>
 
@@ -101,6 +103,7 @@ class CommunityRepositoryImpl(private val queryFactory: QueryFactory) : CustomCo
         userId: Long,
         size: Int,
         lastId: Long?,
+        placeId: String?,
         sortType: CommunitySortType,
     ): List<Community> = queryFactory.listQuery {
         getCommunitySliceBaseQuery(lastId, sortType, size)
@@ -115,6 +118,10 @@ class CommunityRepositoryImpl(private val queryFactory: QueryFactory) : CustomCo
                 col(Community::id).`in`(myFriendOnlyCommunityIds),
             ),
         )
+
+        if (placeId != null) {
+            where(nestedCol(col(Community::communityInformation), CommunityInformation::placeId).equal(placeId))
+        }
     }
 
     override fun findMyCommunitySliceBy(

@@ -79,7 +79,11 @@ operation::community-controller-test/community-get-fail-invalid-token[snippets='
 
 operation::community-controller-test/community-get-communities-success[snippets='http-request,request-headers,query-parameters,http-response,response-fields']
 
-=== *3-2 실패 - 유효하지 않은 토큰인 경우*
+=== *3-2 실패 - placeId가 공백인 경우*
+
+operation::community-controller-test/community-get-communities-fail-blank-place-id[snippets='http-request,request-headers,query-parameters,http-response']
+
+=== *3-3 실패 - 유효하지 않은 토큰인 경우*
 
 operation::community-controller-test/community-get-communities-fail-invalid-token[snippets='http-request,request-headers,query-parameters,http-response']
 

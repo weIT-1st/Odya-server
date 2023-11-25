@@ -154,7 +154,11 @@ operation::travel-journal-controller-test/get-travel-journals-fail-invalid-token
 
 operation::travel-journal-controller-test/get-my-travel-journals-success[snippets='http-request,request-headers,query-parameters,http-response,response-fields']
 
-=== *4-2 실패 - 유효하지 않은 토큰일 경우*
+=== *4-2 실패 - placeId가 공백인 경우*
+
+operation::travel-journal-controller-test/get-my-travel-journals-fail-blank-place-id[snippets='http-request,request-headers,query-parameters,http-response']
+
+=== *4-3 실패 - 유효하지 않은 토큰일 경우*
 
 operation::travel-journal-controller-test/get-my-travel-journals-fail-invalid-token[snippets='http-request,request-headers,query-parameters,http-response']
 
@@ -165,7 +169,11 @@ operation::travel-journal-controller-test/get-my-travel-journals-fail-invalid-to
 
 operation::travel-journal-controller-test/get-friend-travel-journals-success[snippets='http-request,request-headers,query-parameters,http-response,response-fields']
 
-=== *5-2 실패 - 유효하지 않은 토큰일 경우*
+== *5-2 실패 - placeId가 공백인 경우*
+
+operation::travel-journal-controller-test/get-friend-travel-journals-fail-blank-place-id[snippets='http-request,request-headers,query-parameters,http-response']
+
+=== *5-3 실패 - 유효하지 않은 토큰일 경우*
 
 operation::travel-journal-controller-test/get-friend-travel-journals-fail-invalid-token[snippets='http-request,request-headers,query-parameters,http-response']
 
@@ -175,6 +183,10 @@ operation::travel-journal-controller-test/get-friend-travel-journals-fail-invali
 === *6-1 성공*
 
 operation::travel-journal-controller-test/get-recommend-travel-journals-success[snippets='http-request,request-headers,query-parameters,http-response,response-fields']
+
+=== *6-2 실패 - placeId가 공백인 경우*
+
+operation::travel-journal-controller-test/get-recommend-travel-journals-fail-blank-place-id[snippets='http-request,request-headers,query-parameters,http-response']
 
 === *6-2 실패 - 유효하지 않은 토큰일 경우*
 
