@@ -6,6 +6,7 @@ import kr.weit.odya.domain.follow.Follow
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
+import kr.weit.odya.support.TEST_SEARCH_PLACE_ID
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_TITLE
 import kr.weit.odya.support.createContentImage
 import kr.weit.odya.support.createOtherUser
@@ -26,8 +27,10 @@ class TravelJournalRepositoryTest(
         lateinit var user: User
         lateinit var otherUser: User
         lateinit var travelJournal: TravelJournal
+        lateinit var mySearchTravelJournal: TravelJournal
         lateinit var otherTravelJournal: TravelJournal
         lateinit var friendTravelJournal: TravelJournal
+        lateinit var friendSearchTravelJournal: TravelJournal
         beforeEach {
             user = userRepository.save(createUser())
             otherUser = userRepository.save(createOtherUser())
@@ -74,11 +77,41 @@ class TravelJournalRepositoryTest(
                         ),
                     ),
                 ),
+                createTravelJournal(
+                    id = 4L,
+                    user = user,
+                    travelCompanions = listOf(createTravelCompanionById(user = otherUser)),
+                    travelJournalContents = listOf(
+                        createTravelJournalContent(
+                            placeId = TEST_SEARCH_PLACE_ID,
+                            travelJournalContentImages = listOf(
+                                createTravelJournalContentImage(contentImage = createContentImage(user = user)),
+                                createTravelJournalContentImage(contentImage = createContentImage(name = "test1.webp", originName = "test1.webp", user = user)),
+                            ),
+                        ),
+                    ),
+                ),
+                createTravelJournal(
+                    id = 5L,
+                    user = otherUser,
+                    title = "friendTravelJournal2",
+                    travelCompanions = listOf(createTravelCompanionById(user = user)),
+                    travelJournalContents = listOf(
+                        createTravelJournalContent(
+                            placeId = TEST_SEARCH_PLACE_ID,
+                            travelJournalContentImages = listOf(
+                                createTravelJournalContentImage(contentImage = createContentImage(user = otherUser)),
+                            ),
+                        ),
+                    ),
+                ),
             )
             val saveTravelJournals = travelJournalRepository.saveAll(travelJournals)
             travelJournal = saveTravelJournals[0]
             otherTravelJournal = saveTravelJournals[1]
             friendTravelJournal = saveTravelJournals[2]
+            mySearchTravelJournal = saveTravelJournals[3]
+            friendSearchTravelJournal = saveTravelJournals[4]
         }
 
         context("여행 일지 조회") {
@@ -91,7 +124,7 @@ class TravelJournalRepositoryTest(
         context("여행 일지 사용자 ID로 조회") {
             expect("유저 ID와 일치하는 여행기록을 조회한다.") {
                 val result = travelJournalRepository.getByUserId(user.id)
-                result.size shouldBe 2
+                result.size shouldBe 3
             }
         }
 
@@ -103,7 +136,7 @@ class TravelJournalRepositoryTest(
                     lastId = null,
                     sortType = TravelJournalSortType.LATEST,
                 )
-                result.size shouldBe 3
+                result.size shouldBe 5
             }
 
             expect("나의 여행 일지 목록을 조회한다.") {
@@ -111,9 +144,22 @@ class TravelJournalRepositoryTest(
                     userId = user.id,
                     size = 10,
                     lastId = null,
+                    placeId = null,
                     sortType = TravelJournalSortType.LATEST,
                 )
-                result.size shouldBe 2
+                result.size shouldBe 3
+            }
+
+            expect("나의 여행일지 중에 장소id에 해당하는 목록을 조회한다") {
+                val result = travelJournalRepository.getMyTravelJournalSliceBy(
+                    userId = user.id,
+                    size = 10,
+                    lastId = null,
+                    placeId = TEST_SEARCH_PLACE_ID,
+                    sortType = TravelJournalSortType.LATEST,
+                )
+                result.size shouldBe 1
+                result[0] shouldBe mySearchTravelJournal
             }
 
             expect("내 친구의 여행 일지 목록을 조회한다.") {
@@ -121,10 +167,23 @@ class TravelJournalRepositoryTest(
                     userId = user.id,
                     size = 10,
                     lastId = null,
+                    placeId = null,
+                    sortType = TravelJournalSortType.LATEST,
+                )
+                result.size shouldBe 2
+                result[0] shouldBe friendSearchTravelJournal
+            }
+
+            expect("내 친구 여행일지 중에 장소id에 해당하는 목록을 조회한다") {
+                val result = travelJournalRepository.getFriendTravelJournalSliceBy(
+                    userId = user.id,
+                    size = 10,
+                    lastId = null,
+                    placeId = TEST_SEARCH_PLACE_ID,
                     sortType = TravelJournalSortType.LATEST,
                 )
                 result.size shouldBe 1
-                result[0] shouldBe friendTravelJournal
+                result[0] shouldBe friendSearchTravelJournal
             }
 
             expect("추천 여행 일지 목록을 조회한다.") {
@@ -132,10 +191,23 @@ class TravelJournalRepositoryTest(
                     user = user,
                     size = 10,
                     lastId = null,
+                    placeId = null,
+                    sortType = TravelJournalSortType.LATEST,
+                )
+                result.size shouldBe 2
+                result[0] shouldBe friendSearchTravelJournal
+            }
+
+            expect("추천 여행일지 중에 장소id에 해당하는 목록을 조회한다") {
+                val result = travelJournalRepository.getRecommendTravelJournalSliceBy(
+                    user = user,
+                    size = 10,
+                    lastId = null,
+                    placeId = TEST_SEARCH_PLACE_ID,
                     sortType = TravelJournalSortType.LATEST,
                 )
                 result.size shouldBe 1
-                result[0] shouldBe friendTravelJournal
+                result[0] shouldBe friendSearchTravelJournal
             }
 
             expect("유저가 태그된 여행일지 목록을 조회한다.") {
@@ -144,7 +216,7 @@ class TravelJournalRepositoryTest(
                     size = 10,
                     lastId = null,
                 )
-                result.size shouldBe 1
+                result.size shouldBe 2
                 result[0] shouldBe friendTravelJournal
             }
         }
@@ -174,7 +246,7 @@ class TravelJournalRepositoryTest(
 
             expect("USER ID와 일치하는 여행 일지 모두 삭제한다.") {
                 travelJournalRepository.deleteAllByUserId(user.id)
-                travelJournalRepository.count() shouldBe 1
+                travelJournalRepository.count() shouldBe 2
             }
         }
     },
