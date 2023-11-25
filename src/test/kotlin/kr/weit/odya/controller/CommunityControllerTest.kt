@@ -14,6 +14,7 @@ import kr.weit.odya.service.dto.CommunityUpdateRequest
 import kr.weit.odya.support.LAST_ID_PARAM
 import kr.weit.odya.support.MAX_COMMUNITY_CONTENT_IMAGE_COUNT
 import kr.weit.odya.support.MIM_COMMUNITY_CONTENT_IMAGE_COUNT
+import kr.weit.odya.support.PLACE_ID_PARAM
 import kr.weit.odya.support.SIZE_PARAM
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.SORT_TYPE_PARAM
@@ -27,6 +28,7 @@ import kr.weit.odya.support.TEST_DEFAULT_SIZE
 import kr.weit.odya.support.TEST_INVALID_TOPIC_ID
 import kr.weit.odya.support.TEST_NOT_EXIST_TOPIC_ID
 import kr.weit.odya.support.TEST_NOT_EXIST_TRAVEL_JOURNAL_ID
+import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_TOPIC_ID
 import kr.weit.odya.support.TEST_UPDATE_IMAGE_FILE_WEBP
 import kr.weit.odya.support.TEST_USER_ID
@@ -544,12 +546,14 @@ class CommunityControllerTest(
                         TEST_USER_ID,
                         TEST_DEFAULT_SIZE,
                         null,
+                        TEST_PLACE_ID,
                         any<CommunitySortType>(),
                     )
                 } returns response
                 it("200 응답한다.") {
                     restDocMockMvc.get(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(PLACE_ID_PARAM, TEST_PLACE_ID)
                     }
                         .andExpect {
                             status { isOk() }
@@ -564,6 +568,7 @@ class CommunityControllerTest(
                                     SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_DEFAULT_SIZE isOptional true,
                                     LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example "null" isOptional true,
                                     SORT_TYPE_PARAM parameterDescription "정렬 타입" example CommunitySortType.values() isOptional true,
+                                    PLACE_ID_PARAM parameterDescription "장소 아이디" example TEST_PLACE_ID isOptional true,
                                 ),
                                 responseBody(
                                     "hasNext" type JsonFieldType.BOOLEAN description "다음 페이지 존재 여부" example response.hasNext,
@@ -586,6 +591,31 @@ class CommunityControllerTest(
                                     "content[].communityLikeCount" type JsonFieldType.NUMBER description "커뮤니티 좋아요 수" example response.content[0].communityLikeCount,
                                     "content[].isUserLiked" type JsonFieldType.BOOLEAN description "사용자가 좋아요를 눌렀는지 여부" example response.content[0].isUserLiked,
                                     "content[].createdDate" type JsonFieldType.STRING description "커뮤니티 생성 날짜" example response.content[0].createdDate,
+                                ),
+                            )
+                        }
+                }
+            }
+            context("placeId가 공백인 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(PLACE_ID_PARAM, " ")
+                    }
+                        .andExpect {
+                            status { isBadRequest() }
+                        }
+                        .andDo {
+                            createDocument(
+                                "community-get-communities-fail-blank-place-id",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_DEFAULT_SIZE isOptional true,
+                                    LAST_ID_PARAM parameterDescription "마지막 리스트 ID" example "null" isOptional true,
+                                    SORT_TYPE_PARAM parameterDescription "정렬 타입" example CommunitySortType.values() isOptional true,
+                                    PLACE_ID_PARAM parameterDescription "공백인 장소 id" example " " isOptional true,
                                 ),
                             )
                         }

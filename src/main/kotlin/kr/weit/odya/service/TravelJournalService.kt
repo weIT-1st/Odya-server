@@ -189,9 +189,10 @@ class TravelJournalService(
         userId: Long,
         size: Int,
         lastId: Long?,
+        placeId: String?,
         sortType: TravelJournalSortType,
     ): SliceResponse<TravelJournalSummaryResponse> {
-        val travelJournals = travelJournalRepository.getMyTravelJournalSliceBy(userId, size, lastId, sortType)
+        val travelJournals = travelJournalRepository.getMyTravelJournalSliceBy(userId, size, lastId, placeId, sortType)
         return SliceResponse(
             size,
             getTravelJournalSimpleResponses(travelJournals),
@@ -203,9 +204,10 @@ class TravelJournalService(
         userId: Long,
         size: Int,
         lastId: Long?,
+        placeId: String?,
         sortType: TravelJournalSortType,
     ): SliceResponse<TravelJournalSummaryResponse> {
-        val travelJournals = travelJournalRepository.getFriendTravelJournalSliceBy(userId, size, lastId, sortType)
+        val travelJournals = travelJournalRepository.getFriendTravelJournalSliceBy(userId, size, lastId, placeId, sortType)
         return SliceResponse(
             size,
             getTravelJournalSimpleResponses(travelJournals),
@@ -217,10 +219,11 @@ class TravelJournalService(
         userId: Long,
         size: Int,
         lastId: Long?,
+        placeId: String?,
         sortType: TravelJournalSortType,
     ): SliceResponse<TravelJournalSummaryResponse> {
         val user = userRepository.getByUserId(userId)
-        val travelJournals = travelJournalRepository.getRecommendTravelJournalSliceBy(user, size, lastId, sortType)
+        val travelJournals = travelJournalRepository.getRecommendTravelJournalSliceBy(user, size, lastId, placeId, sortType)
         return SliceResponse(
             size,
             getTravelJournalSimpleResponses(travelJournals),

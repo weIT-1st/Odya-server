@@ -9,6 +9,7 @@ const val SORT_TYPE_PARAM = "sortType"
 const val LAST_ID_PARAM = "lastId"
 const val NICKNAME_PARAM = "nickname"
 const val PHONE_NUMBERS_PARAM = "phoneNumbers"
+const val PLACE_ID_PARAM = "placeId"
 const val TEST_DEFAULT_PAGE = 0
 const val TEST_DEFAULT_SIZE = 10
 const val TEST_PAGE: Int = 1
