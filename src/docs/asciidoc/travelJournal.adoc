@@ -169,7 +169,7 @@ operation::travel-journal-controller-test/get-my-travel-journals-fail-invalid-to
 
 operation::travel-journal-controller-test/get-friend-travel-journals-success[snippets='http-request,request-headers,query-parameters,http-response,response-fields']
 
-== *5-2 실패 - placeId가 공백인 경우*
+=== *5-2 실패 - placeId가 공백인 경우*
 
 operation::travel-journal-controller-test/get-friend-travel-journals-fail-blank-place-id[snippets='http-request,request-headers,query-parameters,http-response']
 
