@@ -73,6 +73,7 @@ fun creatSlicePlaceReviewResponse() =
             PlaceReviewListResponse(
                 it,
                 TEST_PROFILE_URL,
+                false,
             )
         },
     )

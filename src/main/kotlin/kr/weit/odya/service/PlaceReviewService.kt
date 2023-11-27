@@ -1,6 +1,8 @@
 package kr.weit.odya.service
 
 import jakarta.ws.rs.ForbiddenException
+import kr.weit.odya.domain.follow.FollowRepository
+import kr.weit.odya.domain.follow.getFollowingIds
 import kr.weit.odya.domain.placeReview.PlaceReview
 import kr.weit.odya.domain.placeReview.PlaceReviewRepository
 import kr.weit.odya.domain.placeReview.PlaceReviewSortType
@@ -29,6 +31,7 @@ class PlaceReviewService(
     private val userRepository: UserRepository,
     private val reportPlaceReviewRepository: ReportPlaceReviewRepository,
     private val fileService: FileService,
+    private val followRepository: FollowRepository,
 ) {
     @Transactional
     fun createReview(request: PlaceReviewCreateRequest, userId: Long) {
@@ -60,13 +63,15 @@ class PlaceReviewService(
 
     @Transactional
     fun getByPlaceReviewList(
+        userId: Long,
         placeId: String,
         size: Int,
         sortType: PlaceReviewSortType,
         lastId: Long?,
     ): SliceResponse<PlaceReviewListResponse> {
+        val followingIdList = followRepository.getFollowingIds(userId)
         val placeReviewListResponses = placeReviewRepository.getPlaceReviewListByPlaceId(placeId, size, sortType, lastId).map { placeReview ->
-            PlaceReviewListResponse(placeReview, fileService.getPreAuthenticatedObjectUrl(placeReview.user.profile.profileName))
+            PlaceReviewListResponse(placeReview, fileService.getPreAuthenticatedObjectUrl(placeReview.user.profile.profileName), placeReview.writerId in followingIdList)
         }
         return SliceResponse(
             size,
@@ -76,14 +81,16 @@ class PlaceReviewService(
 
     @Transactional
     fun getByUserReviewList(
+        loginUserId: Long,
         userId: Long,
         size: Int,
         sortType: PlaceReviewSortType,
         lastId: Long?,
     ): SliceResponse<PlaceReviewListResponse> {
         val user: User = userRepository.getByUserId(userId)
+        val isFollowing = followRepository.existsByFollowerIdAndFollowingId(loginUserId, userId)
         val placeReviewListResponses = placeReviewRepository.getPlaceReviewListByUser(user, size, sortType, lastId).map { placeReview ->
-            PlaceReviewListResponse(placeReview, fileService.getPreAuthenticatedObjectUrl(placeReview.user.profile.profileName))
+            PlaceReviewListResponse(placeReview, fileService.getPreAuthenticatedObjectUrl(placeReview.user.profile.profileName), isFollowing)
         }
         return SliceResponse(
             size,

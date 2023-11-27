@@ -25,6 +25,7 @@ import kr.weit.odya.domain.communitylike.getLikedCommunitySliceBy
 import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowerFcmTokens
+import kr.weit.odya.domain.follow.getFollowingIds
 import kr.weit.odya.domain.report.ReportCommunityRepository
 import kr.weit.odya.domain.report.deleteAllByUserId
 import kr.weit.odya.domain.topic.TopicRepository
@@ -342,12 +343,14 @@ class CommunityService(
                     fileService.getPreAuthenticatedObjectUrl(comment.community.user.profile.profileName)
                 val commenterProfileUrl =
                     fileService.getPreAuthenticatedObjectUrl(comment.user.profile.profileName)
+                val followingIdList = followRepository.getFollowingIds(comment.user.id)
                 CommunityWithCommentsResponse.from(
                     comment.community,
                     communityMainImageUrl,
                     writerProfileUrl,
                     comment,
                     commenterProfileUrl,
+                    followingIdList,
                 )
             },
         )

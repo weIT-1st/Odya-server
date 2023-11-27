@@ -794,7 +794,7 @@ class UserControllerTest(
             val targetUri = "/api/v1/users/search"
             context("유효한 토큰이면서, 가입된 사용자인 경우") {
                 val response = createSliceSimpleUserResponse()
-                every { userService.searchByNickname(TEST_NICKNAME, TEST_SIZE, TEST_LAST_ID) } returns response
+                every { userService.searchByNickname(TEST_USER_ID, TEST_NICKNAME, TEST_SIZE, TEST_LAST_ID) } returns response
                 it("200 응답한다.") {
                     restDocMockMvc.get(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
@@ -819,6 +819,7 @@ class UserControllerTest(
                                 "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
                                 "content[].userId" type JsonFieldType.NUMBER description "사용자 ID" example content.userId,
                                 "content[].nickname" type JsonFieldType.STRING description "사용자 닉네임" example content.nickname,
+                                "content[].isFollowing" type JsonFieldType.BOOLEAN description "사용자 팔로잉 여부" example content.isFollowing,
                                 "content[].profile.profileUrl" type JsonFieldType.STRING description "사용자 프로필 Url" example content.profile.profileUrl,
                                 "content[].profile.profileColor.colorHex" type JsonFieldType.STRING description "색상 Hex" example content.profile.profileColor?.colorHex isOptional true,
                                 "content[].profile.profileColor.red" type JsonFieldType.NUMBER description "RGB RED" example content.profile.profileColor?.red isOptional true,
@@ -1232,6 +1233,7 @@ class UserControllerTest(
                             responseBody(
                                 "[].userId" type JsonFieldType.NUMBER description "사용자 ID" example content.userId,
                                 "[].nickname" type JsonFieldType.STRING description "사용자 닉네임" example content.nickname,
+                                "[].isFollowing" type JsonFieldType.BOOLEAN description "사용자 팔로잉 여부" example content.isFollowing,
                                 "[].profile.profileUrl" type JsonFieldType.STRING description "사용자 프로필 Url" example content.profile.profileUrl,
                                 "[].profile.profileColor.colorHex" type JsonFieldType.STRING description "색상 Hex" example content.profile.profileColor?.colorHex isOptional true,
                                 "[].profile.profileColor.red" type JsonFieldType.NUMBER description "RGB RED" example content.profile.profileColor?.red isOptional true,

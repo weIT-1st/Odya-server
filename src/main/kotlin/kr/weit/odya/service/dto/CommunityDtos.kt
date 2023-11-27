@@ -194,17 +194,18 @@ data class CommunityWithCommentsResponse(
             writerProfileUrl: String,
             communityComment: CommunityComment,
             commenterProfileUrl: String,
+            followingIdList: List<Long>,
         ): CommunityWithCommentsResponse = CommunityWithCommentsResponse(
             communityId = community.id,
             communityContent = community.content,
             communityMainImageUrl = communityMainImageUrl,
             updatedAt = community.updatedDate,
-            writer = UserSimpleResponse(community.user, writerProfileUrl),
+            writer = UserSimpleResponse(community.user, writerProfileUrl, community.user.id in followingIdList),
             communityCommentSimpleResponse = CommunityCommentSimpleResponse(
                 communityCommentId = communityComment.id,
                 content = communityComment.content,
                 updatedAt = communityComment.updatedDate,
-                user = UserSimpleResponse(communityComment.user, commenterProfileUrl),
+                user = UserSimpleResponse(communityComment.user, commenterProfileUrl, communityComment.user.id in followingIdList),
             ),
         )
     }

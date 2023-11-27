@@ -15,6 +15,7 @@ import kr.weit.odya.domain.communitycomment.CommunityComment
 import kr.weit.odya.domain.communitycomment.CommunityCommentRepository
 import kr.weit.odya.domain.communitycomment.getCommunityCommentBy
 import kr.weit.odya.domain.communitycomment.getSliceCommunityCommentBy
+import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.support.TEST_COMMUNITY_COMMENT_ID
@@ -37,11 +38,13 @@ class CommunityCommentServiceTest : DescribeSpec(
         val communityCommentRepository: CommunityCommentRepository = mockk<CommunityCommentRepository>()
         val userRepository: UserRepository = mockk<UserRepository>()
         val fileService: FileService = mockk<FileService>()
+        val followRepository: FollowRepository = mockk<FollowRepository>()
         val communityCommentService = CommunityCommentService(
             communityRepository,
             communityCommentRepository,
             userRepository,
             fileService,
+            followRepository,
         )
 
         describe("createCommunityComment") {
@@ -99,8 +102,10 @@ class CommunityCommentServiceTest : DescribeSpec(
                     createMockCommunityComment(id = TEST_OTHER_COMMUNITY_COMMENT_ID),
                 )
                 every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_FILE_AUTHENTICATED_URL
+                every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
                 it("커뮤니티 댓글 목록을 반환한다.") {
                     communityCommentService.getCommunityComments(
+                        TEST_USER_ID,
                         TEST_COMMUNITY_ID,
                         TEST_DEFAULT_SIZE,
                         null,
@@ -119,8 +124,10 @@ class CommunityCommentServiceTest : DescribeSpec(
                     createMockCommunityComment(id = TEST_OTHER_COMMUNITY_COMMENT_ID),
                 )
                 every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_FILE_AUTHENTICATED_URL
+                every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
                 it("커뮤니티 댓글 목록을 반환한다.") {
                     communityCommentService.getCommunityComments(
+                        TEST_USER_ID,
                         TEST_COMMUNITY_ID,
                         TEST_DEFAULT_SIZE,
                         TEST_COMMUNITY_COMMENT_ID,

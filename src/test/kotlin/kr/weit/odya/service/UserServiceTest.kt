@@ -39,6 +39,7 @@ import kr.weit.odya.support.TEST_ID_TOKEN
 import kr.weit.odya.support.TEST_INVALID_PROFILE_ORIGINAL_NAME
 import kr.weit.odya.support.TEST_MOCK_PROFILE_NAME
 import kr.weit.odya.support.TEST_NICKNAME
+import kr.weit.odya.support.TEST_OTHER_USER_ID
 import kr.weit.odya.support.TEST_PHONE_NUMBER
 import kr.weit.odya.support.TEST_PROFILE_URL
 import kr.weit.odya.support.TEST_PROFILE_WEBP
@@ -352,8 +353,9 @@ class UserServiceTest : DescribeSpec(
                 every { usersDocumentRepository.getByNickname(TEST_NICKNAME) } returns listOf(createUsersDocument(user))
                 every { userRepository.getByUserIds(any(), any(), any()) } returns listOf(user)
                 every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
+                every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
                 it("유저를 조회 한다") {
-                    shouldNotThrowAny { userService.searchByNickname(TEST_NICKNAME, 10, null) }
+                    shouldNotThrowAny { userService.searchByNickname(TEST_USER_ID, TEST_NICKNAME, 10, null) }
                 }
             }
         }

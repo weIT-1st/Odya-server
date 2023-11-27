@@ -74,9 +74,9 @@ data class UserSimpleResponse(
     val userId: Long,
     val nickname: String,
     val profile: ProfileResponse,
-    val isFollowing: Boolean? = null, // 필요할때만 내려준다
+    val isFollowing: Boolean,
 ) {
-    constructor(user: User, profileUrl: String, isFollowing: Boolean? = null) : this(
+    constructor(user: User, profileUrl: String, isFollowing: Boolean) : this(
         user.id,
         user.nickname,
         ProfileResponse(

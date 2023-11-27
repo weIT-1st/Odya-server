@@ -9,6 +9,7 @@ import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowerFcmTokens
+import kr.weit.odya.domain.follow.getFollowingIds
 import kr.weit.odya.domain.report.ReportTravelJournalRepository
 import kr.weit.odya.domain.report.deleteAllByUserId
 import kr.weit.odya.domain.traveljournal.TravelCompanion
@@ -180,7 +181,7 @@ class TravelJournalService(
         val travelJournals = travelJournalRepository.getTravelJournalSliceBy(userId, size, lastId, sortType)
         return SliceResponse(
             size,
-            getTravelJournalSimpleResponses(travelJournals),
+            getTravelJournalSimpleResponses(userId, travelJournals),
         )
     }
 
@@ -194,7 +195,7 @@ class TravelJournalService(
         val travelJournals = travelJournalRepository.getMyTravelJournalSliceBy(userId, size, lastId, sortType)
         return SliceResponse(
             size,
-            getTravelJournalSimpleResponses(travelJournals),
+            getTravelJournalSimpleResponses(userId, travelJournals),
         )
     }
 
@@ -208,7 +209,7 @@ class TravelJournalService(
         val travelJournals = travelJournalRepository.getFriendTravelJournalSliceBy(userId, size, lastId, sortType)
         return SliceResponse(
             size,
-            getTravelJournalSimpleResponses(travelJournals),
+            getTravelJournalSimpleResponses(userId, travelJournals),
         )
     }
 
@@ -223,7 +224,7 @@ class TravelJournalService(
         val travelJournals = travelJournalRepository.getRecommendTravelJournalSliceBy(user, size, lastId, sortType)
         return SliceResponse(
             size,
-            getTravelJournalSimpleResponses(travelJournals),
+            getTravelJournalSimpleResponses(userId, travelJournals),
         )
     }
 
@@ -231,9 +232,10 @@ class TravelJournalService(
     fun getTaggedTravelJournals(userId: Long, size: Int, lastId: Long?): SliceResponse<TaggedTravelJournalResponse> {
         val user = userRepository.getByUserId(userId)
         val travelJournals = travelJournalRepository.getTaggedTravelJournalSliceBy(user, size, lastId)
+        val followingIdList = followRepository.getFollowingIds(userId)
         return SliceResponse(
             size,
-            getTaggedTravelJournalResponses(travelJournals),
+            getTaggedTravelJournalResponses(travelJournals, followingIdList),
         )
     }
 
@@ -417,8 +419,9 @@ class TravelJournalService(
         }
     }
 
-    private fun getTravelJournalSimpleResponses(travelJournals: List<TravelJournal>) =
-        travelJournals.map {
+    private fun getTravelJournalSimpleResponses(userId: Long, travelJournals: List<TravelJournal>): List<TravelJournalSummaryResponse> {
+        val followingIdList = followRepository.getFollowingIds(userId)
+        return travelJournals.map {
             val companionSimpleResponses = getTravelCompanionSimpleResponses(it)
             TravelJournalSummaryResponse(
                 it,
@@ -426,8 +429,10 @@ class TravelJournalService(
                 fileService.getPreAuthenticatedObjectUrl(it.travelJournalContents[0].travelJournalContentImages[0].contentImage.name),
                 fileService.getPreAuthenticatedObjectUrl(it.user.profile.profileName),
                 companionSimpleResponses,
+                it.user.id in followingIdList,
             )
         }
+    }
 
     private fun getTravelCompanionSimpleResponses(it: TravelJournal): List<TravelCompanionSimpleResponse> =
         it.travelCompanions
@@ -453,6 +458,7 @@ class TravelJournalService(
             fileService.getPreAuthenticatedObjectUrl(travelJournal.user.profile.profileName),
             travelJournalContentResponses,
             travelCompanionResponses,
+            followRepository.existsByFollowerIdAndFollowingId(userId, travelJournal.user.id),
         )
     }
 
@@ -486,7 +492,10 @@ class TravelJournalService(
         }
     }
 
-    private fun getTaggedTravelJournalResponses(travelJournals: List<TravelJournal>): List<TaggedTravelJournalResponse> {
+    private fun getTaggedTravelJournalResponses(
+        travelJournals: List<TravelJournal>,
+        followingIdList: List<Long>,
+    ): List<TaggedTravelJournalResponse> {
         return travelJournals.map { travelJournal ->
             val mainImageAuthenticatedUrl =
                 fileService.getPreAuthenticatedObjectUrl(travelJournal.travelJournalContents[0].travelJournalContentImages[0].contentImage.name)
@@ -497,6 +506,7 @@ class TravelJournalService(
                 UserSimpleResponse(
                     travelJournal.user,
                     fileService.getPreAuthenticatedObjectUrl(travelJournal.user.profile.profileName),
+                    travelJournal.user.id in followingIdList,
                 ),
                 travelJournal.travelStartDate,
             )

@@ -450,6 +450,7 @@ class CommunityServiceTest : DescribeSpec(
                 } returns createCommunitiesComments()
                 every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
                 every { communityCommentRepository.countByCommunityId(any<Long>()) } returns TEST_COMMUNITY_COMMENT_COUNT
+                every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny { communityService.getCommunityWithComments(TEST_USER_ID, 10, null) }
                 }

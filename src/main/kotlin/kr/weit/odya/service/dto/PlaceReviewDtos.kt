@@ -55,10 +55,10 @@ data class PlaceReviewListResponse(
     val review: String,
     val createdAt: LocalDateTime,
 ) {
-    constructor(placeReview: PlaceReview, userProfileUrl: String) : this(
+    constructor(placeReview: PlaceReview, userProfileUrl: String, isFollowing: Boolean) : this(
         placeReview.id,
         placeReview.placeId,
-        UserSimpleResponse(placeReview.user, userProfileUrl),
+        UserSimpleResponse(placeReview.user, userProfileUrl, isFollowing),
         placeReview.starRating,
         placeReview.review,
         placeReview.createdDate,
