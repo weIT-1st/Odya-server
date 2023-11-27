@@ -20,6 +20,7 @@ import kr.weit.odya.support.MAX_TRAVEL_COMPANION_COUNT
 import kr.weit.odya.support.MAX_TRAVEL_DAYS
 import kr.weit.odya.support.MAX_TRAVEL_JOURNAL_CONTENT_IMAGE_COUNT
 import kr.weit.odya.support.NOT_EXIST_USER_ERROR_MESSAGE
+import kr.weit.odya.support.PLACE_ID_PARAM
 import kr.weit.odya.support.SIZE_PARAM
 import kr.weit.odya.support.SOMETHING_ERROR_MESSAGE
 import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
@@ -1194,12 +1195,14 @@ class TravelJournalControllerTest(
                         TEST_USER_ID,
                         TEST_DEFAULT_SIZE,
                         null,
+                        TEST_PLACE_ID,
                         any<TravelJournalSortType>(),
                     )
                 } returns response
                 it("200 응답한다.") {
                     restDocMockMvc.get(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(PLACE_ID_PARAM, TEST_PLACE_ID)
                     }.andExpect {
                         status { isOk() }
                     }.andDo {
@@ -1211,6 +1214,7 @@ class TravelJournalControllerTest(
                             queryParameters(
                                 SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_DEFAULT_SIZE isOptional true,
                                 LAST_ID_PARAM parameterDescription "마지막 여행 일지 ID" example TEST_TRAVEL_JOURNAL_ID isOptional true,
+                                PLACE_ID_PARAM parameterDescription "장소 아이디" example TEST_PLACE_ID isOptional true,
                             ),
                             responseBody(
                                 "hasNext" type JsonFieldType.BOOLEAN description "다음 페이지 여부" example response.hasNext,
@@ -1234,6 +1238,29 @@ class TravelJournalControllerTest(
                                 "content[].travelCompanionSimpleResponses[].profileUrl" type JsonFieldType.STRING description "여행 친구의 프로필 사진" example (
                                     response.content[0].travelCompanionSimpleResponses?.get(0)?.profileUrl
                                     ) isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("placeId가 공백인 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(PLACE_ID_PARAM, " ")
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "get-my-travel-journals-fail-blank-place-id",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_DEFAULT_SIZE isOptional true,
+                                LAST_ID_PARAM parameterDescription "마지막 여행 일지 ID" example TEST_TRAVEL_JOURNAL_ID isOptional true,
+                                PLACE_ID_PARAM parameterDescription "공백인 장소 id" example " " isOptional true,
                             ),
                         )
                     }
@@ -1274,12 +1301,14 @@ class TravelJournalControllerTest(
                         TEST_USER_ID,
                         TEST_DEFAULT_SIZE,
                         null,
+                        TEST_PLACE_ID,
                         any<TravelJournalSortType>(),
                     )
                 } returns response
                 it("200 응답한다.") {
                     restDocMockMvc.get(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(PLACE_ID_PARAM, TEST_PLACE_ID)
                     }.andExpect {
                         status { isOk() }
                     }.andDo {
@@ -1291,6 +1320,7 @@ class TravelJournalControllerTest(
                             queryParameters(
                                 SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_DEFAULT_SIZE isOptional true,
                                 LAST_ID_PARAM parameterDescription "마지막 여행 일지 ID" example TEST_TRAVEL_JOURNAL_ID isOptional true,
+                                PLACE_ID_PARAM parameterDescription "장소 아이디" example TEST_PLACE_ID isOptional true,
                             ),
                             responseBody(
                                 "hasNext" type JsonFieldType.BOOLEAN description "다음 페이지 여부" example response.hasNext,
@@ -1314,6 +1344,29 @@ class TravelJournalControllerTest(
                                 "content[].travelCompanionSimpleResponses[].profileUrl" type JsonFieldType.STRING description "여행 친구의 프로필 사진" example (
                                     response.content[0].travelCompanionSimpleResponses?.get(0)?.profileUrl
                                     ) isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("placeId가 공백인 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(PLACE_ID_PARAM, " ")
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "get-friend-travel-journals-fail-blank-place-id",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_DEFAULT_SIZE isOptional true,
+                                LAST_ID_PARAM parameterDescription "마지막 여행 일지 ID" example TEST_TRAVEL_JOURNAL_ID isOptional true,
+                                PLACE_ID_PARAM parameterDescription "공백인 장소 id" example " " isOptional true,
                             ),
                         )
                     }
@@ -1354,12 +1407,14 @@ class TravelJournalControllerTest(
                         TEST_USER_ID,
                         TEST_DEFAULT_SIZE,
                         null,
+                        TEST_PLACE_ID,
                         any<TravelJournalSortType>(),
                     )
                 } returns response
                 it("200 응답한다.") {
                     restDocMockMvc.get(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(PLACE_ID_PARAM, TEST_PLACE_ID)
                     }.andExpect {
                         status { isOk() }
                     }.andDo {
@@ -1371,6 +1426,7 @@ class TravelJournalControllerTest(
                             queryParameters(
                                 SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_DEFAULT_SIZE isOptional true,
                                 LAST_ID_PARAM parameterDescription "마지막 여행 일지 ID" example TEST_TRAVEL_JOURNAL_ID isOptional true,
+                                PLACE_ID_PARAM parameterDescription "장소 아이디" example TEST_PLACE_ID isOptional true,
                             ),
                             responseBody(
                                 "hasNext" type JsonFieldType.BOOLEAN description "다음 페이지 여부" example response.hasNext,
@@ -1394,6 +1450,29 @@ class TravelJournalControllerTest(
                                 "content[].travelCompanionSimpleResponses[].profileUrl" type JsonFieldType.STRING description "여행 친구의 프로필 사진" example (
                                     response.content[0].travelCompanionSimpleResponses?.get(0)?.profileUrl
                                     ) isOptional true,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            context("placeId가 공백인 경우") {
+                it("400 응답한다.") {
+                    restDocMockMvc.get(targetUri) {
+                        header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                        param(PLACE_ID_PARAM, " ")
+                    }.andExpect {
+                        status { isBadRequest() }
+                    }.andDo {
+                        createDocument(
+                            "get-recommend-travel-journals-fail-blank-place-id",
+                            requestHeaders(
+                                HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                            ),
+                            queryParameters(
+                                SIZE_PARAM parameterDescription "데이터 개수 (default = 10)" example TEST_DEFAULT_SIZE isOptional true,
+                                LAST_ID_PARAM parameterDescription "마지막 여행 일지 ID" example TEST_TRAVEL_JOURNAL_ID isOptional true,
+                                PLACE_ID_PARAM parameterDescription "공백인 장소 id" example " " isOptional true,
                             ),
                         )
                     }

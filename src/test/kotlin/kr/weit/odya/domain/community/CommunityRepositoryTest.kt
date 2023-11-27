@@ -13,6 +13,7 @@ import kr.weit.odya.support.TEST_ANOTHER_COMMUNITY_ID
 import kr.weit.odya.support.TEST_COMMUNITY_CONTENT
 import kr.weit.odya.support.TEST_GENERATED_FILE_NAME
 import kr.weit.odya.support.TEST_OTHER_COMMUNITY_ID
+import kr.weit.odya.support.TEST_SEARCH_PLACE_ID
 import kr.weit.odya.support.createCommunity
 import kr.weit.odya.support.createCommunityContentImage
 import kr.weit.odya.support.createContentImage
@@ -43,6 +44,7 @@ class CommunityRepositoryTest(
         lateinit var community1: Community
         lateinit var community2: Community
         lateinit var community3: Community
+        lateinit var searchCommunity: Community
         lateinit var topic: Topic
         beforeEach {
             user1 = userRepository.save(createUser())
@@ -105,6 +107,17 @@ class CommunityRepositoryTest(
                     topic = null,
                 ),
             )
+            searchCommunity = communityRepository.save(
+                createCommunity(
+                    id = 4L,
+                    user = user2,
+                    travelJournal = null,
+                    visibility = CommunityVisibility.FRIEND_ONLY,
+                    communityContentImages = listOf(createCommunityContentImage(contentImage2)),
+                    topic = null,
+                    placeId = TEST_SEARCH_PLACE_ID,
+                ),
+            )
         }
 
         context("커뮤니티 조회") {
@@ -122,8 +135,8 @@ class CommunityRepositoryTest(
         context("커뮤니티 목록 조회") {
             expect("공개 커뮤니티와 나의 친구들 커뮤니티 목록을 조회한다.") {
                 val result =
-                    communityRepository.getCommunitySliceBy(user1.id, 10, null, CommunitySortType.LATEST)
-                result.size shouldBe 3
+                    communityRepository.getCommunitySliceBy(user1.id, 10, null, null, CommunitySortType.LATEST)
+                result.size shouldBe 4
             }
 
             expect("공개 커뮤니티와 나의 친구들 커뮤니티 목록을 좋아요 순으로 조회한다.") {
@@ -138,8 +151,15 @@ class CommunityRepositoryTest(
                     }
                 }
                 val result =
-                    communityRepository.getCommunitySliceBy(user1.id, 10, null, CommunitySortType.LIKE)
-                result.map { it.id } shouldBe listOf(community2.id, community1.id, community3.id)
+                    communityRepository.getCommunitySliceBy(user1.id, 10, null, null, CommunitySortType.LIKE)
+                result.map { it.id } shouldBe listOf(community2.id, community1.id, searchCommunity.id, community3.id)
+            }
+
+            expect("장소 id에 해당하는 공개 커뮤니티와 나의 친구들 커뮤니티 목록을 조회한다") {
+                val result =
+                    communityRepository.getCommunitySliceBy(user1.id, 10, null, TEST_SEARCH_PLACE_ID, CommunitySortType.LATEST)
+                result.size shouldBe 1
+                result[0] shouldBe searchCommunity
             }
 
             expect("나의 커뮤니티 목록을 조회한다.") {
@@ -151,7 +171,7 @@ class CommunityRepositoryTest(
             expect("나와 친구인 사용자의 커뮤니티 목록을 조회한다.") {
                 val result =
                     communityRepository.getFriendCommunitySliceBy(user1.id, 10, null, CommunitySortType.LATEST)
-                result.size shouldBe 2
+                result.size shouldBe 3
             }
 
             expect("토픽과 일치하는 커뮤니티 목록을 조회한다") {
@@ -179,7 +199,7 @@ class CommunityRepositoryTest(
         context("커뮤니티 삭제") {
             expect("유저 ID와 일치하는 커뮤니티를 삭제한다") {
                 communityRepository.deleteAllByUserId(user1.id)
-                communityRepository.findAll().size shouldBe 2
+                communityRepository.findAll().size shouldBe 3
             }
         }
     },

@@ -13,6 +13,7 @@ import kr.weit.odya.service.dto.CommunitySummaryResponse
 import kr.weit.odya.service.dto.CommunityUpdateRequest
 import kr.weit.odya.service.dto.CommunityWithCommentsResponse
 import kr.weit.odya.service.dto.SliceResponse
+import kr.weit.odya.support.validator.NullOrNotBlank
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -68,10 +69,13 @@ class CommunityController(
         @Positive(message = "마지막 ID는 양수여야 합니다.")
         @RequestParam("lastId", required = false)
         lastId: Long?,
+        @NullOrNotBlank(message = "placeId는 공백이면 안됩니다.")
+        @RequestParam(name = "placeId", required = false)
+        placeId: String?,
         @RequestParam("sortType", defaultValue = "LATEST", required = false)
         sortType: CommunitySortType,
     ): ResponseEntity<SliceResponse<CommunitySummaryResponse>> {
-        val response = communityService.getCommunities(userId, size, lastId, sortType)
+        val response = communityService.getCommunities(userId, size, lastId, placeId, sortType)
         return ResponseEntity.ok(response)
     }
 

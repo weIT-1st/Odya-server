@@ -119,9 +119,10 @@ class CommunityService(
         userId: Long,
         size: Int,
         lastId: Long?,
+        placeId: String?,
         sortType: CommunitySortType,
     ): SliceResponse<CommunitySummaryResponse> {
-        val communities = communityRepository.getCommunitySliceBy(userId, size, lastId, sortType)
+        val communities = communityRepository.getCommunitySliceBy(userId, size, lastId, placeId, sortType)
         return getCommunitySummarySliceResponse(size, communities, userId)
     }
 

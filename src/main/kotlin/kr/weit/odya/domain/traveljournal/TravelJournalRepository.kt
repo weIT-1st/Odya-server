@@ -37,22 +37,25 @@ fun TravelJournalRepository.getMyTravelJournalSliceBy(
     userId: Long,
     size: Int,
     lastId: Long?,
+    placeId: String?,
     sortType: TravelJournalSortType,
-): List<TravelJournal> = findMyTravelJournalSliceBy(userId, size, lastId, sortType)
+): List<TravelJournal> = findMyTravelJournalSliceBy(userId, size, lastId, placeId, sortType)
 
 fun TravelJournalRepository.getFriendTravelJournalSliceBy(
     userId: Long,
     size: Int,
     lastId: Long?,
+    placeId: String?,
     sortType: TravelJournalSortType,
-): List<TravelJournal> = findFriendTravelJournalSliceBy(userId, size, lastId, sortType)
+): List<TravelJournal> = findFriendTravelJournalSliceBy(userId, size, lastId, placeId, sortType)
 
 fun TravelJournalRepository.getRecommendTravelJournalSliceBy(
     user: User,
     size: Int,
     lastId: Long?,
+    placeId: String?,
     sortType: TravelJournalSortType,
-): List<TravelJournal> = findRecommendTravelJournalSliceBy(user, size, lastId, sortType)
+): List<TravelJournal> = findRecommendTravelJournalSliceBy(user, size, lastId, placeId, sortType)
 
 fun TravelJournalRepository.getTaggedTravelJournalSliceBy(
     user: User,
@@ -86,6 +89,7 @@ interface CustomTravelJournalRepository {
         userId: Long,
         size: Int,
         lastId: Long?,
+        placeId: String?,
         sortType: TravelJournalSortType,
     ): List<TravelJournal>
 
@@ -93,6 +97,7 @@ interface CustomTravelJournalRepository {
         userId: Long,
         size: Int,
         lastId: Long?,
+        placeId: String?,
         sortType: TravelJournalSortType,
     ): List<TravelJournal>
 
@@ -100,6 +105,7 @@ interface CustomTravelJournalRepository {
         user: User,
         size: Int,
         lastId: Long?,
+        placeId: String?,
         sortType: TravelJournalSortType,
     ): List<TravelJournal>
 
@@ -138,7 +144,7 @@ class CustomTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) 
         lastId: Long?,
         sortType: TravelJournalSortType,
     ): List<TravelJournal> = queryFactory.listQuery {
-        getTravelJournalSliceBaseQuery(lastId, sortType, size)
+        getTravelJournalSliceBaseQuery(lastId, sortType, size, null)
         val followingIds = getFollowingIdsSubQuery(userId)
         val publicTravelJournalIds = getPublicTravelJournalIdsSubQuery()
         val friendOnlyTravelJournalIds = getFriendOnlyTravelJournalIdsSubQuery(followingIds)
@@ -156,9 +162,10 @@ class CustomTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) 
         userId: Long,
         size: Int,
         lastId: Long?,
+        placeId: String?,
         sortType: TravelJournalSortType,
     ): List<TravelJournal> = queryFactory.listQuery {
-        getTravelJournalSliceBaseQuery(lastId, sortType, size)
+        getTravelJournalSliceBaseQuery(lastId, sortType, size, placeId)
         where(nestedCol(col(TravelJournal::user), User::id).equal(userId))
     }
 
@@ -166,10 +173,11 @@ class CustomTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) 
         userId: Long,
         size: Int,
         lastId: Long?,
+        placeId: String?,
         sortType: TravelJournalSortType,
     ): List<TravelJournal> = queryFactory.listQuery {
         val followingIds = getFollowingIdsSubQuery(userId)
-        getTravelJournalSliceBaseQuery(lastId, sortType, size)
+        getTravelJournalSliceBaseQuery(lastId, sortType, size, placeId)
         where(
             and(
                 col(TravelJournalInformation::visibility).notEqual(TravelJournalVisibility.PRIVATE),
@@ -182,11 +190,12 @@ class CustomTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) 
         user: User,
         size: Int,
         lastId: Long?,
+        placeId: String?,
         sortType: TravelJournalSortType,
     ): List<TravelJournal> = queryFactory.listQuery {
         val sameAgeRangeFollowingIds = getSameAgeRangeFollowingIds(user)
 
-        getTravelJournalSliceBaseQuery(lastId, sortType, size)
+        getTravelJournalSliceBaseQuery(lastId, sortType, size, placeId)
         where(
             and(
                 col(TravelJournalInformation::visibility).notEqual(TravelJournalVisibility.PRIVATE),
@@ -300,6 +309,7 @@ class CustomTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) 
         lastId: Long?,
         sortType: TravelJournalSortType,
         size: Int,
+        placeId: String?,
     ) {
         select(entity(TravelJournal::class))
         from(entity(TravelJournal::class))
@@ -309,6 +319,14 @@ class CustomTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) 
             on(TravelJournal::travelJournalInformation),
         )
         where(dynamicPredicateByLastId(lastId, sortType))
+        if (placeId != null) {
+            associate(
+                TravelJournal::class,
+                entity(TravelJournalContent::class),
+                Relation<TravelJournal, TravelJournalContent>("mutableTravelJournalContents"),
+            )
+            where(nestedCol(col(TravelJournalContent::travelJournalContentInformation), TravelJournalContentInformation::placeId).equal(placeId))
+        }
         orderBy(dynamicOrderingSortType(sortType))
         limit(size + 1)
     }

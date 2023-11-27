@@ -314,6 +314,7 @@ class CommunityServiceTest : DescribeSpec(
                         TEST_USER_ID,
                         10,
                         null,
+                        TEST_PLACE_ID,
                         CommunitySortType.LATEST,
                     )
                 } returns createAllCommunities()
@@ -323,7 +324,13 @@ class CommunityServiceTest : DescribeSpec(
                 every { communityLikeRepository.existsByCommunityIdAndUserId(any<Long>(), any<Long>()) } returns true
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
-                        communityService.getCommunities(TEST_USER_ID, 10, null, CommunitySortType.LATEST)
+                        communityService.getCommunities(
+                            TEST_USER_ID,
+                            10,
+                            null,
+                            TEST_PLACE_ID,
+                            CommunitySortType.LATEST,
+                        )
                     }
                 }
             }
