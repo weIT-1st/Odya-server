@@ -28,7 +28,8 @@ class CommunityCommentController(
     @PostMapping
     fun createCommunityComment(
         @Positive(message = "communityId는 0보다 커야합니다.")
-        @PathVariable("communityId") communityId: Long,
+        @PathVariable("communityId")
+        communityId: Long,
         @RequestBody communityCommentRequest: CommunityCommentRequest,
         @LoginUserId userId: Long,
     ): ResponseEntity<Void> {
@@ -41,8 +42,11 @@ class CommunityCommentController(
 
     @GetMapping
     fun getCommunityComments(
+        @LoginUserId
+        userId: Long,
         @Positive(message = "communityId는 0보다 커야합니다.")
-        @PathVariable("communityId") communityId: Long,
+        @PathVariable("communityId")
+        communityId: Long,
         @Positive(message = "조회할 개수는 양수여야 합니다.")
         @RequestParam("size", defaultValue = "10", required = false)
         size: Int,
@@ -50,16 +54,18 @@ class CommunityCommentController(
         @RequestParam("lastId", required = false)
         lastId: Long?,
     ): ResponseEntity<SliceResponse<CommunityCommentResponse>> {
-        val response = communityCommentService.getCommunityComments(communityId, size, lastId)
+        val response = communityCommentService.getCommunityComments(userId, communityId, size, lastId)
         return ResponseEntity.ok(response)
     }
 
     @PatchMapping("/{communityCommentId}")
     fun updateCommunityComment(
         @Positive(message = "communityId는 0보다 커야합니다.")
-        @PathVariable("communityId") communityId: Long,
+        @PathVariable("communityId")
+        communityId: Long,
         @Positive(message = "communityCommentId는 1보다 커야합니다.")
-        @PathVariable("communityCommentId") communityCommentId: Long,
+        @PathVariable("communityCommentId")
+        communityCommentId: Long,
         @RequestBody communityCommentRequest: CommunityCommentRequest,
         @LoginUserId userId: Long,
     ): ResponseEntity<Void> {
@@ -70,9 +76,11 @@ class CommunityCommentController(
     @DeleteMapping("/{communityCommentId}")
     fun deleteCommunityComment(
         @Positive(message = "communityId는 0보다 커야합니다.")
-        @PathVariable("communityId") communityId: Long,
+        @PathVariable("communityId")
+        communityId: Long,
         @Positive(message = "communityCommentId는 1보다 커야합니다.")
-        @PathVariable("communityCommentId") communityCommentId: Long,
+        @PathVariable("communityCommentId")
+        communityCommentId: Long,
         @LoginUserId userId: Long,
     ): ResponseEntity<Void> {
         communityCommentService.deleteCommunityComment(userId, communityId, communityCommentId)

@@ -92,19 +92,22 @@ fun createProfile(profileId: Long = 0L, profileName: String = TEST_DEFAULT_PROFI
 
 fun createUsersDocument(user: User = createUser()): UsersDocument = UsersDocument(user)
 
-fun createSimpleUserResponse(user: User = createUser(), profileUrl: String = TEST_PROFILE_URL): UserSimpleResponse =
+fun createSimpleUserResponse(user: User = createUser(), profileUrl: String = TEST_PROFILE_URL, isFollowing: Boolean = false): UserSimpleResponse =
     UserSimpleResponse(
         user = user,
         profileUrl = profileUrl,
+        isFollowing = isFollowing,
     )
 
 fun createOtherSimpleUserResponse(
     user: User = createOtherUser(),
     profileUrl: String = TEST_PROFILE_URL,
+    isFollowing: Boolean = false,
 ): UserSimpleResponse =
     UserSimpleResponse(
         user = user,
         profileUrl = profileUrl,
+        isFollowing = isFollowing,
     )
 
 fun createSliceSimpleUserResponse() = SliceResponse(

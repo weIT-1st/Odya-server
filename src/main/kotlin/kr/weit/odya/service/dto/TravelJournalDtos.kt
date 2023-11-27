@@ -91,6 +91,7 @@ data class TravelJournalResponse(
         writerProfileUrl: String,
         travelJournalContents: List<TravelJournalContentResponse>,
         travelJournalCompanions: List<TravelCompanionResponse>,
+        isFollowing: Boolean,
     ) : this(
         travelJournal.id,
         travelJournal.title,
@@ -98,7 +99,7 @@ data class TravelJournalResponse(
         travelJournal.travelEndDate,
         travelJournal.visibility,
         isBookmarked,
-        UserSimpleResponse(travelJournal.user, writerProfileUrl),
+        UserSimpleResponse(travelJournal.user, writerProfileUrl, isFollowing),
         travelJournalContents,
         travelJournalCompanions,
     )
@@ -228,6 +229,7 @@ data class TravelJournalSummaryResponse(
         contentImageUrl: String,
         writerProfileUrl: String,
         travelCompanionSimpleResponses: List<TravelCompanionSimpleResponse>?,
+        isFollowing: Boolean,
     ) : this(
         travelJournal.id,
         travelJournal.title,
@@ -236,7 +238,7 @@ data class TravelJournalSummaryResponse(
         travelJournal.travelStartDate,
         travelJournal.travelEndDate,
         travelJournal.travelJournalContents.mapNotNull { it.placeId },
-        UserSimpleResponse(travelJournal.user, writerProfileUrl),
+        UserSimpleResponse(travelJournal.user, writerProfileUrl, isFollowing),
         travelCompanionSimpleResponses,
     )
 }

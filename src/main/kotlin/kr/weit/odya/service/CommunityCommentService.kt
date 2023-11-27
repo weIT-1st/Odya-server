@@ -7,6 +7,8 @@ import kr.weit.odya.domain.communitycomment.CommunityComment
 import kr.weit.odya.domain.communitycomment.CommunityCommentRepository
 import kr.weit.odya.domain.communitycomment.getCommunityCommentBy
 import kr.weit.odya.domain.communitycomment.getSliceCommunityCommentBy
+import kr.weit.odya.domain.follow.FollowRepository
+import kr.weit.odya.domain.follow.getFollowingIds
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.service.dto.CommunityCommentRequest
@@ -21,6 +23,7 @@ class CommunityCommentService(
     private val communityCommentRepository: CommunityCommentRepository,
     private val userRepository: UserRepository,
     private val fileService: FileService,
+    private val followRepository: FollowRepository,
 ) {
     @Transactional
     fun createCommunityComment(userId: Long, communityId: Long, request: CommunityCommentRequest): Long {
@@ -36,11 +39,12 @@ class CommunityCommentService(
     }
 
     @Transactional(readOnly = true)
-    fun getCommunityComments(communityId: Long, size: Int, lastId: Long?): SliceResponse<CommunityCommentResponse> {
+    fun getCommunityComments(userId: Long, communityId: Long, size: Int, lastId: Long?): SliceResponse<CommunityCommentResponse> {
+        val followingIdList = followRepository.getFollowingIds(userId)
         val communityCommentResponses =
             communityCommentRepository.getSliceCommunityCommentBy(communityId, size, lastId).map {
                 val profileUrl = fileService.getPreAuthenticatedObjectUrl(it.user.profile.profileName)
-                CommunityCommentResponse(it, it.user, profileUrl)
+                CommunityCommentResponse(it, it.user, profileUrl, it.id in followingIdList)
             }
 
         return SliceResponse(size, communityCommentResponses)

@@ -10,6 +10,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import jakarta.ws.rs.ForbiddenException
+import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.placeReview.PlaceReviewRepository
 import kr.weit.odya.domain.placeReview.getByPlaceReviewId
 import kr.weit.odya.domain.report.ReportPlaceReviewRepository
@@ -20,6 +21,7 @@ import kr.weit.odya.support.TEST_AVERAGE_RATING
 import kr.weit.odya.support.TEST_DEFAULT_PROFILE_PNG
 import kr.weit.odya.support.TEST_LAST_ID
 import kr.weit.odya.support.TEST_NOT_EXIST_PLACE_REVIEW_ID
+import kr.weit.odya.support.TEST_OTHER_USER_ID
 import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_PLACE_REVIEW_COUNT
 import kr.weit.odya.support.TEST_PLACE_REVIEW_ID
@@ -42,7 +44,8 @@ class PlaceReviewServiceTest : DescribeSpec(
         val placeReviewRepository = mockk<PlaceReviewRepository>()
         val reportPlaceReviewRepository = mockk<ReportPlaceReviewRepository>()
         val fileService = mockk<FileService>()
-        val sut = PlaceReviewService(placeReviewRepository, userRepository, reportPlaceReviewRepository, fileService)
+        val followRepository = mockk<FollowRepository>()
+        val sut = PlaceReviewService(placeReviewRepository, userRepository, reportPlaceReviewRepository, fileService, followRepository)
         val user = createUser()
 
         describe("createPlaceReview 메소드") {
@@ -131,26 +134,28 @@ class PlaceReviewServiceTest : DescribeSpec(
             context("유효한 placeId가 전달되면") {
                 every { placeReviewRepository.findSliceByPlaceIdOrderBySortType(TEST_PLACE_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) } returns listOf(createMockPlaceReview(user))
                 every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
+                every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
                 it("리뷰를 조회한다.") {
-                    shouldNotThrowAny { sut.getByPlaceReviewList(TEST_PLACE_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) }
+                    shouldNotThrowAny { sut.getByPlaceReviewList(TEST_USER_ID, TEST_PLACE_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) }
                 }
             }
         }
 
         describe("getByUserReviewList 메소드") {
             context("유효한 userId가 전달되면") {
-                every { userRepository.getByUserId(TEST_USER_ID) } returns user
+                every { userRepository.getByUserId(TEST_OTHER_USER_ID) } returns user
                 every { placeReviewRepository.findSliceByUserOrderBySortType(any(), TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) } returns listOf(createMockPlaceReview(user))
                 every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
+                every { followRepository.existsByFollowerIdAndFollowingId(TEST_USER_ID, TEST_OTHER_USER_ID) } returns true
                 it("리뷰를 조회한다.") {
-                    shouldNotThrowAny { sut.getByUserReviewList(TEST_USER_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) }
+                    shouldNotThrowAny { sut.getByUserReviewList(TEST_USER_ID, TEST_OTHER_USER_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) }
                 }
             }
 
             context("존재하지 않는 userId가 전달되면") {
-                every { userRepository.getByUserId(TEST_USER_ID) } throws NoSuchElementException()
+                every { userRepository.getByUserId(TEST_OTHER_USER_ID) } throws NoSuchElementException()
                 it("[NoSuchElementException] 예외가 발생한다") {
-                    shouldThrow<NoSuchElementException> { sut.getByUserReviewList(TEST_USER_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) }
+                    shouldThrow<NoSuchElementException> { sut.getByUserReviewList(TEST_USER_ID, TEST_OTHER_USER_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) }
                 }
             }
         }
@@ -200,6 +205,7 @@ class PlaceReviewServiceTest : DescribeSpec(
             context("userId가 전달되면") {
                 every { reportPlaceReviewRepository.deleteAllByUserId(TEST_USER_ID) } just runs
                 every { placeReviewRepository.deleteByUserId(TEST_USER_ID) } just runs
+                every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
                 it("유저의 한 줄 리뷰 관련된 데이터 전부 삭제") {
                     shouldNotThrowAny { sut.deleteReviewRelatedData(TEST_USER_ID) }
                 }

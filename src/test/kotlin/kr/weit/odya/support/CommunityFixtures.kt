@@ -156,7 +156,7 @@ fun createCommunityResponse(
     travelJournal: TravelJournalSimpleResponse? = createTravelJournalSimpleResponse(),
     topic: TopicResponse? = createCommunityTopicResponse(),
     communityContentImages: List<CommunityContentImageResponse> = listOf(createCommunityContentImageResponse()),
-    isFollowing: Boolean? = null,
+    isFollowing: Boolean = false,
 ) = CommunityResponse(
     communityId = id,
     content = content,
@@ -188,7 +188,7 @@ fun createOtherCommunityResponse(
     visibility = visibility,
     placeId = placeId,
     isWriter = isWriter,
-    writer = UserSimpleResponse(createOtherUser(), TEST_FILE_AUTHENTICATED_URL),
+    writer = UserSimpleResponse(createOtherUser(), TEST_FILE_AUTHENTICATED_URL, false),
     travelJournal = travelJournal,
     topic = topic,
     communityContentImages = communityContentImages,
@@ -280,12 +280,14 @@ fun createCommunityWithCommentResponse(
     writerProfileUrl: String = TEST_FILE_AUTHENTICATED_URL,
     communityComment: CommunityComment = createMockCommunityComment(),
     commenterProfileUrl: String = TEST_FILE_AUTHENTICATED_URL,
+    followingIdList: List<Long> = listOf(TEST_OTHER_USER_ID),
 ) = CommunityWithCommentsResponse.from(
     community = community,
     communityMainImageUrl = communityMainImageUrl,
     writerProfileUrl = writerProfileUrl,
     communityComment = communityComment,
     commenterProfileUrl = commenterProfileUrl,
+    followingIdList = followingIdList,
 )
 
 fun createOtherCommunityWithCommentResponse(
@@ -297,12 +299,14 @@ fun createOtherCommunityWithCommentResponse(
     writerProfileUrl: String = TEST_FILE_AUTHENTICATED_URL,
     communityComment: CommunityComment = createMockCommunityComment(),
     commenterProfileUrl: String = TEST_FILE_AUTHENTICATED_URL,
+    followingIdList: List<Long> = listOf(TEST_OTHER_USER_ID),
 ) = CommunityWithCommentsResponse.from(
     community = community,
     communityMainImageUrl = communityMainImageUrl,
     writerProfileUrl = writerProfileUrl,
     communityComment = communityComment,
     commenterProfileUrl = commenterProfileUrl,
+    followingIdList = followingIdList,
 )
 
 fun createSliceCommunitySummaryResponse(
