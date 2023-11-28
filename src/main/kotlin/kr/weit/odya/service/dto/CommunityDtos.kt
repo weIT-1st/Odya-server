@@ -183,6 +183,7 @@ data class CommunityWithCommentsResponse(
     val communityId: Long,
     val communityContent: String,
     val communityMainImageUrl: String,
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     val updatedAt: LocalDateTime,
     val writer: UserSimpleResponse,
     val communityCommentSimpleResponse: CommunityCommentSimpleResponse,
