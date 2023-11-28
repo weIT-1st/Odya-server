@@ -53,7 +53,7 @@ class TravelJournalBookmarkService(
                     bookmark,
                     profileUrl,
                     travelJournalMainImageUrl,
-                    bookmark.user,
+                    bookmark.travelJournal.user,
                 )
             }
         return SliceResponse(size, journalBookmarkResponses)
