@@ -166,7 +166,7 @@ class CommunityCommentControllerTest(
             val targetUri = "/api/v1/communities/{communityId}/comments"
             context("유효한 정보가 주어졌을 때 (lastId null)") {
                 val response = createCommunityCommentSliceResponse()
-                every { communityCommentService.getCommunityComments(TEST_COMMUNITY_ID, 10, null) } returns
+                every { communityCommentService.getCommunityComments(TEST_USER_ID, TEST_COMMUNITY_ID, 10, null) } returns
                     response
                 it("200를 반환한다.") {
                     restDocMockMvc.perform(
@@ -195,6 +195,7 @@ class CommunityCommentControllerTest(
                                     "content[].isWriter" type JsonFieldType.BOOLEAN description "댓글 작성자 여부" example response.content[0].isWriter,
                                     "content[].user.userId" type JsonFieldType.NUMBER description "사용자 ID" example response.content[0].user.userId,
                                     "content[].user.nickname" type JsonFieldType.STRING description "사용자 닉네임" example response.content[0].user.nickname,
+                                    "content[].user.isFollowing" type JsonFieldType.BOOLEAN description "사용자 팔로잉 여부" example response.content[0].user.isFollowing,
                                     "content[].user.profile.profileUrl" type JsonFieldType.STRING description "프로필 URL" example response.content[0].user.profile.profileUrl,
                                     "content[].user.profile.profileColor.colorHex" type JsonFieldType.STRING description "프로필 색상 HEX" example response.content[0].user.profile.profileColor?.colorHex,
                                     "content[].user.profile.profileColor.red" type JsonFieldType.NUMBER description "프로필 색상 RED" example response.content[0].user.profile.profileColor?.red,
@@ -216,7 +217,7 @@ class CommunityCommentControllerTest(
                         ),
                     ),
                 )
-                every { communityCommentService.getCommunityComments(TEST_COMMUNITY_ID, 10, TEST_COMMUNITY_ID) } returns
+                every { communityCommentService.getCommunityComments(TEST_USER_ID, TEST_COMMUNITY_ID, 10, TEST_COMMUNITY_ID) } returns
                     response
                 it("200를 반환한다.") {
                     restDocMockMvc.perform(
@@ -246,6 +247,7 @@ class CommunityCommentControllerTest(
                                     "content[].isWriter" type JsonFieldType.BOOLEAN description "댓글 작성자 여부" example response.content[0].isWriter,
                                     "content[].user.userId" type JsonFieldType.NUMBER description "사용자 ID" example response.content[0].user.userId,
                                     "content[].user.nickname" type JsonFieldType.STRING description "사용자 닉네임" example response.content[0].user.nickname,
+                                    "content[].user.isFollowing" type JsonFieldType.BOOLEAN description "사용자 팔로잉 여부" example response.content[0].user.isFollowing,
                                     "content[].user.profile.profileUrl" type JsonFieldType.STRING description "프로필 URL" example response.content[0].user.profile.profileUrl,
                                     "content[].user.profile.profileColor.colorHex" type JsonFieldType.STRING description "프로필 색상 HEX" example response.content[0].user.profile.profileColor?.colorHex,
                                     "content[].user.profile.profileColor.red" type JsonFieldType.NUMBER description "프로필 색상 RED" example response.content[0].user.profile.profileColor?.red,

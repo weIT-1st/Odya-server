@@ -1,5 +1,7 @@
 package kr.weit.odya.service
 
+import kr.weit.odya.domain.follow.FollowRepository
+import kr.weit.odya.domain.follow.getFollowingIds
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.traveljournal.getByTravelJournalId
 import kr.weit.odya.domain.traveljournalbookmark.TravelJournalBookmark
@@ -19,6 +21,7 @@ class TravelJournalBookmarkService(
     private val userRepository: UserRepository,
     private val travelJournalRepository: TravelJournalRepository,
     private val fileService: FileService,
+    private val followRepository: FollowRepository,
 ) {
     @Transactional
     fun createTravelJournalBookmark(userId: Long, travelJournalId: Long) {
@@ -44,6 +47,7 @@ class TravelJournalBookmarkService(
         sortType: TravelJournalBookmarkSortType,
     ): SliceResponse<TravelJournalBookmarkSummaryResponse> {
         val user = userRepository.getByUserId(userId)
+        val followingIdList = followRepository.getFollowingIds(userId)
         val journalBookmarkResponses =
             travelJournalBookmarkRepository.getSliceBy(size, lastId, sortType, user).map { bookmark ->
                 val profileUrl = fileService.getPreAuthenticatedObjectUrl(bookmark.user.profile.profileName)
@@ -54,6 +58,7 @@ class TravelJournalBookmarkService(
                     profileUrl,
                     travelJournalMainImageUrl,
                     bookmark.travelJournal.user,
+                    bookmark.user.id in followingIdList,
                 )
             }
         return SliceResponse(size, journalBookmarkResponses)

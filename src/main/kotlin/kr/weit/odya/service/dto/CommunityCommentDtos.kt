@@ -23,12 +23,13 @@ data class CommunityCommentResponse(
         communityComment: CommunityComment,
         user: User,
         profileUrl: String,
+        isFollowing: Boolean,
     ) : this(
         communityComment.id,
         communityComment.content,
         communityComment.updatedDate,
         communityComment.community.user.id == user.id,
-        UserSimpleResponse(user, profileUrl),
+        UserSimpleResponse(user, profileUrl, isFollowing),
     )
 }
 

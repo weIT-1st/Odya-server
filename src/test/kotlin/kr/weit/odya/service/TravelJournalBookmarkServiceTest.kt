@@ -7,6 +7,7 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
+import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.traveljournal.getByTravelJournalId
 import kr.weit.odya.domain.traveljournalbookmark.TravelJournalBookmark
@@ -18,6 +19,7 @@ import kr.weit.odya.support.TEST_DEFAULT_SIZE
 import kr.weit.odya.support.TEST_FILE_AUTHENTICATED_URL
 import kr.weit.odya.support.TEST_NOT_EXIST_TRAVEL_JOURNAL_ID
 import kr.weit.odya.support.TEST_NOT_EXIST_USER_ID
+import kr.weit.odya.support.TEST_OTHER_USER_ID
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_BOOKMARK_SORT_TYPE
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_ID
@@ -31,11 +33,13 @@ class TravelJournalBookmarkServiceTest : DescribeSpec(
         val userRepository = mockk<UserRepository>()
         val travelJournalRepository = mockk<TravelJournalRepository>()
         val fileService = mockk<FileService>()
+        val followRepository = mockk<FollowRepository>()
         val travelJournalBookmarkService = TravelJournalBookmarkService(
             travelJournalBookmarkRepository = travelJournalBookmarkRepository,
             userRepository = userRepository,
             travelJournalRepository = travelJournalRepository,
             fileService = fileService,
+            followRepository,
         )
 
         describe("createTravelJournalBookmark") {
@@ -113,6 +117,7 @@ class TravelJournalBookmarkServiceTest : DescribeSpec(
                     )
                 } returns listOf(createTravelJournalBookmark())
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
+                every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalBookmarkService.getMyTravelJournalBookmarks(

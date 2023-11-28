@@ -106,6 +106,8 @@ class UserController(
 
     @GetMapping("/search")
     fun search(
+        @LoginUserId
+        userId: Long,
         @NotBlank(message = "검색할 닉네임은 필수입니다.")
         @RequestParam("nickname")
         nickname: String,
@@ -116,7 +118,7 @@ class UserController(
         @RequestParam(name = "lastId", required = false)
         lastId: Long?,
     ): ResponseEntity<SliceResponse<UserSimpleResponse>> {
-        return ResponseEntity.ok(userService.searchByNickname(nickname, size, lastId))
+        return ResponseEntity.ok(userService.searchByNickname(userId, nickname, size, lastId))
     }
 
     @GetMapping("/search/phone-number")
