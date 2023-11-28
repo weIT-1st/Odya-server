@@ -67,6 +67,7 @@ class PlaceReviewController(private val placeReviewService: PlaceReviewService) 
 
     @GetMapping("/places/{id}")
     fun getByPlaceReviewList(
+        @LoginUserId userId: Long,
         @NotBlank(message = "장소 ID는 필수 입력값입니다.")
         @PathVariable("id")
         placeId: String,
@@ -78,11 +79,12 @@ class PlaceReviewController(private val placeReviewService: PlaceReviewService) 
         @RequestParam(name = "lastId", required = false)
         lastId: Long?,
     ): ResponseEntity<SliceResponse<PlaceReviewListResponse>> {
-        return ResponseEntity.ok(placeReviewService.getByPlaceReviewList(placeId, size, sortType, lastId))
+        return ResponseEntity.ok(placeReviewService.getByPlaceReviewList(userId, placeId, size, sortType, lastId))
     }
 
     @GetMapping("/users/{id}")
     fun getByUserReviewList(
+        @LoginUserId loginUserId: Long,
         @NotNull(message = "유저 ID는 필수 입력값입니다.")
         @Positive(message = "유저 ID는 양수여야 합니다.")
         @PathVariable("id")
@@ -96,7 +98,7 @@ class PlaceReviewController(private val placeReviewService: PlaceReviewService) 
         @RequestParam(name = "lastId", required = false)
         lastId: Long?,
     ): ResponseEntity<SliceResponse<PlaceReviewListResponse>> {
-        return ResponseEntity.ok(placeReviewService.getByUserReviewList(userId, size, sortType, lastId))
+        return ResponseEntity.ok(placeReviewService.getByUserReviewList(loginUserId, userId, size, sortType, lastId))
     }
 
     @GetMapping("/average/{id}")

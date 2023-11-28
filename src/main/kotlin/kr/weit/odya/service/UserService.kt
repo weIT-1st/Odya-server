@@ -100,13 +100,15 @@ class UserService(
         }
     }
 
-    fun searchByNickname(nickname: String, size: Int, lastId: Long?): SliceResponse<UserSimpleResponse> {
+    fun searchByNickname(userId: Long, nickname: String, size: Int, lastId: Long?): SliceResponse<UserSimpleResponse> {
         val usersDocuments = usersDocumentRepository.getByNickname(nickname)
         val userIds = usersDocuments.map { it.id }
+        val followingIdList = followRepository.getFollowingIds(userId)
         val users = userRepository.getByUserIds(userIds, size + 1, lastId).map {
             UserSimpleResponse(
                 it,
                 fileService.getPreAuthenticatedObjectUrl(it.profile.profileName),
+                it.id in followingIdList,
             )
         }
         return SliceResponse(size, users)

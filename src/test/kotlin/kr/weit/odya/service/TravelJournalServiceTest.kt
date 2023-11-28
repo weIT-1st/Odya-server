@@ -455,6 +455,7 @@ class TravelJournalServiceTest : DescribeSpec(
                     )
                 } returns false
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
+                every { followRepository.existsByFollowerIdAndFollowingId(TEST_USER_ID, TEST_USER_ID) } returns false
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalService.getTravelJournal(TEST_TRAVEL_JOURNAL.id, TEST_USER_ID)
@@ -477,6 +478,12 @@ class TravelJournalServiceTest : DescribeSpec(
                     followRepository.existsByFollowerIdAndFollowingId(
                         TEST_USER_ID,
                         TEST_OTHER_USER_ID,
+                    )
+                } returns true
+                every {
+                    followRepository.existsByFollowerIdAndFollowingId(
+                        TEST_OTHER_USER_ID,
+                        TEST_USER_ID,
                     )
                 } returns true
                 it("정상적으로 종료한다") {
@@ -548,6 +555,7 @@ class TravelJournalServiceTest : DescribeSpec(
                     )
                 } returns listOf(TEST_TRAVEL_JOURNAL)
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
+                every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalService.getTravelJournals(
@@ -573,6 +581,7 @@ class TravelJournalServiceTest : DescribeSpec(
                     )
                 } returns listOf(TEST_TRAVEL_JOURNAL)
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
+                every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalService.getMyTravelJournals(
@@ -599,6 +608,7 @@ class TravelJournalServiceTest : DescribeSpec(
                     )
                 } returns listOf(TEST_TRAVEL_JOURNAL)
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
+                every { followRepository.findFollowingIdsByFollowerId(TEST_OTHER_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalService.getFriendTravelJournals(
@@ -627,6 +637,7 @@ class TravelJournalServiceTest : DescribeSpec(
                     )
                 } returns listOf(TEST_TRAVEL_JOURNAL)
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
+                every { followRepository.findFollowingIdsByFollowerId(TEST_OTHER_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalService.getRecommendTravelJournals(
@@ -644,6 +655,7 @@ class TravelJournalServiceTest : DescribeSpec(
         describe("getTaggedTravelJournals") {
             context("유효한 데이터가 주어지는 경우") {
                 every { userRepository.getByUserId(TEST_USER_ID) } returns TEST_USER
+                every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
                 every {
                     travelJournalRepository.getTaggedTravelJournalSliceBy(
                         TEST_USER,
@@ -1125,6 +1137,7 @@ class TravelJournalServiceTest : DescribeSpec(
                 it("정상적으로 종료한다") {
                     every { userRepository.getByUserId(TEST_USER_ID) } returns user
                     every { travelJournalRepository.findTravelCompanionId(user, TEST_TRAVEL_JOURNAL_ID) } throws ForbiddenException()
+                    every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
                     shouldThrow<ForbiddenException> {
                         travelJournalService.removeTravelCompanion(TEST_USER_ID, TEST_TRAVEL_JOURNAL_ID)
                     }

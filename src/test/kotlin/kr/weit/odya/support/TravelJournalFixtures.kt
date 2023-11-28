@@ -316,7 +316,7 @@ fun createTravelJournalSummaryResponse(
     TEST_TRAVEL_JOURNAL_START_DATE,
     TEST_TRAVEL_JOURNAL_END_DATE,
     listOf(TEST_PLACE_ID),
-    UserSimpleResponse(user, TEST_FILE_AUTHENTICATED_URL),
+    UserSimpleResponse(user, TEST_FILE_AUTHENTICATED_URL, false),
     listOf(createTravelCompanionSimpleResponse(travelCompanion)),
 )
 
@@ -334,7 +334,7 @@ fun createTravelJournalResponse(travelJournal: TravelJournal = createTravelJourn
         travelJournal.travelEndDate,
         travelJournal.visibility,
         TEST_IS_BOOK_MARKED_FALSE,
-        UserSimpleResponse(createUser(), TEST_FILE_AUTHENTICATED_URL),
+        UserSimpleResponse(createUser(), TEST_FILE_AUTHENTICATED_URL, false),
         listOf(createTravelJournalContentResponse()),
         listOf(createTravelCompanionResponse()),
     )
@@ -361,7 +361,7 @@ fun createTaggedTravelJournalResponse(): TaggedTravelJournalResponse =
         TEST_TRAVEL_JOURNAL_ID,
         TEST_TRAVEL_JOURNAL_TITLE,
         TEST_FILE_AUTHENTICATED_URL,
-        UserSimpleResponse(createUser(), TEST_FILE_AUTHENTICATED_URL),
+        UserSimpleResponse(createUser(), TEST_FILE_AUTHENTICATED_URL, true),
         TEST_TRAVEL_JOURNAL_START_DATE,
     )
 

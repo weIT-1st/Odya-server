@@ -20,6 +20,7 @@ data class TravelJournalBookmarkSummaryResponse(
             profileUrl: String,
             travelJournalMainImageUrl: String,
             user: User,
+            isFollowing: Boolean,
         ) =
             TravelJournalBookmarkSummaryResponse(
                 travelJournalBookmark.id,
@@ -27,7 +28,7 @@ data class TravelJournalBookmarkSummaryResponse(
                 travelJournalBookmark.travelJournal.title,
                 travelJournalBookmark.travelJournal.travelStartDate,
                 travelJournalMainImageUrl,
-                UserSimpleResponse(user, profileUrl),
+                UserSimpleResponse(user, profileUrl, isFollowing),
             )
     }
 }

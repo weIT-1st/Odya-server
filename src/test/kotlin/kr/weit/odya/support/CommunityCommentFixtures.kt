@@ -62,8 +62,9 @@ fun createCommunityCommentResponse(
     id: Long = TEST_COMMUNITY_COMMENT_ID,
     user: User = createUser(),
     communityComment: MockCommunityComment = createMockCommunityComment(id = id, user = user),
+    isFollowing: Boolean = false,
 ): CommunityCommentResponse =
-    CommunityCommentResponse(communityComment, user, TEST_FILE_AUTHENTICATED_URL)
+    CommunityCommentResponse(communityComment, user, TEST_FILE_AUTHENTICATED_URL, isFollowing)
 
 class MockCommunityComment(
     id: Long = TEST_COMMUNITY_COMMENT_ID,

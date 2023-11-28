@@ -672,7 +672,7 @@ class PlaceReviewControllerTest(
             context("유효한 요청 데이터가 전달되면") {
                 val response = creatSlicePlaceReviewResponse()
                 val content = response.content[0]
-                every { placeReviewService.getByPlaceReviewList(TEST_PLACE_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) } returns response
+                every { placeReviewService.getByPlaceReviewList(TEST_USER_ID, TEST_PLACE_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) } returns response
                 it("200 및 장소 리스트를 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -704,6 +704,7 @@ class PlaceReviewControllerTest(
                                     "content[].placeId" type JsonFieldType.STRING description "장소 ID" example content.placeId,
                                     "content[].userInfo.userId" type JsonFieldType.NUMBER description "사용자 ID" example response.content[0].userInfo.userId,
                                     "content[].userInfo.nickname" type JsonFieldType.STRING description "사용자 닉네임" example response.content[0].userInfo.nickname,
+                                    "content[].userInfo.isFollowing" type JsonFieldType.BOOLEAN description "사용자 팔로잉 여부" example response.content[0].userInfo.isFollowing,
                                     "content[].userInfo.profile.profileUrl" type JsonFieldType.STRING description "사용자 프로필 Url" example response.content[0].userInfo.profile.profileUrl,
                                     "content[].userInfo.profile.profileColor.colorHex" type JsonFieldType.STRING description "색상 Hex" example response.content[0].userInfo.profile.profileColor?.colorHex isOptional true,
                                     "content[].userInfo.profile.profileColor.red" type JsonFieldType.NUMBER description "RGB RED" example response.content[0].userInfo.profile.profileColor?.red isOptional true,
@@ -879,7 +880,7 @@ class PlaceReviewControllerTest(
             context("유효한 요청 데이터가 전달되면") {
                 val response = creatSlicePlaceReviewResponse()
                 val content = response.content[0]
-                every { placeReviewService.getByUserReviewList(TEST_USER_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) } returns response
+                every { placeReviewService.getByUserReviewList(TEST_USER_ID, TEST_USER_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) } returns response
                 it("200 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -911,6 +912,7 @@ class PlaceReviewControllerTest(
                                     "content[].placeId" type JsonFieldType.STRING description "장소 ID" example content.placeId,
                                     "content[].userInfo.userId" type JsonFieldType.NUMBER description "사용자 ID" example response.content[0].userInfo.userId,
                                     "content[].userInfo.nickname" type JsonFieldType.STRING description "사용자 닉네임" example response.content[0].userInfo.nickname,
+                                    "content[].userInfo.isFollowing" type JsonFieldType.BOOLEAN description "사용자 팔로잉 여부" example response.content[0].userInfo.isFollowing,
                                     "content[].userInfo.profile.profileUrl" type JsonFieldType.STRING description "사용자 프로필 Url" example response.content[0].userInfo.profile.profileUrl,
                                     "content[].userInfo.profile.profileColor.colorHex" type JsonFieldType.STRING description "색상 Hex" example response.content[0].userInfo.profile.profileColor?.colorHex isOptional true,
                                     "content[].userInfo.profile.profileColor.red" type JsonFieldType.NUMBER description "RGB RED" example response.content[0].userInfo.profile.profileColor?.red isOptional true,
@@ -1048,7 +1050,7 @@ class PlaceReviewControllerTest(
             }
 
             context("유효한 토큰이지만 가입되지 않은 USER ID로 조회하려는 경우") {
-                every { placeReviewService.getByUserReviewList(TEST_NOT_EXIST_USER_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) } throws NoSuchElementException(NOT_EXIST_USER_ERROR_MESSAGE)
+                every { placeReviewService.getByUserReviewList(TEST_USER_ID, TEST_NOT_EXIST_USER_ID, TEST_SIZE, TEST_PLACE_SORT_TYPE, TEST_LAST_ID) } throws NoSuchElementException(NOT_EXIST_USER_ERROR_MESSAGE)
                 it("404 응답한다.") {
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
