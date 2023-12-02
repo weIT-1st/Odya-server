@@ -452,7 +452,8 @@ class TravelJournalService(
 
     private fun getTravelJournalResponse(userId: Long, travelJournal: TravelJournal): TravelJournalResponse {
         val travelJournalContentResponses = getTravelJournalContentResponses(travelJournal)
-        val travelCompanionResponses = getTravelCompanionResponses(travelJournal)
+        val followingIdList = followRepository.getFollowingIds(userId)
+        val travelCompanionResponses = getTravelCompanionResponses(followingIdList, travelJournal)
         val isBookmarked =
             travelJournalBookmarkRepository.existsByUserIdAndTravelJournal(userId, travelJournal)
         return TravelJournalResponse(
@@ -461,21 +462,23 @@ class TravelJournalService(
             fileService.getPreAuthenticatedObjectUrl(travelJournal.user.profile.profileName),
             travelJournalContentResponses,
             travelCompanionResponses,
-            followRepository.existsByFollowerIdAndFollowingId(userId, travelJournal.user.id),
+            travelJournal.user.id in followingIdList,
         )
     }
 
-    private fun getTravelCompanionResponses(travelJournal: TravelJournal): List<TravelCompanionResponse> =
-        travelJournal.travelCompanions.map {
+    private fun getTravelCompanionResponses(followingIdList: List<Long>, travelJournal: TravelJournal): List<TravelCompanionResponse> {
+        return travelJournal.travelCompanions.map {
             if (it.user != null) {
                 TravelCompanionResponse.fromRegisteredUser(
                     it.user!!,
                     fileService.getPreAuthenticatedObjectUrl(it.user!!.profile.profileName),
+                    it.user!!.id in followingIdList,
                 )
             } else {
                 TravelCompanionResponse.fromNonRegisteredUser(it)
             }
         }
+    }
 
     private fun getTravelJournalContentResponses(travelJournal: TravelJournal): List<TravelJournalContentResponse> {
         return travelJournal.travelJournalContents.map { travelJournalContent ->

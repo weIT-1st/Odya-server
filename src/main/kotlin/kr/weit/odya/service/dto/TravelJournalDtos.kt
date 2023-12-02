@@ -140,23 +140,26 @@ data class TravelCompanionResponse private constructor(
     val nickname: String?,
     val profileUrl: String?,
     val isRegistered: Boolean,
+    val isFollowing: Boolean,
 ) {
     companion object {
-        fun fromRegisteredUser(user: User, profileUrl: String): TravelCompanionResponse {
+        fun fromRegisteredUser(user: User, profileUrl: String, isFollowing: Boolean): TravelCompanionResponse {
             return TravelCompanionResponse(
                 user.id,
                 user.nickname,
                 profileUrl,
                 true,
+                isFollowing,
             )
         }
 
         fun fromNonRegisteredUser(travelCompanion: TravelCompanion): TravelCompanionResponse {
             return TravelCompanionResponse(
-                null,
-                travelCompanion.username!!,
-                null,
-                false,
+                userId = null,
+                nickname = travelCompanion.username!!,
+                profileUrl = null,
+                isRegistered = false,
+                isFollowing = false,
             )
         }
     }
