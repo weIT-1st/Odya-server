@@ -1025,6 +1025,7 @@ class TravelJournalControllerTest(
                                     "travelJournalCompanions[].nickname" type JsonFieldType.STRING description "여행 친구의 닉네임" example response.travelJournalCompanions[0].nickname isOptional true,
                                     "travelJournalCompanions[].profileUrl" type JsonFieldType.STRING description "여행 친구의 프로필 사진" example response.travelJournalCompanions[0].profileUrl isOptional true,
                                     "travelJournalCompanions[].isRegistered" type JsonFieldType.BOOLEAN description "여행 친구가 등록된 사용자인지 여부" example response.travelJournalCompanions[0].isRegistered,
+                                    "travelJournalCompanions[].isFollowing" type JsonFieldType.BOOLEAN description "사용자 팔로잉 여부" example response.travelJournalCompanions[0].isFollowing,
                                 ),
                             ),
                         )
