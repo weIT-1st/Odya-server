@@ -347,7 +347,7 @@ fun createTravelJournalContentResponse(travelJournalContent: TravelJournalConten
     )
 
 fun createTravelCompanionResponse(): TravelCompanionResponse =
-    TravelCompanionResponse.fromRegisteredUser(createOtherUser(), TEST_GENERATED_FILE_NAME)
+    TravelCompanionResponse.fromRegisteredUser(createOtherUser(), TEST_GENERATED_FILE_NAME, false)
 
 fun createTravelJournalContentImageResponse(travelJournalContentImageId: TravelJournalContentImage = createTravelJournalContentImage()): TravelJournalContentImageResponse =
     TravelJournalContentImageResponse(

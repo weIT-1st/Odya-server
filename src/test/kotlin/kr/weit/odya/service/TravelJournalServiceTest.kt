@@ -14,6 +14,7 @@ import kr.weit.odya.client.push.PushNotificationEvent
 import kr.weit.odya.domain.community.CommunityRepository
 import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.follow.FollowRepository
+import kr.weit.odya.domain.follow.getFollowingIds
 import kr.weit.odya.domain.report.ReportTravelJournalRepository
 import kr.weit.odya.domain.report.deleteAllByUserId
 import kr.weit.odya.domain.traveljournal.TravelCompanionRepository
@@ -455,7 +456,7 @@ class TravelJournalServiceTest : DescribeSpec(
                     )
                 } returns false
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
-                every { followRepository.existsByFollowerIdAndFollowingId(TEST_USER_ID, TEST_USER_ID) } returns false
+                every { followRepository.getFollowingIds(TEST_USER_ID) } returns listOf()
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalService.getTravelJournal(TEST_TRAVEL_JOURNAL.id, TEST_USER_ID)
@@ -480,12 +481,7 @@ class TravelJournalServiceTest : DescribeSpec(
                         TEST_OTHER_USER_ID,
                     )
                 } returns true
-                every {
-                    followRepository.existsByFollowerIdAndFollowingId(
-                        TEST_OTHER_USER_ID,
-                        TEST_USER_ID,
-                    )
-                } returns true
+                every { followRepository.getFollowingIds(TEST_OTHER_USER_ID) } returns listOf()
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalService.getTravelJournal(TEST_TRAVEL_JOURNAL.id, TEST_OTHER_USER_ID)
@@ -523,6 +519,7 @@ class TravelJournalServiceTest : DescribeSpec(
                         any<TravelJournal>(),
                     )
                 } returns false
+                every { followRepository.getFollowingIds(TEST_USER_ID) } returns listOf()
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
