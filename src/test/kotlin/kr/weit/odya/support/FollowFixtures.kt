@@ -24,7 +24,8 @@ fun createFollow(follower: User = createUser(), following: User = createOtherUse
 fun createFollowUserResponse(
     userId: Long = TEST_USER_ID,
     nickname: String = TEST_NICKNAME,
-) = FollowUserResponse(userId, nickname, createFollowProfileResponse())
+    isFollowing: Boolean = true,
+) = FollowUserResponse(userId, nickname, createFollowProfileResponse(), isFollowing)
 
 fun createFollowList(): List<Follow> = listOf(createFollow())
 

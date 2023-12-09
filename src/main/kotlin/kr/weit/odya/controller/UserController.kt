@@ -126,7 +126,7 @@ class UserController(
         @LoginUserId
         userId: Long,
         @Valid
-        @Size(min = 1, max = 10, message = "전화번호는 1개 이상 10개 이하로 입력해주세요.")
+        @Size(min = 1, max = 30, message = "전화번호는 1개 이상 30개 이하로 입력해주세요.")
         @RequestParam("phoneNumbers")
         phoneNumbers: List<SearchPhoneNumberRequest>,
     ): ResponseEntity<List<UserSimpleResponse>> {
