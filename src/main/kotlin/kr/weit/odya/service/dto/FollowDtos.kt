@@ -21,8 +21,9 @@ data class FollowUserResponse(
     val userId: Long,
     val nickname: String,
     val profile: FollowProfileResponse,
+    val isFollowing: Boolean,
 ) {
-    constructor(user: User, profileUrl: String) : this(
+    constructor(user: User, profileUrl: String, isFollowing: Boolean) : this(
         user.id,
         user.nickname,
         FollowProfileResponse(
@@ -33,6 +34,7 @@ data class FollowUserResponse(
                 null
             },
         ),
+        isFollowing,
     )
 }
 

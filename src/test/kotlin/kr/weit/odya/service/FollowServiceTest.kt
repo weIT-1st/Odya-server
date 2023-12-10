@@ -133,10 +133,11 @@ class FollowServiceTest : DescribeSpec(
                         TEST_DEFAULT_SORT_TYPE,
                     )
                 } returns createFollowList()
+                every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
                 every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
                 it("SliceResponse<FollowUserResponse>를 반환한다.") {
                     val response =
-                        followService.getSliceFollowings(TEST_USER_ID, TEST_DEFAULT_PAGEABLE, TEST_DEFAULT_SORT_TYPE)
+                        followService.getSliceFollowings(TEST_USER_ID, TEST_USER_ID, TEST_DEFAULT_PAGEABLE, TEST_DEFAULT_SORT_TYPE)
                     response.content[0].userId shouldBe TEST_OTHER_USER_ID
                 }
             }
@@ -152,9 +153,10 @@ class FollowServiceTest : DescribeSpec(
                 every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } throws ObjectStorageException(
                     SOMETHING_ERROR_MESSAGE,
                 )
+                every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
                 it("[ObjectStorageException] 반환한다.") {
                     shouldThrow<ObjectStorageException> {
-                        followService.getSliceFollowings(TEST_USER_ID, TEST_DEFAULT_PAGEABLE, TEST_DEFAULT_SORT_TYPE)
+                        followService.getSliceFollowings(TEST_USER_ID, TEST_USER_ID, TEST_DEFAULT_PAGEABLE, TEST_DEFAULT_SORT_TYPE)
                     }
                 }
             }
@@ -169,10 +171,11 @@ class FollowServiceTest : DescribeSpec(
                         TEST_DEFAULT_SORT_TYPE,
                     )
                 } returns createFollowList()
+                every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
                 every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
                 it("SliceResponse<FollowUserResponse>를 반환한다.") {
                     val response =
-                        followService.getSliceFollowers(TEST_USER_ID, TEST_DEFAULT_PAGEABLE, TEST_DEFAULT_SORT_TYPE)
+                        followService.getSliceFollowers(TEST_USER_ID, TEST_USER_ID, TEST_DEFAULT_PAGEABLE, TEST_DEFAULT_SORT_TYPE)
                     response.content[0].userId shouldBe TEST_USER_ID
                 }
             }
@@ -185,12 +188,13 @@ class FollowServiceTest : DescribeSpec(
                         TEST_DEFAULT_SORT_TYPE,
                     )
                 } returns createFollowList()
+                every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
                 every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } throws ObjectStorageException(
                     SOMETHING_ERROR_MESSAGE,
                 )
                 it("[ObjectStorageException] 반환한다.") {
                     shouldThrow<ObjectStorageException> {
-                        followService.getSliceFollowers(TEST_USER_ID, TEST_DEFAULT_PAGEABLE, TEST_DEFAULT_SORT_TYPE)
+                        followService.getSliceFollowers(TEST_USER_ID, TEST_USER_ID, TEST_DEFAULT_PAGEABLE, TEST_DEFAULT_SORT_TYPE)
                     }
                 }
             }
@@ -232,6 +236,7 @@ class FollowServiceTest : DescribeSpec(
                 every { usersDocumentRepository.getByNickname(TEST_NICKNAME) } returns listOf(createUsersDocument(user))
                 every { followRepository.getByFollowingIdAndFollowerIdIn(any(), any(), any(), any()) } returns listOf(createFollow(following = user))
                 every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
+                every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
                 it("유저를 조회 한다") {
                     shouldNotThrowAny { followService.searchByFollowerNickname(TEST_USER_ID, TEST_NICKNAME, TEST_DEFAULT_SIZE, null) }
                 }

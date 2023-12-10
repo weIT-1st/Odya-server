@@ -391,7 +391,7 @@ class FollowControllerTest(
             context("유효한 토큰이면서, 유효한 요청인 경우") {
                 val response = createFollowSlice()
                 every {
-                    followService.getSliceFollowings(TEST_USER_ID, TEST_PAGEABLE, TEST_SORT_TYPE)
+                    followService.getSliceFollowings(TEST_USER_ID, TEST_USER_ID, TEST_PAGEABLE, TEST_SORT_TYPE)
                 } returns response
                 it("200, 팔로잉 목록을 응답한다.") {
                     restDocMockMvc.perform(
@@ -422,6 +422,7 @@ class FollowControllerTest(
                                     "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
                                     "content[].userId" type JsonFieldType.NUMBER description "사용자 ID" example response.content[0].userId,
                                     "content[].nickname" type JsonFieldType.STRING description "사용자 닉네임" example response.content[0].nickname,
+                                    "content[].isFollowing" type JsonFieldType.BOOLEAN description "사용자 팔로잉 여부" example response.content[0].isFollowing,
                                     "content[].profile.profileUrl" type JsonFieldType.STRING description "사용자 프로필 Url" example response.content[0].profile.profileUrl,
                                     "content[].profile.profileColor.colorHex" type JsonFieldType.STRING description "색상 Hex" example response.content[0].profile.profileColor?.colorHex isOptional true,
                                     "content[].profile.profileColor.red" type JsonFieldType.NUMBER description "RGB RED" example response.content[0].profile.profileColor?.red isOptional true,
@@ -435,7 +436,7 @@ class FollowControllerTest(
 
             context("유효한 토큰이면서, 프로필 PreAuthentication Access Url 생성에 실패한 경우") {
                 every {
-                    followService.getSliceFollowings(TEST_USER_ID, TEST_PAGEABLE, TEST_SORT_TYPE)
+                    followService.getSliceFollowings(TEST_USER_ID, TEST_USER_ID, TEST_PAGEABLE, TEST_SORT_TYPE)
                 } throws ObjectStorageException(SOMETHING_ERROR_MESSAGE)
                 it("500 응답한다.") {
                     restDocMockMvc.perform(
@@ -517,7 +518,7 @@ class FollowControllerTest(
             context("유효한 토큰이면서, 유효한 요청인 경우") {
                 val response = createFollowSlice()
                 every {
-                    followService.getSliceFollowers(TEST_USER_ID, TEST_PAGEABLE, TEST_SORT_TYPE)
+                    followService.getSliceFollowers(TEST_USER_ID, TEST_USER_ID, TEST_PAGEABLE, TEST_SORT_TYPE)
                 } returns response
                 it("200, 팔로잉 목록을 응답한다.") {
                     restDocMockMvc.perform(
@@ -548,6 +549,7 @@ class FollowControllerTest(
                                     "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
                                     "content[].userId" type JsonFieldType.NUMBER description "사용자 ID" example response.content[0].userId,
                                     "content[].nickname" type JsonFieldType.STRING description "사용자 닉네임" example response.content[0].nickname,
+                                    "content[].isFollowing" type JsonFieldType.BOOLEAN description "사용자 팔로잉 여부" example response.content[0].isFollowing,
                                     "content[].profile.profileUrl" type JsonFieldType.STRING description "사용자 프로필 Url" example response.content[0].profile.profileUrl,
                                     "content[].profile.profileColor.colorHex" type JsonFieldType.STRING description "색상 Hex" example response.content[0].profile.profileColor?.colorHex isOptional true,
                                     "content[].profile.profileColor.red" type JsonFieldType.NUMBER description "RGB RED" example response.content[0].profile.profileColor?.red isOptional true,
@@ -561,7 +563,7 @@ class FollowControllerTest(
 
             context("유효한 토큰이면서, 프로필 PreAuthentication Access Url 생성에 실패한 경우") {
                 every {
-                    followService.getSliceFollowers(TEST_USER_ID, TEST_PAGEABLE, TEST_SORT_TYPE)
+                    followService.getSliceFollowers(TEST_USER_ID, TEST_USER_ID, TEST_PAGEABLE, TEST_SORT_TYPE)
                 } throws ObjectStorageException(SOMETHING_ERROR_MESSAGE)
                 it("500 응답한다.") {
                     restDocMockMvc.perform(
@@ -667,6 +669,7 @@ class FollowControllerTest(
                                 "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
                                 "content[].userId" type JsonFieldType.NUMBER description "사용자 ID" example content.userId,
                                 "content[].nickname" type JsonFieldType.STRING description "사용자 닉네임" example content.nickname,
+                                "content[].isFollowing" type JsonFieldType.BOOLEAN description "사용자 팔로잉 여부" example content.isFollowing,
                                 "content[].profile.profileUrl" type JsonFieldType.STRING description "사용자 프로필 Url" example content.profile.profileUrl,
                                 "content[].profile.profileColor.colorHex" type JsonFieldType.STRING description "색상 Hex" example content.profile.profileColor?.colorHex isOptional true,
                                 "content[].profile.profileColor.red" type JsonFieldType.NUMBER description "RGB RED" example content.profile.profileColor?.red isOptional true,
@@ -833,6 +836,7 @@ class FollowControllerTest(
                                 "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
                                 "content[].userId" type JsonFieldType.NUMBER description "사용자 ID" example content.userId,
                                 "content[].nickname" type JsonFieldType.STRING description "사용자 닉네임" example content.nickname,
+                                "content[].isFollowing" type JsonFieldType.BOOLEAN description "사용자 팔로잉 여부" example content.isFollowing,
                                 "content[].profile.profileUrl" type JsonFieldType.STRING description "사용자 프로필 Url" example content.profile.profileUrl,
                                 "content[].profile.profileColor.colorHex" type JsonFieldType.STRING description "색상 Hex" example content.profile.profileColor?.colorHex isOptional true,
                                 "content[].profile.profileColor.red" type JsonFieldType.NUMBER description "RGB RED" example content.profile.profileColor?.red isOptional true,
@@ -972,6 +976,7 @@ class FollowControllerTest(
                                 "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
                                 "content[].userId" type JsonFieldType.NUMBER description "사용자 ID" example content.userId,
                                 "content[].nickname" type JsonFieldType.STRING description "사용자 닉네임" example content.nickname,
+                                "content[].isFollowing" type JsonFieldType.BOOLEAN description "사용자 팔로잉 여부" example content.isFollowing,
                                 "content[].profile.profileUrl" type JsonFieldType.STRING description "사용자 프로필 Url" example content.profile.profileUrl,
                                 "content[].profile.profileColor.colorHex" type JsonFieldType.STRING description "색상 Hex" example content.profile.profileColor?.colorHex isOptional true,
                                 "content[].profile.profileColor.red" type JsonFieldType.NUMBER description "RGB RED" example content.profile.profileColor?.red isOptional true,
@@ -1102,6 +1107,7 @@ class FollowControllerTest(
                                     "count" type JsonFieldType.NUMBER description "방문한 친구 수" example response.count,
                                     "followings[].userId" type JsonFieldType.NUMBER description "사용자 ID" example following.userId,
                                     "followings[].nickname" type JsonFieldType.STRING description "사용자 닉네임" example following.nickname,
+                                    "followings[].isFollowing" type JsonFieldType.BOOLEAN description "사용자 팔로잉 여부" example following.isFollowing,
                                     "followings[].profile.profileUrl" type JsonFieldType.STRING description "사용자 프로필 Url" example following.profile.profileUrl,
                                     "followings[].profile.profileColor.colorHex" type JsonFieldType.STRING description "색상 Hex" example following.profile.profileColor?.colorHex isOptional true,
                                     "followings[].profile.profileColor.red" type JsonFieldType.NUMBER description "RGB RED" example following.profile.profileColor?.red isOptional true,

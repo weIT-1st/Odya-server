@@ -74,24 +74,26 @@ class FollowController(
 
     @GetMapping("/{userId}/followings")
     fun getFollowings(
+        @LoginUserId loginUserId: Long,
         @Positive(message = "USER ID는 양수여야 합니다.")
         @PathVariable("userId")
         userId: Long,
         @PageableDefault(page = 0, size = 10) pageable: Pageable,
         @RequestParam(name = "sortType", required = false, defaultValue = "LATEST") sortType: FollowSortType,
     ): ResponseEntity<SliceResponse<FollowUserResponse>> {
-        return ResponseEntity.ok(followService.getSliceFollowings(userId, pageable, sortType))
+        return ResponseEntity.ok(followService.getSliceFollowings(loginUserId, userId, pageable, sortType))
     }
 
     @GetMapping("/{userId}/followers")
     fun getFollowers(
+        @LoginUserId loginUserId: Long,
         @Positive(message = "USER ID는 양수여야 합니다.")
         @PathVariable("userId")
         userId: Long,
         @PageableDefault(page = 0, size = 10) pageable: Pageable,
         @RequestParam(name = "sortType", required = false, defaultValue = "LATEST") sortType: FollowSortType,
     ): ResponseEntity<SliceResponse<FollowUserResponse>> {
-        return ResponseEntity.ok(followService.getSliceFollowers(userId, pageable, sortType))
+        return ResponseEntity.ok(followService.getSliceFollowers(loginUserId, userId, pageable, sortType))
     }
 
     @GetMapping("/followings/search")

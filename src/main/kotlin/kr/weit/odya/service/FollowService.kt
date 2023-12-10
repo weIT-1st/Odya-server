@@ -7,6 +7,7 @@ import kr.weit.odya.domain.follow.FollowSortType
 import kr.weit.odya.domain.follow.getByFollowerIdAndFollowingIdIn
 import kr.weit.odya.domain.follow.getByFollowingIdAndFollowerIdIn
 import kr.weit.odya.domain.follow.getFollowerListBySearchCond
+import kr.weit.odya.domain.follow.getFollowingIds
 import kr.weit.odya.domain.follow.getFollowingListBySearchCond
 import kr.weit.odya.domain.follow.getMayKnowFollowings
 import kr.weit.odya.domain.follow.getVisitedFollowingIds
@@ -72,15 +73,18 @@ class FollowService(
 
     @Transactional(readOnly = true)
     fun getSliceFollowings(
+        loginUserId: Long,
         followerId: Long,
         pageable: Pageable,
         sortType: FollowSortType,
     ): SliceResponse<FollowUserResponse> {
+        val followingIds = followRepository.getFollowingIds(loginUserId)
         val followingList = followRepository.getFollowingListBySearchCond(followerId, pageable, sortType)
             .map {
                 FollowUserResponse(
                     it.following,
                     fileService.getPreAuthenticatedObjectUrl(it.following.profile.profileName),
+                    it.follower.id in followingIds,
                 )
             }
         return SliceResponse(pageable, followingList)
@@ -88,15 +92,18 @@ class FollowService(
 
     @Transactional(readOnly = true)
     fun getSliceFollowers(
+        loginUserId: Long,
         followingId: Long,
         pageable: Pageable,
         sortType: FollowSortType,
     ): SliceResponse<FollowUserResponse> {
+        val followingIds = followRepository.getFollowingIds(loginUserId)
         val followerList = followRepository.getFollowerListBySearchCond(followingId, pageable, sortType)
             .map {
                 FollowUserResponse(
                     it.follower,
                     fileService.getPreAuthenticatedObjectUrl(it.follower.profile.profileName),
+                    it.follower.id in followingIds,
                 )
             }
         return SliceResponse(pageable, followerList)
@@ -118,19 +125,27 @@ class FollowService(
                 FollowUserResponse(
                     it.following,
                     fileService.getPreAuthenticatedObjectUrl(it.following.profile.profileName),
+                    true,
                 )
             }
         return SliceResponse(size, followings)
     }
 
     @Transactional(readOnly = true)
-    fun searchByFollowerNickname(userId: Long, nickname: String, size: Int, lastId: Long?): SliceResponse<FollowUserResponse> {
+    fun searchByFollowerNickname(
+        userId: Long,
+        nickname: String,
+        size: Int,
+        lastId: Long?,
+    ): SliceResponse<FollowUserResponse> {
         val usersDocuments = usersDocumentRepository.getByNickname(nickname)
         val userIds = usersDocuments.map { it.id }
+        val followingIds = followRepository.getFollowingIds(userId)
         val followers = followRepository.getByFollowingIdAndFollowerIdIn(userId, userIds, size + 1, lastId).map {
             FollowUserResponse(
                 it.follower,
                 fileService.getPreAuthenticatedObjectUrl(it.follower.profile.profileName),
+                it.follower.id in followingIds,
             )
         }
         return SliceResponse(size, followers)
@@ -146,6 +161,7 @@ class FollowService(
                 FollowUserResponse(
                     it,
                     fileService.getPreAuthenticatedObjectUrl(it.profile.profileName),
+                    false,
                 )
             },
         )
@@ -158,6 +174,7 @@ class FollowService(
             FollowUserResponse(
                 it,
                 fileService.getPreAuthenticatedObjectUrl(it.profile.profileName),
+                true,
             )
         }
         return VisitedFollowingResponse(getVisitedFollowingIds.size, followings)

@@ -1262,11 +1262,11 @@ class UserControllerTest(
                 }
             }
 
-            context("유효한 토큰이면서, 검색할 전화번호를 10개를 넘개 보낸 경우") {
+            context("유효한 토큰이면서, 검색할 전화번호를 30개를 넘개 보낸 경우") {
                 it("400 응답한다.") {
                     restDocMockMvc.get(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
-                        repeat(11) {
+                        repeat(31) {
                             param(PHONE_NUMBERS_PARAM, TEST_PHONE_NUMBER)
                         }
                     }.andExpect {
