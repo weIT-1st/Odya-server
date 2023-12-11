@@ -317,6 +317,7 @@ fun createTravelJournalSummaryResponse(
     TEST_TRAVEL_JOURNAL_END_DATE,
     listOf(TEST_PLACE_ID),
     UserSimpleResponse(user, TEST_FILE_AUTHENTICATED_URL, false),
+    TravelJournalVisibility.PUBLIC,
     listOf(createTravelCompanionSimpleResponse(travelCompanion)),
 )
 
