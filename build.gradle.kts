@@ -48,7 +48,7 @@ dependencies {
     implementation("com.oracle.database.security:osdt_core:19.8.0.0")
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
 
-    implementation("org.flywaydb:flyway-core")
+    implementation("org.flywaydb:flyway-core:10.2.0")
 
     implementation("com.google.firebase:firebase-admin:9.1.1")
     implementation("com.google.maps:google-maps-services:2.2.0")
