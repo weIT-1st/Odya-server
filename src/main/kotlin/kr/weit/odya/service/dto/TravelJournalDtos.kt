@@ -224,6 +224,7 @@ data class TravelJournalSummaryResponse(
     val travelEndDate: LocalDate,
     val placeIds: List<String>,
     val writer: UserSimpleResponse,
+    val visibility: TravelJournalVisibility,
     val travelCompanionSimpleResponses: List<TravelCompanionSimpleResponse>?,
 ) {
     constructor(
@@ -242,6 +243,7 @@ data class TravelJournalSummaryResponse(
         travelJournal.travelEndDate,
         travelJournal.travelJournalContents.mapNotNull { it.placeId },
         UserSimpleResponse(travelJournal.user, writerProfileUrl, isFollowing),
+        travelJournal.visibility,
         travelCompanionSimpleResponses,
     )
 }
