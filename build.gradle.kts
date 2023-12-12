@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.springframework.boot") version "3.1.0"
+    id("org.springframework.boot") version "3.1.6"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jlleitschuh.gradle.ktlint") version "11.2.0"
     id("org.asciidoctor.jvm.convert") version "3.3.2"
@@ -48,7 +48,7 @@ dependencies {
     implementation("com.oracle.database.security:osdt_core:19.8.0.0")
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
 
-    implementation("org.flywaydb:flyway-core")
+    implementation("org.flywaydb:flyway-core:9.16.3")
 
     implementation("com.google.firebase:firebase-admin:9.1.1")
     implementation("com.google.maps:google-maps-services:2.2.0")
@@ -78,7 +78,7 @@ dependencies {
     }
 
     implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.0.1"))
-    implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store")
+    implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store:3.1.0")
     implementation("org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.3")
 
     asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor")
