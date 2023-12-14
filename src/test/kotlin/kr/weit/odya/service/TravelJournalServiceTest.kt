@@ -4,6 +4,7 @@ import com.google.maps.errors.InvalidRequestException
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
@@ -72,6 +73,7 @@ import kr.weit.odya.support.createTravelJournalContentUpdateRequest
 import kr.weit.odya.support.createTravelJournalRequest
 import kr.weit.odya.support.createTravelJournalRequestByContentSize
 import kr.weit.odya.support.createTravelJournalUpdateRequest
+import kr.weit.odya.support.createTravelJournalVisibilityUpdateRequest
 import kr.weit.odya.support.createUpdateImageNamePairs
 import kr.weit.odya.support.createUser
 import org.mockito.ArgumentMatchers.any
@@ -1089,6 +1091,96 @@ class TravelJournalServiceTest : DescribeSpec(
                             placeIds,
                         )
                     }
+                }
+            }
+        }
+
+        describe("updateTravelJournalVisibility") {
+            context("유효한 데이터가 주어지는 경우") {
+                val travelJournal = createTravelJournal()
+                every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns travelJournal
+                every { communityRepository.existsByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns false
+                it("정상적으로 종료한다") {
+                    shouldNotThrowAny {
+                        travelJournalService.updateTravelJournalVisibility(
+                            TEST_TRAVEL_JOURNAL_ID,
+                            TEST_USER_ID,
+                            createTravelJournalVisibilityUpdateRequest(),
+                        )
+                    }
+                    travelJournal.visibility shouldBe TravelJournalVisibility.FRIEND_ONLY
+                }
+            }
+
+            context("요청한 사용자와 작성자가 일치하지 않는 경우") {
+                every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns createTravelJournal()
+                it("[ForbiddenException] 반환한다") {
+                    shouldThrow<ForbiddenException> {
+                        travelJournalService.updateTravelJournalVisibility(
+                            TEST_TRAVEL_JOURNAL_ID,
+                            TEST_OTHER_USER_ID,
+                            createTravelJournalVisibilityUpdateRequest(),
+                        )
+                    }
+                }
+            }
+
+            context("여행일지가 존재하지 않는 경우") {
+                every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } throws NoSuchElementException()
+                it("[NoSuchElementException] 반환한다") {
+                    shouldThrow<NoSuchElementException> {
+                        travelJournalService.updateTravelJournalVisibility(
+                            TEST_TRAVEL_JOURNAL_ID,
+                            TEST_USER_ID,
+                            createTravelJournalVisibilityUpdateRequest(),
+                        )
+                    }
+                }
+            }
+
+            context("커뮤니티에 연결된 여행일지를 비공개로 변경하는 경우") {
+                every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns createTravelJournal()
+                every { communityRepository.existsByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns true
+                it("[IllegalStateException] 반환한다") {
+                    shouldThrow<IllegalStateException> {
+                        travelJournalService.updateTravelJournalVisibility(
+                            TEST_TRAVEL_JOURNAL_ID,
+                            TEST_USER_ID,
+                            createTravelJournalVisibilityUpdateRequest(TravelJournalVisibility.PRIVATE),
+                        )
+                    }
+                }
+            }
+
+            context("커뮤니티에 연결된 여행일지를 친구공개로 변경하는 경우") {
+                val travelJournal = createTravelJournal()
+                every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns travelJournal
+                every { communityRepository.existsByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns true
+                it("정상적으로 종료한다") {
+                    shouldNotThrowAny {
+                        travelJournalService.updateTravelJournalVisibility(
+                            TEST_TRAVEL_JOURNAL_ID,
+                            TEST_USER_ID,
+                            createTravelJournalVisibilityUpdateRequest(),
+                        )
+                    }
+                    travelJournal.visibility shouldBe TravelJournalVisibility.FRIEND_ONLY
+                }
+            }
+
+            context("커뮤니티에 연결되지 않은 여행일지를 비공개로 변경하는 경우") {
+                val travelJournal = createTravelJournal()
+                every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns travelJournal
+                every { communityRepository.existsByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns false
+                it("정상적으로 종료한다") {
+                    shouldNotThrowAny {
+                        travelJournalService.updateTravelJournalVisibility(
+                            TEST_TRAVEL_JOURNAL_ID,
+                            TEST_USER_ID,
+                            createTravelJournalVisibilityUpdateRequest(TravelJournalVisibility.PRIVATE),
+                        )
+                    }
+                    travelJournal.visibility shouldBe TravelJournalVisibility.PRIVATE
                 }
             }
         }

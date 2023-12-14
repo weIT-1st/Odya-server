@@ -61,6 +61,8 @@ interface CommunityRepository : JpaRepository<Community, Long>, CustomCommunityR
     fun deleteAllByUserId(userId: Long)
 
     fun findAllByUserId(userId: Long): List<Community>
+
+    fun existsByTravelJournalId(travelJournalId: Long): Boolean
 }
 
 interface CustomCommunityRepository {

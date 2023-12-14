@@ -10,6 +10,7 @@ import io.mockk.mockk
 import io.mockk.runs
 import jakarta.ws.rs.ForbiddenException
 import kr.weit.odya.domain.traveljournal.TravelJournalSortType
+import kr.weit.odya.domain.traveljournal.TravelJournalVisibility
 import kr.weit.odya.service.ObjectStorageException
 import kr.weit.odya.service.TravelJournalService
 import kr.weit.odya.service.dto.TravelJournalContentUpdateRequest
@@ -66,11 +67,13 @@ import kr.weit.odya.support.createTravelJournalRequestByContentSize
 import kr.weit.odya.support.createTravelJournalRequestFile
 import kr.weit.odya.support.createTravelJournalResponse
 import kr.weit.odya.support.createTravelJournalUpdateRequest
+import kr.weit.odya.support.createTravelJournalVisibilityUpdateRequest
 import kr.weit.odya.support.createUser
 import kr.weit.odya.support.test.BaseTests.UnitControllerTestEnvironment
 import kr.weit.odya.support.test.ControllerTestHelper
 import kr.weit.odya.support.test.RestDocsHelper
 import kr.weit.odya.support.test.RestDocsHelper.Companion.createDocument
+import kr.weit.odya.support.test.RestDocsHelper.Companion.requestBody
 import kr.weit.odya.support.test.RestDocsHelper.Companion.responseBody
 import kr.weit.odya.support.test.example
 import kr.weit.odya.support.test.files
@@ -83,6 +86,7 @@ import kr.weit.odya.support.test.type
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
+import org.springframework.http.MediaType
 import org.springframework.restdocs.ManualRestDocumentation
 import org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
@@ -2597,6 +2601,190 @@ class TravelJournalControllerTest(
                                         "updateContentImageNames(List<String>): 여행 일지 콘텐츠 이미지 이름(Nullable)\n " +
                                         "deleteContentImageIds(List<Long>): 삭제할 여행 일지 콘텐츠 이미지 아이디(Nullable)\n ",
                                     "travel-journal-content-image-update" requestPartDescription "추가할 여행 일지 콘텐츠 이미지" isOptional true,
+                                ),
+                            ),
+                        )
+                }
+            }
+        }
+
+        describe("PATCH /api/v1/travel-journals/{travelJournalId}/visibility") {
+            val targetUri = "/api/v1/travel-journals/{travelJournalId}/visibility"
+            context("유효한 요청이 왔을 경우") {
+                val request = createTravelJournalVisibilityUpdateRequest()
+                every { travelJournalService.updateTravelJournalVisibility(TEST_TRAVEL_JOURNAL_ID, TEST_USER_ID, request) } just runs
+                it("204 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .patch(targetUri, TEST_TRAVEL_JOURNAL_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(
+                                ControllerTestHelper.jsonContent(
+                                    request,
+                                ),
+                            ),
+                    )
+                        .andExpect(status().isNoContent)
+                        .andDo(
+                            RestDocsHelper.createPathDocument(
+                                "travel-journals-visibility-update-success",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "travelJournalId" pathDescription "공개 여부를 수정할 여행 일지의 아이디" example TEST_TRAVEL_JOURNAL_ID,
+                                ),
+                                requestBody(
+                                    "visibility" type JsonFieldType.STRING description "여행 일지 공개 범위" example request.visibility,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효하지 않은 여행일지 id인 경우") {
+                val request = createTravelJournalVisibilityUpdateRequest()
+                it("400 응답한다") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .patch(targetUri, TEST_INVALID_TRAVEL_JOURNAL_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(
+                                ControllerTestHelper.jsonContent(
+                                    request,
+                                ),
+                            ),
+                    )
+                        .andExpect(status().isBadRequest)
+                        .andDo(
+                            RestDocsHelper.createPathDocument(
+                                "travel-journals-visibility-update-fail-invalid-travel-journal-id",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "travelJournalId" pathDescription "유효하지 않은 여행 일지의 아이디" example TEST_INVALID_TRAVEL_JOURNAL_ID,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("존재하지 않는 여행일지 id인 경우") {
+                val request = createTravelJournalVisibilityUpdateRequest()
+                every { travelJournalService.updateTravelJournalVisibility(TEST_TRAVEL_JOURNAL_ID, TEST_USER_ID, request) } throws NoSuchElementException("해당 여행 일지($TEST_TRAVEL_JOURNAL_ID)가 존재하지 않습니다.")
+                it("404 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .patch(targetUri, TEST_TRAVEL_JOURNAL_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(
+                                ControllerTestHelper.jsonContent(
+                                    request,
+                                ),
+                            ),
+                    )
+                        .andExpect(status().isNotFound)
+                        .andDo(
+                            RestDocsHelper.createPathDocument(
+                                "travel-journals-visibility-update-fail-not-found-travel-journal",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "travelJournalId" pathDescription "존재하지 않는 여행일지 id",
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("커뮤니티에 연결된 여행일지를 비공개로 바꾸려고 한 경우") {
+                val request = createTravelJournalVisibilityUpdateRequest(TravelJournalVisibility.PRIVATE)
+                every { travelJournalService.updateTravelJournalVisibility(TEST_TRAVEL_JOURNAL_ID, TEST_USER_ID, request) } throws IllegalStateException("여행 일지가 커뮤니티에 등록되어 있어 비공개로 변경할 수 없습니다.")
+                it("400 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .patch(targetUri, TEST_TRAVEL_JOURNAL_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(
+                                ControllerTestHelper.jsonContent(
+                                    request,
+                                ),
+                            ),
+                    )
+                        .andExpect(status().isBadRequest)
+                        .andDo(
+                            RestDocsHelper.createPathDocument(
+                                "travel-journals-visibility-update-fail-community-connected",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "travelJournalId" pathDescription "공개 여부를 수정할 여행 일지의 아이디" example TEST_TRAVEL_JOURNAL_ID,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("작성자와 요청자가 다른 경우") {
+                val request = createTravelJournalVisibilityUpdateRequest()
+                every { travelJournalService.updateTravelJournalVisibility(TEST_TRAVEL_JOURNAL_ID, TEST_USER_ID, request) } throws ForbiddenException("요청 사용자($TEST_USER_ID)는 해당 요청을 처리할 권한이 없습니다.")
+                it("403 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .patch(targetUri, TEST_TRAVEL_JOURNAL_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(
+                                ControllerTestHelper.jsonContent(
+                                    request,
+                                ),
+                            ),
+                    )
+                        .andExpect(status().isForbidden)
+                        .andDo(
+                            RestDocsHelper.createPathDocument(
+                                "travel-journals-visibility-update-fail-not-same-user",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "작성자가 아닌 사용자 ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "travelJournalId" pathDescription "공개 여부를 수정할 여행 일지의 아이디" example TEST_TRAVEL_JOURNAL_ID,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효하지 않은 토큰인 경우") {
+                val request = createTravelJournalVisibilityUpdateRequest()
+                it("401 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .patch(targetUri, TEST_TRAVEL_JOURNAL_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(
+                                ControllerTestHelper.jsonContent(
+                                    request,
+                                ),
+                            ),
+                    )
+                        .andExpect(status().isUnauthorized)
+                        .andDo(
+                            RestDocsHelper.createPathDocument(
+                                "travel-journals-visibility-update-fail-invalid-token",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "travelJournalId" pathDescription "공개 여부를 수정할 여행 일지의 아이디" example TEST_TRAVEL_JOURNAL_ID,
                                 ),
                             ),
                         )
