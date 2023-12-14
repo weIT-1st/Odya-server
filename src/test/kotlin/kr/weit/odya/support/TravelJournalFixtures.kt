@@ -23,6 +23,7 @@ import kr.weit.odya.service.dto.TravelJournalResponse
 import kr.weit.odya.service.dto.TravelJournalSimpleResponse
 import kr.weit.odya.service.dto.TravelJournalSummaryResponse
 import kr.weit.odya.service.dto.TravelJournalUpdateRequest
+import kr.weit.odya.service.dto.TravelJournalVisibilityUpdateRequest
 import kr.weit.odya.service.dto.UserSimpleResponse
 import org.springframework.mock.web.MockMultipartFile
 import java.io.InputStream
@@ -121,6 +122,12 @@ fun createOtherTravelJournalContentRequest() = createTravelJournalContentRequest
     content = TEST_OTHER_TRAVEL_JOURNAL_CONTENT,
     travelDate = TEST_OTHER_TRAVEL_DATE,
     contentImageNames = listOf(TEST_OTHER_IMAGE_FILE_WEBP),
+)
+
+fun createTravelJournalVisibilityUpdateRequest(
+    visibility: TravelJournalVisibility = TravelJournalVisibility.FRIEND_ONLY,
+) = TravelJournalVisibilityUpdateRequest(
+    visibility = visibility,
 )
 
 fun createImageMap(

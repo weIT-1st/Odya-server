@@ -132,6 +132,17 @@ class CommunityRepositoryTest(
             }
         }
 
+        context("여행일지가 연결된 커뮤니티가 있는지 조회") {
+            expect("여행일지가 연결된 커뮤니티가 없다") {
+                val result = communityRepository.existsByTravelJournalId(travelJournal2.id + 1)
+                result shouldBe false
+            }
+            expect("여행일지가 연결된 커뮤니티가 있다") {
+                val result = communityRepository.existsByTravelJournalId(travelJournal2.id)
+                result shouldBe true
+            }
+        }
+
         context("커뮤니티 목록 조회") {
             expect("공개 커뮤니티와 나의 친구들 커뮤니티 목록을 조회한다.") {
                 val result =

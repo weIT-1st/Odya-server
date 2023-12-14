@@ -46,6 +46,7 @@ import kr.weit.odya.service.dto.TravelJournalRequest
 import kr.weit.odya.service.dto.TravelJournalResponse
 import kr.weit.odya.service.dto.TravelJournalSummaryResponse
 import kr.weit.odya.service.dto.TravelJournalUpdateRequest
+import kr.weit.odya.service.dto.TravelJournalVisibilityUpdateRequest
 import kr.weit.odya.service.dto.UserSimpleResponse
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
@@ -379,6 +380,21 @@ class TravelJournalService(
 
     fun getPlaceDetailsMap(placeIdList: Set<String>): Map<String, PlaceDetails> =
         placeIdList.associateWith { googleMapsClient.findPlaceDetailsByPlaceId(it) }
+
+    @Transactional
+    fun updateTravelJournalVisibility(
+        travelJournalId: Long,
+        userId: Long,
+        travelJournalVisibilityUpdateRequest: TravelJournalVisibilityUpdateRequest,
+    ) {
+        val travelJournal = travelJournalRepository.getByTravelJournalId(travelJournalId)
+        validateUserPermission(travelJournal, userId)
+
+        check(travelJournalVisibilityUpdateRequest.visibility != TravelJournalVisibility.PRIVATE || !communityRepository.existsByTravelJournalId(travelJournalId)) {
+            "여행 일지가 커뮤니티에 등록되어 있어 비공개로 변경할 수 없습니다."
+        }
+        travelJournal.changeTravelJournalInformation(travelJournal.travelJournalInformation.copy(visibility = travelJournalVisibilityUpdateRequest.visibility))
+    }
 
     private fun getTravelJournalContent(
         travelJournal: TravelJournal,

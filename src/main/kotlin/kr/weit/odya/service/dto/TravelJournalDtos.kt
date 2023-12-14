@@ -215,6 +215,11 @@ data class TravelJournalContentUpdateRequest(
     )
 }
 
+data class TravelJournalVisibilityUpdateRequest(
+    @field:NotNull(message = "여행 일지 공개 여부는 필수 입력값입니다.")
+    val visibility: TravelJournalVisibility,
+)
+
 data class TravelJournalSummaryResponse(
     val travelJournalId: Long,
     val title: String,
