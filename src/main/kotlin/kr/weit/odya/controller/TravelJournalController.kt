@@ -13,15 +13,18 @@ import kr.weit.odya.service.dto.TravelJournalRequest
 import kr.weit.odya.service.dto.TravelJournalResponse
 import kr.weit.odya.service.dto.TravelJournalSummaryResponse
 import kr.weit.odya.service.dto.TravelJournalUpdateRequest
+import kr.weit.odya.service.dto.TravelJournalVisibilityUpdateRequest
 import kr.weit.odya.support.validator.NullOrNotBlank
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestPart
@@ -213,6 +216,20 @@ class TravelJournalController(private val travelJournalService: TravelJournalSer
             imageNamePairs,
             placeDetailsMap,
         )
+        return ResponseEntity.noContent().build()
+    }
+
+    @PatchMapping("/{travelJournalId}/visibility")
+    fun updateTravelJournalVisibility(
+        @Positive(message = "travelJournalId는 0보다 커야합니다.")
+        @PathVariable("travelJournalId")
+        travelJournalId: Long,
+        @LoginUserId userId: Long,
+        @Valid
+        @RequestBody
+        travelJournalVisibilityUpdateRequest: TravelJournalVisibilityUpdateRequest,
+    ): ResponseEntity<Void> {
+        travelJournalService.updateTravelJournalVisibility(travelJournalId, userId, travelJournalVisibilityUpdateRequest)
         return ResponseEntity.noContent().build()
     }
 
