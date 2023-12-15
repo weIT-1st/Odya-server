@@ -205,17 +205,11 @@ class CustomTravelJournalRepositoryImpl(private val queryFactory: QueryFactory) 
     }
 
     override fun findTaggedTravelJournalSliceBy(user: User, size: Int, lastId: Long?): List<TravelJournal> = queryFactory.listQuery {
-        select(entity(TravelJournal::class))
-        from(entity(TravelJournal::class))
+        getTravelJournalSliceBaseQuery(lastId, TravelJournalSortType.LATEST, size, null)
         associate(
             entity(TravelJournal::class),
             entity(TravelCompanion::class),
             Relation<TravelJournal, TravelCompanion>("mutableTravelCompanions"),
-        )
-        associate(
-            entity(TravelJournal::class),
-            entity(TravelJournalInformation::class),
-            on(TravelJournal::travelJournalInformation),
         )
         where(
             and(
