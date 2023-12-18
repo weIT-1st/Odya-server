@@ -14,7 +14,9 @@ import kr.weit.odya.support.SORT_TYPE_PARAM
 import kr.weit.odya.support.TEST_BEARER_ID_TOKEN
 import kr.weit.odya.support.TEST_BEARER_INVALID_ID_TOKEN
 import kr.weit.odya.support.TEST_DEFAULT_SIZE
+import kr.weit.odya.support.TEST_INVALID_USER_ID
 import kr.weit.odya.support.TEST_NOT_EXIST_TRAVEL_JOURNAL_ID
+import kr.weit.odya.support.TEST_OTHER_USER_ID
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_BOOKMARK_SORT_TYPE
 import kr.weit.odya.support.TEST_TRAVEL_JOURNAL_ID
 import kr.weit.odya.support.TEST_USER_ID
@@ -34,6 +36,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.HttpHeaders
 import org.springframework.restdocs.ManualRestDocumentation
 import org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post
 import org.springframework.restdocs.payload.JsonFieldType
@@ -225,6 +228,116 @@ class TravelJournalBookmarkControllerTest(
                             ),
                         )
                     }
+                }
+            }
+        }
+
+        describe("GET /api/v1/travel-journal-bookmarks/{userId}") {
+            val targetUri = "/api/v1/travel-journal-bookmarks/{userId}"
+            context("유효한 토큰이면서, 유효한 요청인 경우") {
+                val response = createSliceTravelJournalBookmarkSummaryResponse()
+                every {
+                    travelJournalBookmarkService.getOtherTravelJournalBookmarks(
+                        TEST_USER_ID,
+                        TEST_OTHER_USER_ID,
+                        TEST_DEFAULT_SIZE,
+                        null,
+                        TEST_TRAVEL_JOURNAL_BOOKMARK_SORT_TYPE,
+                    )
+                } returns response
+                it("200을 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_OTHER_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    )
+                        .andExpect(status().isOk)
+                        .andDo(
+                            createPathDocument(
+                                "get-other-travel-journal-bookmarks-success",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "userId" pathDescription "여행일지 즐겨찾기 목록을 조회할 USER ID" example TEST_USER_ID,
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_DEFAULT_SIZE isOptional true,
+                                    LAST_ID_PARAM parameterDescription "마지막 리스트 ID(travelJournalBookmarkId 값)" example "null" isOptional true,
+                                    SORT_TYPE_PARAM parameterDescription "정렬 타입" example TravelJournalBookmarkSortType.values() isOptional true,
+                                ),
+                                responseBody(
+                                    "hasNext" type JsonFieldType.BOOLEAN description "다음 페이지 여부" example response.hasNext,
+                                    "content[].travelJournalBookmarkId" type JsonFieldType.NUMBER description "여행 일지 즐겨찾기 아이디" example response.content[0].travelJournalBookmarkId,
+                                    "content[].travelJournalId" type JsonFieldType.NUMBER description "여행 일지 아이디" example response.content[0].travelJournalId,
+                                    "content[].title" type JsonFieldType.STRING description "여행 일지 제목" example response.content[0].title,
+                                    "content[].travelStartDate" type JsonFieldType.STRING description "여행 시작일" example response.content[0].travelStartDate,
+                                    "content[].travelJournalMainImageUrl" type JsonFieldType.STRING description "여행 일지의 대표 이미지 URL" example response.content[0].travelJournalMainImageUrl,
+                                    "content[].writer.userId" type JsonFieldType.NUMBER description "여행 일지 작성자의 아이디" example response.content[0].writer.userId,
+                                    "content[].writer.nickname" type JsonFieldType.STRING description "여행 일지 작성자의 닉네임" example response.content[0].writer.nickname,
+                                    "content[].writer.isFollowing" type JsonFieldType.BOOLEAN description "사용자 팔로잉 여부" example response.content[0].writer.isFollowing,
+                                    "content[].writer.profile.profileUrl" type JsonFieldType.STRING description "여행 일지 작성자의 프로필 사진" example response.content[0].writer.profile.profileUrl,
+                                    "content[].writer.profile.profileColor.colorHex" type JsonFieldType.STRING description "여행 일지 작성자의 프로필 색상" example response.content[0].writer.profile.profileColor?.colorHex isOptional true,
+                                    "content[].writer.profile.profileColor.red" type JsonFieldType.NUMBER description "여행 일지 작성자의 프로필 색상의 빨간색 값" example response.content[0].writer.profile.profileColor?.red isOptional true,
+                                    "content[].writer.profile.profileColor.green" type JsonFieldType.NUMBER description "여행 일지 작성자의 프로필 색상의 초록색 값" example response.content[0].writer.profile.profileColor?.green isOptional true,
+                                    "content[].writer.profile.profileColor.blue" type JsonFieldType.NUMBER description "여행 일지 작성자의 프로필 색상의 파란색 값" example response.content[0].writer.profile.profileColor?.blue isOptional true,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("양수가 아닌 UserId가 들어온 경우") {
+                it("400을 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_INVALID_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    )
+                        .andExpect(status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "get-other-travel-journal-bookmarks-negative-id",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "userId" pathDescription "양수가 아닌 USER ID" example TEST_INVALID_USER_ID,
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_DEFAULT_SIZE isOptional true,
+                                    LAST_ID_PARAM parameterDescription "마지막 리스트 ID(travelJournalBookmarkId 값)" example "null" isOptional true,
+                                    SORT_TYPE_PARAM parameterDescription "정렬 타입" example TravelJournalBookmarkSortType.values() isOptional true,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효하지 않은 토큰이 주어지는 경우") {
+                it("401을 응답한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_OTHER_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN),
+                    )
+                        .andExpect(status().isUnauthorized)
+                        .andDo(
+                            createPathDocument(
+                                "get-other-travel-journal-bookmarks-invalid-token",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "userId" pathDescription "여행일지 즐겨찾기 목록을 조회할 USER ID" example TEST_USER_ID,
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM parameterDescription "츨력할 리스트 사이즈(default=10)" example TEST_DEFAULT_SIZE isOptional true,
+                                    LAST_ID_PARAM parameterDescription "마지막 리스트 ID(travelJournalBookmarkId 값)" example "null" isOptional true,
+                                    SORT_TYPE_PARAM parameterDescription "정렬 타입" example TravelJournalBookmarkSortType.values() isOptional true,
+                                ),
+                            ),
+                        )
                 }
             }
         }
