@@ -71,7 +71,7 @@ class CustomTravelJournalBookmarkRepositoryImpl(
         sortType: TravelJournalBookmarkSortType,
         user: User,
     ): List<TravelJournalBookmark> = queryFactory.listQuery {
-        getOtherTravelJournalBookmarksliceBaseQuery(size, lastId, sortType)
+        getTravelJournalBookmarksliceBaseQuery(size, lastId, sortType)
         where(
             col(TravelJournalBookmark::user).equal(user),
         )
@@ -85,7 +85,7 @@ class CustomTravelJournalBookmarkRepositoryImpl(
         loginUserId: Long,
     ): List<TravelJournalBookmark> = queryFactory.listQuery {
         val followingIds = getFollowingsSubQuery(loginUserId)
-        getOtherTravelJournalBookmarksliceBaseQuery(size, lastId, sortType)
+        getTravelJournalBookmarksliceBaseQuery(size, lastId, sortType)
         associate(entity(TravelJournalBookmark::class), entity(TravelJournal::class), on(TravelJournalBookmark::travelJournal))
         where(
             and(
@@ -101,7 +101,7 @@ class CustomTravelJournalBookmarkRepositoryImpl(
         )
     }
 
-    private fun CriteriaQueryDsl<TravelJournalBookmark>.getOtherTravelJournalBookmarksliceBaseQuery(
+    private fun CriteriaQueryDsl<TravelJournalBookmark>.getTravelJournalBookmarksliceBaseQuery(
         size: Int,
         lastId: Long?,
         sortType: TravelJournalBookmarkSortType,
