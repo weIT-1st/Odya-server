@@ -13,6 +13,7 @@ import kr.weit.odya.domain.traveljournal.getByTravelJournalId
 import kr.weit.odya.domain.traveljournalbookmark.TravelJournalBookmark
 import kr.weit.odya.domain.traveljournalbookmark.TravelJournalBookmarkRepository
 import kr.weit.odya.domain.traveljournalbookmark.getSliceBy
+import kr.weit.odya.domain.traveljournalbookmark.getSliceByOther
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.support.TEST_DEFAULT_SIZE
@@ -134,6 +135,49 @@ class TravelJournalBookmarkServiceTest : DescribeSpec(
                     it("[NoSuchElementException] 반환한다") {
                         shouldThrow<NoSuchElementException> {
                             travelJournalBookmarkService.getMyTravelJournalBookmarks(
+                                TEST_NOT_EXIST_USER_ID,
+                                TEST_DEFAULT_SIZE,
+                                null,
+                                TEST_TRAVEL_JOURNAL_BOOKMARK_SORT_TYPE,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        describe("getOtherTravelJournalBookmarks") {
+            context("유효한 데이터가 주어지는 경우") {
+                every { userRepository.getByUserId(TEST_USER_ID) } returns TEST_USER
+                every {
+                    travelJournalBookmarkRepository.getSliceByOther(
+                        TEST_DEFAULT_SIZE,
+                        null,
+                        TEST_TRAVEL_JOURNAL_BOOKMARK_SORT_TYPE,
+                        TEST_USER,
+                        TEST_OTHER_USER_ID,
+                    )
+                } returns listOf(createTravelJournalBookmark())
+                every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
+                every { followRepository.findFollowingIdsByFollowerId(TEST_OTHER_USER_ID) } returns listOf(TEST_USER_ID)
+                it("정상적으로 종료한다") {
+                    shouldNotThrowAny {
+                        travelJournalBookmarkService.getOtherTravelJournalBookmarks(
+                            TEST_OTHER_USER_ID,
+                            TEST_USER_ID,
+                            TEST_DEFAULT_SIZE,
+                            null,
+                            TEST_TRAVEL_JOURNAL_BOOKMARK_SORT_TYPE,
+                        )
+                    }
+                }
+
+                context("유저가 존재하지 않는 경우") {
+                    every { userRepository.getByUserId(TEST_NOT_EXIST_USER_ID) } throws NoSuchElementException()
+                    it("[NoSuchElementException] 반환한다") {
+                        shouldThrow<NoSuchElementException> {
+                            travelJournalBookmarkService.getOtherTravelJournalBookmarks(
+                                TEST_OTHER_USER_ID,
                                 TEST_NOT_EXIST_USER_ID,
                                 TEST_DEFAULT_SIZE,
                                 null,

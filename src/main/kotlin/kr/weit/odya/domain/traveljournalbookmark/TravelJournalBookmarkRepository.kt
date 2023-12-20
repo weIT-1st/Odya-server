@@ -6,7 +6,11 @@ import com.linecorp.kotlinjdsl.query.spec.OrderSpec
 import com.linecorp.kotlinjdsl.query.spec.predicate.PredicateSpec
 import com.linecorp.kotlinjdsl.querydsl.CriteriaQueryDsl
 import com.linecorp.kotlinjdsl.querydsl.expression.col
+import com.linecorp.kotlinjdsl.subquery
+import kr.weit.odya.domain.follow.Follow
 import kr.weit.odya.domain.traveljournal.TravelJournal
+import kr.weit.odya.domain.traveljournal.TravelJournalInformation
+import kr.weit.odya.domain.traveljournal.TravelJournalVisibility
 import kr.weit.odya.domain.user.User
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
@@ -17,6 +21,14 @@ fun TravelJournalBookmarkRepository.getSliceBy(
     sortType: TravelJournalBookmarkSortType,
     user: User,
 ): List<TravelJournalBookmark> = findSliceBy(size, lastId, sortType, user)
+
+fun TravelJournalBookmarkRepository.getSliceByOther(
+    size: Int,
+    lastId: Long?,
+    sortType: TravelJournalBookmarkSortType,
+    user: User,
+    loginUserId: Long,
+): List<TravelJournalBookmark> = findSliceByOther(size, lastId, sortType, user, loginUserId)
 
 @Repository
 interface TravelJournalBookmarkRepository :
@@ -40,6 +52,14 @@ interface CustomTravelJournalBookmarkRepository {
         sortType: TravelJournalBookmarkSortType,
         user: User,
     ): List<TravelJournalBookmark>
+
+    fun findSliceByOther(
+        size: Int,
+        lastId: Long?,
+        sortType: TravelJournalBookmarkSortType,
+        user: User,
+        loginUserId: Long,
+    ): List<TravelJournalBookmark>
 }
 
 class CustomTravelJournalBookmarkRepositoryImpl(
@@ -54,6 +74,30 @@ class CustomTravelJournalBookmarkRepositoryImpl(
         getTravelJournalBookmarkSliceBaseQuery(size, lastId, sortType)
         where(
             col(TravelJournalBookmark::user).equal(user),
+        )
+    }
+
+    override fun findSliceByOther(
+        size: Int,
+        lastId: Long?,
+        sortType: TravelJournalBookmarkSortType,
+        user: User,
+        loginUserId: Long,
+    ): List<TravelJournalBookmark> = queryFactory.listQuery {
+        val followingIds = getFollowingsSubQuery(loginUserId)
+        getTravelJournalBookmarkSliceBaseQuery(size, lastId, sortType)
+        associate(entity(TravelJournalBookmark::class), entity(TravelJournal::class), on(TravelJournalBookmark::travelJournal))
+        where(
+            and(
+                col(TravelJournalBookmark::user).equal(user),
+                or(
+                    nestedCol(col(TravelJournal::travelJournalInformation), TravelJournalInformation::visibility).equal(TravelJournalVisibility.PUBLIC),
+                    and(
+                        nestedCol(col(TravelJournal::travelJournalInformation), TravelJournalInformation::visibility).equal(TravelJournalVisibility.FRIEND_ONLY),
+                        nestedCol(col(TravelJournal::user), User::id).`in`(followingIds),
+                    ),
+                ),
+            ),
         )
     }
 
@@ -86,6 +130,12 @@ class CustomTravelJournalBookmarkRepositoryImpl(
         when (sortType) {
             TravelJournalBookmarkSortType.LATEST -> listOf(col(TravelJournalBookmark::id).desc())
         }
+
+    private fun getFollowingsSubQuery(userId: Long) = queryFactory.subquery<Long> {
+        select(nestedCol(col(Follow::following), User::id))
+        from(entity(Follow::class))
+        where(nestedCol(col(Follow::follower), User::id).equal(userId))
+    }
 }
 
 enum class TravelJournalBookmarkSortType(private val description: String) {

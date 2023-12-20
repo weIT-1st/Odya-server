@@ -8,6 +8,7 @@ import kr.weit.odya.domain.traveljournalbookmark.TravelJournalBookmark
 import kr.weit.odya.domain.traveljournalbookmark.TravelJournalBookmarkRepository
 import kr.weit.odya.domain.traveljournalbookmark.TravelJournalBookmarkSortType
 import kr.weit.odya.domain.traveljournalbookmark.getSliceBy
+import kr.weit.odya.domain.traveljournalbookmark.getSliceByOther
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.service.dto.SliceResponse
@@ -50,6 +51,32 @@ class TravelJournalBookmarkService(
         val followingIdList = followRepository.getFollowingIds(userId)
         val journalBookmarkResponses =
             travelJournalBookmarkRepository.getSliceBy(size, lastId, sortType, user).map { bookmark ->
+                val profileUrl = fileService.getPreAuthenticatedObjectUrl(bookmark.user.profile.profileName)
+                val travelJournalMainImageUrl =
+                    fileService.getPreAuthenticatedObjectUrl(bookmark.travelJournal.travelJournalContents[0].travelJournalContentImages[0].contentImage.name)
+                TravelJournalBookmarkSummaryResponse.from(
+                    bookmark,
+                    profileUrl,
+                    travelJournalMainImageUrl,
+                    bookmark.travelJournal.user,
+                    bookmark.user.id in followingIdList,
+                )
+            }
+        return SliceResponse(size, journalBookmarkResponses)
+    }
+
+    @Transactional(readOnly = true)
+    fun getOtherTravelJournalBookmarks(
+        loginUser: Long,
+        userId: Long,
+        size: Int,
+        lastId: Long?,
+        sortType: TravelJournalBookmarkSortType,
+    ): SliceResponse<TravelJournalBookmarkSummaryResponse> {
+        val user = userRepository.getByUserId(userId)
+        val followingIdList = followRepository.getFollowingIds(loginUser)
+        val journalBookmarkResponses =
+            travelJournalBookmarkRepository.getSliceByOther(size, lastId, sortType, user, loginUser).map { bookmark ->
                 val profileUrl = fileService.getPreAuthenticatedObjectUrl(bookmark.user.profile.profileName)
                 val travelJournalMainImageUrl =
                     fileService.getPreAuthenticatedObjectUrl(bookmark.travelJournal.travelJournalContents[0].travelJournalContentImages[0].contentImage.name)
