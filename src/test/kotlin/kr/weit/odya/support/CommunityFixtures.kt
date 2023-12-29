@@ -43,6 +43,7 @@ const val TEST_COMMUNITY_UPDATE_MOCK_FILE_NAME = "update-community-content-image
 const val MIM_COMMUNITY_CONTENT_IMAGE_COUNT = 1
 const val MAX_COMMUNITY_CONTENT_IMAGE_COUNT = 15
 const val TEST_COMMUNITY_LIKE_COUNT = 2
+const val TEST_LIFE_SHOT_COUNT = 10
 const val TEST_IS_USER_LIKED = false
 val TEST_CREATED_DATE: LocalDateTime = LocalDateTime.parse("2021-01-01T00:00:00")
 

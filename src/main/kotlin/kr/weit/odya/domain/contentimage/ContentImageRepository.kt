@@ -27,6 +27,8 @@ fun ContentImageRepository.getImageByRectangle(
 
 interface ContentImageRepository : JpaRepository<ContentImage, Long>, CustomContentImageRepository {
     fun deleteAllByUserId(userId: Long)
+
+    fun countByUserIdAndIsLifeShotIsTrue(userId: Long): Int
 }
 
 interface CustomContentImageRepository {
