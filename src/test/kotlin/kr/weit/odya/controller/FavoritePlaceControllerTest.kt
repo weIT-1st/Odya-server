@@ -24,6 +24,7 @@ import kr.weit.odya.support.TEST_FAVORITE_PLACE_SORT_TYPE
 import kr.weit.odya.support.TEST_INVALID_FAVORITE_PLACE_ID
 import kr.weit.odya.support.TEST_INVALID_LAST_ID
 import kr.weit.odya.support.TEST_INVALID_SIZE
+import kr.weit.odya.support.TEST_INVALID_USER_ID
 import kr.weit.odya.support.TEST_LAST_ID
 import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_SIZE
@@ -561,6 +562,184 @@ class FavoritePlaceControllerTest(
                                 "favorite-place-list-failed-invalid-token",
                                 requestHeaders(
                                     HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM pathDescription "츨력할 리스트 사이즈(default=10)" example TEST_SIZE isOptional true,
+                                    SORT_TYPE_PARAM pathDescription "리스트 정렬기준(default=최신순)" example TEST_FAVORITE_PLACE_SORT_TYPE isOptional true,
+                                    LAST_ID_PARAM pathDescription "마지막 리스트 ID" example TEST_LAST_ID isOptional true,
+                                ),
+                            ),
+                        )
+                }
+            }
+        }
+
+        describe("GET /api/v1/favorite-places/list/{userId}") {
+            val targetUri = "/api/v1/favorite-places/list/{userId}"
+            context("유효한 USERID와 size,sortType,lastId가 전달되면") {
+                val response = createSliceFavoritePlaceResponse()
+                val content = response.content[0]
+                every { favoritePlaceService.getFavoritePlaceList(TEST_USER_ID, TEST_DEFAULT_SIZE, TEST_FAVORITE_PLACE_SORT_TYPE, TEST_LAST_ID) } returns createSliceFavoritePlaceResponse()
+                it("관심장소 리스트를 출력한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .param(LAST_ID_PARAM, TEST_LAST_ID.toString()),
+                    )
+                        .andExpect(status().isOk)
+                        .andDo(
+                            createPathDocument(
+                                "other-favorite-place-list-success",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "userId" pathDescription "조회할 USER ID" example TEST_USER_ID,
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM pathDescription "츨력할 리스트 사이즈(default=10)" example TEST_DEFAULT_SIZE isOptional true,
+                                    SORT_TYPE_PARAM pathDescription "리스트 정렬기준(default=최신순)" example TEST_FAVORITE_PLACE_SORT_TYPE isOptional true,
+                                    LAST_ID_PARAM pathDescription "마지막 리스트 ID" example TEST_LAST_ID isOptional true,
+                                ),
+                                responseBody(
+                                    "hasNext" type JsonFieldType.BOOLEAN description "데이터가 더 존재하는지 여부" example response.hasNext,
+                                    "content[].id" type JsonFieldType.NUMBER description "관심 장소 ID" example content.id,
+                                    "content[].placeId" type JsonFieldType.STRING description "장소 ID" example content.placeId,
+                                    "content[].userId" type JsonFieldType.NUMBER description "유저 ID" example content.userId,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("양수가 아닌 USERID가 전달되면") {
+                it("400을 반환한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_INVALID_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .param(LAST_ID_PARAM, TEST_LAST_ID.toString()),
+                    )
+                        .andExpect(status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "other-favorite-place-list-failed-invalid-id",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "userId" pathDescription "양수가 아닌 USER ID" example TEST_INVALID_USER_ID,
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM pathDescription "츨력할 리스트 사이즈(default=10)" example TEST_DEFAULT_SIZE isOptional true,
+                                    SORT_TYPE_PARAM pathDescription "리스트 정렬기준(default=최신순)" example TEST_FAVORITE_PLACE_SORT_TYPE isOptional true,
+                                    LAST_ID_PARAM pathDescription "마지막 리스트 ID" example TEST_LAST_ID isOptional true,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("양수가 아닌 size가 전달되면") {
+                it("400을 반환한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .param(SIZE_PARAM, TEST_INVALID_SIZE.toString())
+                            .param(LAST_ID_PARAM, TEST_LAST_ID.toString()),
+                    ).andExpect(status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "other-favorite-place-list-failed-invalid-size",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "userId" pathDescription "조회할 USER ID" example TEST_USER_ID,
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM pathDescription "양수가 아닌 츨력할 리스트 사이즈(default=10)" example TEST_INVALID_SIZE isOptional true,
+                                    SORT_TYPE_PARAM pathDescription "리스트 정렬기준(default=최신순)" example TEST_FAVORITE_PLACE_SORT_TYPE isOptional true,
+                                    LAST_ID_PARAM pathDescription "마지막 리스트 ID" example TEST_LAST_ID isOptional true,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효한 USERID와 정의하지 않은 정렬 기준이 전달되면") {
+                it("400을 반환한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .param(SORT_TYPE_PARAM, TEST_FAVORITE_PLACE_INVALID_SORT_TYPE)
+                            .param(LAST_ID_PARAM, TEST_LAST_ID.toString()),
+                    ).andExpect(status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "other-favorite-place-list-failed-invalid-sort-type",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "userId" pathDescription "조회할 USER ID" example TEST_USER_ID,
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM pathDescription "츨력할 리스트 사이즈(default=10)" example TEST_INVALID_SIZE isOptional true,
+                                    SORT_TYPE_PARAM pathDescription "정의되지 않은 정렬기준(default=최신순)" example TEST_FAVORITE_PLACE_INVALID_SORT_TYPE isOptional true,
+                                    LAST_ID_PARAM pathDescription "마지막 리스트 ID" example TEST_LAST_ID isOptional true,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효한 USERID와 양수가 아닌 마지막 ID가 전달되면") {
+                it("400을 반환한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
+                            .param(LAST_ID_PARAM, TEST_INVALID_LAST_ID.toString()),
+                    ).andExpect(status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "other-favorite-place-list-failed-invalid-last-id",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "userId" pathDescription "조회할 USER ID" example TEST_USER_ID,
+                                ),
+                                queryParameters(
+                                    SIZE_PARAM pathDescription "츨력할 리스트 사이즈(default=10)" example TEST_SIZE isOptional true,
+                                    SORT_TYPE_PARAM pathDescription "리스트 정렬기준(default=최신순)" example TEST_FAVORITE_PLACE_SORT_TYPE isOptional true,
+                                    LAST_ID_PARAM pathDescription "양수가 아닌 마지막 리스트 ID" example TEST_INVALID_LAST_ID isOptional true,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효하지 않은 토큰이 전달되면") {
+                it("401을 반환한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN)
+                            .param(LAST_ID_PARAM, TEST_LAST_ID.toString()),
+                    ).andExpect(status().isUnauthorized)
+                        .andDo(
+                            createPathDocument(
+                                "other-favorite-place-list-failed-invalid-token",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "userId" pathDescription "조회할 USER ID" example TEST_USER_ID,
                                 ),
                                 queryParameters(
                                     SIZE_PARAM pathDescription "츨력할 리스트 사이즈(default=10)" example TEST_SIZE isOptional true,
