@@ -116,6 +116,7 @@ data class UserStatisticsResponse(
     val followingsCount: Int,
     val followersCount: Int,
     val odyaCount: Int,
+    val lifeShotCount: Int,
 )
 
 data class SearchPhoneNumberRequest(

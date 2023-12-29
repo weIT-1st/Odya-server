@@ -975,6 +975,7 @@ class UserControllerTest(
                                     "followingsCount" type JsonFieldType.NUMBER description "팔로잉 수" example response.followingsCount,
                                     "followersCount" type JsonFieldType.NUMBER description "팔로워 수" example response.followersCount,
                                     "odyaCount" type JsonFieldType.NUMBER description "총 오댜수" example response.odyaCount,
+                                    "lifeShotCount" type JsonFieldType.NUMBER description "총 인생샷 수" example response.lifeShotCount,
                                 ),
                             ),
                         )

@@ -10,6 +10,7 @@ import io.mockk.mockk
 import io.mockk.runs
 import kr.weit.odya.domain.community.CommunityRepository
 import kr.weit.odya.domain.community.getAllByUserId
+import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowingIds
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
@@ -37,6 +38,7 @@ import kr.weit.odya.support.TEST_FOLLOWER_COUNT
 import kr.weit.odya.support.TEST_FOLLOWING_COUNT
 import kr.weit.odya.support.TEST_ID_TOKEN
 import kr.weit.odya.support.TEST_INVALID_PROFILE_ORIGINAL_NAME
+import kr.weit.odya.support.TEST_LIFE_SHOT_COUNT
 import kr.weit.odya.support.TEST_MOCK_PROFILE_NAME
 import kr.weit.odya.support.TEST_NICKNAME
 import kr.weit.odya.support.TEST_OTHER_USER_ID
@@ -66,6 +68,7 @@ class UserServiceTest : DescribeSpec(
         val followRepository = mockk<FollowRepository>()
         val travelJournalRepository = mockk<TravelJournalRepository>()
         val communityRepository = mockk<CommunityRepository>()
+        val contentImageRepository = mockk<ContentImageRepository>()
         val userService =
             UserService(
                 userRepository,
@@ -76,6 +79,7 @@ class UserServiceTest : DescribeSpec(
                 followRepository,
                 travelJournalRepository,
                 communityRepository,
+                contentImageRepository,
             )
 
         describe("getInformation") {
@@ -368,6 +372,7 @@ class UserServiceTest : DescribeSpec(
                 every { communityRepository.getAllByUserId(TEST_USER_ID) } returns listOf(createCommunity()).onEach { community ->
                     repeat(2) { community.increaseLikeCount() }
                 }
+                every { contentImageRepository.countByUserIdAndIsLifeShotIsTrue(TEST_USER_ID) } returns TEST_LIFE_SHOT_COUNT
                 it("[FollowCountsResponse] 반환한다.") {
                     val response = userService.getStatistics(TEST_USER_ID)
                     response shouldBe createUserStatisticsResponse()
