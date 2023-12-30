@@ -145,6 +145,10 @@ class TravelJournalBookmarkRepositoryTest(
             }
         }
 
+        context("즐겨찾기한 여행일지 ID 조회") {
+            expect("유저와 일치하는 여행일지 ID를 조회한다.") { travelJournalBookmarkRepository.findTravelJournalIdsByUserId(user.id).size shouldBe 3 }
+        }
+
         context("여행일지 즐겨찾기 삭제") {
             expect("유저, 여행일지가 일치하는 여행일지 즐겨찾기를 삭제한다.") {
                 travelJournalBookmarkRepository.deleteByUserAndTravelJournal(user, travelJournal)

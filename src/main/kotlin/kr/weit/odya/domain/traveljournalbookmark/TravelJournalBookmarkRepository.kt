@@ -30,6 +30,8 @@ fun TravelJournalBookmarkRepository.getSliceByOther(
     loginUserId: Long,
 ): List<TravelJournalBookmark> = findSliceByOther(size, lastId, sortType, user, loginUserId)
 
+fun TravelJournalBookmarkRepository.getTravelJournalIds(userId: Long): List<Long> = findTravelJournalIdsByUserId(userId)
+
 @Repository
 interface TravelJournalBookmarkRepository :
     JpaRepository<TravelJournalBookmark, Long>,
@@ -60,6 +62,8 @@ interface CustomTravelJournalBookmarkRepository {
         user: User,
         loginUserId: Long,
     ): List<TravelJournalBookmark>
+
+    fun findTravelJournalIdsByUserId(userId: Long): List<Long>
 }
 
 class CustomTravelJournalBookmarkRepositoryImpl(
@@ -100,6 +104,13 @@ class CustomTravelJournalBookmarkRepositoryImpl(
             ),
         )
     }
+
+    override fun findTravelJournalIdsByUserId(userId: Long): List<Long> =
+        queryFactory.listQuery {
+            select(nestedCol(col(TravelJournalBookmark::travelJournal), TravelJournal::id))
+            from(entity(TravelJournalBookmark::class))
+            where(nestedCol(col(TravelJournalBookmark::user), User::id).equal(userId))
+        }
 
     private fun CriteriaQueryDsl<TravelJournalBookmark>.getTravelJournalBookmarkSliceBaseQuery(
         size: Int,

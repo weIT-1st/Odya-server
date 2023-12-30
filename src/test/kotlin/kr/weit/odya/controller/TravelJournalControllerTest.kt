@@ -1166,6 +1166,7 @@ class TravelJournalControllerTest(
                                 "content[].travelCompanionSimpleResponses[].profileUrl" type JsonFieldType.STRING description "여행 친구의 프로필 사진" example (
                                     response.content[0].travelCompanionSimpleResponses?.get(0)?.profileUrl
                                     ) isOptional true,
+                                "content[].isBookmarked" type JsonFieldType.BOOLEAN description "여행일지 북마크 여부" example response.content[0].isBookmarked,
                             ),
                         )
                     }
@@ -1248,6 +1249,7 @@ class TravelJournalControllerTest(
                                 "content[].travelCompanionSimpleResponses[].profileUrl" type JsonFieldType.STRING description "여행 친구의 프로필 사진" example (
                                     response.content[0].travelCompanionSimpleResponses?.get(0)?.profileUrl
                                     ) isOptional true,
+                                "content[].isBookmarked" type JsonFieldType.BOOLEAN description "여행일지 북마크 여부" example response.content[0].isBookmarked,
                             ),
                         )
                     }
@@ -1356,6 +1358,7 @@ class TravelJournalControllerTest(
                                 "content[].travelCompanionSimpleResponses[].profileUrl" type JsonFieldType.STRING description "여행 친구의 프로필 사진" example (
                                     response.content[0].travelCompanionSimpleResponses?.get(0)?.profileUrl
                                     ) isOptional true,
+                                "content[].isBookmarked" type JsonFieldType.BOOLEAN description "여행일지 북마크 여부" example response.content[0].isBookmarked,
                             ),
                         )
                     }
@@ -1464,6 +1467,7 @@ class TravelJournalControllerTest(
                                 "content[].travelCompanionSimpleResponses[].profileUrl" type JsonFieldType.STRING description "여행 친구의 프로필 사진" example (
                                     response.content[0].travelCompanionSimpleResponses?.get(0)?.profileUrl
                                     ) isOptional true,
+                                "content[].isBookmarked" type JsonFieldType.BOOLEAN description "여행일지 북마크 여부" example response.content[0].isBookmarked,
                             ),
                         )
                     }

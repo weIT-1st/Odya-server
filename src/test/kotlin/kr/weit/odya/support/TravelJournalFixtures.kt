@@ -326,6 +326,7 @@ fun createTravelJournalSummaryResponse(
     UserSimpleResponse(user, TEST_FILE_AUTHENTICATED_URL, false),
     TravelJournalVisibility.PUBLIC,
     listOf(createTravelCompanionSimpleResponse(travelCompanion)),
+    true,
 )
 
 fun createTravelCompanionSimpleResponse(travelCompanion: TravelCompanion): TravelCompanionSimpleResponse =
