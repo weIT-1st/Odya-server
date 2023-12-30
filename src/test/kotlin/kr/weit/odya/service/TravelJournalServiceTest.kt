@@ -33,6 +33,7 @@ import kr.weit.odya.domain.traveljournal.getRecommendTravelJournalSliceBy
 import kr.weit.odya.domain.traveljournal.getTaggedTravelJournalSliceBy
 import kr.weit.odya.domain.traveljournal.getTravelJournalSliceBy
 import kr.weit.odya.domain.traveljournalbookmark.TravelJournalBookmarkRepository
+import kr.weit.odya.domain.traveljournalbookmark.getTravelJournalIds
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.domain.user.getByUserIds
@@ -555,6 +556,7 @@ class TravelJournalServiceTest : DescribeSpec(
                 } returns listOf(TEST_TRAVEL_JOURNAL)
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
                 every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
+                every { travelJournalBookmarkRepository.getTravelJournalIds(TEST_USER_ID) } returns listOf(TEST_TRAVEL_JOURNAL_ID)
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalService.getTravelJournals(
@@ -581,6 +583,7 @@ class TravelJournalServiceTest : DescribeSpec(
                 } returns listOf(TEST_TRAVEL_JOURNAL)
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
                 every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
+                every { travelJournalBookmarkRepository.getTravelJournalIds(TEST_USER_ID) } returns listOf(TEST_TRAVEL_JOURNAL_ID)
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalService.getMyTravelJournals(
@@ -608,6 +611,7 @@ class TravelJournalServiceTest : DescribeSpec(
                 } returns listOf(TEST_TRAVEL_JOURNAL)
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
                 every { followRepository.findFollowingIdsByFollowerId(TEST_OTHER_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
+                every { travelJournalBookmarkRepository.getTravelJournalIds(TEST_OTHER_USER_ID) } returns listOf(TEST_TRAVEL_JOURNAL_ID)
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalService.getFriendTravelJournals(
@@ -637,6 +641,7 @@ class TravelJournalServiceTest : DescribeSpec(
                 } returns listOf(TEST_TRAVEL_JOURNAL)
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
                 every { followRepository.findFollowingIdsByFollowerId(TEST_OTHER_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
+                every { travelJournalBookmarkRepository.getTravelJournalIds(TEST_OTHER_USER_ID) } returns listOf(TEST_TRAVEL_JOURNAL_ID)
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalService.getRecommendTravelJournals(
@@ -655,6 +660,7 @@ class TravelJournalServiceTest : DescribeSpec(
             context("유효한 데이터가 주어지는 경우") {
                 every { userRepository.getByUserId(TEST_USER_ID) } returns TEST_USER
                 every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
+                every { travelJournalBookmarkRepository.getTravelJournalIds(TEST_USER_ID) } returns listOf(TEST_TRAVEL_JOURNAL_ID)
                 every {
                     travelJournalRepository.getTaggedTravelJournalSliceBy(
                         TEST_USER,

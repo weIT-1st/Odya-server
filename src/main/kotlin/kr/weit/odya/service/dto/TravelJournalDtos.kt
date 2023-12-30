@@ -231,6 +231,7 @@ data class TravelJournalSummaryResponse(
     val writer: UserSimpleResponse,
     val visibility: TravelJournalVisibility,
     val travelCompanionSimpleResponses: List<TravelCompanionSimpleResponse>?,
+    val isBookmarked: Boolean,
 ) {
     constructor(
         travelJournal: TravelJournal,
@@ -239,6 +240,7 @@ data class TravelJournalSummaryResponse(
         writerProfileUrl: String,
         travelCompanionSimpleResponses: List<TravelCompanionSimpleResponse>?,
         isFollowing: Boolean,
+        isBookmarked: Boolean,
     ) : this(
         travelJournal.id,
         travelJournal.title,
@@ -250,6 +252,7 @@ data class TravelJournalSummaryResponse(
         UserSimpleResponse(travelJournal.user, writerProfileUrl, isFollowing),
         travelJournal.visibility,
         travelCompanionSimpleResponses,
+        isBookmarked,
     )
 }
 
