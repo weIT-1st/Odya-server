@@ -167,10 +167,7 @@ class TravelJournalService(
         }
 
     @Transactional(readOnly = true)
-    fun getTravelJournal(
-        travelJournalId: Long,
-        userId: Long,
-    ): TravelJournalResponse {
+    fun getTravelJournal(travelJournalId: Long, userId: Long): TravelJournalResponse {
         val travelJournal = travelJournalRepository.getByTravelJournalId(travelJournalId)
         validateUserReadPermission(travelJournal, userId)
         return getTravelJournalResponse(userId, travelJournal)
@@ -237,11 +234,7 @@ class TravelJournalService(
     }
 
     @Transactional(readOnly = true)
-    fun getTaggedTravelJournals(
-        userId: Long,
-        size: Int,
-        lastId: Long?,
-    ): SliceResponse<TaggedTravelJournalResponse> {
+    fun getTaggedTravelJournals(userId: Long, size: Int, lastId: Long?): SliceResponse<TaggedTravelJournalResponse> {
         val user = userRepository.getByUserId(userId)
         val travelJournals = travelJournalRepository.getTaggedTravelJournalSliceBy(user, size, lastId)
         val followingIdList = followRepository.getFollowingIds(userId)
@@ -281,20 +274,18 @@ class TravelJournalService(
         // 이미지 추가
         val register = userRepository.getByUserId(userId)
         val contentImageMap = getContentImageMap(register, imageNamePairs)
-        val newTravelJournalContentImages =
-            getContentImages(
-                travelJournalContentUpdateRequest.updateContentImageNames ?: emptyList(),
-                contentImageMap,
-                placeDetailsMap,
-                travelJournalContentUpdateRequest.placeId,
-            ).map { TravelJournalContentImage(contentImage = it) }
+        val newTravelJournalContentImages = getContentImages(
+            travelJournalContentUpdateRequest.updateContentImageNames ?: emptyList(),
+            contentImageMap,
+            placeDetailsMap,
+            travelJournalContentUpdateRequest.placeId,
+        ).map { TravelJournalContentImage(contentImage = it) }
         travelJournalContent.addTravelJournalContentImages(newTravelJournalContentImages)
 
         // 이미지 삭제
-        val deleteTravelJournalContentImages =
-            travelJournalContent.travelJournalContentImages.filter {
-                travelJournalContentUpdateRequest.deleteContentImageIds?.contains(it.id) == true
-            }
+        val deleteTravelJournalContentImages = travelJournalContent.travelJournalContentImages.filter {
+            travelJournalContentUpdateRequest.deleteContentImageIds?.contains(it.id) == true
+        }
         travelJournalContent.deleteTravelJournalContentImages(deleteTravelJournalContentImages)
 
         // 이미지 Object Storage 삭제
@@ -312,9 +303,7 @@ class TravelJournalService(
         val travelJournal = travelJournalRepository.getByTravelJournalId(travelJournalId)
         val travelJournalContent = getTravelJournalContent(travelJournal, travelJournalContentId)
         validateUserPermission(travelJournal, userId)
-        require(
-            travelJournalContent.travelJournalContentImages.size + travelJournalContentUpdateRequest.updateImageTotalCount <= MAX_TRAVEL_JOURNAL_CONTENT_IMAGE_COUNT,
-        ) {
+        require(travelJournalContent.travelJournalContentImages.size + travelJournalContentUpdateRequest.updateImageTotalCount <= MAX_TRAVEL_JOURNAL_CONTENT_IMAGE_COUNT) {
             "여행 일지 콘텐츠의 이미지 개수(${travelJournalContent.travelJournalContentImages.size})와 추가 이미지 개수(${travelJournalContentUpdateRequest.updateImageTotalCount})의 합은 최대 $MAX_TRAVEL_JOURNAL_CONTENT_IMAGE_COUNT 개까지 등록 가능합니다."
         }
         travelJournalContentUpdateRequest.updateContentImageNames?.forEach {
@@ -331,10 +320,7 @@ class TravelJournalService(
     }
 
     @Transactional
-    fun deleteTravelJournal(
-        travelJournalId: Long,
-        userId: Long,
-    ) {
+    fun deleteTravelJournal(travelJournalId: Long, userId: Long) {
         val travelJournal = travelJournalRepository.getByTravelJournalId(travelJournalId)
         validateUserPermission(travelJournal, userId)
         val travelJournalContentImageNames = getTravelJournalContentImageNames(travelJournal)
@@ -347,11 +333,7 @@ class TravelJournalService(
     }
 
     @Transactional
-    fun deleteTravelJournalContent(
-        travelJournalId: Long,
-        travelJournalContentId: Long,
-        userId: Long,
-    ) {
+    fun deleteTravelJournalContent(travelJournalId: Long, travelJournalContentId: Long, userId: Long) {
         val travelJournal = travelJournalRepository.getByTravelJournalId(travelJournalId)
         validateUserPermission(travelJournal, userId)
         val travelJournalContent = getTravelJournalContent(travelJournal, travelJournalContentId)
@@ -371,10 +353,7 @@ class TravelJournalService(
     }
 
     @Transactional
-    fun removeTravelCompanion(
-        userId: Long,
-        travelJournalId: Long,
-    ) {
+    fun removeTravelCompanion(userId: Long, travelJournalId: Long) {
         val user = userRepository.getByUserId(userId)
         travelCompanionRepository.deleteById(travelJournalRepository.findTravelCompanionId(user, travelJournalId))
     }
@@ -383,23 +362,20 @@ class TravelJournalService(
         travelJournal: TravelJournal,
         travelJournalUpdateRequest: TravelJournalUpdateRequest,
     ) {
-        val deleteTravelCompanionIds =
-            travelJournal.travelCompanions
-                .filter {
-                    !(travelJournalUpdateRequest.travelCompanionIds?.contains(it.user?.id) ?: false) || it.user == null
-                }
-                .map { it.id }
+        val deleteTravelCompanionIds = travelJournal.travelCompanions
+            .filter {
+                !(travelJournalUpdateRequest.travelCompanionIds?.contains(it.user?.id) ?: false) || it.user == null
+            }
+            .map { it.id }
         travelCompanionRepository.deleteAllByIdInBatch(deleteTravelCompanionIds)
 
-        val updateTravelCompanionIds =
-            travelJournalUpdateRequest.travelCompanionIds.orEmpty().filter {
-                travelJournal.travelCompanions.none { travelCompanion -> travelCompanion.user?.id == it }
-            }
-        val newTravelCompanions =
-            getTravelCompanions(
-                updateTravelCompanionIds,
-                travelJournalUpdateRequest.travelCompanionNames,
-            )
+        val updateTravelCompanionIds = travelJournalUpdateRequest.travelCompanionIds.orEmpty().filter {
+            travelJournal.travelCompanions.none { travelCompanion -> travelCompanion.user?.id == it }
+        }
+        val newTravelCompanions = getTravelCompanions(
+            updateTravelCompanionIds,
+            travelJournalUpdateRequest.travelCompanionNames,
+        )
         travelJournal.addTravelCompanions(newTravelCompanions)
     }
 
@@ -415,14 +391,10 @@ class TravelJournalService(
         val travelJournal = travelJournalRepository.getByTravelJournalId(travelJournalId)
         validateUserPermission(travelJournal, userId)
 
-        check(
-            travelJournalVisibilityUpdateRequest.visibility != TravelJournalVisibility.PRIVATE || !communityRepository.existsByTravelJournalId(travelJournalId),
-        ) {
+        check(travelJournalVisibilityUpdateRequest.visibility != TravelJournalVisibility.PRIVATE || !communityRepository.existsByTravelJournalId(travelJournalId)) {
             "여행 일지가 커뮤니티에 등록되어 있어 비공개로 변경할 수 없습니다."
         }
-        travelJournal.changeTravelJournalInformation(
-            travelJournal.travelJournalInformation.copy(visibility = travelJournalVisibilityUpdateRequest.visibility),
-        )
+        travelJournal.changeTravelJournalInformation(travelJournal.travelJournalInformation.copy(visibility = travelJournalVisibilityUpdateRequest.visibility))
     }
 
     private fun getTravelJournalContent(
@@ -439,10 +411,9 @@ class TravelJournalService(
     ) {
         validateUserPermission(travelJournal, userId)
         require(
-            travelJournalUpdateRequest.travelStartDate == travelJournalUpdateRequest.travelEndDate ||
-                travelJournalUpdateRequest.travelStartDate.isBefore(
-                    travelJournalUpdateRequest.travelEndDate,
-                ),
+            travelJournalUpdateRequest.travelStartDate == travelJournalUpdateRequest.travelEndDate || travelJournalUpdateRequest.travelStartDate.isBefore(
+                travelJournalUpdateRequest.travelEndDate,
+            ),
         ) {
             "여행 일지의 시작일(${travelJournalUpdateRequest.travelStartDate})은 종료일(${travelJournalUpdateRequest.travelEndDate})보다 이전이거나 같아야 합니다."
         }
@@ -462,19 +433,13 @@ class TravelJournalService(
         }
     }
 
-    private fun validateUserPermission(
-        travelJournal: TravelJournal,
-        userId: Long,
-    ) {
+    private fun validateUserPermission(travelJournal: TravelJournal, userId: Long) {
         if (travelJournal.user.id != userId) {
             throw ForbiddenException("요청 사용자($userId)는 해당 요청을 처리할 권한이 없습니다.")
         }
     }
 
-    private fun getTravelJournalSimpleResponses(
-        userId: Long,
-        travelJournals: List<TravelJournal>,
-    ): List<TravelJournalSummaryResponse> {
+    private fun getTravelJournalSimpleResponses(userId: Long, travelJournals: List<TravelJournal>): List<TravelJournalSummaryResponse> {
         val followingIdList = followRepository.getFollowingIds(userId)
         val bookmarkIdList = travelJournalBookmarkRepository.getTravelJournalIds(userId)
         return travelJournals.map {
@@ -504,10 +469,7 @@ class TravelJournalService(
                 }
             }
 
-    private fun getTravelJournalResponse(
-        userId: Long,
-        travelJournal: TravelJournal,
-    ): TravelJournalResponse {
+    private fun getTravelJournalResponse(userId: Long, travelJournal: TravelJournal): TravelJournalResponse {
         val travelJournalContentResponses = getTravelJournalContentResponses(travelJournal)
         val followingIdList = followRepository.getFollowingIds(userId)
         val travelCompanionResponses = getTravelCompanionResponses(followingIdList, travelJournal)
@@ -523,10 +485,7 @@ class TravelJournalService(
         )
     }
 
-    private fun getTravelCompanionResponses(
-        followingIdList: List<Long>,
-        travelJournal: TravelJournal,
-    ): List<TravelCompanionResponse> {
+    private fun getTravelCompanionResponses(followingIdList: List<Long>, travelJournal: TravelJournal): List<TravelCompanionResponse> {
         return travelJournal.travelCompanions.map {
             if (it.user != null) {
                 TravelCompanionResponse.fromRegisteredUser(
@@ -564,9 +523,7 @@ class TravelJournalService(
     ): List<TaggedTravelJournalResponse> {
         return travelJournals.map { travelJournal ->
             val mainImageAuthenticatedUrl =
-                fileService.getPreAuthenticatedObjectUrl(
-                    travelJournal.travelJournalContents[0].travelJournalContentImages[0].contentImage.name,
-                )
+                fileService.getPreAuthenticatedObjectUrl(travelJournal.travelJournalContents[0].travelJournalContentImages[0].contentImage.name)
             TaggedTravelJournalResponse(
                 travelJournal.id,
                 travelJournal.title,
@@ -581,10 +538,7 @@ class TravelJournalService(
         }
     }
 
-    private fun validateUserReadPermission(
-        travelJournal: TravelJournal,
-        userId: Long,
-    ) {
+    private fun validateUserReadPermission(travelJournal: TravelJournal, userId: Long) {
         if (travelJournal.visibility == TravelJournalVisibility.PRIVATE && travelJournal.user.id != userId) {
             throw ForbiddenException("비공개 여행 일지는 작성자만 조회할 수 있습니다.")
         }
