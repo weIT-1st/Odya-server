@@ -31,6 +31,7 @@ import kr.weit.odya.domain.traveljournal.getRecommendTravelJournalSliceBy
 import kr.weit.odya.domain.traveljournal.getTaggedTravelJournalSliceBy
 import kr.weit.odya.domain.traveljournal.getTravelJournalSliceBy
 import kr.weit.odya.domain.traveljournalbookmark.TravelJournalBookmarkRepository
+import kr.weit.odya.domain.traveljournalbookmark.getTravelJournalIds
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
@@ -440,6 +441,7 @@ class TravelJournalService(
 
     private fun getTravelJournalSimpleResponses(userId: Long, travelJournals: List<TravelJournal>): List<TravelJournalSummaryResponse> {
         val followingIdList = followRepository.getFollowingIds(userId)
+        val bookmarkIdList = travelJournalBookmarkRepository.getTravelJournalIds(userId)
         return travelJournals.map {
             val companionSimpleResponses = getTravelCompanionSimpleResponses(it)
             TravelJournalSummaryResponse(
@@ -449,6 +451,7 @@ class TravelJournalService(
                 fileService.getPreAuthenticatedObjectUrl(it.user.profile.profileName),
                 companionSimpleResponses,
                 it.user.id in followingIdList,
+                it.id in bookmarkIdList,
             )
         }
     }
