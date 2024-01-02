@@ -2,6 +2,7 @@ package kr.weit.odya.service
 
 import kr.weit.odya.domain.community.CommunityRepository
 import kr.weit.odya.domain.community.getAllByUserId
+import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowingIds
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
@@ -41,6 +42,7 @@ class UserService(
     private val followRepository: FollowRepository,
     private val travelJournalRepository: TravelJournalRepository,
     private val communityRepository: CommunityRepository,
+    private val contentImageRepository: ContentImageRepository,
 ) {
     fun getEmailByIdToken(idToken: String) = firebaseTokenHelper.getEmail(idToken)
 
@@ -123,12 +125,14 @@ class UserService(
             travelJournal.travelJournalContents.count { content -> content.placeId != null }
         }
         val communityLikeCount = communityRepository.getAllByUserId(userId).sumOf { it.likeCount }
+        val lifeShotCount = contentImageRepository.countByUserIdAndIsLifeShotIsTrue(userId)
         return UserStatisticsResponse(
             travelJournalCount = travelJournals.size,
             travelPlaceCount = travelPlaceCount,
             followingsCount = followingsCount,
             followersCount = followersCount,
             odyaCount = communityLikeCount,
+            lifeShotCount = lifeShotCount,
         )
     }
 

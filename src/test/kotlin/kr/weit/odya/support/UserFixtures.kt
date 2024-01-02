@@ -144,6 +144,7 @@ fun createUserStatisticsResponse() = UserStatisticsResponse(
     followingsCount = TEST_FOLLOWING_COUNT,
     followersCount = TEST_FOLLOWER_COUNT,
     odyaCount = TEST_COMMUNITY_LIKE_COUNT,
+    lifeShotCount = TEST_LIFE_SHOT_COUNT,
 )
 
 fun createLifeShotRequest(placeName: String? = TEST_PLACE_NAME) = LifeShotRequest(
