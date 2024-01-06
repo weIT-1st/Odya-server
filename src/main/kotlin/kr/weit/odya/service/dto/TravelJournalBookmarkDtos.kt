@@ -13,6 +13,7 @@ data class TravelJournalBookmarkSummaryResponse(
     val travelStartDate: LocalDate,
     val travelJournalMainImageUrl: String,
     val writer: UserSimpleResponse,
+    val isBookmarked: Boolean,
 ) {
     companion object {
         fun from(
@@ -21,14 +22,15 @@ data class TravelJournalBookmarkSummaryResponse(
             travelJournalMainImageUrl: String,
             user: User,
             isFollowing: Boolean,
-        ) =
-            TravelJournalBookmarkSummaryResponse(
-                travelJournalBookmark.id,
-                travelJournalBookmark.travelJournal.id,
-                travelJournalBookmark.travelJournal.title,
-                travelJournalBookmark.travelJournal.travelStartDate,
-                travelJournalMainImageUrl,
-                UserSimpleResponse(user, profileUrl, isFollowing),
-            )
+            isBookmarked: Boolean,
+        ) = TravelJournalBookmarkSummaryResponse(
+            travelJournalBookmark.id,
+            travelJournalBookmark.travelJournal.id,
+            travelJournalBookmark.travelJournal.title,
+            travelJournalBookmark.travelJournal.travelStartDate,
+            travelJournalMainImageUrl,
+            UserSimpleResponse(user, profileUrl, isFollowing),
+            isBookmarked,
+        )
     }
 }

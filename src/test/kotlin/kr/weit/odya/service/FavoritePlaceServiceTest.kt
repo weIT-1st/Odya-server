@@ -18,6 +18,7 @@ import kr.weit.odya.support.TEST_FAVORITE_PLACE_ID
 import kr.weit.odya.support.TEST_FAVORITE_PLACE_SORT_TYPE
 import kr.weit.odya.support.TEST_LAST_ID
 import kr.weit.odya.support.TEST_NOT_EXIST_USER_ID
+import kr.weit.odya.support.TEST_OTHER_USER_ID
 import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createFavoritePlace
@@ -92,19 +93,66 @@ class FavoritePlaceServiceTest : DescribeSpec(
             }
         }
 
-        describe("getFavoritePlaceList 메소드") {
+        describe("getMyFavoritePlaceList 메소드") {
             context("유효한 USERID와 size,sortType,lastId가 전달되면") {
                 every { userRepository.getByUserId(TEST_USER_ID) } returns user
-                every { favoritePlaceRepository.getByFavoritePlaceList(user, TEST_DEFAULT_SIZE, TEST_FAVORITE_PLACE_SORT_TYPE, TEST_LAST_ID) } returns createFavoritePlaceList()
-                it("관심 장소 수를 출력한다.") {
-                    shouldNotThrowAny { sut.getFavoritePlaceList(TEST_USER_ID, TEST_DEFAULT_SIZE, TEST_FAVORITE_PLACE_SORT_TYPE, TEST_LAST_ID) }
+                every {
+                    favoritePlaceRepository.getByFavoritePlaceList(user, TEST_DEFAULT_SIZE, TEST_FAVORITE_PLACE_SORT_TYPE, TEST_LAST_ID)
+                } returns createFavoritePlaceList()
+                it("관심 장소 목록을 출력한다.") {
+                    shouldNotThrowAny {
+                        sut.getMyFavoritePlaceList(
+                            TEST_USER_ID,
+                            TEST_DEFAULT_SIZE,
+                            TEST_FAVORITE_PLACE_SORT_TYPE,
+                            TEST_LAST_ID,
+                        )
+                    }
                 }
             }
 
             context("가입되지 않은 USERID가 전달되면") {
                 every { userRepository.getByUserId(TEST_NOT_EXIST_USER_ID) } throws NoSuchElementException()
                 it("NoSuchElementException 예외가 발생한다.") {
-                    shouldThrow<NoSuchElementException> { sut.getFavoritePlaceList(TEST_NOT_EXIST_USER_ID, TEST_DEFAULT_SIZE, TEST_FAVORITE_PLACE_SORT_TYPE, TEST_LAST_ID) }
+                    shouldThrow<NoSuchElementException> {
+                        sut.getMyFavoritePlaceList(TEST_NOT_EXIST_USER_ID, TEST_DEFAULT_SIZE, TEST_FAVORITE_PLACE_SORT_TYPE, TEST_LAST_ID)
+                    }
+                }
+            }
+        }
+
+        describe("getFavoritePlaceList 메소드") {
+            context("유효한 USERID와 size,sortType,lastId가 전달되면") {
+                every { userRepository.getByUserId(TEST_USER_ID) } returns user
+                every {
+                    favoritePlaceRepository.getByFavoritePlaceList(user, TEST_DEFAULT_SIZE, TEST_FAVORITE_PLACE_SORT_TYPE, TEST_LAST_ID)
+                } returns createFavoritePlaceList()
+                every { favoritePlaceRepository.existsByUserIdAndPlaceId(TEST_OTHER_USER_ID, TEST_PLACE_ID) } returns true
+                it("관심 장소 목록을 출력한다.") {
+                    shouldNotThrowAny {
+                        sut.getFavoritePlaceList(
+                            TEST_OTHER_USER_ID,
+                            TEST_USER_ID,
+                            TEST_DEFAULT_SIZE,
+                            TEST_FAVORITE_PLACE_SORT_TYPE,
+                            TEST_LAST_ID,
+                        )
+                    }
+                }
+            }
+
+            context("가입되지 않은 USERID가 전달되면") {
+                every { userRepository.getByUserId(TEST_NOT_EXIST_USER_ID) } throws NoSuchElementException()
+                it("NoSuchElementException 예외가 발생한다.") {
+                    shouldThrow<NoSuchElementException> {
+                        sut.getFavoritePlaceList(
+                            TEST_OTHER_USER_ID,
+                            TEST_NOT_EXIST_USER_ID,
+                            TEST_DEFAULT_SIZE,
+                            TEST_FAVORITE_PLACE_SORT_TYPE,
+                            TEST_LAST_ID,
+                        )
+                    }
                 }
             }
         }

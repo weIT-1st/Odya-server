@@ -15,11 +15,13 @@ data class FavoritePlaceResponse(
     val id: Long,
     val placeId: String,
     val userId: Long,
+    val isFavoritePlace: Boolean,
 ) {
-    constructor(favoritePlace: FavoritePlace) : this(
+    constructor(favoritePlace: FavoritePlace, isFavoritePlace: Boolean) : this(
         favoritePlace.id,
         favoritePlace.placeId,
         favoritePlace.registrantsId,
+        isFavoritePlace,
     )
 }
 
