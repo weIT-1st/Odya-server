@@ -82,11 +82,13 @@ class FavoritePlaceController(private val favoritePlaceService: FavoritePlaceSer
         @RequestParam("lastId", required = false)
         lastId: Long?,
     ): ResponseEntity<SliceFavoritePlaceResponse> {
-        return ResponseEntity.ok(favoritePlaceService.getFavoritePlaceList(userId, size, sortType, lastId))
+        return ResponseEntity.ok(favoritePlaceService.getMyFavoritePlaceList(userId, size, sortType, lastId))
     }
 
     @GetMapping("/list/{userId}")
     fun getOtherFavoritePlaceList(
+        @LoginUserId
+        loginUserId: Long,
         @PathVariable("userId")
         @Positive(message = "USER ID는 양수여야 합니다.")
         userId: Long,
@@ -99,6 +101,6 @@ class FavoritePlaceController(private val favoritePlaceService: FavoritePlaceSer
         @RequestParam("lastId", required = false)
         lastId: Long?,
     ): ResponseEntity<SliceFavoritePlaceResponse> {
-        return ResponseEntity.ok(favoritePlaceService.getFavoritePlaceList(userId, size, sortType, lastId))
+        return ResponseEntity.ok(favoritePlaceService.getFavoritePlaceList(loginUserId, userId, size, sortType, lastId))
     }
 }
