@@ -14,6 +14,7 @@ import kr.weit.odya.domain.traveljournalbookmark.TravelJournalBookmark
 import kr.weit.odya.domain.traveljournalbookmark.TravelJournalBookmarkRepository
 import kr.weit.odya.domain.traveljournalbookmark.getSliceBy
 import kr.weit.odya.domain.traveljournalbookmark.getSliceByOther
+import kr.weit.odya.domain.traveljournalbookmark.getTravelJournalIds
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.support.TEST_DEFAULT_SIZE
@@ -35,13 +36,14 @@ class TravelJournalBookmarkServiceTest : DescribeSpec(
         val travelJournalRepository = mockk<TravelJournalRepository>()
         val fileService = mockk<FileService>()
         val followRepository = mockk<FollowRepository>()
-        val travelJournalBookmarkService = TravelJournalBookmarkService(
-            travelJournalBookmarkRepository = travelJournalBookmarkRepository,
-            userRepository = userRepository,
-            travelJournalRepository = travelJournalRepository,
-            fileService = fileService,
-            followRepository,
-        )
+        val travelJournalBookmarkService =
+            TravelJournalBookmarkService(
+                travelJournalBookmarkRepository = travelJournalBookmarkRepository,
+                userRepository = userRepository,
+                travelJournalRepository = travelJournalRepository,
+                fileService = fileService,
+                followRepository,
+            )
 
         describe("createTravelJournalBookmark") {
             context("유효한 데이터가 주어지는 경우") {
@@ -160,6 +162,7 @@ class TravelJournalBookmarkServiceTest : DescribeSpec(
                 } returns listOf(createTravelJournalBookmark())
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
                 every { followRepository.findFollowingIdsByFollowerId(TEST_OTHER_USER_ID) } returns listOf(TEST_USER_ID)
+                every { travelJournalBookmarkRepository.getTravelJournalIds(TEST_USER_ID) } returns listOf(TEST_TRAVEL_JOURNAL_ID)
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalBookmarkService.getOtherTravelJournalBookmarks(

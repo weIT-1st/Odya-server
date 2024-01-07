@@ -16,7 +16,10 @@ import org.springframework.stereotype.Service
 @Service
 class FavoritePlaceService(private val favoritePlaceRepository: FavoritePlaceRepository, private val userRepository: UserRepository) {
     @Transactional
-    fun createFavoritePlace(userId: Long, request: FavoritePlaceRequest) {
+    fun createFavoritePlace(
+        userId: Long,
+        request: FavoritePlaceRequest,
+    ) {
         if (favoritePlaceRepository.existsByUserIdAndPlaceId(userId, request.placeId)) {
             throw ExistResourceException("${request.placeId}: 해당 장소는 이미 관심 장소입니다")
         }
@@ -24,7 +27,10 @@ class FavoritePlaceService(private val favoritePlaceRepository: FavoritePlaceRep
     }
 
     @Transactional
-    fun deleteFavoritePlace(userId: Long, favoritePlaceId: Long) {
+    fun deleteFavoritePlace(
+        userId: Long,
+        favoritePlaceId: Long,
+    ) {
         favoritePlaceRepository.delete(
             favoritePlaceRepository.getByFavoritePlaceId(favoritePlaceId).also { favoritePlace ->
                 require(favoritePlace.registrantsId == userId) { throw ForbiddenException("관심 장소를 삭제할 권한이 없습니다.") }
@@ -32,7 +38,10 @@ class FavoritePlaceService(private val favoritePlaceRepository: FavoritePlaceRep
         )
     }
 
-    fun getFavoritePlace(userId: Long, placeId: String): Boolean {
+    fun getFavoritePlace(
+        userId: Long,
+        placeId: String,
+    ): Boolean {
         return favoritePlaceRepository.existsByUserIdAndPlaceId(userId, placeId)
     }
 
@@ -41,8 +50,35 @@ class FavoritePlaceService(private val favoritePlaceRepository: FavoritePlaceRep
     }
 
     @Transactional
-    fun getFavoritePlaceList(userId: Long, size: Int, sortType: FavoritePlaceSortType, lastId: Long?): SliceFavoritePlaceResponse {
+    fun getMyFavoritePlaceList(
+        userId: Long,
+        size: Int,
+        sortType: FavoritePlaceSortType,
+        lastId: Long?,
+    ): SliceFavoritePlaceResponse {
         val user = userRepository.getByUserId(userId)
-        return SliceFavoritePlaceResponse(size, favoritePlaceRepository.getByFavoritePlaceList(user, size, sortType, lastId).map { FavoritePlaceResponse(it) })
+        return SliceFavoritePlaceResponse(
+            size,
+            favoritePlaceRepository.getByFavoritePlaceList(user, size, sortType, lastId).map {
+                FavoritePlaceResponse(it, true)
+            },
+        )
+    }
+
+    @Transactional
+    fun getFavoritePlaceList(
+        loginUserId: Long,
+        userId: Long,
+        size: Int,
+        sortType: FavoritePlaceSortType,
+        lastId: Long?,
+    ): SliceFavoritePlaceResponse {
+        val user = userRepository.getByUserId(userId)
+        return SliceFavoritePlaceResponse(
+            size,
+            favoritePlaceRepository.getByFavoritePlaceList(user, size, sortType, lastId).map {
+                FavoritePlaceResponse(it, favoritePlaceRepository.existsByUserIdAndPlaceId(loginUserId, it.placeId))
+            },
+        )
     }
 }

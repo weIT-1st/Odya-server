@@ -14,6 +14,7 @@ const val TEST_EXIST_FAVORITE_PLACE_ID = 10L
 const val TEST_FAVORITE_PLACE_COUNT = 1
 val TEST_FAVORITE_PLACE_SORT_TYPE: FavoritePlaceSortType = FavoritePlaceSortType.LATEST
 const val TEST_FAVORITE_PLACE_INVALID_SORT_TYPE = "OLDEST"
+
 fun createFavoritePlace(user: User = createUser()): FavoritePlace {
     return FavoritePlace(TEST_FAVORITE_PLACE_ID, TEST_PLACE_ID, user)
 }
@@ -31,5 +32,5 @@ fun createFavoritePlaceList(): List<FavoritePlace> {
 }
 
 fun createSliceFavoritePlaceResponse(): SliceFavoritePlaceResponse {
-    return SliceFavoritePlaceResponse(TEST_DEFAULT_SIZE, createFavoritePlaceList().map { FavoritePlaceResponse(it) })
+    return SliceFavoritePlaceResponse(TEST_DEFAULT_SIZE, createFavoritePlaceList().map { FavoritePlaceResponse(it, true) })
 }

@@ -9,6 +9,7 @@ import kr.weit.odya.domain.traveljournalbookmark.TravelJournalBookmarkRepository
 import kr.weit.odya.domain.traveljournalbookmark.TravelJournalBookmarkSortType
 import kr.weit.odya.domain.traveljournalbookmark.getSliceBy
 import kr.weit.odya.domain.traveljournalbookmark.getSliceByOther
+import kr.weit.odya.domain.traveljournalbookmark.getTravelJournalIds
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.service.dto.SliceResponse
@@ -25,7 +26,10 @@ class TravelJournalBookmarkService(
     private val followRepository: FollowRepository,
 ) {
     @Transactional
-    fun createTravelJournalBookmark(userId: Long, travelJournalId: Long) {
+    fun createTravelJournalBookmark(
+        userId: Long,
+        travelJournalId: Long,
+    ) {
         val user = userRepository.getByUserId(userId)
         val travelJournal = travelJournalRepository.getByTravelJournalId(travelJournalId)
         if (travelJournalBookmarkRepository.existsByUserAndTravelJournal(user, travelJournal)) {
@@ -53,13 +57,16 @@ class TravelJournalBookmarkService(
             travelJournalBookmarkRepository.getSliceBy(size, lastId, sortType, user).map { bookmark ->
                 val profileUrl = fileService.getPreAuthenticatedObjectUrl(bookmark.user.profile.profileName)
                 val travelJournalMainImageUrl =
-                    fileService.getPreAuthenticatedObjectUrl(bookmark.travelJournal.travelJournalContents[0].travelJournalContentImages[0].contentImage.name)
+                    fileService.getPreAuthenticatedObjectUrl(
+                        bookmark.travelJournal.travelJournalContents[0].travelJournalContentImages[0].contentImage.name,
+                    )
                 TravelJournalBookmarkSummaryResponse.from(
                     bookmark,
                     profileUrl,
                     travelJournalMainImageUrl,
                     bookmark.travelJournal.user,
                     bookmark.user.id in followingIdList,
+                    true,
                 )
             }
         return SliceResponse(size, journalBookmarkResponses)
@@ -75,24 +82,31 @@ class TravelJournalBookmarkService(
     ): SliceResponse<TravelJournalBookmarkSummaryResponse> {
         val user = userRepository.getByUserId(userId)
         val followingIdList = followRepository.getFollowingIds(loginUser)
+        val bookmarkTravelJournalIdList = travelJournalBookmarkRepository.getTravelJournalIds(userId)
         val journalBookmarkResponses =
             travelJournalBookmarkRepository.getSliceByOther(size, lastId, sortType, user, loginUser).map { bookmark ->
                 val profileUrl = fileService.getPreAuthenticatedObjectUrl(bookmark.user.profile.profileName)
                 val travelJournalMainImageUrl =
-                    fileService.getPreAuthenticatedObjectUrl(bookmark.travelJournal.travelJournalContents[0].travelJournalContentImages[0].contentImage.name)
+                    fileService.getPreAuthenticatedObjectUrl(
+                        bookmark.travelJournal.travelJournalContents[0].travelJournalContentImages[0].contentImage.name,
+                    )
                 TravelJournalBookmarkSummaryResponse.from(
                     bookmark,
                     profileUrl,
                     travelJournalMainImageUrl,
                     bookmark.travelJournal.user,
                     bookmark.user.id in followingIdList,
+                    bookmark.travelJournal.id in bookmarkTravelJournalIdList,
                 )
             }
         return SliceResponse(size, journalBookmarkResponses)
     }
 
     @Transactional
-    fun deleteTravelJournalBookmark(userId: Long, travelJournalId: Long) {
+    fun deleteTravelJournalBookmark(
+        userId: Long,
+        travelJournalId: Long,
+    ) {
         val user = userRepository.getByUserId(userId)
         val travelJournal = travelJournalRepository.getByTravelJournalId(travelJournalId)
         travelJournalBookmarkRepository.deleteByUserAndTravelJournal(user, travelJournal)
