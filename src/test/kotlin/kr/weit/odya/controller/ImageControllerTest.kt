@@ -298,11 +298,11 @@ class ImageControllerTest(
 
             context("유효한 토큰이면서, 장소명이 길이 제한을 넘은경우") {
                 it("400 응답한다.") {
-                    val request = createLifeShotRequest(placeName = TEST_TOO_LONG_PHRASE)
+                    val lifeShotRequest = createLifeShotRequest(placeName = TEST_TOO_LONG_PHRASE)
                     restDocMockMvc.perform(
                         RestDocumentationRequestBuilders
                             .post(targetUri, TEST_IMAGE_ID)
-                            .jsonContent(request)
+                            .jsonContent(lifeShotRequest)
                             .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
                     )
                         .andExpect(MockMvcResultMatchers.status().isBadRequest)

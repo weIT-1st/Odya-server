@@ -40,9 +40,6 @@ class ReportCommunityRepositoryTest(
         lateinit var community2: Community
         lateinit var travelJournal1: TravelJournal
         lateinit var travelJournal2: TravelJournal
-        lateinit var reportCommunity1: ReportCommunity
-        lateinit var reportCommunity2: ReportCommunity
-        lateinit var reportCommunity3: ReportCommunity
         lateinit var contentImage1: ContentImage
         lateinit var contentImage2: ContentImage
         beforeEach {
@@ -94,9 +91,9 @@ class ReportCommunityRepositoryTest(
                     listOf(createCommunityContentImage(contentImage2)),
                 ),
             )
-            reportCommunity1 = reportCommunityRepository.save(createReportCommunity(community2, user1))
-            reportCommunity2 = reportCommunityRepository.save(createReportCommunity(community1, user2))
-            reportCommunity3 = reportCommunityRepository.save(createReportCommunity(community2, user3))
+            reportCommunityRepository.save(createReportCommunity(community2, user1))
+            reportCommunityRepository.save(createReportCommunity(community1, user2))
+            reportCommunityRepository.save(createReportCommunity(community2, user3))
         }
 
         context("커뮤니티 신고 여부 조회") {

@@ -37,8 +37,6 @@ class CommunityCommentRepositoryTest(
         lateinit var community: Community
         lateinit var community2: Community
         lateinit var communityComment1: CommunityComment
-        lateinit var communityComment2: CommunityComment
-        lateinit var communityComment3: CommunityComment
 
         beforeEach {
             user = userRepository.save(createUser())
@@ -77,10 +75,8 @@ class CommunityCommentRepositoryTest(
             )
             communityComment1 =
                 communityCommentRepository.save(createCommunityComment(user = user, community = community))
-            communityComment2 =
-                communityCommentRepository.save(createCommunityComment(user = otherUser, community = community2))
-            communityComment3 =
-                communityCommentRepository.save(createCommunityComment(user = otherUser, community = community))
+            communityCommentRepository.save(createCommunityComment(user = otherUser, community = community2))
+            communityCommentRepository.save(createCommunityComment(user = otherUser, community = community))
         }
 
         context("커뮤니티 댓글 조회") {

@@ -28,8 +28,6 @@ class ReportTravelJournalRepositoryTest(
         lateinit var user2: User
         lateinit var user3: User
         lateinit var travelJournal: TravelJournal
-        lateinit var reportTravelJournal1: ReportTravelJournal
-        lateinit var reportTravelJournal2: ReportTravelJournal
         beforeEach {
             user1 = userRepository.save(createUser())
             user2 = userRepository.save(createOtherUser())
@@ -47,8 +45,8 @@ class ReportTravelJournalRepositoryTest(
                     ),
                 ),
             )
-            reportTravelJournal1 = reportTravelJournalRepository.save(createReportTravelJournal(travelJournal, user1))
-            reportTravelJournal2 = reportTravelJournalRepository.save(createReportTravelJournal(travelJournal, user2))
+            reportTravelJournalRepository.save(createReportTravelJournal(travelJournal, user1))
+            reportTravelJournalRepository.save(createReportTravelJournal(travelJournal, user2))
         }
 
         context("여행 일지 신고 수 조회") {
