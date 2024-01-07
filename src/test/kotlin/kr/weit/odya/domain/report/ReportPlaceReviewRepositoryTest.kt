@@ -26,20 +26,16 @@ class ReportPlaceReviewRepositoryTest(
         lateinit var user3: User
         lateinit var placeReview: PlaceReview
         lateinit var placeReview2: PlaceReview
-        lateinit var reportPlaceReview1: ReportPlaceReview
-        lateinit var reportPlaceReview2: ReportPlaceReview
-        lateinit var reportPlaceReview3: ReportPlaceReview
-        lateinit var reportPlaceReview4: ReportPlaceReview
         beforeEach {
             user1 = userRepository.save(createUser())
             user2 = userRepository.save(createOtherUser())
             user3 = userRepository.save(createCustomUser("test_user3", "test_user3"))
             placeReview = placeReviewRepository.save(createPlaceReview(user1))
             placeReview2 = placeReviewRepository.save(createLowestRatingPlaceReview(user2))
-            reportPlaceReview1 = reportPlaceReviewRepository.save(createReportPlaceReview(placeReview, user1))
-            reportPlaceReview2 = reportPlaceReviewRepository.save(createReportPlaceReview(placeReview, user2))
-            reportPlaceReview3 = reportPlaceReviewRepository.save(createReportPlaceReview(placeReview2, user1))
-            reportPlaceReview4 = reportPlaceReviewRepository.save(createReportPlaceReview(placeReview2, user3))
+            reportPlaceReviewRepository.save(createReportPlaceReview(placeReview, user1))
+            reportPlaceReviewRepository.save(createReportPlaceReview(placeReview, user2))
+            reportPlaceReviewRepository.save(createReportPlaceReview(placeReview2, user1))
+            reportPlaceReviewRepository.save(createReportPlaceReview(placeReview2, user3))
         }
 
         context("한줄 리뷰 신고 수 조회") {

@@ -37,9 +37,6 @@ class TravelJournalBookmarkRepositoryTest(
         lateinit var travelJournal: TravelJournal
         lateinit var otherTravelJournal: TravelJournal
         lateinit var otherTravelJournal2: TravelJournal
-        lateinit var travelJournalBookmark: TravelJournalBookmark
-        lateinit var otherTravelJournalBookmark: TravelJournalBookmark
-        lateinit var otherTravelJournalBookmark2: TravelJournalBookmark
         beforeEach {
             user = userRepository.save(createUser())
             loginUser = userRepository.save(createOtherUser())
@@ -94,19 +91,19 @@ class TravelJournalBookmarkRepositoryTest(
             travelJournal = saveTravelJournals[0]
             otherTravelJournal = saveTravelJournals[1]
             otherTravelJournal2 = saveTravelJournals[2]
-            travelJournalBookmark = travelJournalBookmarkRepository.save(
+            travelJournalBookmarkRepository.save(
                 createTravelJournalBookmark(
                     travelJournal = travelJournal,
                     user = user,
                 ),
             )
-            otherTravelJournalBookmark = travelJournalBookmarkRepository.save(
+            travelJournalBookmarkRepository.save(
                 createOtherTravelJournalBookmark(
                     travelJournal = otherTravelJournal,
                     user = user,
                 ),
             )
-            otherTravelJournalBookmark2 = travelJournalBookmarkRepository.save(
+            travelJournalBookmarkRepository.save(
                 createOtherTravelJournalBookmark(
                     travelJournal = otherTravelJournal2,
                     user = user,

@@ -25,7 +25,6 @@ class TravelCompanionRepositoryTest(
         lateinit var otherUser2: User
         lateinit var travelCompanion1: TravelCompanion
         lateinit var travelCompanion2: TravelCompanion
-        lateinit var travelJournal: TravelJournal
 
         beforeEach {
             user = userRepository.save(createUser())
@@ -33,7 +32,7 @@ class TravelCompanionRepositoryTest(
             otherUser2 = userRepository.save(createCustomUser("testUser3", "testUser3"))
             travelCompanion1 = TravelCompanion(0L, otherUser, otherUser.username)
             travelCompanion2 = TravelCompanion(0L, otherUser2, otherUser2.username)
-            travelJournal = travelJournalRepository.save(
+            travelJournalRepository.save(
                 createTravelJournal(
                     user = user,
                     travelCompanions = listOf(
