@@ -38,6 +38,7 @@ val TEST_BIRTHDAY: LocalDate = LocalDate.of(1999, 10, 10)
 val TEST_SOCIAL_TYPE: SocialType = SocialType.KAKAO
 val TEST_USER_ROLE = UserRole.ROLE_USER
 val TEST_USER = createUser()
+val TEST_OTHER_USER = createOtherUser()
 
 fun createUser(profileName: String = TEST_DEFAULT_PROFILE_PNG, id: Long = TEST_USER_ID): User = User(
     id = id,
@@ -92,7 +93,11 @@ fun createProfile(profileId: Long = 0L, profileName: String = TEST_DEFAULT_PROFI
 
 fun createUsersDocument(user: User = createUser()): UsersDocument = UsersDocument(user)
 
-fun createSimpleUserResponse(user: User = createUser(), profileUrl: String = TEST_PROFILE_URL, isFollowing: Boolean = false): UserSimpleResponse =
+fun createSimpleUserResponse(
+    user: User = createUser(),
+    profileUrl: String = TEST_PROFILE_URL,
+    isFollowing: Boolean = false,
+): UserSimpleResponse =
     UserSimpleResponse(
         user = user,
         profileUrl = profileUrl,
