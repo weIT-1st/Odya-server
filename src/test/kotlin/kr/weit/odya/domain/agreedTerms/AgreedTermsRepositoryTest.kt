@@ -16,17 +16,26 @@ import kr.weit.odya.support.createUser
 import kr.weit.odya.support.test.BaseTests.RepositoryTest
 
 @RepositoryTest
-class AgreedTermsRepositoryTest(private val agreedTermsRepository: AgreedTermsRepository, private val userRepository: UserRepository) : ExpectSpec(
+class AgreedTermsRepositoryTest(
+    private val agreedTermsRepository: AgreedTermsRepository,
+    private val userRepository: UserRepository,
+) : ExpectSpec(
     {
         lateinit var requiredAgreedTerms: AgreedTerms
-        lateinit var requiredAgreedTerms2: AgreedTerms
         lateinit var optionalAgreedTerms: AgreedTerms
         lateinit var user: User
         beforeEach {
             user = userRepository.save(createUser())
             requiredAgreedTerms = agreedTermsRepository.save(createAgreedTerms(user))
-            optionalAgreedTerms = agreedTermsRepository.save(createAgreedTerms(user, TEST_OTHER_AGREED_TERMS_ID, createOptionalTerms()))
-            requiredAgreedTerms2 = agreedTermsRepository.save(createAgreedTerms(user, TEST_OTHER_AGREED_TERMS_ID_2, createRequiredTerms(TEST_OTHER_TERMS_ID_2, TEST_REQUIRED_TERMS_TITLE_2)))
+            optionalAgreedTerms =
+                agreedTermsRepository.save(createAgreedTerms(user, TEST_OTHER_AGREED_TERMS_ID, createOptionalTerms()))
+            agreedTermsRepository.save(
+                createAgreedTerms(
+                    user,
+                    TEST_OTHER_AGREED_TERMS_ID_2,
+                    createRequiredTerms(TEST_OTHER_TERMS_ID_2, TEST_REQUIRED_TERMS_TITLE_2),
+                ),
+            )
         }
 
         context("유저가 동의한 약관 전체 조회") {
@@ -45,7 +54,10 @@ class AgreedTermsRepositoryTest(private val agreedTermsRepository: AgreedTermsRe
 
         context("유저가 동의한 약관 삭제") {
             expect("userId와 termsId리스트와 일치하는 동의한 약관 모두 삭제한다") {
-                agreedTermsRepository.deleteAllByUserIdAndTermsIdIn(user.id, setOf(optionalAgreedTerms.id, requiredAgreedTerms.id))
+                agreedTermsRepository.deleteAllByUserIdAndTermsIdIn(
+                    user.id,
+                    setOf(optionalAgreedTerms.id, requiredAgreedTerms.id),
+                )
                 val result = agreedTermsRepository.existsByUserIdAndTermsId(user.id, optionalAgreedTerms.id)
                 val result2 = agreedTermsRepository.existsByUserIdAndTermsId(user.id, requiredAgreedTerms.id)
                 result shouldBe false

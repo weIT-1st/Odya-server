@@ -21,20 +21,44 @@ import kr.weit.odya.support.createUser
 import kr.weit.odya.support.test.BaseTests.RepositoryTest
 
 @RepositoryTest
-class ContentImageRepositoryTest(private val userRepository: UserRepository, private val contentImageRepository: ContentImageRepository) : ExpectSpec(
+class ContentImageRepositoryTest(
+    private val userRepository: UserRepository,
+    private val contentImageRepository: ContentImageRepository,
+) : ExpectSpec(
     {
-        lateinit var contentImage1: ContentImage
         lateinit var contentImage2: ContentImage
         lateinit var user: User
         beforeEach {
             user = userRepository.save(createUser())
-            contentImage1 = contentImageRepository.save(createContentImage(user = user, placeDetails = createPlaceDetails(lat = 10.0, lng = 10.0), isLifeShot = true))
-            contentImage2 = contentImageRepository.save(createContentImage(user = user, placeDetails = createPlaceDetails(lat = 1.0, lng = 1.0), isLifeShot = true, placeName = null))
             contentImageRepository.save(
-                createContentImage(user = user, placeDetails = createPlaceDetails(lat = -1.0, lng = -1.0), isLifeShot = true),
+                createContentImage(
+                    user = user,
+                    placeDetails = createPlaceDetails(lat = 10.0, lng = 10.0),
+                    isLifeShot = true,
+                ),
+            )
+            contentImage2 = contentImageRepository.save(
+                createContentImage(
+                    user = user,
+                    placeDetails = createPlaceDetails(lat = 1.0, lng = 1.0),
+                    isLifeShot = true,
+                    placeName = null,
+                ),
+            )
+            contentImageRepository.save(
+                createContentImage(
+                    user = user,
+                    placeDetails = createPlaceDetails(lat = -1.0, lng = -1.0),
+                    isLifeShot = true,
+                ),
             )
             contentImageRepository.save(createContentImage(user = user))
-            contentImageRepository.save(createContentImage(user = userRepository.save(createOtherUser()), isLifeShot = true))
+            contentImageRepository.save(
+                createContentImage(
+                    user = userRepository.save(createOtherUser()),
+                    isLifeShot = true,
+                ),
+            )
         }
 
         context("contentImage 삭제") {

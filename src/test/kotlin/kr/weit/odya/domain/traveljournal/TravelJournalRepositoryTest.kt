@@ -28,8 +28,6 @@ class TravelJournalRepositoryTest(
         lateinit var otherUser: User
         lateinit var travelJournal: TravelJournal
         lateinit var mySearchTravelJournal: TravelJournal
-        lateinit var otherTravelJournal: TravelJournal
-        lateinit var friendTravelJournal: TravelJournal
         lateinit var friendSearchTravelJournal: TravelJournal
         lateinit var friendLastTravelJournal: TravelJournal
         beforeEach {
@@ -46,7 +44,13 @@ class TravelJournalRepositoryTest(
                         createTravelJournalContent(
                             travelJournalContentImages = listOf(
                                 createTravelJournalContentImage(contentImage = createContentImage(user = user)),
-                                createTravelJournalContentImage(contentImage = createContentImage(name = "test1.webp", originName = "test1.webp", user = user)),
+                                createTravelJournalContentImage(
+                                    contentImage = createContentImage(
+                                        name = "test1.webp",
+                                        originName = "test1.webp",
+                                        user = user,
+                                    ),
+                                ),
                             ),
                         ),
                     ),
@@ -87,7 +91,13 @@ class TravelJournalRepositoryTest(
                             placeId = TEST_SEARCH_PLACE_ID,
                             travelJournalContentImages = listOf(
                                 createTravelJournalContentImage(contentImage = createContentImage(user = user)),
-                                createTravelJournalContentImage(contentImage = createContentImage(name = "test1.webp", originName = "test1.webp", user = user)),
+                                createTravelJournalContentImage(
+                                    contentImage = createContentImage(
+                                        name = "test1.webp",
+                                        originName = "test1.webp",
+                                        user = user,
+                                    ),
+                                ),
                             ),
                         ),
                     ),
@@ -122,8 +132,6 @@ class TravelJournalRepositoryTest(
             )
             val saveTravelJournals = travelJournalRepository.saveAll(travelJournals)
             travelJournal = saveTravelJournals[0]
-            otherTravelJournal = saveTravelJournals[1]
-            friendTravelJournal = saveTravelJournals[2]
             mySearchTravelJournal = saveTravelJournals[3]
             friendSearchTravelJournal = saveTravelJournals[4]
             friendLastTravelJournal = saveTravelJournals[5]
@@ -255,7 +263,10 @@ class TravelJournalRepositoryTest(
 
         context("TravelCompanion Id 조회") {
             expect("UserId와 TravelJournalId가 일치하는 TravelCompanion Id를 조회(존재)") {
-                travelJournalRepository.findByUserIdAndTravelJournalId(otherUser, travelJournal.id) shouldBe travelJournal.travelCompanions[0].id
+                travelJournalRepository.findByUserIdAndTravelJournalId(
+                    otherUser,
+                    travelJournal.id,
+                ) shouldBe travelJournal.travelCompanions[0].id
             }
 
             expect("UserId와 TravelJournalId가 일치하는 TravelCompanion Id를 조회(존재하지 않음)") {
