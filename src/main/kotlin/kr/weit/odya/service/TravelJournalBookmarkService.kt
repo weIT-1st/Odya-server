@@ -82,7 +82,7 @@ class TravelJournalBookmarkService(
     ): SliceResponse<TravelJournalBookmarkSummaryResponse> {
         val user = userRepository.getByUserId(userId)
         val followingIdList = followRepository.getFollowingIds(loginUser)
-        val bookmarkTravelJournalIdList = travelJournalBookmarkRepository.getTravelJournalIds(userId)
+        val bookmarkTravelJournalIdList = travelJournalBookmarkRepository.getTravelJournalIds(loginUser)
         val journalBookmarkResponses =
             travelJournalBookmarkRepository.getSliceByOther(size, lastId, sortType, user, loginUser).map { bookmark ->
                 val profileUrl = fileService.getPreAuthenticatedObjectUrl(bookmark.user.profile.profileName)

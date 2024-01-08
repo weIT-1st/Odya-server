@@ -1,0 +1,58 @@
+[[RepTravelJournal--API]]
+= *RepTravelJournal API*
+
+[[대표-여행일지-생성-API]]
+== *1. 대표 여행일지 생성 API*
+
+=== *1-1 성공*
+
+operation::representative-travel-journal-controller-test/create-rep-travel-journal[snippets='http-request,path-parameters,request-headers,http-response']
+
+=== *1-2 실패 - 자신의 여행일지가 아닌 경우*
+
+operation::representative-travel-journal-controller-test/create-rep-travel-journal-not-my-travel-journal[snippets='http-request,path-parameters,request-headers,http-response']
+
+=== *1-3 실패 - 이미 대표 여행일지로 설정한 여행일지인 경우*
+
+operation::representative-travel-journal-controller-test/create-rep-travel-journal-already-registered[snippets='http-request,path-parameters,request-headers,http-response']
+
+=== *1-4 실패 - 유효하지 않은 토큰이 주어지는 경우*
+
+operation::representative-travel-journal-controller-test/create-rep-travel-journal-invalid-token[snippets='http-request,path-parameters,request-headers,http-response']
+
+[[대표-여행일지-내-목록-조회-API]]
+== *2. 대표 여행일지 내 목록 조회 API*
+
+=== *2-1 성공*
+
+operation::representative-travel-journal-controller-test/get-my-rep-travel-journals-success[snippets='http-request,request-headers,query-parameters,http-response,response-fields']
+
+=== *2-2 실패 - 유효하지 않은 토큰이 주어지는 경우*
+
+operation::representative-travel-journal-controller-test/get-my-rep-travel-journals-invalid-token[snippets='http-request,request-headers,query-parameters,http-response']
+
+[[대표-여행일지-다른-사용자-목록-조회-API]]
+== *3. 대표 여행일지 다른 사용자 목록 조회 API*
+
+=== *3-1 성공*
+
+operation::representative-travel-journal-controller-test/get-other-rep-travel-journals-success[snippets='http-request,request-headers,query-parameters,http-response,response-fields']
+
+=== *3-2 실패 - 유효하지 않은 토큰이 주어지는 경우*
+
+operation::representative-travel-journal-controller-test/get-other-rep-travel-journals-invalid-token[snippets='http-request,request-headers,path-parameters,http-response']
+
+[[대표-여행일지-삭제-API]]
+== *4. 대표 여행일지 삭제 API*
+
+=== *4-1 성공*
+
+operation::representative-travel-journal-controller-test/delete-rep-travel-journal-success[snippets='http-request,path-parameters,request-headers,http-response']
+
+=== *4-2 실패 - 대표 여행일지 작성자와 다른 경우*
+
+operation::representative-travel-journal-controller-test/delete-rep-travel-journal-not-my-rep-travel-journal[snippets='http-request,path-parameters,request-headers,http-response']
+
+=== *4-3 실패 - 유효하지 않은 토큰이 주어지는 경우*
+
+operation::representative-travel-journal-controller-test/delete-rep-travel-journal-invalid-token[snippets='http-request,path-parameters,request-headers,http-response']
