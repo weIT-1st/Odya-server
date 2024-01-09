@@ -162,7 +162,7 @@ class TravelJournalBookmarkServiceTest : DescribeSpec(
                 } returns listOf(createTravelJournalBookmark())
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
                 every { followRepository.findFollowingIdsByFollowerId(TEST_OTHER_USER_ID) } returns listOf(TEST_USER_ID)
-                every { travelJournalBookmarkRepository.getTravelJournalIds(TEST_USER_ID) } returns listOf(TEST_TRAVEL_JOURNAL_ID)
+                every { travelJournalBookmarkRepository.getTravelJournalIds(TEST_OTHER_USER_ID) } returns listOf(TEST_TRAVEL_JOURNAL_ID)
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalBookmarkService.getOtherTravelJournalBookmarks(
