@@ -375,14 +375,13 @@ class FavoritePlaceControllerTest(
                     restDocMockMvc.get(targetUri) {
                         header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN)
                     }.andExpect {
-                        status { isOk() }
+                        status {  isOk() }
                     }.andDo {
                         createDocument(
                             "favorite-place-count-success",
                             requestHeaders(
                                 HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
                             ),
-                            requestBody(),
                         )
                     }
                 }
