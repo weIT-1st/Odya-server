@@ -69,6 +69,15 @@ class FavoritePlaceController(private val favoritePlaceService: FavoritePlaceSer
         return ResponseEntity.ok(favoritePlaceService.getFavoritePlaceCount(userId))
     }
 
+    @GetMapping("/counts/{userId}")
+    fun getFavoriteOtherPlaceCount(
+        @PathVariable("userId")
+        @Positive(message = "USER ID는 양수여야 합니다.")
+        userId: Long,
+    ): ResponseEntity<Int> {
+        return ResponseEntity.ok(favoritePlaceService.getFavoritePlaceCount(userId))
+    }
+
     @GetMapping("/list")
     fun getFavoritePlaceList(
         @LoginUserId
