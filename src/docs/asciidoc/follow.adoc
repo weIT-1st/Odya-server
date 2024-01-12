@@ -164,19 +164,19 @@ operation::follow-controller-test/search-other-followings-fail-invalid-user-id[s
 
 === *9-3 실패 - 닉네임이 공백인 경우*
 
-operation::follow-controller-test/search-followings-fail-nickname-null[snippets='http-request,request-headers,query-parameters,http-response']
+operation::follow-controller-test/search-other-followings-fail-nickname-blank[snippets='http-request,request-headers,path-parameters,query-parameters,http-response']
 
 === *9-4 실패 - 유효하지 않은 마지막 id*
 
-operation::follow-controller-test/search-followings-fail-invalid-last-id[snippets='http-request,request-headers,query-parameters,http-response']
+operation::follow-controller-test/search-other-followings-fail-invalid-last-id[snippets='http-request,request-headers,path-parameters,query-parameters,http-response']
 
 === *9-5 실패 - 유효하지 않은 사이즈*
 
-operation::follow-controller-test/search-followings-fail-invalid-size[snippets='http-request,request-headers,query-parameters,http-response']
+operation::follow-controller-test/search-other-followings-fail-invalid-size[snippets='http-request,request-headers,path-parameters,query-parameters,http-response']
 
 === *9-6 실패 - 유효하지 않은 토큰*
 
-operation::follow-controller-test/search-followings-fail-invalid-token[snippets='http-request,request-headers,query-parameters,http-response']
+operation::follow-controller-test/search-other-followings-fail-invalid-token[snippets='http-request,request-headers,path-parameters,query-parameters,http-response']
 
 [[타인의-팔로워-검색-API]]
 == *10. 타인의 팔로워 검색 API*
@@ -191,19 +191,19 @@ operation::follow-controller-test/search-other-followers-fail-invalid-user-id[sn
 
 === *10-3 실패 - 닉네임이 공백인 경우*
 
-operation::follow-controller-test/search-followers-fail-nickname-null[snippets='http-request,request-headers,query-parameters,http-response']
+operation::follow-controller-test/search-other-followers-fail-nickname-blank[snippets='http-request,request-headers,path-parameters,query-parameters,http-response']
 
 === *10-4 실패 - 유효하지 않은 마지막 id*
 
-operation::follow-controller-test/search-followers-fail-invalid-last-id[snippets='http-request,request-headers,query-parameters,http-response']
+operation::follow-controller-test/search-other-followers-fail-invalid-last-id[snippets='http-request,request-headers,path-parameters,query-parameters,http-response']
 
 === *10-5 실패 - 유효하지 않은 사이즈*
 
-operation::follow-controller-test/search-followers-fail-invalid-size[snippets='http-request,request-headers,query-parameters,http-response']
+operation::follow-controller-test/search-other-followers-fail-invalid-size[snippets='http-request,request-headers,path-parameters,query-parameters,http-response']
 
 === *10-6 실패 - 유효하지 않은 토큰*
 
-operation::follow-controller-test/search-followers-fail-invalid-token[snippets='http-request,request-headers,query-parameters,http-response']
+operation::follow-controller-test/search-other-followers-fail-invalid-token[snippets='http-request,request-headers,path-parameters,query-parameters,http-response']
 
 
 [[알수도-있는-유저-검색-API]]
