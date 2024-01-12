@@ -151,45 +151,100 @@ operation::follow-controller-test/search-followers-fail-invalid-size[snippets='h
 
 operation::follow-controller-test/search-followers-fail-invalid-token[snippets='http-request,request-headers,query-parameters,http-response']
 
-[[알수도-있는-유저-검색-API]]
-== *9. 알수도 있는 유저 검색 API*
+[[타인의-팔로잉-검색-API]]
+== *9. 타인의 팔로잉 검색 API*
 
 === *9-1 성공*
 
+operation::follow-controller-test/search-other-followings-success[snippets='http-request,request-headers,path-parameters,query-parameters,http-response']
+
+=== *9-2 실패 - 검색할 유저 ID가 음수인 경우*
+
+operation::follow-controller-test/search-other-followings-fail-invalid-user-id[snippets='http-request,request-headers,path-parameters,query-parameters,http-response']
+
+=== *9-3 실패 - 닉네임이 공백인 경우*
+
+operation::follow-controller-test/search-followings-fail-nickname-null[snippets='http-request,request-headers,query-parameters,http-response']
+
+=== *9-4 실패 - 유효하지 않은 마지막 id*
+
+operation::follow-controller-test/search-followings-fail-invalid-last-id[snippets='http-request,request-headers,query-parameters,http-response']
+
+=== *9-5 실패 - 유효하지 않은 사이즈*
+
+operation::follow-controller-test/search-followings-fail-invalid-size[snippets='http-request,request-headers,query-parameters,http-response']
+
+=== *9-6 실패 - 유효하지 않은 토큰*
+
+operation::follow-controller-test/search-followings-fail-invalid-token[snippets='http-request,request-headers,query-parameters,http-response']
+
+[[타인의-팔로워-검색-API]]
+== *10. 타인의 팔로워 검색 API*
+
+=== *10-1 성공*
+
+operation::follow-controller-test/search-other-followers-success[snippets='http-request,request-headers,path-parameters,query-parameters,http-response']
+
+=== *10-2 실패 - 검색할 유저 ID가 음수인 경우*
+
+operation::follow-controller-test/search-other-followers-fail-invalid-user-id[snippets='http-request,request-headers,path-parameters,query-parameters,http-response']
+
+=== *10-3 실패 - 닉네임이 공백인 경우*
+
+operation::follow-controller-test/search-followers-fail-nickname-null[snippets='http-request,request-headers,query-parameters,http-response']
+
+=== *10-4 실패 - 유효하지 않은 마지막 id*
+
+operation::follow-controller-test/search-followers-fail-invalid-last-id[snippets='http-request,request-headers,query-parameters,http-response']
+
+=== *10-5 실패 - 유효하지 않은 사이즈*
+
+operation::follow-controller-test/search-followers-fail-invalid-size[snippets='http-request,request-headers,query-parameters,http-response']
+
+=== *10-6 실패 - 유효하지 않은 토큰*
+
+operation::follow-controller-test/search-followers-fail-invalid-token[snippets='http-request,request-headers,query-parameters,http-response']
+
+
+[[알수도-있는-유저-검색-API]]
+== *11. 알수도 있는 유저 검색 API*
+
+=== *11-1 성공*
+
 operation::follow-controller-test/get-may-know-success[snippets='http-request,request-headers,query-parameters,http-response']
 
-=== *9-2 실패 - 유효하지 않은 마지막 id*
+=== *11-2 실패 - 유효하지 않은 마지막 id*
 
 operation::follow-controller-test/get-may-know-fail-invalid-last-id[snippets='http-request,request-headers,query-parameters,http-response']
 
-=== *9-3 실패 - 유효하지 않은 사이즈*
+=== *11-3 실패 - 유효하지 않은 사이즈*
 
 operation::follow-controller-test/get-may-know-fail-invalid-size[snippets='http-request,request-headers,query-parameters,http-response']
 
-=== *9-4 실패 - 가입하지 않은 유저*
+=== *11-4 실패 - 가입하지 않은 유저*
 
 operation::follow-controller-test/get-may-know-fail-not-registered-user[snippets='http-request,request-headers,query-parameters,http-response']
 
-=== *9-5 실패 - 유효하지 않은 토큰*
+=== *11-5 실패 - 유효하지 않은 토큰*
 
 operation::follow-controller-test/get-may-know-fail-invalid-token[snippets='http-request,request-headers,query-parameters,http-response']
 
 [[방문한-친구수-조회-API]]
 
-== *10. 방문한 친구수 조회 API*
+== *12. 방문한 친구수 조회 API*
 
-=== *10-1 성공*
+=== *12-1 성공*
 
 operation::follow-controller-test/get-visited-followings-success[snippets='http-request,request-headers,path-parameters,http-response']
 
-=== *10-2 실패 - 잘못된 장소 Id*
+=== *12-2 실패 - 잘못된 장소 Id*
 
 operation::follow-controller-test/get-visited-followings-fail-invalid-placeId[snippets='http-request,request-headers,path-parameters,http-response']
 
-=== *10-3 실패 - 가입되어 있지 않은 USER*
+=== *12-3 실패 - 가입되어 있지 않은 USER*
 
 operation::follow-controller-test/get-visited-followings-fail-not-registered-user[snippets='http-request,request-headers,path-parameters,http-response']
 
-=== *10-4 실패 - 유효하지 않은 토큰*
+=== *12-4 실패 - 유효하지 않은 토큰*
 
 operation::follow-controller-test/get-visited-followings-fail-invalid-token[snippets='http-request,request-headers,path-parameters,http-response']
