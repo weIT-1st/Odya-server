@@ -12,6 +12,7 @@ import jakarta.persistence.Index
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
+import jakarta.persistence.OrderBy
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
 import kr.weit.odya.domain.user.User
@@ -58,6 +59,7 @@ class TravelJournal(
     val travelCompanions: List<TravelCompanion>
         get() = mutableTravelCompanions
 
+    @OrderBy("travel_date ASC")
     @OneToMany(cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE], orphanRemoval = true)
     @JoinColumn(name = "travel_journal_id", nullable = false, updatable = false, columnDefinition = "NUMERIC(19, 0)")
     private val mutableTravelJournalContents: MutableList<TravelJournalContent> = travelJournalContents.toMutableList()
@@ -86,5 +88,9 @@ class TravelJournal(
 
     fun addTravelCompanions(travelCompanions: List<TravelCompanion>) {
         mutableTravelCompanions.addAll(travelCompanions)
+    }
+
+    fun addTravelJournalContent(travelJournalContent: TravelJournalContent) {
+        mutableTravelJournalContents.add(travelJournalContent)
     }
 }
