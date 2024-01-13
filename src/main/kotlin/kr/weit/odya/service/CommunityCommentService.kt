@@ -1,6 +1,9 @@
 package kr.weit.odya.service
 
 import jakarta.ws.rs.ForbiddenException
+import kr.weit.odya.client.push.NotificationEventType
+import kr.weit.odya.client.push.PushNotificationEvent
+import kr.weit.odya.domain.community.Community
 import kr.weit.odya.domain.community.CommunityRepository
 import kr.weit.odya.domain.community.getByCommunityId
 import kr.weit.odya.domain.communitycomment.CommunityComment
@@ -9,11 +12,13 @@ import kr.weit.odya.domain.communitycomment.getCommunityCommentBy
 import kr.weit.odya.domain.communitycomment.getSliceCommunityCommentBy
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowingIds
+import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.service.dto.CommunityCommentRequest
 import kr.weit.odya.service.dto.CommunityCommentResponse
 import kr.weit.odya.service.dto.SliceResponse
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -24,18 +29,21 @@ class CommunityCommentService(
     private val userRepository: UserRepository,
     private val fileService: FileService,
     private val followRepository: FollowRepository,
+    private val eventPublisher: ApplicationEventPublisher,
 ) {
     @Transactional
     fun createCommunityComment(userId: Long, communityId: Long, request: CommunityCommentRequest): Long {
         val community = communityRepository.getByCommunityId(communityId)
         val user = userRepository.getByUserId(userId)
-        return communityCommentRepository.save(
+        val communityComment = communityCommentRepository.save(
             CommunityComment(
                 content = request.content,
                 user = user,
                 community = community,
             ),
-        ).id
+        )
+        publishCommentPushEvent(user, community, communityComment)
+        return communityComment.id
     }
 
     @Transactional(readOnly = true)
@@ -76,5 +84,24 @@ class CommunityCommentService(
         if (communityComment.user.id != userId) {
             throw ForbiddenException("요청 사용자($userId)는 해당 커뮤니티 댓글(${communityComment.id})을 처리할 권한이 없습니다.")
         }
+    }
+
+    private fun publishCommentPushEvent(
+        commentWriter: User,
+        community: Community,
+        communityComment: CommunityComment,
+    ) {
+        val token = community.user.fcmToken ?: return
+        eventPublisher.publishEvent(
+            PushNotificationEvent(
+                title = "댓글 알림",
+                body = "${commentWriter.nickname}님이 댓글을 남겼습니다 : ${communityComment.content}",
+                tokens = listOf(token),
+                userName = commentWriter.nickname,
+                eventType = NotificationEventType.COMMUNITY_COMMENT,
+                communityId = community.id,
+                content = communityComment.content,
+            ),
+        )
     }
 }
