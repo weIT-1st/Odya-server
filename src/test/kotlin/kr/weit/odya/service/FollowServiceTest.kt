@@ -224,8 +224,9 @@ class FollowServiceTest : DescribeSpec(
                     )
                 } returns listOf(createFollow(following = user))
                 every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
+                every { followRepository.findFollowingIdsByFollowerId(TEST_OTHER_USER_ID) } returns listOf(TEST_ANOTHER_USER_ID)
                 it("유저를 조회 한다") {
-                    shouldNotThrowAny { followService.searchByFollowingNickname(TEST_USER_ID, TEST_NICKNAME, 10, null) }
+                    shouldNotThrowAny { followService.searchByFollowingNickname(TEST_OTHER_USER_ID, TEST_USER_ID, TEST_NICKNAME, 10, null) }
                 }
             }
         }
@@ -236,9 +237,17 @@ class FollowServiceTest : DescribeSpec(
                 every { usersDocumentRepository.getByNickname(TEST_NICKNAME) } returns listOf(createUsersDocument(user))
                 every { followRepository.getByFollowingIdAndFollowerIdIn(any(), any(), any(), any()) } returns listOf(createFollow(following = user))
                 every { fileService.getPreAuthenticatedObjectUrl(TEST_DEFAULT_PROFILE_PNG) } returns TEST_PROFILE_URL
-                every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
+                every { followRepository.findFollowingIdsByFollowerId(TEST_OTHER_USER_ID) } returns listOf(TEST_ANOTHER_USER_ID)
                 it("유저를 조회 한다") {
-                    shouldNotThrowAny { followService.searchByFollowerNickname(TEST_USER_ID, TEST_NICKNAME, TEST_DEFAULT_SIZE, null) }
+                    shouldNotThrowAny {
+                        followService.searchByFollowerNickname(
+                            TEST_OTHER_USER_ID,
+                            TEST_USER_ID,
+                            TEST_NICKNAME,
+                            TEST_DEFAULT_SIZE,
+                            null,
+                        )
+                    }
                 }
             }
         }
