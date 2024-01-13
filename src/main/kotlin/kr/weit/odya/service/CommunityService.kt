@@ -2,6 +2,7 @@ package kr.weit.odya.service
 
 import jakarta.ws.rs.ForbiddenException
 import kr.weit.odya.client.GoogleMapsClient
+import kr.weit.odya.client.push.NotificationEventType
 import kr.weit.odya.client.push.PushNotificationEvent
 import kr.weit.odya.domain.community.Community
 import kr.weit.odya.domain.community.CommunityContentImage
@@ -389,7 +390,9 @@ class CommunityService(
                 title = "피드 알림",
                 body = "${user.nickname}님이 피드를 작성했어요!",
                 tokens = fcmTokens,
-                data = mapOf("communityId" to community.id.toString()),
+                userName = user.nickname,
+                eventType = NotificationEventType.FOLLOWING_COMMUNITY,
+                communityId = community.id,
             ),
         )
     }

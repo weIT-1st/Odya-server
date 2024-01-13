@@ -1,5 +1,6 @@
 package kr.weit.odya.service
 
+import kr.weit.odya.client.push.NotificationEventType
 import kr.weit.odya.client.push.PushNotificationEvent
 import kr.weit.odya.domain.follow.Follow
 import kr.weit.odya.domain.follow.FollowRepository
@@ -54,9 +55,11 @@ class FollowService(
         eventPublisher.publishEvent(
             PushNotificationEvent(
                 title = "팔로우 알림",
-                body = "${follower.nickname}님이 팔로우 했어요!",
-                token = token,
-                data = mapOf("followerId" to follower.id.toString()),
+                body = "${follower.nickname}님이 회원님을 팔로우했습니다",
+                tokens = listOf(token),
+                userName = follower.nickname,
+                eventType = NotificationEventType.FOLLOWER_ADD,
+                followerId = follower.id,
             ),
         )
     }

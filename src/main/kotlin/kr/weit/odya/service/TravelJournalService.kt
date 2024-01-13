@@ -3,6 +3,7 @@ package kr.weit.odya.service
 import com.google.maps.model.PlaceDetails
 import jakarta.ws.rs.ForbiddenException
 import kr.weit.odya.client.GoogleMapsClient
+import kr.weit.odya.client.push.NotificationEventType
 import kr.weit.odya.client.push.PushNotificationEvent
 import kr.weit.odya.domain.community.CommunityRepository
 import kr.weit.odya.domain.contentimage.ContentImage
@@ -562,7 +563,9 @@ class TravelJournalService(
                     title = "같이간 친구 알림",
                     body = "${user.nickname}님이 여행 일지에 같이간 친구로 등록했어요!",
                     tokens = fcmTokens,
-                    data = mapOf("travelJournalId" to travelJournal.id.toString()),
+                    userName = user.nickname,
+                    eventType = NotificationEventType.TRAVEL_JOURNAL_TAG,
+                    travelJournalId = travelJournal.id,
                 )
             },
         )
@@ -573,7 +576,9 @@ class TravelJournalService(
                 title = "여행일지 알림",
                 body = "${user.nickname}님이 여행 일지를 작성했어요!",
                 tokens = followRepository.getFollowerFcmTokens(user.id),
-                data = mapOf("travelJournalId" to travelJournal.id.toString()),
+                userName = user.nickname,
+                eventType = NotificationEventType.FOLLOWING_TRAVEL_JOURNAL,
+                travelJournalId = travelJournal.id,
             ),
         )
     }
