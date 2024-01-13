@@ -8,6 +8,7 @@ import kr.weit.odya.security.LoginUserId
 import kr.weit.odya.service.TravelJournalService
 import kr.weit.odya.service.dto.SliceResponse
 import kr.weit.odya.service.dto.TaggedTravelJournalResponse
+import kr.weit.odya.service.dto.TravelJournalContentRequest
 import kr.weit.odya.service.dto.TravelJournalContentUpdateRequest
 import kr.weit.odya.service.dto.TravelJournalRequest
 import kr.weit.odya.service.dto.TravelJournalResponse
@@ -15,6 +16,7 @@ import kr.weit.odya.service.dto.TravelJournalSummaryResponse
 import kr.weit.odya.service.dto.TravelJournalUpdateRequest
 import kr.weit.odya.service.dto.TravelJournalVisibilityUpdateRequest
 import kr.weit.odya.support.validator.NullOrNotBlank
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -215,6 +217,43 @@ class TravelJournalController(private val travelJournalService: TravelJournalSer
         return ResponseEntity.noContent().build()
     }
 
+    @PostMapping(path = ["/{travelJournalId}"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun addTravelJournalContent(
+        @Positive(message = "travelJournalId는 0보다 커야합니다.")
+        @PathVariable("travelJournalId")
+        travelJournalId: Long,
+        @LoginUserId userId: Long,
+        @RequestPart("travel-journal-content")
+        travelJournalContentRequest: TravelJournalContentRequest,
+        @Size(min = 1, max = 15, message = "이미지는 최소 1개, 최대 15개까지 업로드할 수 있습니다.")
+        @RequestPart("travel-journal-content-image")
+        images: List<MultipartFile>,
+    ): ResponseEntity<Void> {
+        val imageMap = travelJournalService.getImageMap(images)
+        travelJournalService.validateTravelJournalContentRequest(
+            travelJournalId,
+            userId,
+            travelJournalContentRequest,
+            imageMap,
+        )
+        val imageNamePairs = travelJournalService.uploadTravelContentImages(
+            travelJournalContentRequest.contentImageNames,
+            imageMap,
+        )
+        val placeDetailsMap =
+            travelJournalService.getPlaceDetailsMap(
+                travelJournalContentRequest.placeId?.let { setOf(it) }
+                    ?: emptySet(),
+            )
+        travelJournalService.addTravelJournalContent(
+            travelJournalId,
+            travelJournalContentRequest,
+            imageNamePairs,
+            placeDetailsMap,
+        )
+        return ResponseEntity.status(HttpStatus.CREATED).build()
+    }
+
     @PatchMapping("/{travelJournalId}/visibility")
     fun updateTravelJournalVisibility(
         @Positive(message = "travelJournalId는 0보다 커야합니다.")
@@ -225,7 +264,11 @@ class TravelJournalController(private val travelJournalService: TravelJournalSer
         @RequestBody
         travelJournalVisibilityUpdateRequest: TravelJournalVisibilityUpdateRequest,
     ): ResponseEntity<Void> {
-        travelJournalService.updateTravelJournalVisibility(travelJournalId, userId, travelJournalVisibilityUpdateRequest)
+        travelJournalService.updateTravelJournalVisibility(
+            travelJournalId,
+            userId,
+            travelJournalVisibilityUpdateRequest,
+        )
         return ResponseEntity.noContent().build()
     }
 

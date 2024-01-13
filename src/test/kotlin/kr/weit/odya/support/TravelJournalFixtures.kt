@@ -63,6 +63,7 @@ const val TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_MOCK_FILE_NAME = "travel-journal-co
 val TEST_TRAVEL_CONTENT_IMAGE_MAP = createImageMap(TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME)
 val TEST_TRAVEL_JOURNAL = createTravelJournal()
 const val TEST_TRAVEL_JOURNAL_REQUEST_NAME = "travel-journal"
+const val TEST_TRAVEL_JOURNAL_CONTENT_REQUEST_NAME = "travel-journal-content"
 const val TEST_TRAVEL_JOURNAL_UPDATE_REQUEST_NAME = "travel-journal-update"
 const val TEST_TRAVEL_JOURNAL_CONTENT_UPDATE_REQUEST_NAME = "travel-journal-content-update"
 const val MAX_TRAVEL_DAYS = 15
@@ -252,6 +253,20 @@ fun createOtherTravelJournalContentImage(contentImage: ContentImage = createCont
 fun createTravelJournalRequestFile(
     name: String = TEST_TRAVEL_JOURNAL_REQUEST_NAME,
     originalFileName: String? = TEST_TRAVEL_JOURNAL_REQUEST_NAME,
+    contentType: String? = TEST_FILE_CONTENT_TYPE,
+    contentStream: InputStream,
+): MockMultipartFile {
+    return MockMultipartFile(
+        name,
+        originalFileName,
+        contentType,
+        contentStream,
+    )
+}
+
+fun createTravelJournalContentRequestFile(
+    name: String = TEST_TRAVEL_JOURNAL_CONTENT_REQUEST_NAME,
+    originalFileName: String? = TEST_TRAVEL_JOURNAL_CONTENT_REQUEST_NAME,
     contentType: String? = TEST_FILE_CONTENT_TYPE,
     contentStream: InputStream,
 ): MockMultipartFile {
