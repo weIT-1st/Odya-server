@@ -87,7 +87,7 @@ class FollowService(
                 FollowUserResponse(
                     it.following,
                     fileService.getPreAuthenticatedObjectUrl(it.following.profile.profileName),
-                    it.follower.id in followingIds,
+                    it.following.id in followingIds,
                 )
             }
         return SliceResponse(pageable, followingList)
