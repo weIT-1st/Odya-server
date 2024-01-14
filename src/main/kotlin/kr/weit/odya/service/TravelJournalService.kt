@@ -13,6 +13,8 @@ import kr.weit.odya.domain.follow.getFollowerFcmTokens
 import kr.weit.odya.domain.follow.getFollowingIds
 import kr.weit.odya.domain.report.ReportTravelJournalRepository
 import kr.weit.odya.domain.report.deleteAllByUserId
+import kr.weit.odya.domain.representativetraveljournal.RepresentativeTravelJournalRepository
+import kr.weit.odya.domain.representativetraveljournal.getRepTravelJournalIds
 import kr.weit.odya.domain.traveljournal.TravelCompanion
 import kr.weit.odya.domain.traveljournal.TravelCompanionRepository
 import kr.weit.odya.domain.traveljournal.TravelJournal
@@ -74,6 +76,7 @@ class TravelJournalService(
     private val travelCompanionRepository: TravelCompanionRepository,
     private val googleMapsClient: GoogleMapsClient,
     private val travelJournalBookmarkRepository: TravelJournalBookmarkRepository,
+    private val repTravelJournalRepository: RepresentativeTravelJournalRepository,
 ) {
     @Transactional
     fun createTravelJournal(
@@ -201,7 +204,7 @@ class TravelJournalService(
         val travelJournals = travelJournalRepository.getMyTravelJournalSliceBy(userId, size, lastId, placeId, sortType)
         return SliceResponse(
             size,
-            getTravelJournalSimpleResponses(userId, travelJournals),
+            getMyTravelJournalSimpleResponses(userId, travelJournals),
         )
     }
 
@@ -504,6 +507,18 @@ class TravelJournalService(
         }
     }
 
+    private fun getMyTravelJournalSimpleResponses(
+        userId: Long,
+        travelJournals: List<TravelJournal>,
+    ): List<TravelJournalSummaryResponse> {
+        val repTravelJournalIds = repTravelJournalRepository.getRepTravelJournalIds(userId)
+        return getTravelJournalSimpleResponses(userId, travelJournals).map {
+            it.copy(
+                isRepresentative = it.travelJournalId in repTravelJournalIds,
+            )
+        }
+    }
+
     private fun getTravelJournalSimpleResponses(
         userId: Long,
         travelJournals: List<TravelJournal>,
@@ -520,6 +535,7 @@ class TravelJournalService(
                 companionSimpleResponses,
                 it.user.id in followingIdList,
                 it.id in bookmarkIdList,
+                false,
             )
         }
     }
@@ -543,9 +559,12 @@ class TravelJournalService(
         val travelCompanionResponses = getTravelCompanionResponses(followingIdList, travelJournal)
         val isBookmarked =
             travelJournalBookmarkRepository.existsByUserIdAndTravelJournal(userId, travelJournal)
+        val isRepresentative =
+            repTravelJournalRepository.existsByUserIdAndTravelJournal(userId, travelJournal)
         return TravelJournalResponse(
             travelJournal,
             isBookmarked,
+            isRepresentative,
             fileService.getPreAuthenticatedObjectUrl(travelJournal.user.profile.profileName),
             travelJournalContentResponses,
             travelCompanionResponses,
