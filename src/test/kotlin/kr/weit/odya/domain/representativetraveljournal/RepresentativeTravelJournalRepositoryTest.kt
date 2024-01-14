@@ -126,6 +126,10 @@ class RepresentativeTravelJournalRepositoryTest(
                     loginUser.id,
                 ).size shouldBe 2
             }
+
+            expect("유저 아이디와 일치하는 대표여행일지 아이디를 조회한다.") {
+                repTravelJournalRepository.getRepTravelJournalIds(loginUser.id).size shouldBe 1
+            }
         }
     },
 )
