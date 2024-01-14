@@ -211,7 +211,6 @@ operation::travel-journal-controller-test/get-tagged-travel-journals-fail-invali
 
 operation::travel-journal-controller-test/get-tagged-travel-journals-fail-invalid-token[snippets='http-request,request-headers,query-parameters,http-response']
 
-
 [[여행일지수정-API]]
 == *8. 여행 일지 수정 API*
 
@@ -282,86 +281,117 @@ operation::travel-journal-controller-test/travel-journal-content-update-fail-not
 
 operation::travel-journal-controller-test/travel-journal-content-update-fail-invalid-token[snippets='http-request,request-headers,path-parameters,request-parts,http-response']
 
-[[여행일지-공개범위-수정-API]]
-== *10. 여행 일지 공개 범위 수정 API*
+[[여행일지콘텐츠수정-API]]
+== *10. 여행 일지 콘텐츠 추가 API*
 
 === *10-1 성공*
 
+operation::travel-journal-controller-test/add-travel-journals-content-success[snippets='http-request,request-headers,path-parameters,request-parts,http-response']
+
+=== *10-2 실패 - 여행일지 작성자가 아닌 경우*
+
+operation::travel-journal-controller-test/add-travel-journals-content-fail-not-same-user[snippets='http-request,request-headers,path-parameters,request-parts,http-response']
+
+=== *10-3 실패 - 여행일지 콘텐츠 이미지가 225개를 넘어가는 경우*
+
+operation::travel-journal-controller-test/add-travel-journals-content-fail-over-max-image-count[snippets='http-request,request-headers,path-parameters,request-parts,http-response']
+
+=== *10-4 실패 - 요청 여행일지 콘텐츠 이미지 이름과 이미지 파일의 이름이 다른 경우*
+
+operation::travel-journal-controller-test/add-travel-journals-content-fail-not-same-image-name[snippets='http-request,request-headers,path-parameters,request-parts,http-response']
+
+=== *10-5 실패 - 여행 콘텐츠 일자가 여행 시작일과 종료일 사이에 없는 경우*
+
+operation::travel-journal-controller-test/add-travel-journals-content-fail-travel-date-not-between-start-date-and-end-date[snippets='http-request,request-headers,path-parameters,request-parts,http-response']
+
+=== *10-6 실패 - 요청 여행일지 콘텐츠의 위도 개수와 경도 개수가 다른 경우*
+
+operation::travel-journal-controller-test/add-travel-journals-content-fail-not-same-size-of-latitudes-and-longitudes[snippets='http-request,request-headers,path-parameters,request-parts,http-response']
+
+=== *10-7 실패 - 유효하지 않은 토큰일 경우*
+
+operation::travel-journal-controller-test/add-travel-journals-content-fail-invalid-token[snippets='http-request,request-headers,path-parameters,request-parts,http-response']
+
+[[여행일지-공개범위-수정-API]]
+== *11. 여행 일지 공개 범위 수정 API*
+
+=== *11-1 성공*
+
 operation::travel-journal-controller-test/travel-journals-visibility-update-success[snippets='http-request,request-headers,path-parameters,request-body,http-response']
 
-=== *10-2 실패 - 유효하지 않은 여행일지 id인 경우*
+=== *11-2 실패 - 유효하지 않은 여행일지 id인 경우*
 
 operation::travel-journal-controller-test/travel-journals-visibility-update-fail-invalid-travel-journal-id[snippets='http-request,request-headers,path-parameters,request-body,http-response']
 
-=== *10-3 실패 - 존재하지 않는 여행일지 id인 경우*
+=== *11-3 실패 - 존재하지 않는 여행일지 id인 경우*
 
 operation::travel-journal-controller-test/travel-journals-visibility-update-fail-not-found-travel-journal[snippets='http-request,request-headers,path-parameters,request-body,http-response']
 
-=== *10-4 실패 - 커뮤니티에 연결된 여행일지를 비공개로 바꾸려고 한 경우*
+=== *11-4 실패 - 커뮤니티에 연결된 여행일지를 비공개로 바꾸려고 한 경우*
 
 operation::travel-journal-controller-test/travel-journals-visibility-update-fail-community-connected[snippets='http-request,request-headers,path-parameters,request-body,http-response']
 
-=== *10-5 실패 - 작성자와 요청자가 다른 경우*
+=== *11-5 실패 - 작성자와 요청자가 다른 경우*
 
 operation::travel-journal-controller-test/travel-journals-visibility-update-fail-not-same-user[snippets='http-request,request-headers,path-parameters,request-body,http-response']
 
-=== *10-6 실패 - 유효하지 않은 토큰일 경우*
+=== *11-6 실패 - 유효하지 않은 토큰일 경우*
 
 operation::travel-journal-controller-test/travel-journals-visibility-update-fail-invalid-token[snippets='http-request,request-headers,path-parameters,request-body,http-response']
 
 [[여행일지삭제-API]]
-== *11. 여행 일지 삭제 API*
+== *12. 여행 일지 삭제 API*
 
-=== *11-1 성공*
+=== *12-1 성공*
 
 operation::travel-journal-controller-test/travel-journals-delete-success[snippets='http-request,request-headers,path-parameters,http-response']
 
-=== *11-2 실패 - 작성자와 요청자가 다른 경우*
+=== *12-2 실패 - 작성자와 요청자가 다른 경우*
 
 operation::travel-journal-controller-test/travel-journals-delete-fail-not-same-user[snippets='http-request,request-headers,path-parameters,http-response']
 
-=== *11-3 실패 - 유효하지 않은 토큰일 경우*
+=== *12-3 실패 - 유효하지 않은 토큰일 경우*
 
 operation::travel-journal-controller-test/travel-journals-delete-fail-invalid-token[snippets='http-request,request-headers,path-parameters,http-response']
 
 [[여행일지콘텐츠삭제-API]]
-== *12. 여행 일지 콘텐츠 삭제 API*
+== *13. 여행 일지 콘텐츠 삭제 API*
 
-=== *12-1 성공*
+=== *13-1 성공*
 
 operation::travel-journal-controller-test/travel-journal-content-delete-success[snippets='http-request,request-headers,path-parameters,http-response']
 
-=== *12-2 실패 - 작성자와 요청자가 다른 경우*
+=== *13-2 실패 - 작성자와 요청자가 다른 경우*
 
 operation::travel-journal-controller-test/travel-journal-content-delete-fail-not-same-user[snippets='http-request,request-headers,path-parameters,http-response']
 
-=== *12-3 실패 - 여행 일지 콘텐츠 아이디와 일치하는 여행 일지 콘텐츠가 없는 경우*
+=== *13-3 실패 - 여행 일지 콘텐츠 아이디와 일치하는 여행 일지 콘텐츠가 없는 경우*
 
 operation::travel-journal-controller-test/travel-journal-content-delete-fail-not-found[snippets='http-request,request-headers,path-parameters,http-response']
 
-=== *12-4 실패 - 유효하지 않은 토큰일 경우*
+=== *13-4 실패 - 유효하지 않은 토큰일 경우*
 
 operation::travel-journal-controller-test/travel-journal-content-delete-fail-invalid-token[snippets='http-request,request-headers,path-parameters,http-response']
 
 [[여행일지같이간친구삭제-API]]
-== *13. 여행 일지 같이 간 친구 삭제 API*
+== *14. 여행 일지 같이 간 친구 삭제 API*
 
-=== *13-1 성공*
+=== *14-1 성공*
 
 operation::travel-journal-controller-test/travel-journal-remove-travel-companion-success[snippets='http-request,request-headers,path-parameters,http-response']
 
-=== *13-2 실패 - 양수가 아닌 여행 일지 ID가 들어온 경우*
+=== *14-2 실패 - 양수가 아닌 여행 일지 ID가 들어온 경우*
 
 operation::travel-journal-controller-test/travel-journal-remove-travel-companion-fail-invalid-id[snippets='http-request,request-headers,path-parameters,http-response']
 
-=== *13-3 실패 - 해당 여행일지의 같이 간 친구를 처리할 권한이 없는 경우*
+=== *14-3 실패 - 해당 여행일지의 같이 간 친구를 처리할 권한이 없는 경우*
 
 operation::travel-journal-controller-test/travel-journal-remove-travel-companion-fail-no-permission[snippets='http-request,request-headers,path-parameters,http-response']
 
-=== *13-4 실패 - 존재하지 않는 유저ID가 들어온 경우*
+=== *14-4 실패 - 존재하지 않는 유저ID가 들어온 경우*
 
 operation::travel-journal-controller-test/travel-journal-remove-travel-companion-fail-not-found[snippets='http-request,request-headers,path-parameters,http-response']
 
-=== *13-5 실패 - 유효하지 않은 토큰일 경우*
+=== *14-5 실패 - 유효하지 않은 토큰일 경우*
 
 operation::travel-journal-controller-test/travel-journal-remove-travel-companion-fail-invalid-token[snippets='http-request,request-headers,path-parameters,http-response']

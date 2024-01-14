@@ -43,6 +43,7 @@ import kr.weit.odya.support.TEST_FILE_AUTHENTICATED_URL
 import kr.weit.odya.support.TEST_GENERATED_FILE_NAME
 import kr.weit.odya.support.TEST_IMAGE_FILE_WEBP
 import kr.weit.odya.support.TEST_OTHER_IMAGE_FILE_WEBP
+import kr.weit.odya.support.TEST_OTHER_TRAVEL_JOURNAL_ID
 import kr.weit.odya.support.TEST_OTHER_USER_ID
 import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_TRAVEL_COMPANION_IDS
@@ -556,7 +557,9 @@ class TravelJournalServiceTest : DescribeSpec(
                 } returns listOf(TEST_TRAVEL_JOURNAL)
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
                 every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
-                every { travelJournalBookmarkRepository.getTravelJournalIds(TEST_USER_ID) } returns listOf(TEST_TRAVEL_JOURNAL_ID)
+                every { travelJournalBookmarkRepository.getTravelJournalIds(TEST_USER_ID) } returns listOf(
+                    TEST_TRAVEL_JOURNAL_ID,
+                )
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalService.getTravelJournals(
@@ -583,7 +586,9 @@ class TravelJournalServiceTest : DescribeSpec(
                 } returns listOf(TEST_TRAVEL_JOURNAL)
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
                 every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
-                every { travelJournalBookmarkRepository.getTravelJournalIds(TEST_USER_ID) } returns listOf(TEST_TRAVEL_JOURNAL_ID)
+                every { travelJournalBookmarkRepository.getTravelJournalIds(TEST_USER_ID) } returns listOf(
+                    TEST_TRAVEL_JOURNAL_ID,
+                )
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalService.getMyTravelJournals(
@@ -610,8 +615,12 @@ class TravelJournalServiceTest : DescribeSpec(
                     )
                 } returns listOf(TEST_TRAVEL_JOURNAL)
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
-                every { followRepository.findFollowingIdsByFollowerId(TEST_OTHER_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
-                every { travelJournalBookmarkRepository.getTravelJournalIds(TEST_OTHER_USER_ID) } returns listOf(TEST_TRAVEL_JOURNAL_ID)
+                every { followRepository.findFollowingIdsByFollowerId(TEST_OTHER_USER_ID) } returns listOf(
+                    TEST_OTHER_USER_ID,
+                )
+                every { travelJournalBookmarkRepository.getTravelJournalIds(TEST_OTHER_USER_ID) } returns listOf(
+                    TEST_TRAVEL_JOURNAL_ID,
+                )
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalService.getFriendTravelJournals(
@@ -640,8 +649,12 @@ class TravelJournalServiceTest : DescribeSpec(
                     )
                 } returns listOf(TEST_TRAVEL_JOURNAL)
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
-                every { followRepository.findFollowingIdsByFollowerId(TEST_OTHER_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
-                every { travelJournalBookmarkRepository.getTravelJournalIds(TEST_OTHER_USER_ID) } returns listOf(TEST_TRAVEL_JOURNAL_ID)
+                every { followRepository.findFollowingIdsByFollowerId(TEST_OTHER_USER_ID) } returns listOf(
+                    TEST_OTHER_USER_ID,
+                )
+                every { travelJournalBookmarkRepository.getTravelJournalIds(TEST_OTHER_USER_ID) } returns listOf(
+                    TEST_TRAVEL_JOURNAL_ID,
+                )
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalService.getRecommendTravelJournals(
@@ -660,7 +673,9 @@ class TravelJournalServiceTest : DescribeSpec(
             context("유효한 데이터가 주어지는 경우") {
                 every { userRepository.getByUserId(TEST_USER_ID) } returns TEST_USER
                 every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
-                every { travelJournalBookmarkRepository.getTravelJournalIds(TEST_USER_ID) } returns listOf(TEST_TRAVEL_JOURNAL_ID)
+                every { travelJournalBookmarkRepository.getTravelJournalIds(TEST_USER_ID) } returns listOf(
+                    TEST_TRAVEL_JOURNAL_ID,
+                )
                 every {
                     travelJournalRepository.getTaggedTravelJournalSliceBy(
                         TEST_USER,
@@ -857,6 +872,44 @@ class TravelJournalServiceTest : DescribeSpec(
             }
         }
 
+        describe("addTravelJournalContent") {
+            context("유효한 데이터가 주어지는 경우") {
+                val travelJournalContentRequest = createTravelJournalContentRequest(
+                    contentImageNames = listOf(TEST_IMAGE_FILE_WEBP, TEST_OTHER_IMAGE_FILE_WEBP),
+                )
+                every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns createTravelJournal()
+                it("정상적으로 종료한다") {
+                    shouldNotThrowAny {
+                        travelJournalService.addTravelJournalContent(
+                            TEST_TRAVEL_JOURNAL_ID,
+                            travelJournalContentRequest,
+                            createImageNamePairs(),
+                            createPlaceDetailsMap(),
+                        )
+                    }
+                }
+            }
+
+            context("ID에 맞는 여행 일지 콘텐츠가 없는 경우") {
+                val travelJournalContentRequest = createTravelJournalContentRequest(
+                    contentImageNames = listOf(TEST_IMAGE_FILE_WEBP, TEST_OTHER_IMAGE_FILE_WEBP),
+                )
+                every { travelJournalRepository.getByTravelJournalId(TEST_OTHER_TRAVEL_JOURNAL_ID) } throws NoSuchElementException(
+                    "$TEST_OTHER_TRAVEL_JOURNAL_ID : 해당 여행 일지가 존재하지 않습니다.",
+                )
+                it("정상적으로 종료한다") {
+                    shouldThrow<NoSuchElementException> {
+                        travelJournalService.addTravelJournalContent(
+                            TEST_OTHER_TRAVEL_JOURNAL_ID,
+                            travelJournalContentRequest,
+                            createImageNamePairs(),
+                            createPlaceDetailsMap(),
+                        )
+                    }
+                }
+            }
+        }
+
         describe("validateTravelJournalContentUpdateRequest") {
             context("유효한 데이터가 주어지는 경우") {
                 val imageMap = createImageMap(
@@ -982,6 +1035,127 @@ class TravelJournalServiceTest : DescribeSpec(
                             TEST_USER_ID,
                             imageMap,
                             travelJournalContentUpdateRequest,
+                        )
+                    }
+                }
+            }
+        }
+
+        describe("validateTravelJournalContentRequest") {
+            context("유효한 데이터가 주어지는 경우") {
+                val imageMap = createImageMap(
+                    mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME,
+                )
+                val travelJournalContentRequest = createTravelJournalContentRequest(
+                    contentImageNames = listOf(TEST_IMAGE_FILE_WEBP, TEST_OTHER_IMAGE_FILE_WEBP),
+                )
+                every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns createTravelJournal()
+                it("정상적으로 종료한다") {
+                    shouldNotThrowAny {
+                        travelJournalService.validateTravelJournalContentRequest(
+                            TEST_TRAVEL_JOURNAL_ID,
+                            TEST_USER_ID,
+                            travelJournalContentRequest,
+                            imageMap,
+                        )
+                    }
+                }
+            }
+
+            context("작성자와 수정 요청자가 일치하지 않는 경우") {
+                val imageMap = createImageMap(
+                    mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME,
+                )
+                val travelJournalContentRequest = createTravelJournalContentRequest(
+                    contentImageNames = listOf(TEST_IMAGE_FILE_WEBP, TEST_OTHER_IMAGE_FILE_WEBP),
+                )
+                every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns createTravelJournal()
+                it("[ForbiddenException] 반환한다") {
+                    shouldThrow<ForbiddenException> {
+                        travelJournalService.validateTravelJournalContentRequest(
+                            TEST_TRAVEL_JOURNAL_ID,
+                            TEST_OTHER_USER_ID,
+                            travelJournalContentRequest,
+                            imageMap,
+                        )
+                    }
+                }
+            }
+
+            context("여행일지의 총 이미지 개수가 225개를 초과하는 경우") {
+                val travelJournalContentRequest = createTravelJournalContentRequest(
+                    contentImageNames = (0 until 255).map { "updateTestImage$it.webp" }.toList(),
+                )
+                every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns createTravelJournal()
+                it("[IllegalArgumentException] 반환한다") {
+                    shouldThrow<IllegalArgumentException> {
+                        travelJournalService.validateTravelJournalContentRequest(
+                            TEST_TRAVEL_JOURNAL_ID,
+                            TEST_USER_ID,
+                            travelJournalContentRequest,
+                            any<Map<String, MultipartFile>>(),
+                        )
+                    }
+                }
+            }
+
+            context("여행 일지 콘텐츠 이미지의 이름과 실제 이미지의 이름이 다른 경우") {
+                val imageMap = createImageMap(
+                    mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME,
+                )
+                val travelJournalContentRequest = createTravelJournalContentRequest(
+                    contentImageNames = listOf("otherFileName.WEBP", TEST_OTHER_IMAGE_FILE_WEBP),
+                )
+                every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns createTravelJournal()
+                it("[IllegalArgumentException] 반환한다") {
+                    shouldThrow<IllegalArgumentException> {
+                        travelJournalService.validateTravelJournalContentRequest(
+                            TEST_TRAVEL_JOURNAL_ID,
+                            TEST_USER_ID,
+                            travelJournalContentRequest,
+                            imageMap,
+                        )
+                    }
+                }
+            }
+
+            context("여행 일지 콘텐츠의 여행 일자가 여행 기간을 벗어나는 경우") {
+                val imageMap = createImageMap(
+                    mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME,
+                )
+                val travelJournalContentRequest = createTravelJournalContentRequest(
+                    contentImageNames = listOf(TEST_IMAGE_FILE_WEBP, TEST_OTHER_IMAGE_FILE_WEBP),
+                    travelDate = LocalDate.of(2022, 10, 10),
+                )
+                every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns createTravelJournal()
+                it("[IllegalArgumentException] 반환한다") {
+                    shouldThrow<IllegalArgumentException> {
+                        travelJournalService.validateTravelJournalContentRequest(
+                            TEST_TRAVEL_JOURNAL_ID,
+                            TEST_USER_ID,
+                            travelJournalContentRequest,
+                            imageMap,
+                        )
+                    }
+                }
+            }
+
+            context("여행 일지 위도와 경도의 개수가 다른 경우") {
+                val imageMap = createImageMap(
+                    mockFileName = TEST_TRAVEL_JOURNAL_MOCK_FILE_NAME,
+                )
+                val travelJournalContentRequest = createTravelJournalContentRequest(
+                    contentImageNames = listOf(TEST_IMAGE_FILE_WEBP, TEST_OTHER_IMAGE_FILE_WEBP),
+                    latitudes = listOf(123.123),
+                )
+                every { travelJournalRepository.getByTravelJournalId(TEST_TRAVEL_JOURNAL_ID) } returns createTravelJournal()
+                it("[IllegalArgumentException] 반환한다") {
+                    shouldThrow<IllegalArgumentException> {
+                        travelJournalService.validateTravelJournalContentRequest(
+                            TEST_TRAVEL_JOURNAL_ID,
+                            TEST_USER_ID,
+                            travelJournalContentRequest,
+                            imageMap,
                         )
                     }
                 }
@@ -1231,8 +1405,15 @@ class TravelJournalServiceTest : DescribeSpec(
             context("해당 여행일지의 같이 간 친구를 처리할 권한이 없는 경우") {
                 it("정상적으로 종료한다") {
                     every { userRepository.getByUserId(TEST_USER_ID) } returns user
-                    every { travelJournalRepository.findTravelCompanionId(user, TEST_TRAVEL_JOURNAL_ID) } throws ForbiddenException()
-                    every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
+                    every {
+                        travelJournalRepository.findTravelCompanionId(
+                            user,
+                            TEST_TRAVEL_JOURNAL_ID,
+                        )
+                    } throws ForbiddenException()
+                    every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(
+                        TEST_OTHER_USER_ID,
+                    )
                     shouldThrow<ForbiddenException> {
                         travelJournalService.removeTravelCompanion(TEST_USER_ID, TEST_TRAVEL_JOURNAL_ID)
                     }
