@@ -2,6 +2,8 @@ package kr.weit.odya.service
 
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowingIds
+import kr.weit.odya.domain.representativetraveljournal.RepresentativeTravelJournalRepository
+import kr.weit.odya.domain.representativetraveljournal.getRepTravelJournalIds
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.traveljournal.getByTravelJournalId
 import kr.weit.odya.domain.traveljournalbookmark.TravelJournalBookmark
@@ -24,6 +26,7 @@ class TravelJournalBookmarkService(
     private val travelJournalRepository: TravelJournalRepository,
     private val fileService: FileService,
     private val followRepository: FollowRepository,
+    private val repTravelJournalRepository: RepresentativeTravelJournalRepository,
 ) {
     @Transactional
     fun createTravelJournalBookmark(
@@ -53,6 +56,7 @@ class TravelJournalBookmarkService(
     ): SliceResponse<TravelJournalBookmarkSummaryResponse> {
         val user = userRepository.getByUserId(userId)
         val followingIdList = followRepository.getFollowingIds(userId)
+        val repTravelJournalIds = repTravelJournalRepository.getRepTravelJournalIds(userId)
         val journalBookmarkResponses =
             travelJournalBookmarkRepository.getSliceBy(size, lastId, sortType, user).map { bookmark ->
                 val profileUrl = fileService.getPreAuthenticatedObjectUrl(bookmark.user.profile.profileName)
@@ -67,6 +71,7 @@ class TravelJournalBookmarkService(
                     bookmark.travelJournal.user,
                     bookmark.user.id in followingIdList,
                     true,
+                    bookmark.travelJournal.id in repTravelJournalIds,
                 )
             }
         return SliceResponse(size, journalBookmarkResponses)
@@ -97,6 +102,7 @@ class TravelJournalBookmarkService(
                     bookmark.travelJournal.user,
                     bookmark.user.id in followingIdList,
                     bookmark.travelJournal.id in bookmarkTravelJournalIdList,
+                    false,
                 )
             }
         return SliceResponse(size, journalBookmarkResponses)

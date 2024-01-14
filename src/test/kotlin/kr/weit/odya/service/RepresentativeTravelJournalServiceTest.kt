@@ -9,12 +9,14 @@ import io.mockk.mockk
 import io.mockk.runs
 import jakarta.ws.rs.ForbiddenException
 import kr.weit.odya.domain.follow.FollowRepository
+import kr.weit.odya.domain.representativetraveljournal.RepresentativeTravelJournal
 import kr.weit.odya.domain.representativetraveljournal.RepresentativeTravelJournalRepository
 import kr.weit.odya.domain.representativetraveljournal.getSliceBy
 import kr.weit.odya.domain.representativetraveljournal.getTargetSliceBy
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.traveljournal.getByTravelJournalId
-import kr.weit.odya.domain.traveljournalbookmark.RepresentativeTravelJournal
+import kr.weit.odya.domain.traveljournalbookmark.TravelJournalBookmarkRepository
+import kr.weit.odya.domain.traveljournalbookmark.getTravelJournalIds
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.support.TEST_DEFAULT_SIZE
@@ -40,12 +42,14 @@ class RepresentativeTravelJournalServiceTest : DescribeSpec(
         val travelJournalRepository = mockk<TravelJournalRepository>()
         val fileService = mockk<FileService>()
         val followRepository = mockk<FollowRepository>()
+        val travelJournalBookmarkRepository = mockk<TravelJournalBookmarkRepository>()
         val repTravelJournalService = RepresentativeTravelJournalService(
             userRepository = userRepository,
             travelJournalRepository = travelJournalRepository,
             repTravelJournalRepository = repTravelJournalRepository,
             followRepository = followRepository,
             fileService = fileService,
+            travelJournalBookmarkRepository = travelJournalBookmarkRepository,
         )
 
         describe("createRepTravelJournal") {
@@ -146,6 +150,9 @@ class RepresentativeTravelJournalServiceTest : DescribeSpec(
                     )
                 } returns listOf(createRepTravelJournal())
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
+                every { travelJournalBookmarkRepository.getTravelJournalIds(TEST_USER_ID) } returns listOf(
+                    TEST_TRAVEL_JOURNAL_ID,
+                )
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         repTravelJournalService.getTargetRepTravelJournals(
@@ -172,6 +179,9 @@ class RepresentativeTravelJournalServiceTest : DescribeSpec(
                     )
                 } returns listOf(createRepTravelJournal())
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
+                every { travelJournalBookmarkRepository.getTravelJournalIds(TEST_USER_ID) } returns listOf(
+                    TEST_TRAVEL_JOURNAL_ID,
+                )
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         repTravelJournalService.getMyRepTravelJournals(

@@ -1,0 +1,1 @@
+CREATE INDEX travel_journal_content_travel_travel_date_index ON travel_journal_content (travel_date);

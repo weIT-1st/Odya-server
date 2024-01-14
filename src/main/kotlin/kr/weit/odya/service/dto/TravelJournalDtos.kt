@@ -81,6 +81,7 @@ data class TravelJournalResponse(
     val travelEndDate: LocalDate,
     val visibility: TravelJournalVisibility,
     val isBookmarked: Boolean,
+    val isRepresentative: Boolean,
     val writer: UserSimpleResponse,
     val travelJournalContents: List<TravelJournalContentResponse>,
     val travelJournalCompanions: List<TravelCompanionResponse>,
@@ -88,6 +89,7 @@ data class TravelJournalResponse(
     constructor(
         travelJournal: TravelJournal,
         isBookmarked: Boolean,
+        isRepresentative: Boolean,
         writerProfileUrl: String,
         travelJournalContents: List<TravelJournalContentResponse>,
         travelJournalCompanions: List<TravelCompanionResponse>,
@@ -99,6 +101,7 @@ data class TravelJournalResponse(
         travelJournal.travelEndDate,
         travelJournal.visibility,
         isBookmarked,
+        isRepresentative,
         UserSimpleResponse(travelJournal.user, writerProfileUrl, isFollowing),
         travelJournalContents,
         travelJournalCompanions,
@@ -232,6 +235,7 @@ data class TravelJournalSummaryResponse(
     val visibility: TravelJournalVisibility,
     val travelCompanionSimpleResponses: List<TravelCompanionSimpleResponse>?,
     val isBookmarked: Boolean,
+    val isRepresentative: Boolean,
 ) {
     constructor(
         travelJournal: TravelJournal,
@@ -241,6 +245,7 @@ data class TravelJournalSummaryResponse(
         travelCompanionSimpleResponses: List<TravelCompanionSimpleResponse>?,
         isFollowing: Boolean,
         isBookmarked: Boolean,
+        isRepresentative: Boolean,
     ) : this(
         travelJournal.id,
         travelJournal.title,
@@ -253,6 +258,7 @@ data class TravelJournalSummaryResponse(
         travelJournal.visibility,
         travelCompanionSimpleResponses,
         isBookmarked,
+        isRepresentative,
     )
 }
 

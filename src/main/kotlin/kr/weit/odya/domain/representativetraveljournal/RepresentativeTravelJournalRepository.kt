@@ -11,9 +11,9 @@ import kr.weit.odya.domain.follow.Follow
 import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.traveljournal.TravelJournalInformation
 import kr.weit.odya.domain.traveljournal.TravelJournalVisibility
-import kr.weit.odya.domain.traveljournalbookmark.RepresentativeTravelJournal
 import kr.weit.odya.domain.user.User
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
 
 fun RepresentativeTravelJournalRepository.getSliceBy(
     size: Int,
@@ -30,12 +30,20 @@ fun RepresentativeTravelJournalRepository.getTargetSliceBy(
     loginUserId: Long,
 ): List<RepresentativeTravelJournal> = findTargetSliceBy(size, lastId, sortType, targetUser, loginUserId)
 
+fun RepresentativeTravelJournalRepository.getRepTravelJournalIds(userId: Long): List<Long> =
+    findTravelJournalIdsByUserId(userId)
+
 interface RepresentativeTravelJournalRepository :
     JpaRepository<RepresentativeTravelJournal, Long>,
     CustomRepresentativeTravelJournalRepository {
     fun existsByUserAndTravelJournal(user: User, travelJournal: TravelJournal): Boolean
 
     fun deleteByUserAndTravelJournal(user: User, travelJournal: TravelJournal)
+
+    fun existsByUserIdAndTravelJournal(userId: Long, travelJournal: TravelJournal): Boolean
+
+    @Query("select rtj.travelJournal.id from RepresentativeTravelJournal rtj where rtj.user.id = :userId")
+    fun findTravelJournalIdsByUserId(userId: Long): List<Long>
 }
 
 interface CustomRepresentativeTravelJournalRepository {

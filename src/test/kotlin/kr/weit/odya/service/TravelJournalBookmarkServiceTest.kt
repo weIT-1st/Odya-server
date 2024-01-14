@@ -8,6 +8,8 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import kr.weit.odya.domain.follow.FollowRepository
+import kr.weit.odya.domain.representativetraveljournal.RepresentativeTravelJournalRepository
+import kr.weit.odya.domain.representativetraveljournal.getRepTravelJournalIds
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.traveljournal.getByTravelJournalId
 import kr.weit.odya.domain.traveljournalbookmark.TravelJournalBookmark
@@ -36,13 +38,15 @@ class TravelJournalBookmarkServiceTest : DescribeSpec(
         val travelJournalRepository = mockk<TravelJournalRepository>()
         val fileService = mockk<FileService>()
         val followRepository = mockk<FollowRepository>()
+        val repTravelJournalRepository = mockk<RepresentativeTravelJournalRepository>()
         val travelJournalBookmarkService =
             TravelJournalBookmarkService(
                 travelJournalBookmarkRepository = travelJournalBookmarkRepository,
                 userRepository = userRepository,
                 travelJournalRepository = travelJournalRepository,
                 fileService = fileService,
-                followRepository,
+                followRepository = followRepository,
+                repTravelJournalRepository = repTravelJournalRepository,
             )
 
         describe("createTravelJournalBookmark") {
@@ -121,6 +125,9 @@ class TravelJournalBookmarkServiceTest : DescribeSpec(
                 } returns listOf(createTravelJournalBookmark())
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
                 every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
+                every { repTravelJournalRepository.getRepTravelJournalIds(TEST_USER_ID) } returns listOf(
+                    TEST_TRAVEL_JOURNAL_ID,
+                )
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalBookmarkService.getMyTravelJournalBookmarks(
@@ -162,7 +169,9 @@ class TravelJournalBookmarkServiceTest : DescribeSpec(
                 } returns listOf(createTravelJournalBookmark())
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
                 every { followRepository.findFollowingIdsByFollowerId(TEST_OTHER_USER_ID) } returns listOf(TEST_USER_ID)
-                every { travelJournalBookmarkRepository.getTravelJournalIds(TEST_OTHER_USER_ID) } returns listOf(TEST_TRAVEL_JOURNAL_ID)
+                every { travelJournalBookmarkRepository.getTravelJournalIds(TEST_OTHER_USER_ID) } returns listOf(
+                    TEST_TRAVEL_JOURNAL_ID,
+                )
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalBookmarkService.getOtherTravelJournalBookmarks(
