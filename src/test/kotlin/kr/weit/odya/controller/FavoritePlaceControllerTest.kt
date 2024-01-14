@@ -26,6 +26,7 @@ import kr.weit.odya.support.TEST_INVALID_LAST_ID
 import kr.weit.odya.support.TEST_INVALID_SIZE
 import kr.weit.odya.support.TEST_INVALID_USER_ID
 import kr.weit.odya.support.TEST_LAST_ID
+import kr.weit.odya.support.TEST_OTHER_USER_ID
 import kr.weit.odya.support.TEST_PLACE_ID
 import kr.weit.odya.support.TEST_SIZE
 import kr.weit.odya.support.TEST_USER_ID
@@ -400,6 +401,76 @@ class FavoritePlaceControllerTest(
                             ),
                         )
                     }
+                }
+            }
+        }
+
+        describe("GET /api/v1/favorite-places/counts/{userId}") {
+            val targetUri = "/api/v1/favorite-places/counts/{userId}"
+            context("유효한 USERID가 전달되면") {
+                every { favoritePlaceService.getFavoritePlaceCount(TEST_OTHER_USER_ID) } returns TEST_FAVORITE_PLACE_COUNT
+                it("관심장소 수를 출력한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_OTHER_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    )
+                        .andExpect(status().isOk)
+                        .andDo(
+                            createPathDocument(
+                                "other-favorite-place-count-success",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "userId" pathDescription "조회할 USER ID" example TEST_OTHER_USER_ID,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("양수가 아닌 USERID가 전달되면") {
+                it("400을 출력한다") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_INVALID_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    )
+                        .andExpect(status().isBadRequest)
+                        .andDo(
+                            createPathDocument(
+                                "other-favorite-place-count-failed-invalid-favorite-place-id",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "userId" pathDescription "양수가 아닌 USER ID" example TEST_INVALID_USER_ID,
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효하지않은 토큰이 전달되면") {
+                it("401을 출력한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .get(targetUri, TEST_OTHER_USER_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN),
+                    )
+                        .andExpect(status().isUnauthorized())
+                        .andDo(
+                            createPathDocument(
+                                "other-favorite-place-count-failed-invalid-token",
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                                ),
+                                pathParameters(
+                                    "userId" pathDescription "조회할 USER ID" example TEST_OTHER_USER_ID,
+                                ),
+                            ),
+                        )
                 }
             }
         }

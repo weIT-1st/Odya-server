@@ -1,5 +1,6 @@
 package kr.weit.odya.service
 
+import kr.weit.odya.client.push.NotificationEventType
 import kr.weit.odya.client.push.PushNotificationEvent
 import kr.weit.odya.domain.follow.Follow
 import kr.weit.odya.domain.follow.FollowRepository
@@ -54,9 +55,11 @@ class FollowService(
         eventPublisher.publishEvent(
             PushNotificationEvent(
                 title = "팔로우 알림",
-                body = "${follower.nickname}님이 팔로우 했어요!",
-                token = token,
-                data = mapOf("followerId" to follower.id.toString()),
+                body = "${follower.nickname}님이 회원님을 팔로우했습니다",
+                tokens = listOf(token),
+                userName = follower.nickname,
+                eventType = NotificationEventType.FOLLOWER_ADD,
+                followerId = follower.id,
             ),
         )
     }
@@ -84,7 +87,7 @@ class FollowService(
                 FollowUserResponse(
                     it.following,
                     fileService.getPreAuthenticatedObjectUrl(it.following.profile.profileName),
-                    it.follower.id in followingIds,
+                    it.following.id in followingIds,
                 )
             }
         return SliceResponse(pageable, followingList)
@@ -116,23 +119,8 @@ class FollowService(
     }
 
     @Transactional(readOnly = true)
-    fun searchByFollowingNickname(userId: Long, nickname: String, size: Int, lastId: Long?): SliceResponse<FollowUserResponse> {
-        val usersDocuments = usersDocumentRepository.getByNickname(nickname)
-        val userIds = usersDocuments.map { it.id }
-
-        val followings =
-            followRepository.getByFollowerIdAndFollowingIdIn(userId, userIds, size + 1, lastId).map {
-                FollowUserResponse(
-                    it.following,
-                    fileService.getPreAuthenticatedObjectUrl(it.following.profile.profileName),
-                    true,
-                )
-            }
-        return SliceResponse(size, followings)
-    }
-
-    @Transactional(readOnly = true)
-    fun searchByFollowerNickname(
+    fun searchByFollowingNickname(
+        loginUserId: Long,
         userId: Long,
         nickname: String,
         size: Int,
@@ -140,14 +128,38 @@ class FollowService(
     ): SliceResponse<FollowUserResponse> {
         val usersDocuments = usersDocumentRepository.getByNickname(nickname)
         val userIds = usersDocuments.map { it.id }
-        val followingIds = followRepository.getFollowingIds(userId)
-        val followers = followRepository.getByFollowingIdAndFollowerIdIn(userId, userIds, size + 1, lastId).map {
-            FollowUserResponse(
-                it.follower,
-                fileService.getPreAuthenticatedObjectUrl(it.follower.profile.profileName),
-                it.follower.id in followingIds,
-            )
-        }
+        val followingIds = followRepository.getFollowingIds(loginUserId)
+
+        val followings =
+            followRepository.getByFollowerIdAndFollowingIdIn(userId, userIds, size + 1, lastId).map {
+                FollowUserResponse(
+                    it.following,
+                    fileService.getPreAuthenticatedObjectUrl(it.following.profile.profileName),
+                    it.following.id in followingIds,
+                )
+            }
+        return SliceResponse(size, followings)
+    }
+
+    @Transactional(readOnly = true)
+    fun searchByFollowerNickname(
+        loginUserId: Long,
+        userId: Long,
+        nickname: String,
+        size: Int,
+        lastId: Long?,
+    ): SliceResponse<FollowUserResponse> {
+        val usersDocuments = usersDocumentRepository.getByNickname(nickname)
+        val userIds = usersDocuments.map { it.id }
+        val followingIds = followRepository.getFollowingIds(loginUserId)
+        val followers =
+            followRepository.getByFollowingIdAndFollowerIdIn(userId, userIds, size + 1, lastId).map {
+                FollowUserResponse(
+                    it.follower,
+                    fileService.getPreAuthenticatedObjectUrl(it.follower.profile.profileName),
+                    it.follower.id in followingIds,
+                )
+            }
         return SliceResponse(size, followers)
     }
 

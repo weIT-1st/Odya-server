@@ -31,6 +31,7 @@ import kr.weit.odya.support.createCommunityComment
 import kr.weit.odya.support.createCommunityCommentRequest
 import kr.weit.odya.support.createMockCommunityComment
 import kr.weit.odya.support.createUser
+import org.springframework.context.ApplicationEventPublisher
 
 class CommunityCommentServiceTest : DescribeSpec(
     {
@@ -39,12 +40,14 @@ class CommunityCommentServiceTest : DescribeSpec(
         val userRepository: UserRepository = mockk<UserRepository>()
         val fileService: FileService = mockk<FileService>()
         val followRepository: FollowRepository = mockk<FollowRepository>()
+        val eventPublisher: ApplicationEventPublisher = mockk<ApplicationEventPublisher>()
         val communityCommentService = CommunityCommentService(
             communityRepository,
             communityCommentRepository,
             userRepository,
             fileService,
             followRepository,
+            eventPublisher,
         )
 
         describe("createCommunityComment") {

@@ -19,13 +19,15 @@ import kr.weit.odya.support.TEST_USER_ID
 import kr.weit.odya.support.createCommunity
 import kr.weit.odya.support.createCommunityLike
 import kr.weit.odya.support.createUser
+import org.springframework.context.ApplicationEventPublisher
 
 class CommunityLikeServiceTest : DescribeSpec(
     {
         val communityLikeRepository = mockk<CommunityLikeRepository>()
         val communityRepository = mockk<CommunityRepository>()
         val userRepository = mockk<UserRepository>()
-        val communityLikeService = CommunityLikeService(communityLikeRepository, communityRepository, userRepository)
+        val eventPublisher = mockk<ApplicationEventPublisher>()
+        val communityLikeService = CommunityLikeService(communityLikeRepository, communityRepository, userRepository,eventPublisher)
 
         describe("increaseCommunityLikeCount") {
             context("유효한 요청이 주어지는 경우") {
