@@ -343,6 +343,7 @@ fun createTravelJournalSummaryResponse(
     TravelJournalVisibility.PUBLIC,
     listOf(createTravelCompanionSimpleResponse(travelCompanion)),
     true,
+    true,
 )
 
 fun createTravelCompanionSimpleResponse(travelCompanion: TravelCompanion): TravelCompanionSimpleResponse =
@@ -359,6 +360,7 @@ fun createTravelJournalResponse(travelJournal: TravelJournal = createTravelJourn
         travelJournal.travelEndDate,
         travelJournal.visibility,
         TEST_IS_BOOK_MARKED_FALSE,
+        TEST_IS_REPRESENTATIVE_FALSE,
         UserSimpleResponse(createUser(), TEST_FILE_AUTHENTICATED_URL, false),
         listOf(createTravelJournalContentResponse()),
         listOf(createTravelCompanionResponse()),

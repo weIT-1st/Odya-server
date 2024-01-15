@@ -1011,6 +1011,7 @@ class TravelJournalControllerTest(
                                     "travelEndDate" type JsonFieldType.STRING description "여행 종료일" example response.travelEndDate,
                                     "visibility" type JsonFieldType.STRING description "여행 일지 공개 범위" example response.visibility,
                                     "isBookmarked" type JsonFieldType.BOOLEAN description "여행 일지 북마크 여부" example response.isBookmarked,
+                                    "isRepresentative" type JsonFieldType.BOOLEAN description "여행 일지 대표 여부" example response.isRepresentative,
                                     "writer.userId" type JsonFieldType.NUMBER description "여행 일지 작성자의 아이디" example response.writer.userId,
                                     "writer.nickname" type JsonFieldType.STRING description "여행 일지 작성자의 닉네임" example response.writer.nickname,
                                     "writer.isFollowing" type JsonFieldType.BOOLEAN description "사용자 팔로잉 여부" example response.writer.isFollowing,
@@ -1170,6 +1171,7 @@ class TravelJournalControllerTest(
                                     response.content[0].travelCompanionSimpleResponses?.get(0)?.profileUrl
                                     ) isOptional true,
                                 "content[].isBookmarked" type JsonFieldType.BOOLEAN description "여행일지 북마크 여부" example response.content[0].isBookmarked,
+                                "content[].isRepresentative" type JsonFieldType.BOOLEAN description "여행일지 대표 여부" example response.content[0].isRepresentative,
                             ),
                         )
                     }
@@ -1253,6 +1255,7 @@ class TravelJournalControllerTest(
                                     response.content[0].travelCompanionSimpleResponses?.get(0)?.profileUrl
                                     ) isOptional true,
                                 "content[].isBookmarked" type JsonFieldType.BOOLEAN description "여행일지 북마크 여부" example response.content[0].isBookmarked,
+                                "content[].isRepresentative" type JsonFieldType.BOOLEAN description "여행일지 대표 여부" example response.content[0].isRepresentative,
                             ),
                         )
                     }
@@ -1362,6 +1365,7 @@ class TravelJournalControllerTest(
                                     response.content[0].travelCompanionSimpleResponses?.get(0)?.profileUrl
                                     ) isOptional true,
                                 "content[].isBookmarked" type JsonFieldType.BOOLEAN description "여행일지 북마크 여부" example response.content[0].isBookmarked,
+                                "content[].isRepresentative" type JsonFieldType.BOOLEAN description "여행일지 대표 여부" example response.content[0].isRepresentative,
                             ),
                         )
                     }
@@ -1471,6 +1475,7 @@ class TravelJournalControllerTest(
                                     response.content[0].travelCompanionSimpleResponses?.get(0)?.profileUrl
                                     ) isOptional true,
                                 "content[].isBookmarked" type JsonFieldType.BOOLEAN description "여행일지 북마크 여부" example response.content[0].isBookmarked,
+                                "content[].isRepresentative" type JsonFieldType.BOOLEAN description "여행일지 대표 여부" example response.content[0].isRepresentative,
                             ),
                         )
                     }

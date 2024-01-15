@@ -66,6 +66,7 @@ fun createTravelJournalBookmarkSummaryResponse(
     travelJournalMainImageUrl: String = TEST_GENERATED_FILE_NAME,
     userSimpleResponse: UserSimpleResponse = createSimpleUserResponse(),
     isBookmarked: Boolean = TEST_IS_BOOK_MARKED_FALSE,
+    isRepresentative: Boolean = TEST_IS_REPRESENTATIVE_FALSE,
 ): TravelJournalBookmarkSummaryResponse =
     TravelJournalBookmarkSummaryResponse(
         travelJournalBookmarkId = travelJournalBookmarkId,
@@ -75,4 +76,5 @@ fun createTravelJournalBookmarkSummaryResponse(
         travelJournalMainImageUrl = travelJournalMainImageUrl,
         writer = userSimpleResponse,
         isBookmarked = isBookmarked,
+        isRepresentative = isRepresentative,
     )

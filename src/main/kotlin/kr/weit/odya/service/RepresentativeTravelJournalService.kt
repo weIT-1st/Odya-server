@@ -2,6 +2,7 @@ package kr.weit.odya.service
 
 import jakarta.ws.rs.ForbiddenException
 import kr.weit.odya.domain.follow.FollowRepository
+import kr.weit.odya.domain.representativetraveljournal.RepresentativeTravelJournal
 import kr.weit.odya.domain.representativetraveljournal.RepresentativeTravelJournalRepository
 import kr.weit.odya.domain.representativetraveljournal.RepresentativeTravelJournalSortType
 import kr.weit.odya.domain.representativetraveljournal.getSliceBy
@@ -9,7 +10,8 @@ import kr.weit.odya.domain.representativetraveljournal.getTargetSliceBy
 import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.traveljournal.TravelJournalRepository
 import kr.weit.odya.domain.traveljournal.getByTravelJournalId
-import kr.weit.odya.domain.traveljournalbookmark.RepresentativeTravelJournal
+import kr.weit.odya.domain.traveljournalbookmark.TravelJournalBookmarkRepository
+import kr.weit.odya.domain.traveljournalbookmark.getTravelJournalIds
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
@@ -27,6 +29,7 @@ class RepresentativeTravelJournalService(
     val repTravelJournalRepository: RepresentativeTravelJournalRepository,
     val followRepository: FollowRepository,
     val fileService: FileService,
+    val travelJournalBookmarkRepository: TravelJournalBookmarkRepository,
 ) {
     @Transactional
     fun createRepTravelJournal(userId: Long, travelJournalId: Long) {
@@ -52,6 +55,7 @@ class RepresentativeTravelJournalService(
     ): SliceResponse<RepTravelJournalSummaryResponse> {
         val targetUser = userRepository.getByUserId(targetUserId)
         val isFollowing = followRepository.existsByFollowerIdAndFollowingId(loginUserId, targetUserId)
+        val bookmarkIdList = travelJournalBookmarkRepository.getTravelJournalIds(loginUserId)
         val repTravelJournalSummaryResponses =
             repTravelJournalRepository.getTargetSliceBy(size, lastId, sortType, targetUser, loginUserId)
                 .map { repTravelJournal ->
@@ -61,6 +65,7 @@ class RepresentativeTravelJournalService(
                     RepTravelJournalSummaryResponse.from(
                         repTravelJournal,
                         travelJournalMainImageUrl,
+                        repTravelJournal.travelJournal.id in bookmarkIdList,
                         UserSimpleResponse(
                             repTravelJournal.user,
                             profileUrl,
@@ -80,6 +85,7 @@ class RepresentativeTravelJournalService(
         sortType: RepresentativeTravelJournalSortType,
     ): SliceResponse<RepTravelJournalSummaryResponse> {
         val user = userRepository.getByUserId(userId)
+        val bookmarkIdList = travelJournalBookmarkRepository.getTravelJournalIds(userId)
         val repTravelJournalSummaryResponses =
             repTravelJournalRepository.getSliceBy(size, lastId, sortType, user).map { repTravelJournal ->
                 val profileUrl = fileService.getPreAuthenticatedObjectUrl(repTravelJournal.user.profile.profileName)
@@ -88,6 +94,7 @@ class RepresentativeTravelJournalService(
                 RepTravelJournalSummaryResponse.from(
                     repTravelJournal,
                     travelJournalMainImageUrl,
+                    repTravelJournal.travelJournal.id in bookmarkIdList,
                     UserSimpleResponse(
                         repTravelJournal.user,
                         profileUrl,
@@ -131,7 +138,7 @@ class RepresentativeTravelJournalService(
                 if (travelCompanion.user != null) {
                     TravelCompanionSimpleResponse(
                         travelCompanion.user!!.username,
-                        fileService.getPreAuthenticatedObjectUrl(it.user.profile.profileName),
+                        fileService.getPreAuthenticatedObjectUrl(travelCompanion.user!!.profile.profileName),
                     )
                 } else {
                     TravelCompanionSimpleResponse(travelCompanion.username, null)

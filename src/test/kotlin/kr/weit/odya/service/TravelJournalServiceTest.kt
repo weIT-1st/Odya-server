@@ -18,6 +18,8 @@ import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowingIds
 import kr.weit.odya.domain.report.ReportTravelJournalRepository
 import kr.weit.odya.domain.report.deleteAllByUserId
+import kr.weit.odya.domain.representativetraveljournal.RepresentativeTravelJournalRepository
+import kr.weit.odya.domain.representativetraveljournal.getRepTravelJournalIds
 import kr.weit.odya.domain.traveljournal.TravelCompanionRepository
 import kr.weit.odya.domain.traveljournal.TravelJournal
 import kr.weit.odya.domain.traveljournal.TravelJournalContentUpdateEvent
@@ -96,6 +98,7 @@ class TravelJournalServiceTest : DescribeSpec(
         val communityRepository = mockk<CommunityRepository>()
         val googleMapsClient = mockk<GoogleMapsClient>()
         val travelJournalBookmarkRepository = mockk<TravelJournalBookmarkRepository>()
+        val repTravelJournalRepository = mockk<RepresentativeTravelJournalRepository>()
         val travelJournalService = TravelJournalService(
             userRepository,
             travelJournalRepository,
@@ -108,6 +111,7 @@ class TravelJournalServiceTest : DescribeSpec(
             travelCompanionRepository,
             googleMapsClient,
             travelJournalBookmarkRepository,
+            repTravelJournalRepository,
         )
 
         describe("createTravelJournal") {
@@ -459,6 +463,12 @@ class TravelJournalServiceTest : DescribeSpec(
                         TEST_TRAVEL_JOURNAL,
                     )
                 } returns false
+                every {
+                    repTravelJournalRepository.existsByUserIdAndTravelJournal(
+                        TEST_USER_ID,
+                        TEST_TRAVEL_JOURNAL,
+                    )
+                } returns false
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
                 every { followRepository.getFollowingIds(TEST_USER_ID) } returns listOf()
                 it("정상적으로 종료한다") {
@@ -474,6 +484,12 @@ class TravelJournalServiceTest : DescribeSpec(
                 )
                 every {
                     travelJournalBookmarkRepository.existsByUserIdAndTravelJournal(
+                        TEST_OTHER_USER_ID,
+                        any<TravelJournal>(),
+                    )
+                } returns false
+                every {
+                    repTravelJournalRepository.existsByUserIdAndTravelJournal(
                         TEST_OTHER_USER_ID,
                         any<TravelJournal>(),
                     )
@@ -519,6 +535,12 @@ class TravelJournalServiceTest : DescribeSpec(
                 )
                 every {
                     travelJournalBookmarkRepository.existsByUserIdAndTravelJournal(
+                        TEST_USER_ID,
+                        any<TravelJournal>(),
+                    )
+                } returns false
+                every {
+                    repTravelJournalRepository.existsByUserIdAndTravelJournal(
                         TEST_USER_ID,
                         any<TravelJournal>(),
                     )
@@ -587,6 +609,9 @@ class TravelJournalServiceTest : DescribeSpec(
                 every { fileService.getPreAuthenticatedObjectUrl(any<String>()) } returns TEST_FILE_AUTHENTICATED_URL
                 every { followRepository.findFollowingIdsByFollowerId(TEST_USER_ID) } returns listOf(TEST_OTHER_USER_ID)
                 every { travelJournalBookmarkRepository.getTravelJournalIds(TEST_USER_ID) } returns listOf(
+                    TEST_TRAVEL_JOURNAL_ID,
+                )
+                every { repTravelJournalRepository.getRepTravelJournalIds(TEST_USER_ID) } returns listOf(
                     TEST_TRAVEL_JOURNAL_ID,
                 )
                 it("정상적으로 종료한다") {

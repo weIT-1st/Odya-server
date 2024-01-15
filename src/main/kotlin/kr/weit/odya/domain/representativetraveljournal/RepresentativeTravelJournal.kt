@@ -1,4 +1,4 @@
-package kr.weit.odya.domain.traveljournalbookmark
+package kr.weit.odya.domain.representativetraveljournal
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
