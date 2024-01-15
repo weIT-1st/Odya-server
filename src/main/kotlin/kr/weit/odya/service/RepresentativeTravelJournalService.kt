@@ -138,7 +138,7 @@ class RepresentativeTravelJournalService(
                 if (travelCompanion.user != null) {
                     TravelCompanionSimpleResponse(
                         travelCompanion.user!!.username,
-                        fileService.getPreAuthenticatedObjectUrl(it.user.profile.profileName),
+                        fileService.getPreAuthenticatedObjectUrl(travelCompanion.user!!.profile.profileName),
                     )
                 } else {
                     TravelCompanionSimpleResponse(travelCompanion.username, null)
