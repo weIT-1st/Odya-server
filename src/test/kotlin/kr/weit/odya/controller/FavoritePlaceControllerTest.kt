@@ -300,6 +300,52 @@ class FavoritePlaceControllerTest(
             }
         }
 
+        describe("DELETE /api/v1/favorite-places/places/{placeId}") {
+            val targetUri = "/api/v1/favorite-places/places/{placeId}"
+            context("유효한 요청 데이터가 전달되면") {
+                every { favoritePlaceService.deleteFavoritePlaceByPlaceId(TEST_USER_ID, TEST_PLACE_ID) } just Runs
+                it("204를 반환한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .delete(targetUri, TEST_PLACE_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_ID_TOKEN),
+                    ).andExpect(status().isNoContent)
+                        .andDo(
+                            createPathDocument(
+                                "favorite-place-delete-by-place-id-success",
+                                pathParameters(
+                                    "placeId" pathDescription "장소 ID" example TEST_PLACE_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "VALID ID TOKEN",
+                                ),
+                            ),
+                        )
+                }
+            }
+
+            context("유효하지 않은 토큰이 전달되면") {
+                it("401를 반환한다.") {
+                    restDocMockMvc.perform(
+                        RestDocumentationRequestBuilders
+                            .delete(targetUri, TEST_PLACE_ID)
+                            .header(HttpHeaders.AUTHORIZATION, TEST_BEARER_INVALID_ID_TOKEN),
+                    ).andExpect(status().isUnauthorized)
+                        .andDo(
+                            createPathDocument(
+                                "favorite-place-delete-by-place-id-failed-invalid-token",
+                                pathParameters(
+                                    "placeId" pathDescription "장소 ID" example TEST_PLACE_ID,
+                                ),
+                                requestHeaders(
+                                    HttpHeaders.AUTHORIZATION headerDescription "INVALID ID TOKEN",
+                                ),
+                            ),
+                        )
+                }
+            }
+        }
+
         describe("GET /api/v1/favorite-places/{placeId}") {
             val targetUri = "/api/v1/favorite-places/{placeId}"
             context("유효한 요청 데이터가 전달되면") {
