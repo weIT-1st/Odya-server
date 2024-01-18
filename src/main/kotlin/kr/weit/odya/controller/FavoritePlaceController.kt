@@ -50,6 +50,18 @@ class FavoritePlaceController(private val favoritePlaceService: FavoritePlaceSer
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
     }
 
+    @DeleteMapping("/places/{placeId}")
+    fun deleteFavoritePlaceByPlaceId(
+        @LoginUserId
+        userId: Long,
+        @NotNull(message = "장소 ID는 필수 입력값입니다.")
+        @PathVariable("placeId")
+        placeId: String,
+    ): ResponseEntity<Void> {
+        favoritePlaceService.deleteFavoritePlaceByPlaceId(userId, placeId)
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
+    }
+
     @GetMapping("/{placeId}")
     fun getFavoritePlace(
         @LoginUserId
