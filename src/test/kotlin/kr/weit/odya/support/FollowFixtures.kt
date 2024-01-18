@@ -44,8 +44,6 @@ fun createFollowProfileResponse(): FollowProfileResponse =
 fun createFollowProfileColorResponse(): FollowProfileResponse.ProfileColorResponse =
     FollowProfileResponse.ProfileColorResponse(createProfileColor(TEST_PROFILE_COLOR_ID))
 
-fun createFollowerFcmTokenList() = listOf(TEST_FCM_TOKEN)
-
 fun createVisitedFollowingResponse(): VisitedFollowingResponse =
     VisitedFollowingResponse(
         TEST_VISITED_FOLLOWING_COUNT,
@@ -55,4 +53,6 @@ fun createVisitedFollowingResponse(): VisitedFollowingResponse =
         ),
     )
 
-fun createVisitedFollowingIds() = listOf(TEST_OTHER_USER_ID, TEST_ANOTHER_USER_ID)
+fun createVisitedFollowingIds() = listOf(TEST_USER_ID, TEST_OTHER_USER_ID)
+
+fun createFollowerFcmTokenList() = listOf(TEST_FCM_TOKEN)

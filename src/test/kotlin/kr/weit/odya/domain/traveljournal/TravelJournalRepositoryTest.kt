@@ -144,7 +144,7 @@ class TravelJournalRepositoryTest(
             }
         }
 
-        context("여행 일지 사용자 Id로 조회") {
+        context("여행 일지 사용자 ID로 조회") {
             expect("유저 ID와 일치하는 여행기록을 조회한다.") {
                 val result = travelJournalRepository.getByUserId(user.id)
                 result.size shouldBe 3

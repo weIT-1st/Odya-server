@@ -155,14 +155,14 @@ operation::auth-controller-test/validate-phone-number-fail-exist-nickname[snippe
 
 === *8-1 성공*
 
-operation::auth-controller-test/terms-list-success[snippets='http-request,http-response']
+operation::auth-controller-test/terms-list-success[snippets='http-request,response-fields,http-response']
 
 [[약관내용조회API]]
 == *9. 약관 내용 조회 API*
 
 === *9-1 성공*
 
-operation::auth-controller-test/terms-get-success[snippets='http-request,path-parameters,http-response']
+operation::auth-controller-test/terms-get-success[snippets='http-request,path-parameters,response-fields,http-response']
 
 === *9-2 실패 - 양수가 아닌 약관 ID*
 

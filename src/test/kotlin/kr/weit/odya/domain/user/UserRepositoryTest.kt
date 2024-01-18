@@ -18,6 +18,7 @@ class UserRepositoryTest(
     {
         lateinit var user: User
         lateinit var otherUser: User
+
         beforeEach {
             user = userRepository.save(createUser().apply { changeFcmToken(TEST_FCM_TOKEN) })
             otherUser = userRepository.save(createOtherUser())

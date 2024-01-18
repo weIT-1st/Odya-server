@@ -66,8 +66,7 @@ class TravelJournalController(private val travelJournalService: TravelJournalSer
     @GetMapping("/{travelJournalId}")
     fun getTravelJournal(
         @Positive(message = "travelJournalId는 0보다 커야합니다.")
-        @PathVariable("travelJournalId")
-        travelJournalId: Long,
+        @PathVariable("travelJournalId") travelJournalId: Long,
         @LoginUserId userId: Long,
     ): ResponseEntity<TravelJournalResponse> {
         val response = travelJournalService.getTravelJournal(travelJournalId, userId)
@@ -163,8 +162,7 @@ class TravelJournalController(private val travelJournalService: TravelJournalSer
     @PutMapping(path = ["/{travelJournalId}"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun updateTravelJournal(
         @Positive(message = "travelJournalId는 0보다 커야합니다.")
-        @PathVariable("travelJournalId")
-        travelJournalId: Long,
+        @PathVariable("travelJournalId") travelJournalId: Long,
         @LoginUserId userId: Long,
         @Valid
         @RequestPart("travel-journal-update")
@@ -180,11 +178,9 @@ class TravelJournalController(private val travelJournalService: TravelJournalSer
     )
     fun updateTravelJournalContent(
         @Positive(message = "travelJournalId는 0보다 커야합니다.")
-        @PathVariable("travelJournalId")
-        travelJournalId: Long,
+        @PathVariable("travelJournalId") travelJournalId: Long,
         @Positive(message = "travelJournalContentId는 0보다 커야합니다.")
-        @PathVariable("travelJournalContentId")
-        travelJournalContentId: Long,
+        @PathVariable("travelJournalContentId") travelJournalContentId: Long,
         @LoginUserId userId: Long,
         @Valid
         @RequestPart("travel-journal-content-update")
@@ -279,8 +275,7 @@ class TravelJournalController(private val travelJournalService: TravelJournalSer
     @DeleteMapping("/{travelJournalId}")
     fun deleteTravelJournal(
         @Positive(message = "travelJournalId는 1보다 커야합니다.")
-        @PathVariable("travelJournalId")
-        travelJournalId: Long,
+        @PathVariable("travelJournalId") travelJournalId: Long,
         @LoginUserId userId: Long,
     ): ResponseEntity<Void> {
         travelJournalService.deleteTravelJournal(travelJournalId, userId)
@@ -290,11 +285,9 @@ class TravelJournalController(private val travelJournalService: TravelJournalSer
     @DeleteMapping("/{travelJournalId}/{travelJournalContentId}")
     fun deleteTravelJournalContent(
         @Positive(message = "travelJournalId는 0보다 커야합니다.")
-        @PathVariable("travelJournalId")
-        travelJournalId: Long,
+        @PathVariable("travelJournalId") travelJournalId: Long,
         @Positive(message = "travelJournalContentId는 0보다 커야합니다.")
-        @PathVariable("travelJournalContentId")
-        travelJournalContentId: Long,
+        @PathVariable("travelJournalContentId") travelJournalContentId: Long,
         @LoginUserId userId: Long,
     ): ResponseEntity<Void> {
         travelJournalService.deleteTravelJournalContent(travelJournalId, travelJournalContentId, userId)

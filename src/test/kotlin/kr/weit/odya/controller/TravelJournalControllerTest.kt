@@ -2066,6 +2066,10 @@ class TravelJournalControllerTest(
                 val placeDetailsMap = createPlaceDetailsMap()
                 every { travelJournalService.getPlaceDetailsMap(any()) } returns placeDetailsMap
                 every { travelJournalService.getImageMap(any<List<MultipartFile>>()) } returns mockk<Map<String, MultipartFile>>()
+                every { travelJournalService.validateTravelJournalContentUpdateRequest(TEST_TRAVEL_JOURNAL_ID, TEST_TRAVEL_JOURNAL_CONTENT_ID, TEST_USER_ID, any<Map<String, MultipartFile>>(), any<TravelJournalContentUpdateRequest>()) } just runs
+                every { travelJournalService.uploadTravelContentImages(any<List<String>>(), any<Map<String, MultipartFile>>()) } returns mockk<List<Pair<String, String>>>()
+                every { travelJournalService.updateTravelJournalContent(TEST_TRAVEL_JOURNAL_ID, TEST_TRAVEL_JOURNAL_CONTENT_ID, TEST_USER_ID, any<TravelJournalContentUpdateRequest>(), any<List<Pair<String, String>>>(), any<Map<String, PlaceDetails>>()) } just runs
+                every { travelJournalService.getPlaceDetailsMap(any()) } returns createPlaceDetailsMap()
                 every {
                     travelJournalService.validateTravelJournalContentUpdateRequest(
                         TEST_TRAVEL_JOURNAL_ID,
