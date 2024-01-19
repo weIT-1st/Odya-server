@@ -7,6 +7,7 @@ import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
 import kr.weit.odya.domain.favoritePlace.FavoritePlaceRepository
 import kr.weit.odya.domain.favoritePlace.getByFavoritePlaceId
 import kr.weit.odya.domain.favoritePlace.getByFavoritePlaceList
@@ -46,21 +47,33 @@ class FavoritePlaceServiceTest : DescribeSpec(
             context("가입되어 있지 않은 USERID이 주어지는 경우") {
                 every { userRepository.getByUserId(TEST_USER_ID) } throws NoSuchElementException()
                 it("[NoSuchElementException] 예외가 발생한다") {
-                    shouldThrow<NoSuchElementException> { sut.createFavoritePlace(TEST_USER_ID, createFavoritePlaceRequest()) }
+                    shouldThrow<NoSuchElementException> {
+                        sut.createFavoritePlace(
+                            TEST_USER_ID,
+                            createFavoritePlaceRequest(),
+                        )
+                    }
                 }
             }
 
             context("이미 관심 장소인 경우") {
                 every { favoritePlaceRepository.existsByUserIdAndPlaceId(TEST_USER_ID, TEST_PLACE_ID) } returns true
                 it("[ExistResourceException] 예외가 발생한다") {
-                    shouldThrow<ExistResourceException> { sut.createFavoritePlace(TEST_USER_ID, createFavoritePlaceRequest()) }
+                    shouldThrow<ExistResourceException> {
+                        sut.createFavoritePlace(
+                            TEST_USER_ID,
+                            createFavoritePlaceRequest(),
+                        )
+                    }
                 }
             }
         }
 
         describe("deleteFavoritePlace 메소드") {
             context("유효한 USERID와 관심장소ID가 전달되면") {
-                every { favoritePlaceRepository.getByFavoritePlaceId(TEST_FAVORITE_PLACE_ID) } returns createFavoritePlace(user)
+                every { favoritePlaceRepository.getByFavoritePlaceId(TEST_FAVORITE_PLACE_ID) } returns createFavoritePlace(
+                    user,
+                )
                 every { favoritePlaceRepository.delete(any()) } just Runs
                 it("관심 장소를 해제한다.") {
                     shouldNotThrowAny { sut.deleteFavoritePlace(TEST_USER_ID, TEST_FAVORITE_PLACE_ID) }
@@ -70,7 +83,21 @@ class FavoritePlaceServiceTest : DescribeSpec(
             context("등록된 관심 장소가 아닌 경우") {
                 every { favoritePlaceRepository.getByFavoritePlaceId(TEST_FAVORITE_PLACE_ID) } throws NoSuchElementException()
                 it("[NoSuchElementException] 예외가 발생한다") {
-                    shouldThrow<NoSuchElementException> { sut.deleteFavoritePlace(TEST_USER_ID, TEST_FAVORITE_PLACE_ID) }
+                    shouldThrow<NoSuchElementException> {
+                        sut.deleteFavoritePlace(
+                            TEST_USER_ID,
+                            TEST_FAVORITE_PLACE_ID,
+                        )
+                    }
+                }
+            }
+        }
+
+        describe("deleteFavoritePlaceByPlaceId 메소드") {
+            context("유효한 USERID와 관심장소ID가 전달되면") {
+                every { favoritePlaceRepository.deleteByPlaceIdAndUserId(TEST_PLACE_ID, TEST_USER_ID) } just runs
+                it("관심 장소를 해제한다.") {
+                    shouldNotThrowAny { sut.deleteFavoritePlaceByPlaceId(TEST_USER_ID, TEST_PLACE_ID) }
                 }
             }
         }
@@ -97,7 +124,12 @@ class FavoritePlaceServiceTest : DescribeSpec(
             context("유효한 USERID와 size,sortType,lastId가 전달되면") {
                 every { userRepository.getByUserId(TEST_USER_ID) } returns user
                 every {
-                    favoritePlaceRepository.getByFavoritePlaceList(user, TEST_DEFAULT_SIZE, TEST_FAVORITE_PLACE_SORT_TYPE, TEST_LAST_ID)
+                    favoritePlaceRepository.getByFavoritePlaceList(
+                        user,
+                        TEST_DEFAULT_SIZE,
+                        TEST_FAVORITE_PLACE_SORT_TYPE,
+                        TEST_LAST_ID,
+                    )
                 } returns createFavoritePlaceList()
                 it("관심 장소 목록을 출력한다.") {
                     shouldNotThrowAny {
@@ -115,7 +147,12 @@ class FavoritePlaceServiceTest : DescribeSpec(
                 every { userRepository.getByUserId(TEST_NOT_EXIST_USER_ID) } throws NoSuchElementException()
                 it("NoSuchElementException 예외가 발생한다.") {
                     shouldThrow<NoSuchElementException> {
-                        sut.getMyFavoritePlaceList(TEST_NOT_EXIST_USER_ID, TEST_DEFAULT_SIZE, TEST_FAVORITE_PLACE_SORT_TYPE, TEST_LAST_ID)
+                        sut.getMyFavoritePlaceList(
+                            TEST_NOT_EXIST_USER_ID,
+                            TEST_DEFAULT_SIZE,
+                            TEST_FAVORITE_PLACE_SORT_TYPE,
+                            TEST_LAST_ID,
+                        )
                     }
                 }
             }
@@ -125,9 +162,19 @@ class FavoritePlaceServiceTest : DescribeSpec(
             context("유효한 USERID와 size,sortType,lastId가 전달되면") {
                 every { userRepository.getByUserId(TEST_USER_ID) } returns user
                 every {
-                    favoritePlaceRepository.getByFavoritePlaceList(user, TEST_DEFAULT_SIZE, TEST_FAVORITE_PLACE_SORT_TYPE, TEST_LAST_ID)
+                    favoritePlaceRepository.getByFavoritePlaceList(
+                        user,
+                        TEST_DEFAULT_SIZE,
+                        TEST_FAVORITE_PLACE_SORT_TYPE,
+                        TEST_LAST_ID,
+                    )
                 } returns createFavoritePlaceList()
-                every { favoritePlaceRepository.existsByUserIdAndPlaceId(TEST_OTHER_USER_ID, TEST_PLACE_ID) } returns true
+                every {
+                    favoritePlaceRepository.existsByUserIdAndPlaceId(
+                        TEST_OTHER_USER_ID,
+                        TEST_PLACE_ID,
+                    )
+                } returns true
                 it("관심 장소 목록을 출력한다.") {
                     shouldNotThrowAny {
                         sut.getFavoritePlaceList(

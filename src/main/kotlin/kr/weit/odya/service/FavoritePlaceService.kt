@@ -14,7 +14,10 @@ import kr.weit.odya.service.dto.SliceFavoritePlaceResponse
 import org.springframework.stereotype.Service
 
 @Service
-class FavoritePlaceService(private val favoritePlaceRepository: FavoritePlaceRepository, private val userRepository: UserRepository) {
+class FavoritePlaceService(
+    private val favoritePlaceRepository: FavoritePlaceRepository,
+    private val userRepository: UserRepository,
+) {
     @Transactional
     fun createFavoritePlace(
         userId: Long,
@@ -36,6 +39,11 @@ class FavoritePlaceService(private val favoritePlaceRepository: FavoritePlaceRep
                 require(favoritePlace.registrantsId == userId) { throw ForbiddenException("관심 장소를 삭제할 권한이 없습니다.") }
             },
         )
+    }
+
+    @Transactional
+    fun deleteFavoritePlaceByPlaceId(userId: Long, placeId: String) {
+        favoritePlaceRepository.deleteByPlaceIdAndUserId(placeId, userId)
     }
 
     fun getFavoritePlace(

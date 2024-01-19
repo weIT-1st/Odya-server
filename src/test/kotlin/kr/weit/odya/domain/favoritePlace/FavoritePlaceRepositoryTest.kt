@@ -51,7 +51,12 @@ class FavoritePlaceRepositoryTest(
 
         context("관심 장소 목록") {
             expect("userId가 일치하는 관심 장소 목록을 조회한다") {
-                val result = favoritePlaceRepository.getByFavoritePlaceList(user, TEST_DEFAULT_SIZE, TEST_FAVORITE_PLACE_SORT_TYPE, otherFavoritePlace.id)
+                val result = favoritePlaceRepository.getByFavoritePlaceList(
+                    user,
+                    TEST_DEFAULT_SIZE,
+                    TEST_FAVORITE_PLACE_SORT_TYPE,
+                    otherFavoritePlace.id,
+                )
                 result.size shouldBe 1
                 result.first() shouldBe favoritePlace
             }
@@ -59,7 +64,8 @@ class FavoritePlaceRepositoryTest(
 
         context("관심 장소 목록 (lastId가 null인 경우)") {
             expect("userId가 일치하는 관심 장소 목록을 조회한다") {
-                val result = favoritePlaceRepository.getByFavoritePlaceList(user, TEST_SIZE, TEST_FAVORITE_PLACE_SORT_TYPE, null)
+                val result =
+                    favoritePlaceRepository.getByFavoritePlaceList(user, TEST_SIZE, TEST_FAVORITE_PLACE_SORT_TYPE, null)
                 result.size shouldBe TEST_SIZE + 1
                 result.first() shouldBe otherFavoritePlace
             }
@@ -67,7 +73,7 @@ class FavoritePlaceRepositoryTest(
 
         context("관심 장소 삭제") {
             expect("user와 placeId가 일치하는 관심 장소를 삭제한다") {
-                favoritePlaceRepository.delete(favoritePlace)
+                favoritePlaceRepository.deleteByPlaceIdAndUserId(TEST_PLACE_ID, user.id)
                 favoritePlaceRepository.existsByUserIdAndPlaceId(user.id, TEST_PLACE_ID) shouldBe false
             }
         }
