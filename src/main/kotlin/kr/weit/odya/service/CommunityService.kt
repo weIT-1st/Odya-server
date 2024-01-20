@@ -27,6 +27,7 @@ import kr.weit.odya.domain.contentimage.ContentImage
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowerFcmTokens
 import kr.weit.odya.domain.follow.getFollowingIds
+import kr.weit.odya.domain.profilecolor.NONE_PROFILE_COLOR_HEX
 import kr.weit.odya.domain.report.ReportCommunityRepository
 import kr.weit.odya.domain.report.deleteAllByUserId
 import kr.weit.odya.domain.topic.TopicRepository
@@ -47,6 +48,7 @@ import kr.weit.odya.service.dto.CommunityUpdateRequest
 import kr.weit.odya.service.dto.CommunityWithCommentsResponse
 import kr.weit.odya.service.dto.SliceResponse
 import kr.weit.odya.service.dto.TravelJournalSimpleResponse
+import kr.weit.odya.service.dto.UserProfileResponse
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -391,6 +393,13 @@ class CommunityService(
                 body = "${user.nickname}님이 피드를 작성했어요!",
                 tokens = fcmTokens,
                 userName = user.nickname,
+                userProfileUrl = fileService.getPreAuthenticatedObjectUrl(user.profile.profileName),
+                userProfileColor = if (user.profile.profileColor.colorHex != NONE_PROFILE_COLOR_HEX) {
+                    UserProfileResponse.ProfileColorResponse(user.profile.profileColor)
+                } else {
+                    null
+                },
+                contentImage = fileService.getPreAuthenticatedObjectUrl(community.communityContentImages[0].contentImage.name),
                 eventType = NotificationEventType.FOLLOWING_COMMUNITY,
                 communityId = community.id,
             ),
