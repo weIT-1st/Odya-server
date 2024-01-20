@@ -125,6 +125,7 @@ class TravelJournalServiceTest : DescribeSpec(
                 every { travelJournalRepository.save(any<TravelJournal>()) } returns TEST_TRAVEL_JOURNAL
                 every { followRepository.findFollowerFcmTokenByFollowingId(TEST_USER_ID) } returns createFollowerFcmTokenList()
                 every { applicationEventPublisher.publishEvent(any<PushNotificationEvent>()) } just runs
+                every {fileService.getPreAuthenticatedObjectUrl(any())} returns TEST_FILE_AUTHENTICATED_URL
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalService.createTravelJournal(
@@ -150,6 +151,7 @@ class TravelJournalServiceTest : DescribeSpec(
                 every { travelJournalRepository.save(any<TravelJournal>()) } returns TEST_TRAVEL_JOURNAL
                 every { followRepository.findFollowerFcmTokenByFollowingId(TEST_USER_ID) } returns createFollowerFcmTokenList()
                 every { applicationEventPublisher.publishEvent(any<PushNotificationEvent>()) } just runs
+                every {fileService.getPreAuthenticatedObjectUrl(any())} returns TEST_FILE_AUTHENTICATED_URL
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         travelJournalService.createTravelJournal(

@@ -11,6 +11,7 @@ import kr.weit.odya.domain.contentimage.ContentImageRepository
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowerFcmTokens
 import kr.weit.odya.domain.follow.getFollowingIds
+import kr.weit.odya.domain.profilecolor.NONE_PROFILE_COLOR_HEX
 import kr.weit.odya.domain.report.ReportTravelJournalRepository
 import kr.weit.odya.domain.report.deleteAllByUserId
 import kr.weit.odya.domain.representativetraveljournal.RepresentativeTravelJournalRepository
@@ -52,6 +53,7 @@ import kr.weit.odya.service.dto.TravelJournalResponse
 import kr.weit.odya.service.dto.TravelJournalSummaryResponse
 import kr.weit.odya.service.dto.TravelJournalUpdateRequest
 import kr.weit.odya.service.dto.TravelJournalVisibilityUpdateRequest
+import kr.weit.odya.service.dto.UserProfileResponse
 import kr.weit.odya.service.dto.UserSimpleResponse
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
@@ -643,6 +645,14 @@ class TravelJournalService(
         user: User,
         travelJournal: TravelJournal,
     ) {
+        val userProfileUrl = fileService.getPreAuthenticatedObjectUrl(user.profile.profileName)
+        val userProfileColor = if (user.profile.profileColor.colorHex != NONE_PROFILE_COLOR_HEX) {
+            UserProfileResponse.ProfileColorResponse(user.profile.profileColor)
+        } else {
+            null
+        }
+        val contentImage = fileService.getPreAuthenticatedObjectUrl(travelJournal.travelJournalContents[0].travelJournalContentImages[0].contentImage.name)
+
         // 같이간 친구에게 알림
         eventPublisher.publishEvent(
             travelJournal.travelCompanions.mapNotNull { travelCompanion ->
@@ -653,6 +663,9 @@ class TravelJournalService(
                     body = "${user.nickname}님이 여행 일지에 같이간 친구로 등록했어요!",
                     tokens = fcmTokens,
                     userName = user.nickname,
+                    userProfileUrl = userProfileUrl,
+                    userProfileColor = userProfileColor,
+                    contentImage = contentImage,
                     eventType = NotificationEventType.TRAVEL_JOURNAL_TAG,
                     travelJournalId = travelJournal.id,
                 )
@@ -666,6 +679,9 @@ class TravelJournalService(
                 body = "${user.nickname}님이 여행 일지를 작성했어요!",
                 tokens = followRepository.getFollowerFcmTokens(user.id),
                 userName = user.nickname,
+                userProfileUrl = userProfileUrl,
+                userProfileColor = userProfileColor,
+                contentImage = contentImage,
                 eventType = NotificationEventType.FOLLOWING_TRAVEL_JOURNAL,
                 travelJournalId = travelJournal.id,
             ),

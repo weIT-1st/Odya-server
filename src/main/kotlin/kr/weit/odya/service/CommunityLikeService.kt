@@ -8,9 +8,11 @@ import kr.weit.odya.domain.community.getByCommunityId
 import kr.weit.odya.domain.communitylike.CommunityLike
 import kr.weit.odya.domain.communitylike.CommunityLikeId
 import kr.weit.odya.domain.communitylike.CommunityLikeRepository
+import kr.weit.odya.domain.profilecolor.NONE_PROFILE_COLOR_HEX
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
+import kr.weit.odya.service.dto.UserProfileResponse
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -21,6 +23,7 @@ class CommunityLikeService(
     private val communityRepository: CommunityRepository,
     private val userRepository: UserRepository,
     private val eventPublisher: ApplicationEventPublisher,
+    private val fileService: FileService,
 ) {
     @Transactional
     fun increaseCommunityLikeCount(communityId: Long, userId: Long) {
@@ -55,6 +58,13 @@ class CommunityLikeService(
                 body = "${likeUser.nickname}님께 오댜를 받았습니다",
                 tokens = listOf(token),
                 userName = likeUser.nickname,
+                userProfileUrl = fileService.getPreAuthenticatedObjectUrl(likeUser.profile.profileName),
+                userProfileColor = if (likeUser.profile.profileColor.colorHex != NONE_PROFILE_COLOR_HEX) {
+                    UserProfileResponse.ProfileColorResponse(likeUser.profile.profileColor)
+                } else {
+                    null
+                },
+                contentImage = fileService.getPreAuthenticatedObjectUrl(community.communityContentImages[0].contentImage.name),
                 eventType = NotificationEventType.COMMUNITY_LIKE,
                 communityId = community.id,
             ),
