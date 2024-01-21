@@ -12,6 +12,7 @@ import kr.weit.odya.domain.follow.getFollowingIds
 import kr.weit.odya.domain.follow.getFollowingListBySearchCond
 import kr.weit.odya.domain.follow.getMayKnowFollowings
 import kr.weit.odya.domain.follow.getVisitedFollowingIds
+import kr.weit.odya.domain.profilecolor.NONE_PROFILE_COLOR_HEX
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.UsersDocumentRepository
@@ -22,6 +23,7 @@ import kr.weit.odya.service.dto.FollowCountsResponse
 import kr.weit.odya.service.dto.FollowRequest
 import kr.weit.odya.service.dto.FollowUserResponse
 import kr.weit.odya.service.dto.SliceResponse
+import kr.weit.odya.service.dto.UserProfileResponse
 import kr.weit.odya.service.dto.VisitedFollowingResponse
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Pageable
@@ -58,6 +60,12 @@ class FollowService(
                 body = "${follower.nickname}님이 회원님을 팔로우했습니다",
                 tokens = listOf(token),
                 userName = follower.nickname,
+                userProfileUrl = fileService.getPreAuthenticatedObjectUrl(follower.profile.profileName),
+                userProfileColor = if (follower.profile.profileColor.colorHex != NONE_PROFILE_COLOR_HEX) {
+                    UserProfileResponse.ProfileColorResponse(follower.profile.profileColor)
+                } else {
+                    null
+                },
                 eventType = NotificationEventType.FOLLOWER_ADD,
                 followerId = follower.id,
             ),

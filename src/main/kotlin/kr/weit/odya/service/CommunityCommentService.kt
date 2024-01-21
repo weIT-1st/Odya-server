@@ -12,12 +12,14 @@ import kr.weit.odya.domain.communitycomment.getCommunityCommentBy
 import kr.weit.odya.domain.communitycomment.getSliceCommunityCommentBy
 import kr.weit.odya.domain.follow.FollowRepository
 import kr.weit.odya.domain.follow.getFollowingIds
+import kr.weit.odya.domain.profilecolor.NONE_PROFILE_COLOR_HEX
 import kr.weit.odya.domain.user.User
 import kr.weit.odya.domain.user.UserRepository
 import kr.weit.odya.domain.user.getByUserId
 import kr.weit.odya.service.dto.CommunityCommentRequest
 import kr.weit.odya.service.dto.CommunityCommentResponse
 import kr.weit.odya.service.dto.SliceResponse
+import kr.weit.odya.service.dto.UserProfileResponse
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -98,6 +100,13 @@ class CommunityCommentService(
                 body = "${commentWriter.nickname}님이 댓글을 남겼습니다 : ${communityComment.content}",
                 tokens = listOf(token),
                 userName = commentWriter.nickname,
+                userProfileUrl = fileService.getPreAuthenticatedObjectUrl(commentWriter.profile.profileName),
+                userProfileColor = if (commentWriter.profile.profileColor.colorHex != NONE_PROFILE_COLOR_HEX) {
+                    UserProfileResponse.ProfileColorResponse(commentWriter.profile.profileColor)
+                } else {
+                    null
+                },
+                contentImage = fileService.getPreAuthenticatedObjectUrl(community.communityContentImages[0].contentImage.name) ,
                 eventType = NotificationEventType.COMMUNITY_COMMENT,
                 communityId = community.id,
                 content = communityComment.content,

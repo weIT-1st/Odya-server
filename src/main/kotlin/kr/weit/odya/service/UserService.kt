@@ -138,10 +138,10 @@ class UserService(
 
     @Transactional
     fun updateFcmToken(userId: Long, fcmTokenRequest: FCMTokenRequest) {
-        val user = userRepository.getByUserId(userId)
-        user.changeFcmToken(fcmTokenRequest.fcmToken)
         // FCM토큰이 충돌나는 경우 기존 유저의 토큰을 무효화 한다
         userRepository.findByFcmToken(fcmTokenRequest.fcmToken)?.changeFcmToken(null)
+        val user = userRepository.getByUserId(userId)
+        user.changeFcmToken(fcmTokenRequest.fcmToken)
     }
 
     @Transactional
