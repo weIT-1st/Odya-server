@@ -548,7 +548,7 @@ class TravelJournalService(
                 if (travelCompanion.user != null) {
                     TravelCompanionSimpleResponse(
                         travelCompanion.user!!.username,
-                        fileService.getPreAuthenticatedObjectUrl(it.user.profile.profileName),
+                        fileService.getPreAuthenticatedObjectUrl(travelCompanion.user!!.profile.profileName),
                     )
                 } else {
                     TravelCompanionSimpleResponse(travelCompanion.username, null)
@@ -651,7 +651,8 @@ class TravelJournalService(
         } else {
             null
         }
-        val contentImage = fileService.getPreAuthenticatedObjectUrl(travelJournal.travelJournalContents[0].travelJournalContentImages[0].contentImage.name)
+        val contentImage =
+            fileService.getPreAuthenticatedObjectUrl(travelJournal.travelJournalContents[0].travelJournalContentImages[0].contentImage.name)
 
         // 같이간 친구에게 알림
         eventPublisher.publishEvent(
