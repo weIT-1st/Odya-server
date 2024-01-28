@@ -18,7 +18,7 @@ data class PushNotificationEvent(
         userProfileUrl: String,
         userProfileColor: UserProfileResponse.ProfileColorResponse?,
         eventType: NotificationEventType,
-        contentImage:String?=null,
+        contentImage: String? = null,
         communityId: Long? = null,
         travelJournalId: Long? = null,
         content: String? = null,
@@ -33,7 +33,7 @@ data class PushNotificationEvent(
             "userProfileUrl" to userProfileUrl,
             "notifiedAt" to LocalDateTime.now().format(dateTimeFormatter),
         ).apply {
-            userProfileColor?.let {profileColor->
+            userProfileColor?.let { profileColor ->
                 put("profileColorHex", profileColor.colorHex)
                 put("profileColorRed", profileColor.red.toString())
                 put("profileColorGreen", profileColor.green.toString())
@@ -47,9 +47,9 @@ data class PushNotificationEvent(
         },
     )
 
-    companion object{
+    companion object {
         // 멀티쓰레드 환경에서 안전하지 않은 SimpleDateFormat 대신 사용
-       private val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        private val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
     }
 }
 

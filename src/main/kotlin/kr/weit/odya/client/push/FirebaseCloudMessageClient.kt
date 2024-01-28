@@ -22,7 +22,7 @@ class FirebaseCloudMessageClient(
                     .build(),
             )
             .apply {
-                    putAllData(event.data)
+                putAllData(event.data)
             }
             .addAllTokens(event.tokens)
             .build()

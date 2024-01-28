@@ -29,7 +29,13 @@ class CommunityLikeServiceTest : DescribeSpec(
         val eventPublisher = mockk<ApplicationEventPublisher>()
         val fileService = mockk<FileService>()
         val communityLikeService =
-            CommunityLikeService(communityLikeRepository, communityRepository, userRepository, eventPublisher,fileService)
+            CommunityLikeService(
+                communityLikeRepository,
+                communityRepository,
+                userRepository,
+                eventPublisher,
+                fileService,
+            )
 
         describe("increaseCommunityLikeCount") {
             context("유효한 요청이 주어지는 경우") {

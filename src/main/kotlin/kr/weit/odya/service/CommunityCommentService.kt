@@ -49,7 +49,12 @@ class CommunityCommentService(
     }
 
     @Transactional(readOnly = true)
-    fun getCommunityComments(userId: Long, communityId: Long, size: Int, lastId: Long?): SliceResponse<CommunityCommentResponse> {
+    fun getCommunityComments(
+        userId: Long,
+        communityId: Long,
+        size: Int,
+        lastId: Long?,
+    ): SliceResponse<CommunityCommentResponse> {
         val followingIdList = followRepository.getFollowingIds(userId)
         val communityCommentResponses =
             communityCommentRepository.getSliceCommunityCommentBy(communityId, size, lastId).map {
@@ -106,7 +111,7 @@ class CommunityCommentService(
                 } else {
                     null
                 },
-                contentImage = fileService.getPreAuthenticatedObjectUrl(community.communityContentImages[0].contentImage.name) ,
+                contentImage = fileService.getPreAuthenticatedObjectUrl(community.communityContentImages[0].contentImage.name),
                 eventType = NotificationEventType.COMMUNITY_COMMENT,
                 communityId = community.id,
                 content = communityComment.content,
