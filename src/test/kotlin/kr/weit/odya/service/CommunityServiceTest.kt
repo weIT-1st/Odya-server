@@ -120,7 +120,7 @@ class CommunityServiceTest : DescribeSpec(
                 every { followRepository.findFollowerFcmTokenByFollowingId(TEST_USER_ID) } returns createFollowerFcmTokenList()
                 every { applicationEventPublisher.publishEvent(any<PushNotificationEvent>()) } just runs
                 every { googleMapsClient.findPlaceDetailsByPlaceId(any()) } returns createPlaceDetails()
-                every {fileService.getPreAuthenticatedObjectUrl(any())} returns TEST_FILE_AUTHENTICATED_URL
+                every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         communityService.createCommunity(
@@ -164,7 +164,7 @@ class CommunityServiceTest : DescribeSpec(
                 every { communityRepository.save(any<Community>()) } returns createCommunity()
                 every { followRepository.findFollowerFcmTokenByFollowingId(TEST_USER_ID) } returns createFollowerFcmTokenList()
                 every { applicationEventPublisher.publishEvent(any<PushNotificationEvent>()) } just runs
-                every {fileService.getPreAuthenticatedObjectUrl(any())} returns TEST_FILE_AUTHENTICATED_URL
+                every { fileService.getPreAuthenticatedObjectUrl(any()) } returns TEST_FILE_AUTHENTICATED_URL
                 it("정상적으로 종료한다") {
                     shouldNotThrowAny {
                         communityService.createCommunity(
