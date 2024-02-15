@@ -5,6 +5,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 data class PushNotificationEvent(
+    val title: String,
+    val body: String,
     val tokens: List<String>,
     val data: Map<String, String>,
 ) {
@@ -22,6 +24,8 @@ data class PushNotificationEvent(
         content: String? = null,
         followerId: Long? = null,
     ) : this(
+        title = title,
+        body = body,
         tokens = tokens,
         data = mutableMapOf(
             "title" to title,
