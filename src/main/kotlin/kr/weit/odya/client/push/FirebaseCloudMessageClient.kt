@@ -19,7 +19,7 @@ class FirebaseCloudMessageClient(
         val apnsConfig =
             ApnsConfig.builder().setAps(
                 Aps.builder()
-                    .setContentAvailable(true)
+                    .setMutableContent(true)
                     .setAlert(
                         ApsAlert
                             .builder()
