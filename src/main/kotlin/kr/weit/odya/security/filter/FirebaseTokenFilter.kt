@@ -16,7 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.filter.OncePerRequestFilter
 
 val FIREBASE_TOKEN_FILTER_PERMITTED_PATTERNS: List<String> =
-    listOf("/api/v1/auth/**", "/ready", "/health", "/docs/index.html")
+    listOf("/api/v1/auth/**", "/ready", "/health","/actuator/prometheus", "/docs/index.html")
 
 data class TokenInvalidErrorResponse(
     val code: Int = ErrorCode.INVALID_FIREBASE_ID_TOKEN.code,

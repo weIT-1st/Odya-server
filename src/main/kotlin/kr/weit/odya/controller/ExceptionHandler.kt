@@ -10,6 +10,7 @@ import kr.weit.odya.security.FirebaseAuthException
 import kr.weit.odya.service.OdyaException
 import kr.weit.odya.service.dto.ErrorResponse
 import kr.weit.odya.support.exception.ErrorCode
+import kr.weit.odya.support.log.TraceManager
 import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException
 import org.apache.tomcat.util.http.fileupload.impl.SizeException
 import org.apache.tomcat.util.http.fileupload.impl.SizeLimitExceededException
@@ -30,14 +31,16 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
 @RestControllerAdvice
-class ExceptionHandler : ResponseEntityExceptionHandler() {
+class ExceptionHandler(
+    private val traceManager: TraceManager,
+) : ResponseEntityExceptionHandler() {
     override fun handleMethodArgumentNotValid(
         ex: MethodArgumentNotValidException,
         headers: HttpHeaders,
         status: HttpStatusCode,
         request: WebRequest,
     ): ResponseEntity<Any>? {
-        logger.error("[MethodArgumentNotValidException] ${ex.messages()}")
+        traceManager.doErrorLog(ex)
         return getInvalidRequestResponse(ex.messages().joinToString())
     }
 
@@ -47,7 +50,6 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         status: HttpStatusCode,
         request: WebRequest,
     ): ResponseEntity<Any>? {
-        logger.error("[HttpMessageNotReadableException] ${ex.message}")
         val errorMessage = when (val cause = ex.cause) {
             is InvalidFormatException -> "${cause.path.joinToString(separator = ".") { it?.fieldName.orEmpty() }}: ${ex.message}"
             is MismatchedInputException -> {
@@ -55,6 +57,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
             }
             else -> "유효하지 않은 요청입니다"
         }
+        traceManager.doErrorLog(ex)
         return getInvalidRequestResponse(errorMessage)
     }
 
@@ -64,7 +67,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         status: HttpStatusCode,
         request: WebRequest,
     ): ResponseEntity<Any>? {
-        logger.error("[HttpRequestMethodNotSupportedException] ${ex.message}")
+        traceManager.doErrorLog(ex)
         return getInvalidRequestResponse(ex.message)
     }
 
@@ -74,7 +77,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         status: HttpStatusCode,
         request: WebRequest,
     ): ResponseEntity<Any>? {
-        logger.error("[MissingServletRequestPart] ${ex.message}")
+        traceManager.doErrorLog(ex)
         return getInvalidRequestResponse(ex.message)
     }
 
@@ -84,7 +87,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         status: HttpStatusCode,
         request: WebRequest,
     ): ResponseEntity<Any>? {
-        logger.error("[MissingServletRequestParameter] ${ex.message}")
+        traceManager.doErrorLog(ex)
         return getInvalidRequestResponse(ex.message)
     }
 
@@ -94,7 +97,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         status: HttpStatusCode,
         request: WebRequest,
     ): ResponseEntity<Any>? {
-        logger.error("[MissingPathVariable] ${ex.message}")
+        traceManager.doErrorLog(ex)
         return getInvalidRequestResponse(ex.message)
     }
 
@@ -104,7 +107,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         status: HttpStatusCode,
         request: WebRequest,
     ): ResponseEntity<Any>? {
-        logger.error("[HttpMediaTypeNotSupported] ${ex.message}")
+        traceManager.doErrorLog(ex)
         return getInvalidRequestResponse(ex.message, HttpStatus.UNSUPPORTED_MEDIA_TYPE)
     }
 
@@ -114,19 +117,19 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         ConstraintViolationException::class,
     )
     fun invalidRequestException(ex: RuntimeException): ResponseEntity<Any>? {
-        logger.error("[InvalidRequestException]", ex)
+        traceManager.doErrorLog(ex)
         return getInvalidRequestResponse(ex.message)
     }
 
     @ExceptionHandler(InvalidRequestException::class)
     fun invalidRequestException(ex: InvalidRequestException): ResponseEntity<Any>? {
-        logger.error("[InvalidRequestException]", ex)
+        traceManager.doErrorLog(ex)
         return getInvalidRequestResponse("유효하지 않은 placeId입니다.")
     }
 
     @ExceptionHandler(NoSuchElementException::class)
     fun noSuchElementException(ex: NoSuchElementException): ResponseEntity<ErrorResponse> {
-        logger.error("[NoSuchElementException]", ex)
+        traceManager.doErrorLog(ex)
         val noSuchElementErrorCode = ErrorCode.NO_SUCH_ELEMENT
         return ResponseEntity.status(noSuchElementErrorCode.httpStatus)
             .body(ErrorResponse.of(noSuchElementErrorCode, ex.message))
@@ -134,25 +137,25 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
 
     @ExceptionHandler(FirebaseAuthException::class)
     fun firebaseAuthException(ex: FirebaseAuthException): ResponseEntity<ErrorResponse> {
-        logger.error("[FirebaseAuthException]", ex)
+        traceManager.doErrorLog(ex)
         return ResponseEntity.status(ex.errorCode.httpStatus).body(ErrorResponse.of(ex.errorCode, ex.message))
     }
 
     @ExceptionHandler(OdyaException::class)
     fun odyaException(ex: OdyaException): ResponseEntity<ErrorResponse> {
-        logger.error("[OdyaException]", ex)
+        traceManager.doErrorLog(ex)
         return ResponseEntity.status(ex.errorCode.httpStatus).body(ErrorResponse.of(ex.errorCode, ex.message))
     }
 
     @ExceptionHandler(ClientException::class)
     fun clientException(ex: ClientException): ResponseEntity<ErrorResponse> {
-        logger.error("[ClientException]", ex)
+        traceManager.doErrorLog(ex)
         return ResponseEntity.status(ex.errorCode.httpStatus).body(ErrorResponse.of(ex.errorCode, ex.message))
     }
 
     @ExceptionHandler(ForbiddenException::class)
     fun forbiddenException(ex: ForbiddenException): ResponseEntity<ErrorResponse> {
-        logger.error("[ForbiddenException]", ex)
+        traceManager.doErrorLog(ex)
         val forbiddenErrorCode = ErrorCode.FORBIDDEN
         return ResponseEntity.status(forbiddenErrorCode.httpStatus)
             .body(ErrorResponse.of(forbiddenErrorCode, ex.message))
@@ -160,7 +163,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
 
     @ExceptionHandler(Exception::class)
     fun exception(ex: Exception): ResponseEntity<ErrorResponse> {
-        logger.error("[Exception]", ex)
+        traceManager.doErrorLog(ex)
         val internalServerErrorCode = ErrorCode.INTERNAL_SERVER_ERROR
         return ResponseEntity.status(internalServerErrorCode.httpStatus)
             .body(ErrorResponse.of(internalServerErrorCode, ex.message))
@@ -168,7 +171,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
 
     @ExceptionHandler(SizeLimitExceededException::class, FileSizeLimitExceededException::class)
     fun sizeLimitExceededException(ex: SizeException): ResponseEntity<ErrorResponse> {
-        logger.error("[SizeException]", ex)
+        traceManager.doErrorLog(ex)
         val payloadTooLargeErrorCode = ErrorCode.PAYLOAD_TOO_LARGE
         return ResponseEntity.status(payloadTooLargeErrorCode.httpStatus)
             .body(ErrorResponse.of(payloadTooLargeErrorCode, ex.message))
